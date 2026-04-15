@@ -1,4 +1,5 @@
 import React from 'react';
+
 import type { Weekday } from '../../types';
 
 /**
@@ -67,7 +68,7 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({
         <span className="time-day">第{nowday}天</span>
         <span className="time-weekday">{weekday}</span>
       </div>
-      
+
       {/* 时间进度条 */}
       <div className="time-progress">
         {Array.from({ length: onedaytime }, (_, index) => (

@@ -3,8 +3,8 @@
  * 提供技能伤害计算、战斗力加成等功能
  */
 
-import type { SkillDetail } from '../types';
 import { getFightingSpiritBonus, getSkillDamagePercent } from '../data/skillData';
+import type { SkillDetail } from '../types';
 
 /**
  * 计算技能伤害
@@ -20,15 +20,15 @@ export const calculateSkillDamage = (
 ): number[] => {
   const damages: number[] = [];
   const damagePercent = getSkillDamagePercent(skill);
-  
+
   // 多段攻击（如飞天连斩）
   if (skill.attackType === 'multi' && skill.effect.hitCount) {
     const hitCount = skill.effect.hitCount;
     const breakDefenseHits = skill.effect.breakDefenseHits || 0;
-    
+
     for (let i = 0; i < hitCount; i++) {
       const baseDamage = attackerAttack * (skill.effect.damagePercent || 0) / 100;
-      
+
       // 破防攻击无视防御
       if (i < breakDefenseHits) {
         damages.push(Math.floor(baseDamage));
@@ -38,23 +38,26 @@ export const calculateSkillDamage = (
         damages.push(Math.floor(damageAfterDefense));
       }
     }
+
     return damages;
   }
-  
+
   // 单体攻击
   if (skill.attackType === 'single') {
     const baseDamage = attackerAttack * damagePercent / 100;
     const damageAfterDefense = Math.max(1, baseDamage - defenderDefense * 0.3);
+
     return [Math.floor(damageAfterDefense)];
   }
-  
+
   // 群体攻击
   if (skill.attackType === 'aoe') {
     const baseDamage = attackerAttack * damagePercent / 100;
     const damageAfterDefense = Math.max(1, baseDamage - defenderDefense * 0.3);
+
     return [Math.floor(damageAfterDefense)];
   }
-  
+
   return [0];
 };
 
@@ -71,6 +74,7 @@ export const calculateTotalSkillDamage = (
   defenderDefense: number = 0
 ): number => {
   const damages = calculateSkillDamage(skill, attackerAttack, defenderDefense);
+
   return damages.reduce((sum, damage) => sum + damage, 0);
 };
 
@@ -84,6 +88,7 @@ export const getTotalBattlePowerBonus = (skills: SkillDetail[]): number => {
   if (fightingSpirit) {
     return getFightingSpiritBonus(fightingSpirit.level);
   }
+
   return 0;
 };
 
@@ -98,6 +103,7 @@ export const calculateActualBattlePower = (
   skills: SkillDetail[]
 ): number => {
   const bonus = getTotalBattlePowerBonus(skills);
+
   return Math.floor(baseBattlePower * (1 + bonus / 100));
 };
 
@@ -111,6 +117,7 @@ export const canUpgradeSkill = (skill: SkillDetail): boolean => {
   if (skill.skillIndex === 4) {
     return skill.level < 5;
   }
+
   // 其他技能只能升级到2级
   return skill.level < skill.maxLevel;
 };
@@ -122,13 +129,14 @@ export const canUpgradeSkill = (skill: SkillDetail): boolean => {
  */
 export const getSkillUpgradeCost = (skill: SkillDetail): number => {
   if (!canUpgradeSkill(skill)) return 0;
-  
+
   // 斗志抑扬升级消耗递增
   if (skill.skillIndex === 4) {
     const costs = [3000, 5000, 10000, 20000, 50000];
+
     return costs[skill.level] || 0;
   }
-  
+
   // 其他技能升级消耗
   return skill.upgradeCost || 0;
 };
@@ -156,10 +164,10 @@ export const canUseSkill = (
 ): boolean => {
   if (!skill.isLearned) return false;
   if (skill.currentCooldown > 0) return false;
-  
+
   const mpCost = skill.cost.mp || 0;
   const staminaCost = skill.cost.stamina || 0;
-  
+
   return currentMp >= mpCost && currentStamina >= staminaCost;
 };
 
@@ -176,6 +184,7 @@ export const getAttackTypeName = (attackType: string): string => {
     buff: '增益技能',
     special: '特殊技能'
   };
+
   return names[attackType] || '未知';
 };
 
@@ -190,5 +199,6 @@ export const getLearnMethodName = (learnMethod: string): string => {
     skillBook: '技能书学习',
     intimacy: '亲密度解锁'
   };
+
   return names[learnMethod] || '未知';
 };

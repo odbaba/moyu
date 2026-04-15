@@ -4,7 +4,7 @@
  * 参考文档：reference/docs/project_docs/04_怪物系统.md
  */
 
-import type { BossTemplate, BossSpawnConfig } from '../types';
+import type { BossSpawnConfig, BossTemplate } from '../types';
 
 // ========== BOSS 模板数据 ==========
 
@@ -31,7 +31,7 @@ export const bossTemplates: Record<string, BossTemplate> = {
     baseDefense: 30,
     spawnChance: 55, // 55% 刷新概率
   },
-  
+
   // 20级BOSS - 戈壁
   'boss-20': {
     id: 'boss-20',
@@ -49,7 +49,7 @@ export const bossTemplates: Record<string, BossTemplate> = {
     baseDefense: 50,
     spawnChance: 45, // 45% 刷新概率
   },
-  
+
   // 30级BOSS - 迷梦沼泽
   'boss-30': {
     id: 'boss-30',
@@ -67,7 +67,7 @@ export const bossTemplates: Record<string, BossTemplate> = {
     baseDefense: 80,
     spawnChance: 33, // 33% 刷新概率
   },
-  
+
   // 50级BOSS - 冰宫
   'boss-50': {
     id: 'boss-50',
@@ -85,7 +85,7 @@ export const bossTemplates: Record<string, BossTemplate> = {
     baseDefense: 120,
     spawnChance: 23, // 23% 刷新概率
   },
-  
+
   // 70级BOSS - 亚维特岛
   'boss-70': {
     id: 'boss-70',
@@ -103,7 +103,7 @@ export const bossTemplates: Record<string, BossTemplate> = {
     baseDefense: 180,
     spawnChance: 33, // 33% 刷新概率
   },
-  
+
   // 90级BOSS - 火山
   'boss-90': {
     id: 'boss-90',
@@ -121,7 +121,7 @@ export const bossTemplates: Record<string, BossTemplate> = {
     baseDefense: 220,
     spawnChance: 23, // 23% 刷新概率
   },
-  
+
   // 100级BOSS - 深渊迷宫
   'boss-100': {
     id: 'boss-100',

@@ -1,4 +1,4 @@
-import type { InventoryItem, EquipmentItem } from '../types';
+import type { EquipmentItem, InventoryItem } from '../types';
 
 /**
  * 珍稀材料魔石价值配置
@@ -162,6 +162,7 @@ export function calculatePurchasePrice(value: number): number {
  */
 export function calculateTotalPurchasePrice(items: InventoryItem[]): number {
   const totalValue = calculateTotalValue(items);
+
   return calculatePurchasePrice(totalValue);
 }
 

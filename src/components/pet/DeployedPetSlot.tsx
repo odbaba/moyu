@@ -1,7 +1,9 @@
+import './pet.css';
+
 import React from 'react';
+
 import type { Pet } from '../../types';
 import { getPetEmoji } from '../common/utils';
-import './pet.css';
 
 /**
  * 出战幻兽栏组件属性接口
@@ -134,8 +136,8 @@ const DeployedPetSlot: React.FC<DeployedPetSlotProps> = ({
           <div className="pet-stat-bar">
             <div className="stat-label">❤️ 生命</div>
             <div className="stat-bar-container">
-              <div 
-                className="stat-bar-fill hp-fill" 
+              <div
+                className="stat-bar-fill hp-fill"
                 style={{ width: `${hpPercent}%` }}
               />
               <span className="stat-bar-text">
@@ -148,8 +150,8 @@ const DeployedPetSlot: React.FC<DeployedPetSlotProps> = ({
           <div className="pet-stat-bar">
             <div className="stat-label">⭐ 经验</div>
             <div className="stat-bar-container">
-              <div 
-                className="stat-bar-fill exp-fill" 
+              <div
+                className="stat-bar-fill exp-fill"
                 style={{ width: `${expPercent}%` }}
               />
               <span className="stat-bar-text">
@@ -163,7 +165,7 @@ const DeployedPetSlot: React.FC<DeployedPetSlotProps> = ({
       {/* 操作按钮区域 */}
       <div className="pet-actions">
         {/* 召回按钮 */}
-        <button 
+        <button
           className="pet-action-button recall-button"
           onClick={handleRecall}
         >
@@ -172,14 +174,14 @@ const DeployedPetSlot: React.FC<DeployedPetSlotProps> = ({
 
         {/* 合体/解体按钮 */}
         {pet.isMerged ? (
-          <button 
+          <button
             className="pet-action-button unmerge-button"
             onClick={handleUnmerge}
           >
             解体
           </button>
         ) : (
-          <button 
+          <button
             className="pet-action-button merge-button"
             onClick={handleMerge}
           >

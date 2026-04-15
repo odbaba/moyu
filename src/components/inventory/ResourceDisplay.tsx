@@ -1,7 +1,9 @@
+import './inventory.css';
+
 import React from 'react';
+
 import type { PlayerResources } from '../../types';
 import { formatNumber } from '../common/utils';
-import './inventory.css';
 
 /**
  * 资源信息展示组件属性接口
@@ -19,7 +21,7 @@ interface ResourceDisplayProps {
  * 资源信息展示组件
  * 紧凑布局显示玩家的金币和魔石资源
  * 移动端优化：图标+数值的简洁横向展示方式
- * 
+ *
  * @param props - 组件属性
  * @param props.resources - 玩家资源数据（金币和魔石）
  */

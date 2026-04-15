@@ -1,4 +1,4 @@
-import type { EquipmentItem, EquipmentDetail, EquipmentSlotType, EquipmentQuality, GemAttribute } from '../types';
+import type { EquipmentDetail, EquipmentItem, EquipmentQuality, EquipmentSlotType, GemAttribute } from '../types';
 
 /**
  * 装备品质映射（EquipmentItem 的 equipmentQuality 到 EquipmentDetail 的 quality）
@@ -63,7 +63,7 @@ export function calculateGemAttributes(gems: string[] | undefined): GemAttribute
   if (!gems || gems.length === 0) {
     return [];
   }
-  
+
   return gems.map(_gemName => {
     const attribute: GemAttribute = {
       attack: 0,
@@ -73,11 +73,11 @@ export function calculateGemAttributes(gems: string[] | undefined): GemAttribute
       dodge: 0,
       luck: 0
     };
-    
+
     // 战斗力石不提供属性加成，只提供战斗力加成
     // 经验石不提供属性加成，只提供经验加成
     // 这里返回空属性，战斗力加成单独计算
-    
+
     return attribute;
   });
 }
@@ -91,12 +91,12 @@ export function calculateGemCombatPower(gems: string[] | undefined): number {
   if (!gems || gems.length === 0) {
     return 0;
   }
-  
+
   let totalCombatPower = 0;
   gems.forEach(gemName => {
     totalCombatPower += GEM_COMBAT_POWER[gemName] || 0;
   });
-  
+
   return totalCombatPower;
 }
 
@@ -109,12 +109,12 @@ export function calculateGemExpBonus(gems: string[] | undefined): number {
   if (!gems || gems.length === 0) {
     return 0;
   }
-  
+
   let totalExpBonus = 0;
   gems.forEach(gemName => {
     totalExpBonus += GEM_EXP_BONUS[gemName] || 0;
   });
-  
+
   return totalExpBonus;
 }
 
@@ -140,11 +140,11 @@ export function calculateSoulBonus(
     attackMaxBonus: 0,
     dodgeBonus: 0
   };
-  
+
   if (!soulType || soulType <= 0 || !soulLevel) {
     return result;
   }
-  
+
   // 天魂：攻击力 + 战魂等级 × 5%
   if (soulType === 1) {
     const bonusPercent = soulLevel * 0.05;
@@ -155,7 +155,7 @@ export function calculateSoulBonus(
   else if (soulType === 2) {
     result.dodgeBonus = soulLevel * 2;
   }
-  
+
   return result;
 }
 
@@ -170,6 +170,7 @@ export function calculateSoulCombatPower(soulType: number | undefined, soulLevel
   if (!soulType || soulType <= 0 || !soulLevel) {
     return 0;
   }
+
   return soulLevel;
 }
 
@@ -186,21 +187,21 @@ export function calculateSoulCombatPower(soulType: number | undefined, soulLevel
  */
 export function calculateEquipmentCombatPower(equipment: EquipmentDetail): number {
   let totalCombatPower = 0;
-  
+
   // 1. 品质战斗力加成（pz）
   totalCombatPower += QUALITY_COMBAT_POWER[equipment.quality] || 0;
-  
+
   // 2. 魔魂等级战斗力加成：单件装备无加成
   // 只有全套六件装备都有魔魂等级才有战斗力加成，由 combatPower.ts 的 calculateFullSetMagicSoulBonusCombatPower 计算
-  
+
   // 3. 洞数战斗力加成（洞数本身，不乘系数）
   totalCombatPower += equipment.holeCount || 0;
-  
+
   // 4. 战魂战斗力加成（每级+1）
   totalCombatPower += calculateSoulCombatPower(equipment.soulType, equipment.soulLevel);
-  
+
   // 5. 宝石战斗力加成（由外部调用时累加）
-  
+
   return totalCombatPower;
 }
 
@@ -215,20 +216,20 @@ export function equipmentItemToDetail(item: EquipmentItem): EquipmentDetail {
   const baseAttackMax = item.attackMax || 0;
   const baseDefense = item.defense || 0;
   const magicSoulLevel = item.magicSoulLevel || 0;
-  
+
   const bonusAttackMin = calculateMagicSoulBonus(baseAttackMin, magicSoulLevel);
   const bonusAttackMax = calculateMagicSoulBonus(baseAttackMax, magicSoulLevel);
   const bonusDefense = calculateMagicSoulBonus(baseDefense, magicSoulLevel);
-  
+
   // 计算战魂属性加成
   const soulBonus = calculateSoulBonus(item.soulType, item.soulLevel, baseAttackMin, baseAttackMax);
-  
+
   // 计算宝石属性
   const gemAttributes = calculateGemAttributes(item.gems);
-  
+
   // 计算宝石战斗力加成
   const gemCombatPower = calculateGemCombatPower(item.gems);
-  
+
   // 创建装备详情对象
   const detail: EquipmentDetail = {
     id: item.id,
@@ -259,10 +260,10 @@ export function equipmentItemToDetail(item: EquipmentItem): EquipmentDetail {
     bonusAttackMax: bonusAttackMax,
     bonusDefense: bonusDefense
   };
-  
+
   // 计算总战斗力
   detail.combatPower = calculateEquipmentCombatPower(detail) + gemCombatPower;
-  
+
   return detail;
 }
 
@@ -319,6 +320,7 @@ function getEquipmentIcon(type: EquipmentSlotType): string {
     bracelet: '💫',
     necklace: '📿'
   };
+
   return iconMap[type] || '📦';
 }
 
@@ -335,6 +337,7 @@ function getRarityFromQuality(quality: EquipmentQuality): 'common' | 'uncommon' 
     '精品': 'epic',
     '极品': 'legendary'
   };
+
   return rarityMap[quality] || 'common';
 }
 
@@ -351,6 +354,7 @@ function getQualityNumber(quality: EquipmentQuality): number {
     '精品': 3,
     '极品': 4
   };
+
   return qualityNumberMap[quality] || 0;
 }
 
@@ -368,6 +372,7 @@ export function getEquipmentSlotName(type: EquipmentSlotType): string {
     bracelet: '手镯',
     necklace: '项链'
   };
+
   return nameMap[type] || type;
 }
 
@@ -393,6 +398,7 @@ export function getEquipmentDisplayName(
 ): string {
   // 普通品不显示品质前缀
   const qualityPrefix = quality === '普通品' ? '' : quality;
+
   // 构建显示名称：品质前缀 + 基础名称 + 魔魂等级
   return `${qualityPrefix}${name}+${magicSoulLevel}`;
 }

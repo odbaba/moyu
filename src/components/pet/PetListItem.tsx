@@ -1,7 +1,9 @@
+import './pet.css';
+
 import React from 'react';
+
 import type { Pet } from '../../types';
 import { getPetEmoji, getPetQualityColor } from '../common/utils';
-import './pet.css';
 
 /**
  * 幻兽列表项组件属性接口
@@ -70,6 +72,7 @@ const PetListItem: React.FC<PetListItemProps> = ({
     if (pet.isDeployed) {
       return <span className="pet-status-badge deployed">出战中</span>;
     }
+
     return null;
   };
 
@@ -80,7 +83,7 @@ const PetListItem: React.FC<PetListItemProps> = ({
   const showDeployButton = !pet.isDeployed && onDeploy && canDeploy;
 
   return (
-    <div 
+    <div
       className="pet-list-item"
       onClick={handleClick}
     >
@@ -93,7 +96,7 @@ const PetListItem: React.FC<PetListItemProps> = ({
       <div className="pet-list-info">
         {/* 幻兽名称 */}
         <div className="pet-list-name-row">
-          <span 
+          <span
             className="pet-list-name"
             style={{ color: getPetQualityColor(pet.quality) }}
           >
@@ -118,7 +121,7 @@ const PetListItem: React.FC<PetListItemProps> = ({
           出战
         </button>
       ) : (
-        <div 
+        <div
           className="pet-list-quality"
           style={{ backgroundColor: getPetQualityColor(pet.quality) }}
         >

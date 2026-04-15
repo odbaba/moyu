@@ -1,8 +1,10 @@
+import './character.css';
+
 import React from 'react';
+
 import type { EquipmentItem } from '../../types';
 import { EQUIPMENT_SLOT_TYPE_NAMES } from '../common/constants';
 import { getEquipmentQualityColor } from '../common/utils';
-import './character.css';
 
 /**
  * 背包装备详情弹窗组件属性接口
@@ -63,39 +65,39 @@ const InventoryEquipmentModal: React.FC<InventoryEquipmentModalProps> = ({
   const calculateAddDefense = (base: number) => Math.floor(base / 10) * (item.magicSoulLevel || 0);
 
   return (
-    <div 
-      className="inventory-equipment-modal-overlay" 
+    <div
+      className="inventory-equipment-modal-overlay"
       onClick={handleOverlayClick}
     >
       <div className="inventory-equipment-modal-content">
         {/* 关闭按钮 */}
-        <button 
-          className="inventory-equipment-close-button" 
+        <button
+          className="inventory-equipment-close-button"
           onClick={onClose}
         >
           ×
         </button>
-        
+
         {/* 装备名称 */}
-        <h3 
-          className="inventory-equipment-title" 
+        <h3
+          className="inventory-equipment-title"
           style={{ color: getEquipmentQualityColor(item.equipmentQuality) }}
         >
           {item.equipmentQuality}{item.name}
         </h3>
-        
+
         {/* 装备类型 */}
         <div className="inventory-equipment-info-row">
           <span className="info-label">装备类型</span>
           <span className="info-value">{EQUIPMENT_SLOT_TYPE_NAMES[item.equipmentType]}</span>
         </div>
-        
+
         {/* 使用等级 */}
         <div className="inventory-equipment-info-row">
           <span className="info-label">使用等级</span>
           <span className="info-value">{item.useLevel}级</span>
         </div>
-        
+
         {/* 装备属性 */}
         <div className="inventory-equipment-attributes">
           {/* 攻击型装备显示攻击力 */}
@@ -138,19 +140,19 @@ const InventoryEquipmentModal: React.FC<InventoryEquipmentModalProps> = ({
             </>
           )}
         </div>
-        
+
         {/* 魔魂等级 */}
         <div className="inventory-equipment-info-row">
           <span className="info-label">魔魂等级</span>
           <span className="info-value">+{item.magicSoulLevel}</span>
         </div>
-        
+
         {/* 宝石洞 */}
         <div className="inventory-equipment-info-row">
           <span className="info-label">宝石洞</span>
           <span className="info-value">{item.holeCount}个</span>
         </div>
-        
+
         {/* 战魂属性 */}
         {item.soulType && item.soulType > 0 && (
           <div className="inventory-equipment-info-row">
@@ -160,11 +162,11 @@ const InventoryEquipmentModal: React.FC<InventoryEquipmentModalProps> = ({
             </span>
           </div>
         )}
-        
+
         {/* 装备按钮 - 固定在弹窗底部 */}
         <div className="inventory-equipment-modal-footer">
-          <button 
-            className="inventory-equipment-equip-button" 
+          <button
+            className="inventory-equipment-equip-button"
             onClick={handleEquipClick}
           >
             装备

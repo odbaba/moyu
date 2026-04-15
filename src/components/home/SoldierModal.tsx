@@ -13,10 +13,10 @@ interface SoldierModalProps {
  * 小兵弹窗组件
  * 显示三个小兵的描述，提供攻击和离开按钮
  */
-const SoldierModal: React.FC<SoldierModalProps> = ({ 
-  isVisible, 
-  onClose, 
-  onAttack 
+const SoldierModal: React.FC<SoldierModalProps> = ({
+  isVisible,
+  onClose,
+  onAttack
 }) => {
   if (!isVisible) return null;
 
@@ -25,10 +25,10 @@ const SoldierModal: React.FC<SoldierModalProps> = ({
       <div className="modal-content">
         {/* 关闭按钮 */}
         <button className="close-modal" onClick={onClose}>×</button>
-        
+
         {/* 标题 */}
         <h3>巡逻小兵</h3>
-        
+
         {/* 小兵描述 */}
         <div className="modal-description">
           <p>你看到三个正在巡逻的城卫小兵。</p>
@@ -41,14 +41,14 @@ const SoldierModal: React.FC<SoldierModalProps> = ({
             <li>小兵丙：背负弓箭，身手敏捷</li>
           </ul>
         </div>
-        
+
         {/* 按钮区域 */}
         <div className="modal-options" style={{ flexDirection: 'row', gap: '10px' }}>
           {/* 攻击按钮 */}
-          <button 
+          <button
             className="option-button"
-            style={{ 
-              backgroundColor: '#ff4444', 
+            style={{
+              backgroundColor: '#ff4444',
               borderColor: '#ff6b6b',
               flex: 1
             }}
@@ -59,9 +59,9 @@ const SoldierModal: React.FC<SoldierModalProps> = ({
           >
             ⚔️ 攻击
           </button>
-          
+
           {/* 离开按钮 */}
-          <button 
+          <button
             className="option-button"
             style={{ flex: 1 }}
             onClick={onClose}

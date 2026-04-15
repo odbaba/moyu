@@ -1,9 +1,11 @@
+import './pet.css';
+
 import React, { useState } from 'react';
+
 import type { Pet } from '../../types';
 import DeployedPetSlot from './DeployedPetSlot';
-import PetListItem from './PetListItem';
 import PetDetailModal from './PetDetailModal';
-import './pet.css';
+import PetListItem from './PetListItem';
 
 /**
  * 幻兽页面主组件属性接口
@@ -122,6 +124,7 @@ const PetPage: React.FC<PetPageProps> = ({
    */
   const getUndeployedPets = (): Pet[] => {
     const deployedIds = deployedPets.map(p => p.id);
+
     return pets.filter(p => !deployedIds.includes(p.id));
   };
 

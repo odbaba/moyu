@@ -1,4 +1,4 @@
-import type { EnemyTemplate, BattleCharacter, BattleSkill, GridPosition } from '../types';
+import type { BattleCharacter, BattleSkill, EnemyTemplate, GridPosition } from '../types';
 
 /**
  * 敌人模板数据
@@ -158,6 +158,7 @@ export function createEnemyFromTemplate(
     if (!skill) {
       throw new Error(`未找到敌人技能模板: ${skillId}`);
     }
+
     return { ...skill };
   });
 

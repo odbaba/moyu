@@ -4,19 +4,21 @@
  * 复用背包系统的物品网格组件
  */
 
+import './shop.css';
+
 import React, { useState } from 'react';
-import type { ShopItem, ShopType, InventoryItem, PlayerResources, Pet } from '../../types';
+
 import { getShopConfig } from '../../data/shopData';
+import type { InventoryItem, Pet, PlayerResources, ShopItem, ShopType } from '../../types';
 import {
+  calculateSellPrice,
+  canAffordPurchase,
+  formatCurrency,
+  generatePet,
+  generateRandomWeapon,
   purchaseItem,
   sellItem,
-  formatCurrency,
-  canAffordPurchase,
-  generateRandomWeapon,
-  generatePet,
-  calculateSellPrice,
 } from '../../utils/shopUtils';
-import './shop.css';
 
 /**
  * 商店物品槽位组件属性接口
@@ -57,6 +59,7 @@ const ShopItemSlot: React.FC<ShopItemSlotProps> = ({
     if ('imagePath' in item && item.imagePath) {
       return item.imagePath;
     }
+
     return null;
   };
 
@@ -66,7 +69,7 @@ const ShopItemSlot: React.FC<ShopItemSlotProps> = ({
    */
   const renderItemIcon = () => {
     const imagePath = getItemImagePath();
-    
+
     if (imagePath && !imageError) {
       return (
         <img
@@ -77,7 +80,7 @@ const ShopItemSlot: React.FC<ShopItemSlotProps> = ({
         />
       );
     }
-    
+
     return (
       <span className="shop-item-icon">
         {item.icon}
@@ -189,6 +192,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
       // 这里需要调用父组件的添加装备函数
       // 暂时显示提示
       setMessage(`获得随机装备：${weapon.name}（${weapon.quality}）`);
+
       return;
     }
 
@@ -197,13 +201,15 @@ const ShopPage: React.FC<ShopPageProps> = ({
       // 检查幻兽背包是否已满
       if (pets.length >= maxPetSlots) {
         setMessage('幻兽背包已满，无法购买幻兽');
+
         return;
       }
       // 生成幻兽
       const pet = generatePet(shopItem.name);
       // 这里需要调用父组件的添加幻兽函数
       // 暂时显示提示
-      setMessage(`获得幻兽：${pet.name}（${pet.quality}）`);
+      setMessage(`获得幻兽：${pet.othername}（${pet.quality}）`);
+
       return;
     }
 
@@ -318,7 +324,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
         ? shopItem!.priceGold * quantity
         : shopItem!.priceMagicStone * quantity
       : 0;
-    
+
     const sellPriceResult = !isBuying && inventoryItem
       ? calculateSellPrice({ ...inventoryItem, quantity })
       : { gold: 0, magicStone: 0 };
@@ -326,12 +332,12 @@ const ShopPage: React.FC<ShopPageProps> = ({
     // 检查是否可以购买
     const canBuy = isBuying
       ? canAffordPurchase(
-          playerResources.gold,
-          playerResources.magicStone,
+        playerResources.gold,
+        playerResources.magicStone,
           shopItem!,
           quantity,
           shopType
-        )
+      )
       : true;
 
     /**
@@ -341,6 +347,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
       if ('imagePath' in selectedItem && selectedItem.imagePath) {
         return selectedItem.imagePath;
       }
+
       return null;
     };
 
@@ -349,7 +356,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
      */
     const renderItemIcon = () => {
       const imagePath = getItemImagePath();
-      
+
       if (imagePath) {
         return (
           <img
@@ -367,7 +374,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
           />
         );
       }
-      
+
       return (
         <span className="shop-detail-icon-emoji">
           {selectedItem.icon}

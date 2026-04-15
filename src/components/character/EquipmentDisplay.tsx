@@ -1,8 +1,10 @@
-import React from 'react';
-import type { EquipmentDetail, EquipmentSlotType } from '../../types';
-import { ALL_EQUIPMENT_SLOTS, getEquipmentSlotName, getEquipmentDisplayName } from '../../utils/equipmentConverter';
-import { getEquipmentIcon, getEquipmentQualityColor } from '../common/utils';
 import './character.css';
+
+import React from 'react';
+
+import type { EquipmentDetail, EquipmentSlotType } from '../../types';
+import { ALL_EQUIPMENT_SLOTS, getEquipmentDisplayName, getEquipmentSlotName } from '../../utils/equipmentConverter';
+import { getEquipmentIcon, getEquipmentQualityColor } from '../common/utils';
 
 /**
  * 装备展示组件属性接口
@@ -39,12 +41,12 @@ const EquipmentDisplay: React.FC<EquipmentDisplayProps> = ({
    */
   const renderEquipmentSlot = (slotType: EquipmentSlotType) => {
     const equipment = equippedItems?.[slotType];
-    
+
     // 如果槽位有装备
     if (equipment) {
       // 使用 getEquipmentDisplayName 函数生成装备显示名称
       const displayName = getEquipmentDisplayName(equipment.name, equipment.quality, equipment.magicSoulLevel);
-      
+
       return (
         <div
           key={slotType}
@@ -55,22 +57,22 @@ const EquipmentDisplay: React.FC<EquipmentDisplayProps> = ({
           <div className="equipment-icon-compact">
             {getEquipmentIcon(slotType)}
           </div>
-          
+
           {/* 装备信息 */}
           <div className="equipment-info-compact">
             {/* 装备类型 */}
             <div className="equipment-type-compact">
               {getEquipmentSlotName(slotType)}
             </div>
-            
+
             {/* 装备名称 */}
-            <div 
+            <div
               className="equipment-name-compact"
               style={{ color: getEquipmentQualityColor(equipment.quality) }}
             >
               {displayName}
             </div>
-            
+
             {/* 装备等级 */}
             <div className="equipment-level-compact">
               Lv.{equipment.useLevel}
@@ -79,7 +81,7 @@ const EquipmentDisplay: React.FC<EquipmentDisplayProps> = ({
         </div>
       );
     }
-    
+
     // 如果槽位为空
     return (
       <div
@@ -91,19 +93,19 @@ const EquipmentDisplay: React.FC<EquipmentDisplayProps> = ({
         <div className="equipment-icon-compact empty-icon">
           {getEquipmentIcon(slotType)}
         </div>
-        
+
         {/* 空槽位信息 */}
         <div className="equipment-info-compact">
           {/* 装备类型 */}
           <div className="equipment-type-compact">
             {getEquipmentSlotName(slotType)}
           </div>
-          
+
           {/* 空提示 */}
           <div className="equipment-empty-text">
             空
           </div>
-          
+
           {/* 点击提示 */}
           <div className="equipment-empty-hint">
             点击装备

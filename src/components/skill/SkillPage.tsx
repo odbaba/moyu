@@ -1,9 +1,11 @@
-import React, { useState, useCallback } from 'react';
-import type { SkillDetail } from '../../types';
-import { exampleSkills } from '../../data/skillData';
-import SkillList from './SkillList';
-import SkillDetailModal from './SkillDetailModal';
 import './skill.css';
+
+import React, { useCallback, useState } from 'react';
+
+import { exampleSkills } from '../../data/skillData';
+import type { SkillDetail } from '../../types';
+import SkillDetailModal from './SkillDetailModal';
+import SkillList from './SkillList';
 
 /**
  * 技能主页面组件属性接口

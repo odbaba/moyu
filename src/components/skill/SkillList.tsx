@@ -1,9 +1,11 @@
+import './skill.css';
+
 import React, { useMemo } from 'react';
-import type { SkillDetail } from '../../types';
+
 import { getSkillDisplayName } from '../../data/skillData';
+import type { SkillDetail } from '../../types';
 import { getAttackTypeName } from '../../utils/skillUtils';
 import { getRarityClassName } from '../common/utils';
-import './skill.css';
 
 /**
  * 技能列表组件属性接口
@@ -32,7 +34,7 @@ const SkillList: React.FC<SkillListProps> = ({
     return skills.map(skill => {
       const isSelected = selectedSkillId === skill.id;
       const isLearned = skill.isLearned;
-      
+
       return (
         <div
           key={skill.id}
@@ -43,25 +45,25 @@ const SkillList: React.FC<SkillListProps> = ({
           <span className="skill-icon">
             {skill.icon}
           </span>
-          
+
           {/* 技能信息：名称和等级 */}
           <div className="skill-info">
             <span className={`skill-name ${getRarityClassName(skill.rarity)}`}>
               {getSkillDisplayName(skill)}
             </span>
             <span className="skill-level">
-              {skill.skillIndex === 4 
+              {skill.skillIndex === 4
                 ? `Lv.${skill.level}/${skill.maxLevel}`
                 : skill.isLearned ? `Lv.${skill.level}/${skill.maxLevel}` : '未学习'
               }
             </span>
           </div>
-          
+
           {/* 技能类型标签 */}
           <span className="skill-type-tag">
             {getAttackTypeName(skill.attackType)}
           </span>
-          
+
           {/* 学习状态标记 */}
           {!isLearned && (
             <span className="skill-learn-tag">

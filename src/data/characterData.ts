@@ -1,4 +1,4 @@
-import type { CharacterData, EquipmentDetail, EquipmentQuality, PrincessRelationship } from '../types';
+import type { CharacterData, EquipmentDetail, PrincessRelationship } from '../types';
 import { CHARACTER_BASE_STATS, CHARACTER_GROWTH_RATES } from '../utils/attributeCalculator';
 
 
@@ -22,8 +22,8 @@ const weapon: EquipmentDetail = {
   useLevel: 100,
   combatPower: 12, // 极品品质: 4 × 3 = 12
   // 战魂属性
-  soulType: 1,     // 天魂
-  soulLevel: 5     // 5级天魂
+  soulType: 1, // 天魂
+  soulLevel: 5 // 5级天魂
 };
 
 // 示例装备数据 - 衣服
@@ -45,8 +45,8 @@ const clothes: EquipmentDetail = {
   useLevel: 80,
   combatPower: 9, // 精品品质: 3 × 3 = 9
   // 战魂属性
-  soulType: 1,    // 天魂
-  soulLevel: 4    // 4级天魂
+  soulType: 1, // 天魂
+  soulLevel: 4 // 4级天魂
 };
 
 // 示例装备数据 - 战鞋
@@ -68,8 +68,8 @@ const shoes: EquipmentDetail = {
   useLevel: 60,
   combatPower: 6, // 上品品质: 2 × 3 = 6
   // 战魂属性
-  soulType: 2,    // 地魂
-  soulLevel: 3    // 3级地魂
+  soulType: 2, // 地魂
+  soulLevel: 3 // 3级地魂
 };
 
 // 示例装备数据 - 手镯
@@ -90,7 +90,7 @@ const bracelet: EquipmentDetail = {
   useLevel: 40,
   combatPower: 3, // 良品品质: 1 × 3 = 3
   // 战魂属性
-  soulType: 0,    // 无战魂
+  soulType: 0, // 无战魂
   soulLevel: 0
 };
 
@@ -114,8 +114,8 @@ const necklace: EquipmentDetail = {
   useLevel: 100,
   combatPower: 12, // 极品品质: 4 × 3 = 12
   // 战魂属性
-  soulType: 1,     // 天魂
-  soulLevel: 5     // 5级天魂
+  soulType: 1, // 天魂
+  soulLevel: 5 // 5级天魂
 };
 
 // 示例装备数据 - 头盔
@@ -133,7 +133,7 @@ const helmet: EquipmentDetail = {
   useLevel: 1,
   combatPower: 0, // 普通品品质: 0 × 3 = 0
   // 战魂属性
-  soulType: 0,    // 无战魂
+  soulType: 0, // 无战魂
   soulLevel: 0
 };
 
@@ -144,13 +144,13 @@ const playerCharacter: CharacterData = {
   level: 1,
   title: '亚特之巅',
   // 军衔系统
-  militaryRankLevel: 0,      // 军衔等级：无
-  militaryRankName: '无',   // 军衔名称
-  battleExp: 0,            // 累计战功
+  militaryRankLevel: 0, // 军衔等级：无
+  militaryRankName: '无', // 军衔名称
+  battleExp: 0, // 累计战功
   // 爵位系统
-  nobleRankLevel: 0,        // 爵位等级：平民
-  nobleRankName: '平民',     // 爵位名称
-  merit: 0,               // 累计功勋
+  nobleRankLevel: 0, // 爵位等级：平民
+  nobleRankName: '平民', // 爵位名称
+  merit: 0, // 累计功勋
   maxHp: 550,
   currentHp: 550,
   maxStamina: 110,
@@ -205,13 +205,13 @@ export const exampleEquipments: EquipmentDetail[] = [
  * 初始状态：未认识公主
  */
 export const examplePrincessRelationship: PrincessRelationship = {
-  level: 0,                            // 关系等级：未认识
-  intimacy: 0,                         // 亲密度：0
-  relationshipName: '未认识',           // 关系名称
-  canChatToday: true,                  // 今天可以聊天
-  canGiftToday: true,                  // 今天可以送礼
-  canReceiveSundayGift: true,          // 本周可以领取周日礼物
-  hasReceivedConfidantGift: false     // 未领取知己的礼物
+  level: 0, // 关系等级：未认识
+  intimacy: 0, // 亲密度：0
+  relationshipName: '未认识', // 关系名称
+  canChatToday: true, // 今天可以聊天
+  canGiftToday: true, // 今天可以送礼
+  canReceiveSundayGift: true, // 本周可以领取周日礼物
+  hasReceivedConfidantGift: false // 未领取知己的礼物
 };
 
 /**
@@ -219,13 +219,13 @@ export const examplePrincessRelationship: PrincessRelationship = {
  * 关系等级：知己
  */
 export const confidantPrincessRelationship: PrincessRelationship = {
-  level: 4,                            // 关系等级：知己
-  intimacy: 75,                        // 亲密度：75
-  relationshipName: '知己',             // 关系名称
-  canChatToday: true,                  // 今天可以聊天
-  canGiftToday: true,                  // 今天可以送礼
-  canReceiveSundayGift: true,          // 本周可以领取周日礼物
-  hasReceivedConfidantGift: false     // 未领取知己的礼物
+  level: 4, // 关系等级：知己
+  intimacy: 75, // 亲密度：75
+  relationshipName: '知己', // 关系名称
+  canChatToday: true, // 今天可以聊天
+  canGiftToday: true, // 今天可以送礼
+  canReceiveSundayGift: true, // 本周可以领取周日礼物
+  hasReceivedConfidantGift: false // 未领取知己的礼物
 };
 
 /**
@@ -233,11 +233,11 @@ export const confidantPrincessRelationship: PrincessRelationship = {
  * 关系等级：恋人
  */
 export const loverPrincessRelationship: PrincessRelationship = {
-  level: 5,                            // 关系等级：恋人
-  intimacy: 150,                       // 亲密度：150
-  relationshipName: '恋人',             // 关系名称
-  canChatToday: true,                  // 今天可以聊天
-  canGiftToday: true,                  // 今天可以送礼
-  canReceiveSundayGift: true,          // 本周可以领取周日礼物
-  hasReceivedConfidantGift: true      // 已领取知己的礼物
+  level: 5, // 关系等级：恋人
+  intimacy: 150, // 亲密度：150
+  relationshipName: '恋人', // 关系名称
+  canChatToday: true, // 今天可以聊天
+  canGiftToday: true, // 今天可以送礼
+  canReceiveSundayGift: true, // 本周可以领取周日礼物
+  hasReceivedConfidantGift: true // 已领取知己的礼物
 };

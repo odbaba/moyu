@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { locations, connections } from '../../data/gameData';
+import React, { useEffect, useRef, useState } from 'react';
+
+import { connections, locations } from '../../data/gameData';
 
 interface WorldMapProps {
   isVisible: boolean;
@@ -18,11 +19,11 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
   // SVG 基础尺寸（用于内部坐标计算）
   const baseSvgWidth = 800;
   const baseSvgHeight = 600;
-  
+
   // 计算地图边界
   let minX = Infinity, minY = Infinity;
   let maxX = -Infinity, maxY = -Infinity;
-  
+
   locations.forEach(loc => {
     minX = Math.min(minX, loc.x);
     minY = Math.min(minY, loc.y);
@@ -69,7 +70,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
         // 计算当前地点在地图坐标系中的位置
         const locX = (currentLoc.x - minX) * (cellWidth + cellSpacingX) + cellWidth / 2;
         const locY = (currentLoc.y - minY) * (cellHeight + cellSpacingY) + cellHeight / 2;
-        
+
         // 使用实际容器尺寸计算偏移量，使当前地点居中
         setOffset({
           x: containerSize.width / 2 - locX,
@@ -88,9 +89,9 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
   // 处理拖拽移动
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isDragging) {
-      setOffset({ 
-        x: e.clientX - dragStart.x, 
-        y: e.clientY - dragStart.y 
+      setOffset({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
       });
     }
   };
@@ -104,9 +105,9 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 1) {
       setIsDragging(true);
-      setDragStart({ 
-        x: e.touches[0].clientX - offset.x, 
-        y: e.touches[0].clientY - offset.y 
+      setDragStart({
+        x: e.touches[0].clientX - offset.x,
+        y: e.touches[0].clientY - offset.y
       });
     }
   };
@@ -114,9 +115,9 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
   const handleTouchMove = (e: React.TouchEvent) => {
     if (isDragging && e.touches.length === 1) {
       e.preventDefault();
-      setOffset({ 
-        x: e.touches[0].clientX - dragStart.x, 
-        y: e.touches[0].clientY - dragStart.y 
+      setOffset({
+        x: e.touches[0].clientX - dragStart.x,
+        y: e.touches[0].clientY - dragStart.y
       });
     }
   };
@@ -130,7 +131,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
     return connections.map(([loc1Id, loc2Id], index) => {
       const location1 = locations.find(loc => loc.id === loc1Id);
       const location2 = locations.find(loc => loc.id === loc2Id);
-      
+
       if (!location1 || !location2) return null;
 
       const x1 = (location1.x - minX) * (cellWidth + cellSpacingX) + cellWidth / 2;
@@ -162,10 +163,10 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
         <div className="world-map">
           <h2>大地图</h2>
           <div className="map-container" ref={containerRef}>
-            <svg 
+            <svg
               ref={mapRef}
-              width="100%" 
-              height="100%" 
+              width="100%"
+              height="100%"
               className="world-map-svg"
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
@@ -178,7 +179,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
               <g transform={`translate(${offset.x}, ${offset.y})`}>
                 {/* 绘制连接线 */}
                 {renderConnections()}
-                
+
                 {/* 绘制所有地点 */}
                 {locations.map((loc, index) => {
                   const x = (loc.x - minX) * (cellWidth + cellSpacingX);

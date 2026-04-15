@@ -3,9 +3,11 @@
  * 用于选择物品使用的目标（玩家或幻兽）
  */
 
-import React from 'react';
-import type { Pet } from '../../types';
 import './UseItemTargetModal.css';
+
+import React from 'react';
+
+import type { Pet } from '../../types';
 
 /**
  * 使用物品目标选择弹窗 Props 接口
@@ -78,8 +80,8 @@ const UseItemTargetModal: React.FC<UseItemTargetModalProps> = ({
 
           {/* 幻兽列表 */}
           {pets.map((pet) => (
-            <div 
-              key={pet.id} 
+            <div
+              key={pet.id}
               className="target-item pet-target"
               onClick={() => {
                 onSelectPet(pet.id);

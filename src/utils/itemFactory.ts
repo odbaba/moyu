@@ -4,33 +4,29 @@
  * 所有物品来源（抽奖、战利品、商店等）都应使用此模块
  */
 
-import type { 
-  InventoryItem, 
-  EquipmentItem, 
-  EquipmentSlotType,
-} from '../types';
-import { 
+import {
   createEquipment,
-  EQUIPMENT_NAMES,
-  QUALITY_NAMES,
-  QUALITY_TO_RARITY,
-  EQUIPMENT_ICONS,
-  lingHunJingShi,
-  lingHunWang,
-  yueGuangBaoHe,
-  yueGuangBaoHeZengQiangBan,
-  manJingYanQiu,
-  kongJingYanQiu,
   dianJiangYaoShui,
   findItemByName,
+  kongJingYanQiu,
+  lingHunJingShi,
+  lingHunWang,
+  manJingYanQiu,
+  yueGuangBaoHe,
+  yueGuangBaoHeZengQiangBan,
 } from '../data/inventoryData';
+import type {
+  EquipmentItem,
+  EquipmentSlotType,
+  InventoryItem,
+} from '../types';
 
 // ==================== ID生成函数 ====================
 
 /**
  * 生成唯一ID
  * 格式：{type}_{subtype}_{timestamp}_{random}
- * 
+ *
  * @param type 物品类型（equip, consumable, gem, special等）
  * @param subtype 子类型（可选，如装备类型、物品名称等）
  * @returns 唯一ID字符串
@@ -38,7 +34,8 @@ import {
 export function generateItemId(type: string, subtype?: string): string {
   const timestamp = Date.now();
   const random = Math.random().toString(36).substr(2, 9);
-  return subtype 
+
+  return subtype
     ? `${type}_${subtype}_${timestamp}_${random}`
     : `${type}_${timestamp}_${random}`;
 }
@@ -48,7 +45,7 @@ export function generateItemId(type: string, subtype?: string): string {
 /**
  * 创建装备物品
  * 统一的装备创建接口，使用 inventoryData.ts 中的 createEquipment 函数
- * 
+ *
  * @param config 装备配置
  * @param config.equipmentType 装备类型（weapon, helmet, clothes等）
  * @param config.level 装备等级
@@ -65,13 +62,13 @@ export function createEquipmentItem(config: {
   gemSlots?: number;
 }): EquipmentItem {
   const { equipmentType, level, quality, magicSoulLevel = 0, gemSlots = 0 } = config;
-  
+
   // 使用 inventoryData.ts 中的 createEquipment 函数创建装备
   const equipment = createEquipment(equipmentType, level, quality, magicSoulLevel, gemSlots);
-  
+
   // 生成统一的ID
   const id = generateItemId('equip', `${equipmentType}_lv${level}_q${quality}`);
-  
+
   return {
     ...equipment,
     id,
@@ -83,7 +80,7 @@ export function createEquipmentItem(config: {
 /**
  * 创建消耗品物品
  * 从 inventoryData.ts 获取模板并复制，生成新的唯一ID
- * 
+ *
  * @param config 消耗品配置
  * @param config.id 消耗品ID（用于查找模板）
  * @param config.name 消耗品名称
@@ -96,10 +93,10 @@ export function createConsumableItem(config: {
   quantity?: number;
 }): InventoryItem {
   const { id, name, quantity = 1 } = config;
-  
+
   // 从 inventoryData 查找对应的消耗品模板
   const template = findItemByName(name);
-  
+
   if (template && template.type === 'consumable') {
     // 找到模板，复制并生成新ID
     return {
@@ -108,7 +105,7 @@ export function createConsumableItem(config: {
       quantity,
     };
   }
-  
+
   // 如果找不到模板，创建基础的消耗品
   return {
     id: generateItemId('consumable', id),
@@ -133,7 +130,7 @@ export function createConsumableItem(config: {
 /**
  * 创建宝石物品
  * 从 inventoryData.ts 获取模板并复制，生成新的唯一ID
- * 
+ *
  * @param config 宝石配置
  * @param config.id 宝石ID（用于查找模板）
  * @param config.name 宝石名称
@@ -146,10 +143,10 @@ export function createGemItem(config: {
   quantity?: number;
 }): InventoryItem {
   const { id, name, quantity = 1 } = config;
-  
+
   // 从 inventoryData 查找对应的宝石模板
   const template = findItemByName(name);
-  
+
   if (template && template.type === 'gem') {
     // 找到模板，复制并生成新ID
     return {
@@ -158,7 +155,7 @@ export function createGemItem(config: {
       quantity,
     };
   }
-  
+
   // 如果找不到模板，创建基础的宝石
   return {
     id: generateItemId('gem', id),
@@ -183,7 +180,7 @@ export function createGemItem(config: {
 /**
  * 创建特殊道具
  * 从 inventoryData.ts 获取模板并复制，保留原始ID以支持堆叠
- * 
+ *
  * @param config 特殊道具配置
  * @param config.id 特殊道具ID（用于查找模板）
  * @param config.name 特殊道具名称
@@ -196,10 +193,10 @@ export function createSpecialItem(config: {
   quantity?: number;
 }): InventoryItem {
   const { id, name, quantity = 1 } = config;
-  
+
   // 从 inventoryData 查找对应的特殊道具模板
   const template = findItemByName(name);
-  
+
   if (template) {
     // 找到模板，复制并保留原始ID（支持堆叠）
     return {
@@ -207,7 +204,7 @@ export function createSpecialItem(config: {
       quantity,
     };
   }
-  
+
   // 如果找不到模板，创建基础的特殊道具
   return {
     id: `special_${id}`,
@@ -231,7 +228,7 @@ export function createSpecialItem(config: {
  * 从模板创建物品
  * 根据物品名称查找模板并创建实例，保留原始ID以支持堆叠
  * 适用于抽奖、战利品等场景
- * 
+ *
  * @param name 物品名称
  * @param quantity 数量（默认1）
  * @returns 物品实例
@@ -239,7 +236,7 @@ export function createSpecialItem(config: {
 export function createItemFromTemplate(name: string, quantity: number = 1): InventoryItem | null {
   // 从 inventoryData 查找对应的物品模板
   const template = findItemByName(name);
-  
+
   if (template) {
     // 找到模板，复制并保留原始ID（支持堆叠）
     return {
@@ -247,26 +244,26 @@ export function createItemFromTemplate(name: string, quantity: number = 1): Inve
       quantity,
     };
   }
-  
+
   // 如果找不到模板，返回null
   console.warn(`未找到物品模板: ${name}`);
+
   return null;
 }
 
 // ==================== 物品复制函数 ====================
 
 /**
- * 复制物品模板
+ * 复制单个物品模板
  * 用于战利品等场景，生成新的唯一ID
- * 
+ *
  * @param item 原始物品
- * @returns 复制后的物品（带有新的唯一ID）
+ * @returns 复制后的单个物品
  */
 export function cloneItem(item: InventoryItem): InventoryItem {
   return {
     ...item,
-    id: generateItemId(item.type),
-    quantity: item.quantity || 1,
+    quantity: 1,
   };
 }
 
@@ -280,11 +277,11 @@ export const ITEM_TEMPLATES = {
   // 宝石类
   lingHunJingShi,
   lingHunWang,
-  
+
   // 特殊道具类
   yueGuangBaoHe,
   yueGuangBaoHeZengQiangBan,
-  
+
   // 消耗品类
   manJingYanQiu,
   kongJingYanQiu,
@@ -296,18 +293,19 @@ export const ITEM_TEMPLATES = {
 /**
  * 随机选择装备类型
  * 用于抽奖、战利品等场景
- * 
+ *
  * @returns 随机装备类型
  */
 export function randomEquipmentType(): EquipmentSlotType {
   const types: EquipmentSlotType[] = ['weapon', 'helmet', 'necklace', 'clothes', 'bracelet', 'shoes'];
+
   return types[Math.floor(Math.random() * types.length)];
 }
 
 /**
  * 随机生成魔魂等级
  * 根据品质等级生成合适的魔魂等级
- * 
+ *
  * @param quality 装备品质（0-4）
  * @returns 魔魂等级（0-12）
  */
@@ -328,7 +326,7 @@ export function randomMagicSoulLevel(quality: number): number {
 /**
  * 随机生成宝石孔数量
  * 根据品质等级生成合适的宝石孔数量
- * 
+ *
  * @param quality 装备品质（0-4）
  * @returns 宝石孔数量（0-3）
  */

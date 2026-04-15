@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+
 import type { NPCInteractable, NPCInteractionOption, NPCType } from '../../types';
 import { checkNPCOptionCondition, type NPCGameState } from '../../utils/npcUtils';
 
@@ -31,6 +32,7 @@ const getNPCTypeName = (npcType: NPCType): string => {
     shop: '商店',
     special: '特殊'
   };
+
   return typeNames[npcType] || '未知';
 };
 
@@ -46,6 +48,7 @@ const getNPCTypeClassName = (npcType: NPCType): string => {
     shop: 'npc-type-shop',
     special: 'npc-type-special'
   };
+
   return classNames[npcType] || 'npc-type-default';
 };
 
@@ -87,7 +90,7 @@ const NPCModal: React.FC<NPCModalProps> = ({
    * 使用 useMemo 优化性能，避免每次渲染都重新计算
    */
   const availableOptions = useMemo(() => {
-    return npcData.options.filter(option => 
+    return npcData.options.filter(option =>
       checkNPCOptionCondition(option.condition, gameState)
     );
   }, [npcData.options, gameState]);
@@ -112,14 +115,14 @@ const NPCModal: React.FC<NPCModalProps> = ({
     if (resultFeedback) {
       // 查找对应选项以获取 actionType 和 actionParams
       const selectedOption = npcData.options.find(opt => opt.result === resultFeedback);
-      
+
       // 调用回调函数，传递结果、动作类型和动作参数
       onSelectOption(
         resultFeedback,
         selectedOption?.actionType,
         selectedOption?.actionParams
       );
-      
+
       // 清空结果反馈
       setResultFeedback(null);
       // 关闭模态窗口
@@ -149,12 +152,12 @@ const NPCModal: React.FC<NPCModalProps> = ({
       <div className="modal-content npc-modal">
         {/* 关闭按钮 */}
         <button className="close-modal" onClick={handleCloseModal}>×</button>
-        
+
         {/* NPC名称标题 */}
         <h3 className="npc-name">
           {npcData.icon} {npcData.name}
         </h3>
-        
+
         {/* NPC类型和位置信息 */}
         <div className="npc-meta-info">
           {/* NPC类型标签 */}
@@ -164,10 +167,10 @@ const NPCModal: React.FC<NPCModalProps> = ({
           {/* NPC位置信息 */}
           <span className="npc-location">📍 {npcData.location}</span>
         </div>
-        
+
         {/* NPC描述文本区域 */}
         <p className="modal-description">{npcData.description}</p>
-        
+
         {/* 结果反馈显示区域 */}
         {resultFeedback ? (
           <div className="result-feedback-container">
@@ -177,13 +180,13 @@ const NPCModal: React.FC<NPCModalProps> = ({
             </div>
             {/* 操作按钮组 */}
             <div className="result-feedback-buttons">
-              <button 
+              <button
                 className="feedback-button cancel-button"
                 onClick={handleCloseFeedback}
               >
                 返回
               </button>
-              <button 
+              <button
                 className="feedback-button confirm-button"
                 onClick={handleConfirmResult}
               >

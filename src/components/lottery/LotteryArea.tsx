@@ -4,16 +4,18 @@
  * 支持花费魔石进行抽奖，获得各种奖励
  */
 
+import './lottery.css';
+
 import React, { useState } from 'react';
+
 import type { InventoryItem, Pet, PlayerResources, TimeSystem } from '../../types';
 import type { LotteryResult } from '../../utils/lotterySystem';
 import {
   executeLottery,
-  PRIZE_LEVEL_NAMES,
   getPrizeProbabilities,
+  PRIZE_LEVEL_NAMES,
 } from '../../utils/lotterySystem';
-import { TimeDisplay, InteractionLog, Menu } from '../home';
-import './lottery.css';
+import { InteractionLog, Menu, TimeDisplay } from '../home';
 
 /**
  * 抽奖区组件属性接口
@@ -70,7 +72,6 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
   playerLevel,
   timeSystem,
   interactionLog,
-  onClose,
   onReturnToCity,
   onAddItem,
   onAddPet,
@@ -123,6 +124,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
         setCurrentResult(chest.result);
         setShowResultModal(true);
       }
+
       return;
     }
 
@@ -138,12 +140,14 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
   const handleDraw = () => {
     if (!selectedChest) {
       setMessage('请先选择一个宝箱！');
+
       return;
     }
 
     // 检查魔石是否足够
     if (playerResources.magicStone < MAGIC_STONE_COST) {
       setMessage(`魔石不足！需要 ${MAGIC_STONE_COST} 魔石，当前只有 ${playerResources.magicStone} 魔石`);
+
       return;
     }
 
@@ -152,6 +156,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
 
     if (!result.success) {
       setMessage(result.message);
+
       return;
     }
 
@@ -241,6 +246,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
       medium: 'prize-medium',
       common: 'prize-common',
     };
+
     return classNames[level] || 'prize-common';
   };
 
@@ -254,6 +260,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
       medium: '#4ecdc4',
       common: '#95a5a6',
     };
+
     return colors[level] || '#95a5a6';
   };
 

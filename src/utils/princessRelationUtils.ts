@@ -1,21 +1,20 @@
 /**
  * 公主关系系统工具函数
  * 提供公主关系系统的核心功能，包括关系等级计算、聊天奖励、送礼、周日礼物等
- * 
+ *
  * 参考文档：
  * - reference/docs/scripts_analysis/15_公主关系系统.md
  * - reference/docs/scripts_analysis/14_NPC系统.md
  */
 
 import type {
+  ChatReward,
+  DemonArmyInfo,
+  GiftResult,
+  PrincessRelationship,
   RelationshipLevel,
   RelationshipLevelConfig,
-  ChatReward,
-  SundayGift,
-  GiftResult,
-  DemonArmyInfo,
-  PrincessRelationship
-} from '../types';
+  SundayGift} from '../types';
 
 // ========== 关系等级配置数据 ==========
 
@@ -175,10 +174,10 @@ export const DEMON_ARMY_INFO: DemonArmyInfo[] = [
 /**
  * 获取关系名称
  * 根据关系等级返回对应的关系名称
- * 
+ *
  * @param level 关系等级 (0-6)
  * @returns 关系名称
- * 
+ *
  * @example
  * getRelationshipName(0)  // 返回: '未认识'
  * getRelationshipName(4)  // 返回: '知己'
@@ -186,16 +185,17 @@ export const DEMON_ARMY_INFO: DemonArmyInfo[] = [
  */
 export const getRelationshipName = (level: number): string => {
   const config = RELATIONSHIP_LEVELS.find(config => config.level === level);
+
   return config?.name || '未知';
 };
 
 /**
  * 获取升级到下一级所需的亲密度
  * 根据当前关系等级，返回升级到下一级所需的最小亲密度
- * 
+ *
  * @param level 当前关系等级 (0-6)
  * @returns 升级所需亲密度，如果已达最高级则返回 Infinity
- * 
+ *
  * @example
  * getNextRelationshipRequirement(0)  // 返回: 1 (升级到认识需要1点亲密度)
  * getNextRelationshipRequirement(1)  // 返回: 10 (升级到普通朋友需要10点亲密度)
@@ -206,20 +206,21 @@ export const getNextRelationshipRequirement = (level: number): number => {
   if (level >= 6) {
     return Infinity;
   }
-  
+
   // 返回下一级的最小亲密度要求
   const nextLevel = RELATIONSHIP_LEVELS.find(config => config.level === level + 1);
+
   return nextLevel?.minIntimacy || Infinity;
 };
 
 /**
  * 判断是否可以升级关系
  * 根据当前亲密度和关系等级，判断是否可以升级到下一级
- * 
+ *
  * @param currentIntimacy 当前亲密度
  * @param currentLevel 当前关系等级 (0-6)
  * @returns 是否可以升级
- * 
+ *
  * @example
  * canUpgradeRelationship(0, 0)   // 返回: false (亲密度不足)
  * canUpgradeRelationship(1, 0)   // 返回: true (可以升级到认识)
@@ -234,20 +235,20 @@ export const canUpgradeRelationship = (
   if (currentLevel >= 6) {
     return false;
   }
-  
+
   // 获取下一级所需亲密度
   const requiredIntimacy = getNextRelationshipRequirement(currentLevel);
-  
+
   // 判断当前亲密度是否足够
   return currentIntimacy >= requiredIntimacy;
 };
 
 /**
  * 根据亲密度计算关系等级
- * 
+ *
  * @param intimacy 亲密度
  * @returns 关系等级
- * 
+ *
  * @example
  * calculateRelationshipLevel(0)   // 返回: 0 (未认识)
  * calculateRelationshipLevel(5)   // 返回: 1 (认识)
@@ -262,6 +263,7 @@ export const calculateRelationshipLevel = (intimacy: number): RelationshipLevel 
       return config.level;
     }
   }
+
   return 0;
 };
 
@@ -270,10 +272,10 @@ export const calculateRelationshipLevel = (intimacy: number): RelationshipLevel 
 /**
  * 获取聊天奖励
  * 根据关系等级返回对应的聊天奖励
- * 
+ *
  * @param relationshipLevel 关系等级 (0-6)
  * @returns 聊天奖励，如果没有奖励则返回 null
- * 
+ *
  * @example
  * getChatReward(0)  // 返回: null (未认识没有奖励)
  * getChatReward(2)  // 返回: { petType: '攻防型', petStar: 1, description: '极品1星攻防型幻兽' }
@@ -281,17 +283,18 @@ export const calculateRelationshipLevel = (intimacy: number): RelationshipLevel 
  */
 export const getChatReward = (relationshipLevel: number): ChatReward | null => {
   const config = RELATIONSHIP_LEVELS.find(config => config.level === relationshipLevel);
+
   return config?.chatReward || null;
 };
 
 /**
  * 获取聊天对话内容
  * 根据关系等级和是否已救国王，返回公主的对话内容
- * 
+ *
  * @param relationshipLevel 关系等级 (0-6)
  * @param hasRescuedKing 是否已救国王
  * @returns 公主的对话内容
- * 
+ *
  * @example
  * getChatDialogue(0, false)  // 返回: '听说你是位英勇的战士，我非常敬佩你的勇敢。'
  * getChatDialogue(1, false)  // 返回: '很高兴，你能和我聊天。我最担心的是我的父亲，你有他的消息了吗。'
@@ -304,28 +307,29 @@ export const getChatDialogue = (
   switch (relationshipLevel) {
     case 0:
       return '听说你是位英勇的战士，我非常敬佩你的勇敢。';
-    
+
     case 1:
       if (hasRescuedKing) {
         return '很高兴，你能和我聊天。非常感谢你把我父亲救出来。';
       }
+
       return '很高兴，你能和我聊天。我最担心的是我的父亲，你有他的消息了吗。';
-    
+
     case 2:
       return '我的朋友，我这里有些攻防型幻兽...';
-    
+
     case 3:
       return '我这里有许多幻兽，这个奇异兽听说是幻兽幻化时的最好副幻兽...';
-    
+
     case 4:
       return '这是我精心为你培养的12星奇异兽...';
-    
+
     case 5:
       return '看，这只亚特兰蒂斯大陆里非常稀有的极品19星奇异兽...';
-    
+
     case 6:
       return '你把这无比优秀的19星奇异兽带上吧...';
-    
+
     default:
       return '你好，很高兴见到你。';
   }
@@ -334,7 +338,7 @@ export const getChatDialogue = (
 /**
  * 执行聊天功能
  * 增加友好度+1，并返回聊天奖励
- * 
+ *
  * @param relationship 当前公主关系数据
  * @param hasRescuedKing 是否已救国王
  * @returns 聊天结果，包含是否成功、新亲密度、奖励和对话
@@ -361,17 +365,17 @@ export const performChat = (
       message: '今天已经聊过天了，明天再来吧。'
     };
   }
-  
+
   // 增加亲密度
   const newIntimacy = relationship.intimacy + 1;
   const newLevel = calculateRelationshipLevel(newIntimacy);
-  
+
   // 获取奖励
   const reward = getChatReward(newLevel);
-  
+
   // 获取对话
   const dialogue = getChatDialogue(newLevel, hasRescuedKing);
-  
+
   // 生成提示消息
   let message = '与公主聊天，友好度+1。';
   if (reward) {
@@ -380,7 +384,7 @@ export const performChat = (
   if (newLevel > relationship.level) {
     message += `恭喜！你与公主的关系提升到了${getRelationshipName(newLevel)}！`;
   }
-  
+
   return {
     success: true,
     newIntimacy,
@@ -396,11 +400,11 @@ export const performChat = (
 /**
  * 计算送礼增加的亲密度
  * 根据花朵类型和数量计算亲密度增加
- * 
+ *
  * @param flowerType 花朵类型 ('99朵白玫瑰' | '999朵白玫瑰')
  * @param quantity 花朵数量
  * @returns 增加的亲密度
- * 
+ *
  * @example
  * calculateGiftIntimacy('99朵白玫瑰', 1)   // 返回: 5 (基础5点)
  * calculateGiftIntimacy('99朵白玫瑰', 10)   // 返回: 14 (基础5点 + 9点)
@@ -418,13 +422,14 @@ export const calculateGiftIntimacy = (
     // 999朵白玫瑰：基础25点 + 每多1朵+5点
     return 25 + (quantity - 1) * 5;
   }
+
   return 0;
 };
 
 /**
  * 执行送礼功能
  * 送花给公主，增加亲密度
- * 
+ *
  * @param relationship 当前公主关系数据
  * @param flowerType 花朵类型
  * @param quantity 花朵数量
@@ -445,7 +450,7 @@ export const performGift = (
       message: '只有在周日才能送花给公主。'
     };
   }
-  
+
   // 检查今天是否已送礼
   if (!relationship.canGiftToday) {
     return {
@@ -454,10 +459,10 @@ export const performGift = (
       message: '今天已经送过礼物了，明天再来吧。'
     };
   }
-  
+
   // 计算亲密度增加
   const intimacyGain = calculateGiftIntimacy(flowerType, quantity);
-  
+
   return {
     success: true,
     intimacyGain,
@@ -470,11 +475,11 @@ export const performGift = (
 /**
  * 获取周日礼物
  * 根据关系等级返回对应的周日礼物
- * 
+ *
  * @param relationshipLevel 关系等级 (0-6)
  * @param hasOpenedSoul 是否已开战魂（仅关系等级6时需要）
  * @returns 周日礼物，如果没有礼物则返回 null
- * 
+ *
  * @example
  * getSundayGift(0, false)  // 返回: { itemId: 'senior_exp_stone', itemName: '高级经验石', ... }
  * getSundayGift(5, false)  // 返回: { itemId: 'soul_king', itemName: '灵魂王', ... }
@@ -493,7 +498,7 @@ export const getSundayGift = (
       description: '这是我收藏了许久的优质宝石，高级经验石...'
     };
   }
-  
+
   // 关系等级 3-4：高级战斗力石
   if (relationshipLevel >= 3 && relationshipLevel <= 4) {
     return {
@@ -502,7 +507,7 @@ export const getSundayGift = (
       description: '这是我收藏了许久的优质宝石，高级战斗力石...'
     };
   }
-  
+
   // 关系等级 5：灵魂王
   if (relationshipLevel === 5) {
     return {
@@ -511,7 +516,7 @@ export const getSundayGift = (
       description: '这是我收藏了许久的优质宝石，灵魂王...'
     };
   }
-  
+
   // 关系等级 6：根据是否开战魂决定礼物
   if (relationshipLevel === 6) {
     if (hasOpenedSoul) {
@@ -529,13 +534,13 @@ export const getSundayGift = (
       };
     }
   }
-  
+
   return null;
 };
 
 /**
  * 领取周日礼物
- * 
+ *
  * @param relationship 当前公主关系数据
  * @param isSunday 是否是周日
  * @param hasOpenedSoul 是否已开战魂
@@ -558,7 +563,7 @@ export const receiveSundayGift = (
       message: '只有在周日才能领取公主的礼物。'
     };
   }
-  
+
   // 检查本周是否已领取
   if (!relationship.canReceiveSundayGift) {
     return {
@@ -567,10 +572,10 @@ export const receiveSundayGift = (
       message: '本周已经领取过礼物了，下周再来吧。'
     };
   }
-  
+
   // 获取礼物
   const gift = getSundayGift(relationship.level, hasOpenedSoul);
-  
+
   if (!gift) {
     return {
       success: false,
@@ -578,7 +583,7 @@ export const receiveSundayGift = (
       message: '当前关系等级没有礼物可领取。'
     };
   }
-  
+
   return {
     success: true,
     gift,
@@ -591,7 +596,7 @@ export const receiveSundayGift = (
 /**
  * 获取知己的礼物
  * 关系达到知己（等级4）后，可以获得年猪
- * 
+ *
  * @returns 知己的礼物信息
  */
 export const getConfidantGift = (): {
@@ -608,7 +613,7 @@ export const getConfidantGift = (): {
 
 /**
  * 领取知己的礼物
- * 
+ *
  * @param relationship 当前公主关系数据
  * @returns 领取结果
  */
@@ -627,7 +632,7 @@ export const receiveConfidantGift = (
       message: '需要达到知己关系才能领取此礼物。'
     };
   }
-  
+
   // 检查是否已领取
   if (relationship.hasReceivedConfidantGift) {
     return {
@@ -636,9 +641,9 @@ export const receiveConfidantGift = (
       message: '已经领取过知己的礼物了。'
     };
   }
-  
+
   const gift = getConfidantGift();
-  
+
   return {
     success: true,
     gift,
@@ -650,7 +655,7 @@ export const receiveConfidantGift = (
 
 /**
  * 获取所有魔族大军情报
- * 
+ *
  * @returns 魔族大军情报列表
  */
 export const getAllDemonArmyInfo = (): DemonArmyInfo[] => {
@@ -659,7 +664,7 @@ export const getAllDemonArmyInfo = (): DemonArmyInfo[] => {
 
 /**
  * 获取指定魔族大军情报
- * 
+ *
  * @param demonId 魔族ID
  * @returns 魔族情报，如果不存在则返回 null
  */
@@ -670,26 +675,26 @@ export const getDemonArmyInfoById = (demonId: string): DemonArmyInfo | null => {
 /**
  * 获取魔族大军情报对话内容
  * 用于国王NPC显示魔族军队信息
- * 
+ *
  * @param demonId 魔族ID
  * @returns 对话内容
  */
 export const getDemonArmyDialogue = (demonId: string): string => {
   const demon = getDemonArmyInfoById(demonId);
-  
+
   if (!demon) {
     return '没有找到该魔族军队的情报。';
   }
-  
+
   let dialogue = `【${demon.name}】\n`;
-  
+
   if (demon.level > 0) {
     dialogue += `等级：${demon.level}级\n`;
   }
-  
+
   dialogue += `特殊效果：${demon.effect}\n`;
   dialogue += `描述：${demon.description}`;
-  
+
   return dialogue;
 };
 
@@ -697,7 +702,7 @@ export const getDemonArmyDialogue = (demonId: string): string => {
 
 /**
  * 获取关系升级提示消息
- * 
+ *
  * @param newLevel 新的关系等级
  * @returns 提示消息
  */
@@ -725,7 +730,7 @@ export const getUpgradeMessage = (newLevel: number): string => {
 /**
  * 重置每日状态
  * 每天重置聊天和送礼状态
- * 
+ *
  * @param relationship 当前公主关系数据
  * @returns 重置后的关系数据
  */
@@ -742,7 +747,7 @@ export const resetDailyStatus = (
 /**
  * 重置每周状态
  * 每周日重置礼物领取状态
- * 
+ *
  * @param relationship 当前公主关系数据
  * @returns 重置后的关系数据
  */
@@ -758,7 +763,7 @@ export const resetWeeklyStatus = (
 /**
  * 更新关系数据
  * 根据亲密度更新关系等级和名称
- * 
+ *
  * @param relationship 当前公主关系数据
  * @param intimacyChange 亲密度变化值（可正可负）
  * @returns 更新后的关系数据
@@ -770,7 +775,7 @@ export const updateRelationship = (
   const newIntimacy = Math.max(0, relationship.intimacy + intimacyChange);
   const newLevel = calculateRelationshipLevel(newIntimacy);
   const newName = getRelationshipName(newLevel);
-  
+
   return {
     ...relationship,
     intimacy: newIntimacy,

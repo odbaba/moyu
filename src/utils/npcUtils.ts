@@ -10,11 +10,11 @@ import type { NPCInteractionCondition } from '../types';
  * 用于NPC选项条件判断
  */
 export interface NPCGameState {
-  currentWeekday: number;      // 当前星期（0=周日, 1=周一, ..., 6=周六）
-  relationshipLevel: number;    // 公主关系等级（0-6）
-  militaryRank: number;        // 军衔等级（0-11）
-  nobleRank: number;           // 爵位等级（0-6）
-  [key: string]: any;          // 其他自定义状态
+  currentWeekday: number; // 当前星期（0=周日, 1=周一, ..., 6=周六）
+  relationshipLevel: number; // 公主关系等级（0-6）
+  militaryRank: number; // 军衔等级（0-11）
+  nobleRank: number; // 爵位等级（0-6）
+  [key: string]: any; // 其他自定义状态
 }
 
 /**
@@ -53,14 +53,14 @@ const compare = (a: number, b: number, operator: CompareOperator): boolean => {
  * @param condition 条件配置
  * @param gameState 游戏状态（包含时间、角色数据等）
  * @returns 是否显示该选项
- * 
+ *
  * @example
  * // 周日显示
  * checkNPCOptionCondition({ type: 'weekday', value: 0 }, gameState)
- * 
+ *
  * // 关系等级>=4时显示
  * checkNPCOptionCondition({ type: 'relationship', value: 4, operator: 'gte' }, gameState)
- * 
+ *
  * // 军衔>5时显示
  * checkNPCOptionCondition({ type: 'militaryRank', value: 5, operator: 'gt' }, gameState)
  */
@@ -107,6 +107,7 @@ export const checkNPCOptionCondition = (
       if (typeof condition.value === 'function') {
         return condition.value(gameState);
       }
+
       return false;
 
     default:
@@ -173,6 +174,7 @@ export const filterNPCOptions = <T extends { condition?: NPCInteractionCondition
  */
 export const getWeekdayName = (weekday: number): string => {
   const names = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
   return names[weekday] || '未知';
 };
 
@@ -183,6 +185,7 @@ export const getWeekdayName = (weekday: number): string => {
  */
 export const getRelationshipName = (level: number): string => {
   const names = ['陌生人', '认识', '朋友', '好友', '知己', '恋人', '伴侣'];
+
   return names[level] || '未知';
 };
 
@@ -196,6 +199,7 @@ export const getMilitaryRankName = (level: number): string => {
     '列兵', '上等兵', '下士', '中士', '上士', '军士长',
     '准尉', '少尉', '中尉', '上尉', '少校', '中校'
   ];
+
   return names[level] || '未知';
 };
 
@@ -206,5 +210,6 @@ export const getMilitaryRankName = (level: number): string => {
  */
 export const getNobleRankName = (level: number): string => {
   const names = ['平民', '男爵', '子爵', '伯爵', '侯爵', '公爵', '亲王'];
+
   return names[level] || '未知';
 };

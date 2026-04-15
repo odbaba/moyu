@@ -1,13 +1,14 @@
-import React from 'react';
-import type { CharacterData, Pet } from '../../types';
-import { exampleCharacter } from '../../data/characterData';
-import { calculateTotalCombatPower } from '../../utils/combatPower';
-import { 
-  calculateTotalCharacterAttributes, 
-  calculateAllEquipmentBonus, 
-  calculateSoulAttackBonus 
-} from '../../utils/attributeCalculator';
 import './character.css';
+
+import React from 'react';
+
+import { exampleCharacter } from '../../data/characterData';
+import type { CharacterData, Pet } from '../../types';
+import {
+  calculateAllEquipmentBonus,
+  calculateSoulAttackBonus,
+  calculateTotalCharacterAttributes} from '../../utils/attributeCalculator';
+import { calculateTotalCombatPower } from '../../utils/combatPower';
 
 /**
  * 角色信息组件属性接口
@@ -33,10 +34,10 @@ interface CharacterInfoProps {
  * 紧凑布局显示角色的核心属性
  * 移动端优化：图标+数值的简洁展示方式
  */
-const CharacterInfo: React.FC<CharacterInfoProps> = ({ 
-  character = exampleCharacter, 
+const CharacterInfo: React.FC<CharacterInfoProps> = ({
+  character = exampleCharacter,
   pets = [],
-  onShowDetail 
+  onShowDetail
 }) => {
   /**
    * 计算综合战斗力（包含幻兽加成）
@@ -62,32 +63,32 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
    * 计算动态属性（基础属性 + 装备加成 + 幻兽加成 + 战魂加成）
    */
   const totalAttributes = calculateTotalCharacterAttributes(character);
-  
+
   /**
    * 获取装备属性加成
    */
   const equipmentBonus = calculateAllEquipmentBonus(character.equipment);
-  
+
   /**
    * 获取战魂攻击百分比加成
    */
   const soulAttackBonus = calculateSoulAttackBonus(character.equipment);
-  
+
   /**
    * 获取幻兽属性加成
    */
   const petBonus = character.petBonus || { attackMin: 0, attackMax: 0, defense: 0 };
-  
+
   /**
    * 判断是否有装备加成
    */
   const hasEquipmentBonus = equipmentBonus.attackMin > 0 || equipmentBonus.attackMax > 0 || equipmentBonus.defense > 0;
-  
+
   /**
    * 判断是否有幻兽合体加成
    */
   const hasPetBonus = petBonus.attackMin > 0 || petBonus.attackMax > 0 || petBonus.defense > 0;
-  
+
   /**
    * 判断是否有战魂加成
    */
@@ -119,21 +120,21 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
         <div className="hp-container-compact">
           <span className="hp-icon">❤️</span>
           <div className="hp-bar-compact">
-            <div 
-              className="hp-fill-compact" 
-              style={{ width: `${hpPercentage}%` }} 
+            <div
+              className="hp-fill-compact"
+              style={{ width: `${hpPercentage}%` }}
             />
             <span className="hp-text-compact">{character.currentHp}/{totalAttributes.maxHp}</span>
           </div>
         </div>
-        
+
         {/* 体力值 */}
         <div className="stamina-container-compact">
           <span className="stamina-icon">⚡</span>
           <div className="stamina-bar-compact">
-            <div 
-              className="stamina-fill-compact" 
-              style={{ width: `${staminaPercentage}%` }} 
+            <div
+              className="stamina-fill-compact"
+              style={{ width: `${staminaPercentage}%` }}
             />
             <span className="stamina-text-compact">{character.currentStamina}/{totalAttributes.maxStamina}</span>
           </div>
@@ -145,9 +146,9 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
         <div className="exp-container-compact">
           <span className="exp-icon">📊</span>
           <div className="exp-bar-compact">
-            <div 
-              className="exp-fill-compact" 
-              style={{ width: `${expPercentage}%` }} 
+            <div
+              className="exp-fill-compact"
+              style={{ width: `${expPercentage}%` }}
             />
             <span className="exp-text-compact">EXP {character.exp}/{character.maxExp}</span>
           </div>
@@ -202,7 +203,7 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
           <span className="combat-power-label">战斗力</span>
           <span className="combat-power-value">{totalCombatPower}</span>
           {onShowDetail && (
-            <button 
+            <button
               className="detail-button-compact"
               onClick={onShowDetail}
             >

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import type { BattleCharacter, BattlePet, Buff, BuffType } from '../../types';
 
 /**
@@ -81,8 +82,8 @@ const getBuffIcon = (type: BuffType): string => {
  */
 const renderBuff = (buff: Buff) => {
   return (
-    <div 
-      key={buff.id} 
+    <div
+      key={buff.id}
       className={`buff-icon ${getBuffColor(buff.type)}`}
       title={`${buff.name}: +${buff.value}% (${buff.duration}回合)`}
     >
@@ -105,19 +106,19 @@ const renderBuff = (buff: Buff) => {
 const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
   // 计算生命值百分比，用于进度条显示
   const hpPercentage = Math.max(0, Math.min(100, (character.currentHp / character.maxHp) * 100));
-  
+
   // 判断是否为幻兽类型
   const isPet = isBattlePet(character);
-  
+
   // 判断是否为合体幻兽（只有幻兽才有 isMerged 属性）
   const isMerged = isPet && character.isMerged;
-  
+
   // 判断是否为角色类型（有 MP 和 buffs 属性）
   const hasMp = !isPet;
   const hasBuffs = !isPet && character.buffs && character.buffs.length > 0;
-  
+
   // 计算魔法值百分比（仅角色有 MP）
-  const mpPercentage = hasMp 
+  const mpPercentage = hasMp
     ? Math.max(0, Math.min(100, ((character as BattleCharacter).currentMp / (character as BattleCharacter).maxMp) * 100))
     : 0;
 
@@ -162,7 +163,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
             {character.currentHp}/{character.maxHp}
           </span>
           {/* 生命值进度条填充 */}
-          <div 
+          <div
             className="stat-bar-fill hp-fill"
             style={{ width: `${hpPercentage}%` }}
           />
@@ -179,7 +180,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
               {(character as BattleCharacter).currentMp}/{(character as BattleCharacter).maxMp}
             </span>
             {/* 魔法值进度条填充 */}
-            <div 
+            <div
               className="stat-bar-fill mp-fill"
               style={{ width: `${mpPercentage}%` }}
             />

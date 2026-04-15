@@ -1,15 +1,16 @@
 import React from 'react';
+
 import type { BattleSkill, SkillAttackType } from '../../types';
 
 /**
  * 行动按钮组件属性接口
  */
 interface ActionButtonsProps {
-  skills: BattleSkill[];           // 技能列表
-  currentMp: number;               // 当前MP值
-  currentStamina: number;          // 当前体力值
-  onActionSelect: (skillId: string) => void;  // 技能选择回调
-  disabled?: boolean;              // 是否禁用所有按钮
+  skills: BattleSkill[]; // 技能列表
+  currentMp: number; // 当前MP值
+  currentStamina: number; // 当前体力值
+  onActionSelect: (skillId: string) => void; // 技能选择回调
+  disabled?: boolean; // 是否禁用所有按钮
 }
 
 /**
@@ -19,12 +20,13 @@ interface ActionButtonsProps {
  */
 const getSkillTypeIcon = (attackType: SkillAttackType): string => {
   const iconMap: Record<SkillAttackType, string> = {
-    single: '🎯',   // 单体攻击
-    aoe: '💥',      // 群体攻击
-    multi: '⚔️',    // 多段攻击
-    buff: '🔥',     // 增益技能
-    special: '⭐'   // 特殊技能
+    single: '🎯', // 单体攻击
+    aoe: '💥', // 群体攻击
+    multi: '⚔️', // 多段攻击
+    buff: '🔥', // 增益技能
+    special: '⭐' // 特殊技能
   };
+
   return iconMap[attackType] || '⚔️';
 };
 
@@ -41,6 +43,7 @@ const getSkillTypeName = (attackType: SkillAttackType): string => {
     buff: '增益',
     special: '特殊'
   };
+
   return nameMap[attackType] || '未知';
 };
 

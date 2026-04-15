@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import type { InventoryItem, EquipmentItem } from '../../types';
-import { getRarityClassName, isEquipmentItem } from '../common/utils';
-import { getEquipmentDisplayName } from '../../utils/equipmentConverter';
 import './inventory.css';
+
+import React, { useState } from 'react';
+
+import type { EquipmentItem, InventoryItem } from '../../types';
+import { getEquipmentDisplayName } from '../../utils/equipmentConverter';
+import { getRarityClassName, isEquipmentItem } from '../common/utils';
 
 /**
  * 物品网格展示组件属性接口
@@ -36,7 +38,7 @@ const ItemGrid: React.FC<ItemGridProps> = ({
     // 判断是否为装备类型
     const isEquipment = isEquipmentItem(item);
     const equipmentItem = isEquipment ? item as EquipmentItem : null;
-    
+
     return (
       <ItemSlotWithImage
         key={item.id}
@@ -107,6 +109,7 @@ const ItemSlotWithImage: React.FC<ItemSlotWithImageProps> = ({
     if (item.imagePath) {
       return item.imagePath;
     }
+
     return null;
   };
 
@@ -116,7 +119,7 @@ const ItemSlotWithImage: React.FC<ItemSlotWithImageProps> = ({
    */
   const renderItemIcon = () => {
     const imagePath = getItemImagePath();
-    
+
     // 如果有图片路径且图片未加载失败
     if (imagePath && !imageError) {
       return (
@@ -128,7 +131,7 @@ const ItemSlotWithImage: React.FC<ItemSlotWithImageProps> = ({
         />
       );
     }
-    
+
     // 其他情况显示emoji图标
     return (
       <span className="item-list-icon">
@@ -144,14 +147,14 @@ const ItemSlotWithImage: React.FC<ItemSlotWithImageProps> = ({
     >
       {/* 物品图标/图片 */}
       {renderItemIcon()}
-      
+
       {/* 物品名称 */}
       <span className="item-list-name">
-        {isEquipment && equipmentItem 
+        {isEquipment && equipmentItem
           ? getEquipmentDisplayName(item.name, equipmentItem.equipmentQuality, equipmentItem.magicSoulLevel)
           : item.name}
       </span>
-      
+
       {/* 物品数量标签 */}
       {item.quantity > 1 && (
         <span className="item-list-count">

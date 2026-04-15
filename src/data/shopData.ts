@@ -4,11 +4,11 @@
  * 参考文档：
  * - reference/docs/杂货商交互逻辑文档.md
  * - reference/docs/魔石商人交互逻辑文档.md
- * 
+ *
  * 注意：物品 ID 必须与 inventoryData.ts 中的物品 ID 一致，才能正确堆叠
  */
 
-import type { ShopItem, ShopConfig, ShopType } from '../types';
+import type { ShopConfig, ShopItem, ShopType } from '../types';
 
 // ==================== 杂货商物品列表（金币商店）====================
 
@@ -407,6 +407,7 @@ export function getShopItemById(itemId: string): ShopItem | undefined {
       return item;
     }
   }
+
   return undefined;
 }
 

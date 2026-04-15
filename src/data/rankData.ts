@@ -10,11 +10,11 @@
  * 包含军衔的基础信息和奖励配置
  */
 export interface MilitaryRankConfig {
-  level: number;          // 军衔等级 (0-11)
-  name: string;           // 军衔名称
-  requiredBattleExp: number;  // 所需战功
-  combatPowerBonus: number;   // 战斗力加成
-  pay: number;            // 军饷（魔石），周日可领取
+  level: number; // 军衔等级 (0-11)
+  name: string; // 军衔名称
+  requiredBattleExp: number; // 所需战功
+  combatPowerBonus: number; // 战斗力加成
+  pay: number; // 军饷（魔石），周日可领取
 }
 
 /**
@@ -49,6 +49,7 @@ export function getMilitaryRankLevel(battleExp: number): number {
       return MILITARY_RANKS[i].level;
     }
   }
+
   return 0;
 }
 
@@ -69,6 +70,7 @@ export function getMilitaryRankByLevel(level: number): MilitaryRankConfig {
 export function getNextMilitaryRankExp(currentLevel: number): number | null {
   if (currentLevel >= 11) return null;
   const nextRank = MILITARY_RANKS.find(rank => rank.level === currentLevel + 1);
+
   return nextRank ? nextRank.requiredBattleExp : null;
 }
 
@@ -78,10 +80,10 @@ export function getNextMilitaryRankExp(currentLevel: number): number | null {
  * 爵位等级配置接口
  */
 export interface NobleRankConfig {
-  level: number;          // 爵位等级 (0-6)
-  name: string;           // 爵位名称
-  requiredMerit: number;  // 所需功勋
-  combatPowerBonus: number;   // 战斗力加成
+  level: number; // 爵位等级 (0-6)
+  name: string; // 爵位名称
+  requiredMerit: number; // 所需功勋
+  combatPowerBonus: number; // 战斗力加成
 }
 
 /**
@@ -109,6 +111,7 @@ export function getNobleRankLevel(merit: number): number {
       return NOBLE_RANKS[i].level;
     }
   }
+
   return 0;
 }
 
@@ -129,6 +132,7 @@ export function getNobleRankByLevel(level: number): NobleRankConfig {
 export function getNextNobleRankMerit(currentLevel: number): number | null {
   if (currentLevel >= 6) return null;
   const nextRank = NOBLE_RANKS.find(rank => rank.level === currentLevel + 1);
+
   return nextRank ? nextRank.requiredMerit : null;
 }
 
@@ -139,13 +143,13 @@ export function getNextNobleRankMerit(currentLevel: number): number | null {
  * 击败特定敌人获得的功勋值
  */
 export const MERIT_REWARDS: Record<string, number> = {
-  'boss-10': 100,      // 10级BOSS
-  'boss-20': 200,      // 20级BOSS
-  'boss-30': 300,      // 30级BOSS
-  'boss-50': 500,      // 50级BOSS
-  'boss-70': 700,      // 70级BOSS
-  'boss-90': 900,      // 90级BOSS
-  'boss-100': 1000,    // 100级BOSS
+  'boss-10': 100, // 10级BOSS
+  'boss-20': 200, // 20级BOSS
+  'boss-30': 300, // 30级BOSS
+  'boss-50': 500, // 50级BOSS
+  'boss-70': 700, // 70级BOSS
+  'boss-90': 900, // 90级BOSS
+  'boss-100': 1000, // 100级BOSS
 };
 
 /**
@@ -175,21 +179,21 @@ export function calculateBattleExpReward(enemyLevel: number): number {
  * 定义每个爵位等级可以领取的奖励
  */
 export interface NobleRankReward {
-  level: number;              // 爵位等级
-  rewardName: string;         // 奖励名称
-  description: string;        // 奖励描述
-  items: NobleRewardItem[];   // 奖励物品列表
-  magicStone?: number;        // 魔石奖励
-  exp?: number;               // 经验奖励
+  level: number; // 爵位等级
+  rewardName: string; // 奖励名称
+  description: string; // 奖励描述
+  items: NobleRewardItem[]; // 奖励物品列表
+  magicStone?: number; // 魔石奖励
+  exp?: number; // 经验奖励
 }
 
 /**
  * 爵位奖励物品接口
  */
 export interface NobleRewardItem {
-  itemId: string;             // 物品ID
-  itemName: string;           // 物品名称
-  quantity: number;           // 数量
+  itemId: string; // 物品ID
+  itemName: string; // 物品名称
+  quantity: number; // 数量
 }
 
 /**
@@ -296,10 +300,10 @@ export function getNobleRankReward(level: number): NobleRankReward | undefined {
  * 定义进入特定地图所需的爵位等级
  */
 export interface LocationAccessConfig {
-  locationId: string;         // 地图ID
-  locationName: string;       // 地图名称
-  requiredNobleRank: number;  // 所需爵位等级
-  description: string;        // 权限描述
+  locationId: string; // 地图ID
+  locationName: string; // 地图名称
+  requiredNobleRank: number; // 所需爵位等级
+  description: string; // 权限描述
 }
 
 /**

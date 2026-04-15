@@ -1,4 +1,4 @@
-import type { Pet, PetType, PetQuality, PetRating } from '../types';
+import type { Pet, PetQuality, PetRating, PetType } from '../types';
 
 // ========== 幻兽类型基础评分映射 ==========
 // 不同类型的幻兽有不同的基础评分
@@ -9,7 +9,8 @@ const petTypeBaseScore: Record<PetType, number> = {
   '奇异兽': 450,
   '圣天使': 280,
   '守护': 550,
-  '年猪': 600
+  '年猪': 600,
+  '噜噜': 700
 };
 
 // ========== 根据评分计算品质 ==========
@@ -24,6 +25,7 @@ function getQualityByScore(score: number): PetQuality {
   if (score < 500) return '良品';
   if (score < 700) return '上品';
   if (score < 900) return '精品';
+
   return '极品';
 }
 
@@ -52,16 +54,16 @@ function calculateDefense(cz_fy: number, cfy: number, dj: number): number {
 // 攻防型是均衡型幻兽，攻防兼备，基础评分为0
 const pet1: Pet = (() => {
   // 初始属性（范围：生命20-34，最小攻击10-14，最大攻击cxgj到29，防御5-9）
-  const chp = 25;      // 初始生命值
-  const cxgj = 12;     // 初始最小攻击
-  const cdgj = 22;     // 初始最大攻击（比最小攻击大一些）
-  const cfy = 7;       // 初始防御
+  const chp = 25; // 初始生命值
+  const cxgj = 12; // 初始最小攻击
+  const cdgj = 22; // 初始最大攻击（比最小攻击大一些）
+  const cfy = 7; // 初始防御
 
   // 成长属性（范围：生命成长30-41，最小攻击成长8-11，最大攻击成长cz_xgj到16，防御成长1-6）
-  const cz_hp = 35;    // 生命成长率
-  const cz_xgj = 9;    // 最小攻击成长率
-  const cz_dgj = 14;   // 最大攻击成长率
-  const cz_fy = 3;     // 防御成长率
+  const cz_hp = 35; // 生命成长率
+  const cz_xgj = 9; // 最小攻击成长率
+  const cz_dgj = 14; // 最大攻击成长率
+  const cz_fy = 3; // 防御成长率
 
   // 等级
   const dj = 15;
@@ -69,18 +71,18 @@ const pet1: Pet = (() => {
   // 计算评分
   const rating: PetRating = {
     pzbase: petTypeBaseScore['攻防型'],
-    pz_chp: Math.max(0, (chp - 100) * 2),           // 初始生命评分
-    pz_cxgj: Math.max(0, (cxgj - 15) * 2),          // 初始最小攻击评分
-    pz_cdgj: Math.max(0, (cdgj - 25) * 2),          // 初始最大攻击评分
-    pz_cfy: Math.max(0, (cfy - 10) * 2),            // 初始防御评分
-    pz_cz_hp: Math.max(0, (cz_hp - 40) * 20),       // 生命成长评分
-    pz_cz_xgj: Math.max(0, (cz_xgj - 10) * 20),     // 最小攻击成长评分
-    pz_cz_dgj: Math.max(0, (cz_dgj - 15) * 20),     // 最大攻击成长评分
-    pz_cz_fy: Math.max(0, (cz_fy - 5) * 20)         // 防御成长评分
+    pz_chp: Math.max(0, (chp - 100) * 2), // 初始生命评分
+    pz_cxgj: Math.max(0, (cxgj - 15) * 2), // 初始最小攻击评分
+    pz_cdgj: Math.max(0, (cdgj - 25) * 2), // 初始最大攻击评分
+    pz_cfy: Math.max(0, (cfy - 10) * 2), // 初始防御评分
+    pz_cz_hp: Math.max(0, (cz_hp - 40) * 20), // 生命成长评分
+    pz_cz_xgj: Math.max(0, (cz_xgj - 10) * 20), // 最小攻击成长评分
+    pz_cz_dgj: Math.max(0, (cz_dgj - 15) * 20), // 最大攻击成长评分
+    pz_cz_fy: Math.max(0, (cz_fy - 5) * 20) // 防御成长评分
   };
 
   // 总评分
-  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj + 
+  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj +
              rating.pz_cfy + rating.pz_cz_hp + rating.pz_cz_xgj + rating.pz_cz_dgj + rating.pz_cz_fy;
 
   return {
@@ -122,7 +124,7 @@ const pet2: Pet = (() => {
 
   const cz_hp = 36;
   const cz_xgj = 10;
-  const cz_dgj = 15;   // 调皮鬼最大攻击成长较高
+  const cz_dgj = 15; // 调皮鬼最大攻击成长较高
   const cz_fy = 2;
 
   const dj = 25;
@@ -139,7 +141,7 @@ const pet2: Pet = (() => {
     pz_cz_fy: Math.max(0, (cz_fy - 5) * 20)
   };
 
-  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj + 
+  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj +
              rating.pz_cfy + rating.pz_cz_hp + rating.pz_cz_xgj + rating.pz_cz_dgj + rating.pz_cz_fy;
 
   return {
@@ -157,8 +159,8 @@ const pet2: Pet = (() => {
     zs: 0,
     pz,
     quality: getQualityByScore(pz),
-    isDeployed: true,    // 出战状态
-    isMerged: false,     // 不合体
+    isDeployed: true, // 出战状态
+    isMerged: false, // 不合体
     chp,
     cxgj,
     cdgj,
@@ -180,7 +182,7 @@ const pet3: Pet = (() => {
   const cfy = 5;
 
   const cz_hp = 38;
-  const cz_xgj = 11;    // 吉鲁猪攻击成长最高
+  const cz_xgj = 11; // 吉鲁猪攻击成长最高
   const cz_dgj = 16;
   const cz_fy = 2;
 
@@ -198,7 +200,7 @@ const pet3: Pet = (() => {
     pz_cz_fy: Math.max(0, (cz_fy - 5) * 20)
   };
 
-  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj + 
+  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj +
              rating.pz_cfy + rating.pz_cz_hp + rating.pz_cz_xgj + rating.pz_cz_dgj + rating.pz_cz_fy;
 
   return {
@@ -213,7 +215,7 @@ const pet3: Pet = (() => {
     fy: calculateDefense(cz_fy, cfy, dj),
     jy: 2000,
     mjy: 3500,
-    zs: 1,               // 已幻化1次
+    zs: 1, // 已幻化1次
     pz,
     quality: getQualityByScore(pz),
     isDeployed: false,
@@ -227,7 +229,7 @@ const pet3: Pet = (() => {
     cz_dgj,
     cz_fy,
     rating,
-    predj: 50,           // 幻化前等级
+    predj: 50, // 幻化前等级
     premjy: 5000,
     prejy: 2500
   };
@@ -260,7 +262,7 @@ const pet4: Pet = (() => {
     pz_cz_fy: Math.max(0, (cz_fy - 5) * 20)
   };
 
-  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj + 
+  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj +
              rating.pz_cfy + rating.pz_cz_hp + rating.pz_cz_xgj + rating.pz_cz_dgj + rating.pz_cz_fy;
 
   return {
@@ -278,8 +280,8 @@ const pet4: Pet = (() => {
     zs: 0,
     pz,
     quality: getQualityByScore(pz),
-    isDeployed: true,    // 出战状态
-    isMerged: true,      // 合体状态
+    isDeployed: true, // 出战状态
+    isMerged: true, // 合体状态
     chp,
     cxgj,
     cdgj,
@@ -295,12 +297,12 @@ const pet4: Pet = (() => {
 // ========== 示例幻兽5: 圣天使 - 极品品质 ==========
 // 圣天使是高生命型幻兽，生命成长最高，基础评分280
 const pet5: Pet = (() => {
-  const chp = 34;        // 较高的初始生命
+  const chp = 34; // 较高的初始生命
   const cxgj = 11;
   const cdgj = 24;
   const cfy = 7;
 
-  const cz_hp = 41;      // 圣天使生命成长最高
+  const cz_hp = 41; // 圣天使生命成长最高
   const cz_xgj = 9;
   const cz_dgj = 14;
   const cz_fy = 5;
@@ -319,7 +321,7 @@ const pet5: Pet = (() => {
     pz_cz_fy: Math.max(0, (cz_fy - 5) * 20)
   };
 
-  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj + 
+  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj +
              rating.pz_cfy + rating.pz_cz_hp + rating.pz_cz_xgj + rating.pz_cz_dgj + rating.pz_cz_fy;
 
   return {
@@ -334,7 +336,7 @@ const pet5: Pet = (() => {
     fy: calculateDefense(cz_fy, cfy, dj),
     jy: 10000,
     mjy: 15000,
-    zs: 2,               // 已幻化2次
+    zs: 2, // 已幻化2次
     pz,
     quality: getQualityByScore(pz),
     isDeployed: false,
@@ -360,12 +362,12 @@ const pet6: Pet = (() => {
   const chp = 26;
   const cxgj = 12;
   const cdgj = 23;
-  const cfy = 9;         // 较高的初始防御
+  const cfy = 9; // 较高的初始防御
 
   const cz_hp = 37;
   const cz_xgj = 10;
   const cz_dgj = 15;
-  const cz_fy = 6;       // 守护防御成长最高
+  const cz_fy = 6; // 守护防御成长最高
 
   const dj = 40;
 
@@ -381,7 +383,7 @@ const pet6: Pet = (() => {
     pz_cz_fy: Math.max(0, (cz_fy - 5) * 20)
   };
 
-  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj + 
+  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj +
              rating.pz_cfy + rating.pz_cz_hp + rating.pz_cz_xgj + rating.pz_cz_dgj + rating.pz_cz_fy;
 
   return {
@@ -425,4 +427,4 @@ export { petTypeBaseScore };
 export { getQualityByScore };
 
 // ========== 导出属性计算函数 ==========
-export { calculateMaxHp, calculateMinAttack, calculateMaxAttack, calculateDefense };
+export { calculateDefense, calculateMaxAttack, calculateMaxHp, calculateMinAttack };

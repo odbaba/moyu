@@ -3,15 +3,14 @@
  * 统一定义各组件共用的工具函数，避免重复定义
  */
 
-import type { InventoryItem, EquipmentItem, EquipmentSlotType, ItemRarity, PetQuality } from '../../types';
+import type { EquipmentItem, EquipmentSlotType, InventoryItem, ItemRarity, PetQuality } from '../../types';
 import {
-  PET_QUALITY_COLORS,
-  EQUIPMENT_QUALITY_COLORS,
   EQUIPMENT_ICON_MAP,
+  EQUIPMENT_QUALITY_COLORS,
+  PET_QUALITY_COLORS,
   PET_TYPE_EMOJI,
-  RARITY_CONFIG,
-  RARITY_CLASS_NAMES
-} from './constants';
+  RARITY_CLASS_NAMES,
+  RARITY_CONFIG} from './constants';
 
 /**
  * 根据幻兽品质获取对应的颜色
@@ -96,5 +95,6 @@ export const formatNumber = (num: number): string => {
   if (num >= 10000) {
     return `${(num / 10000).toFixed(1)}万`;
   }
+
   return num.toLocaleString();
 };

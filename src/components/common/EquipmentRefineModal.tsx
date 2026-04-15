@@ -1,18 +1,18 @@
-import React, { useState, useMemo } from 'react';
-import type { EquipmentItem, GemItem, RefineResult, InventoryItem } from '../../types';
-import { getEquipmentQualityColor } from './utils';
-import { getEquipmentDisplayName } from '../../utils/equipmentConverter';
-import ItemGrid from '../inventory/ItemGrid';
-import {
-  refineQuality,
-  refineMagicSoul,
-  refineUseLevel,
-  refineOpenHole,
-  embedGem,
-  activateSoul,
-  getQualityName
-} from '../../utils/equipmentRefine';
 import './EquipmentRefineModal.css';
+
+import React, { useMemo, useState } from 'react';
+
+import type { EquipmentItem, GemItem, InventoryItem, RefineResult } from '../../types';
+import { getEquipmentDisplayName } from '../../utils/equipmentConverter';
+import {
+  activateSoul,
+  embedGem,
+  refineMagicSoul,
+  refineOpenHole,
+  refineQuality,
+  refineUseLevel} from '../../utils/equipmentRefine';
+import ItemGrid from '../inventory/ItemGrid';
+import { getEquipmentQualityColor } from './utils';
 
 /**
  * 装备精炼模态窗口组件属性接口
@@ -60,10 +60,10 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
 }) => {
   // 当前选择的标签页：'equipment' 或 'gem'
   const [activeTab, setActiveTab] = useState<'equipment' | 'gem'>('equipment');
-  
+
   // 精炼结果反馈状态
   const [refineResult, setRefineResult] = useState<RefineResult | null>(null);
-  
+
   // 是否显示选择列表
   const [showSelection, setShowSelection] = useState(false);
 
@@ -80,7 +80,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
    * 只显示强化类宝石
    */
   const availableGems = useMemo(() => {
-    return inventoryGems.filter(item => 
+    return inventoryGems.filter(item =>
       item.gemType === 'enhance' || item.gemSubType === 'openHole' || item.gemSubType === 'soul'
     );
   }, [inventoryGems]);
@@ -155,6 +155,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
         success: false,
         message: '请先选择装备和宝石！'
       });
+
       return;
     }
 
@@ -225,22 +226,22 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
       <div className="refine-modal-content">
         {/* 关闭按钮 */}
         <button className="refine-close-modal" onClick={onClose}>×</button>
-        
+
         {/* 标题 */}
         <h3 className="refine-modal-title">装备精炼</h3>
-        
+
         {/* 精炼区域 */}
         <div className="refine-slots-container">
           {/* 装备槽 */}
           <div className="refine-slot-wrapper">
-            <div 
+            <div
               className={`refine-slot equipment-slot ${equipment ? 'filled' : ''}`}
               onClick={handleEquipmentSlotClick}
             >
               {equipment ? (
                 <div className="slot-content">
                   <div className="slot-icon">{equipment.icon}</div>
-                  <div 
+                  <div
                     className="slot-name"
                     style={{ color: getEquipmentQualityColor(equipment.equipmentQuality) }}
                   >
@@ -268,7 +269,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
 
           {/* 精炼按钮 */}
           <div className="refine-button-container">
-            <button 
+            <button
               className={`refine-button ${canRefine ? 'active' : ''}`}
               onClick={handleRefine}
               disabled={!canRefine}
@@ -279,7 +280,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
 
           {/* 宝石槽 */}
           <div className="refine-slot-wrapper">
-            <div 
+            <div
               className={`refine-slot gem-slot ${gem ? 'filled' : ''}`}
               onClick={handleGemSlotClick}
             >
@@ -330,10 +331,10 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
                     attackMaxChange: '最大攻击变化',
                     defenseChange: '防御变化',
                   };
-                  
+
                   const displayName = attributeNameMap[key] || key;
                   const displayValue = typeof value === 'number' && value > 0 ? `+${value}` : value;
-                  
+
                   return (
                     <div key={key} className="change-item">
                       {displayName}: {displayValue}
@@ -354,13 +355,13 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
                 <button className="selection-close" onClick={handleCloseSelection}>×</button>
               </div>
               <div className="selection-tabs">
-                <button 
+                <button
                   className={`tab-button ${activeTab === 'equipment' ? 'active' : ''}`}
                   onClick={() => setActiveTab('equipment')}
                 >
                   装备
                 </button>
-                <button 
+                <button
                   className={`tab-button ${activeTab === 'gem' ? 'active' : ''}`}
                   onClick={() => setActiveTab('gem')}
                 >

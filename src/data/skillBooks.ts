@@ -24,7 +24,7 @@ export const skillBookItems: InventoryItem[] = [
     isUpgrade: true,
     targetLevel: 2
   },
-  
+
   // 高级裂地爆斩技能书（升级书）
   {
     id: 'skillbook_earth_slash_advanced',
@@ -40,7 +40,7 @@ export const skillBookItems: InventoryItem[] = [
     isUpgrade: true,
     targetLevel: 2
   },
-  
+
   // 星魔剑技能书
   {
     id: 'skillbook_star_sword',
@@ -68,7 +68,7 @@ export const skillBookItems: InventoryItem[] = [
     skillId: 'skill_star_sword',
     isUpgrade: true
   },
-  
+
   // 飞天连斩技能书
   {
     id: 'skillbook_flying_slash',
@@ -96,7 +96,7 @@ export const skillBookItems: InventoryItem[] = [
     skillId: 'skill_flying_slash',
     isUpgrade: true
   },
-  
+
   // 斗志抑扬技能书（可升级5级）
   {
     id: 'skillbook_fighting_spirit_1',
@@ -194,9 +194,9 @@ export const getLearnSkillBook = (skillId: string): InventoryItem | undefined =>
  * @returns 升级技能书
  */
 export const getUpgradeSkillBook = (skillId: string, currentLevel: number): InventoryItem | undefined => {
-  return skillBookItems.find(item => 
-    item.skillId === skillId && 
-    item.isUpgrade && 
+  return skillBookItems.find(item =>
+    item.skillId === skillId &&
+    item.isUpgrade &&
     item.targetLevel === currentLevel + 1
   );
 };

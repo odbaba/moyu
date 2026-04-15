@@ -8,7 +8,6 @@
 import type {
   NPCInteractable,
   NPCInteractionOption,
-  NPCInteractionCondition,
 } from '../types';
 
 // ==================== 皇宫 NPC 配置 ====================
@@ -1130,6 +1129,7 @@ export const npcByLocation: Record<string, NPCInteractable[]> = {
  */
 export function getNpcIdsByLocation(locationId: string): string[] {
   const npcs = npcByLocation[locationId] || [];
+
   return npcs.map(npc => npc.id);
 }
 
@@ -1140,6 +1140,7 @@ export function getNpcIdsByLocation(locationId: string): string[] {
  */
 export function getNpcIdsByType(npcType: 'palace' | 'function' | 'shop' | 'special'): string[] {
   const npcs = npcByType[npcType] || [];
+
   return npcs.map(npc => npc.id);
 }
 
@@ -1168,19 +1169,22 @@ export function checkNpcOptionCondition(
   switch (type) {
     case 'weekday':
       return gameState.weekday === value;
-    
+
     case 'relationship':
       if (gameState.relationship === undefined) return false;
+
       return compareValues(gameState.relationship, value, operator);
-    
+
     case 'militaryRank':
       if (gameState.militaryRank === undefined) return false;
+
       return compareValues(gameState.militaryRank, value, operator);
-    
+
     case 'nobleRank':
       if (gameState.nobleRank === undefined) return false;
+
       return compareValues(gameState.nobleRank, value, operator);
-    
+
     default:
       return true;
   }

@@ -6,20 +6,17 @@
 // 导入交互系统相关类型
 import type {
   ActionInteractable,
-  EnemyInteractable,
-  NPCInteractable,
-  InteractableConfig,
   EnemyData,
+  EnemyInteractable,
+  InteractableConfig,
+  NPCInteractable,
 } from '../types';
-
-// 导入怪物数据和工具函数
-import { monsterTemplates, monsterSpawnConfigs } from './monsterData';
-import { calculateMonsterStats, generateEnemiesForBattle } from '../utils/monsterUtils';
-
-// 导入 BOSS 数据和工具函数
-import { bossTemplates, bossSpawnConfigs } from './bossData';
 import { generateBossEnemyData } from '../utils/bossUtils';
-
+import { calculateMonsterStats, generateEnemiesForBattle } from '../utils/monsterUtils';
+// 导入 BOSS 数据和工具函数
+import { bossSpawnConfigs, bossTemplates } from './bossData';
+// 导入怪物数据和工具函数
+import { monsterSpawnConfigs, monsterTemplates } from './monsterData';
 // 导入 NPC 配置数据
 import { npcConfig } from './npcData';
 
@@ -171,22 +168,23 @@ Object.assign(interactableConfig, npcConfig);
  */
 const generateMonsterInteractables = (): Record<string, EnemyInteractable> => {
   const monsterInteractables: Record<string, EnemyInteractable> = {};
-  
+
   // 遍历所有怪物刷新配置
   monsterSpawnConfigs.forEach((spawnConfig) => {
     // 获取怪物模板
     const template = monsterTemplates[spawnConfig.templateId];
     if (!template) {
       console.warn(`怪物模板不存在: ${spawnConfig.templateId}`);
+
       return;
     }
-    
+
     // 计算怪物属性
     const monsterStats = calculateMonsterStats(template);
-    
+
     // 生成战斗用的敌人列表（使用 spawnConfig.id 确保敌人 ID 唯一）
     const enemies: EnemyData[] = generateEnemiesForBattle(monsterStats, spawnConfig.id);
-    
+
     // 创建交互对象
     monsterInteractables[spawnConfig.interactableId] = {
       id: spawnConfig.interactableId,
@@ -197,7 +195,7 @@ const generateMonsterInteractables = (): Record<string, EnemyInteractable> => {
       enemies,
     };
   });
-  
+
   return monsterInteractables;
 };
 
@@ -229,7 +227,7 @@ export function generateBossInteractables(
   spawnedBossInteractableIds: string[]
 ): Record<string, EnemyInteractable> {
   const bossInteractables: Record<string, EnemyInteractable> = {};
-  
+
   // 遍历已刷新的 BOSS 交互 ID
   for (const interactableId of spawnedBossInteractableIds) {
     // 获取对应的刷新配置
@@ -238,17 +236,17 @@ export function generateBossInteractables(
       console.warn(`BOSS 刷新配置不存在: ${interactableId}`);
       continue;
     }
-    
+
     // 获取 BOSS 模板
     const bossTemplate = bossTemplates[spawnConfig.bossTemplateId];
     if (!bossTemplate) {
       console.warn(`BOSS 模板不存在: ${spawnConfig.bossTemplateId}`);
       continue;
     }
-    
+
     // 生成 BOSS 敌人数据
     const enemy = generateBossEnemyData(bossTemplate, spawnConfig.id);
-    
+
     // 创建交互对象
     bossInteractables[interactableId] = {
       id: interactableId,
@@ -259,7 +257,7 @@ export function generateBossInteractables(
       enemies: [enemy],
     };
   }
-  
+
   return bossInteractables;
 }
 

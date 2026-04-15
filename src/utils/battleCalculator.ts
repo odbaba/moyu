@@ -1,4 +1,4 @@
-import type { BattleCharacter, BattleSkill, DamageResult, Buff, BuffType, BattleLogEntry, BattleLogType } from '../types';
+import type { BattleCharacter, BattleLogEntry, BattleSkill, Buff, BuffType, DamageResult } from '../types';
 
 /**
  * 计算战斗力修正系数
@@ -14,17 +14,19 @@ export function calculateCombatPowerModifier(
   // 如果攻击者战斗力高
   if (attackerCombatPower > defenderCombatPower) {
     const gap = attackerCombatPower - defenderCombatPower;
+
     // 修正 = 1 + Math.min(差距, 20) * 0.05（最多 +100%，即系数 2.0）
     return 1 + Math.min(gap, 20) * 0.05;
   }
-  
+
   // 如果防御者战斗力高
   if (defenderCombatPower > attackerCombatPower) {
     const gap = defenderCombatPower - attackerCombatPower;
+
     // 修正 = 1 - Math.min(差距, 50) * 0.01（最多 -50%，即系数 0.5）
     return 1 - Math.min(gap, 50) * 0.01;
   }
-  
+
   // 如果相等，修正 = 1.0
   return 1.0;
 }
@@ -38,6 +40,7 @@ export function calculateCombatPowerModifier(
 export function checkDodge(dodgeRate: number): boolean {
   // 生成 0-99 的随机数
   const random = Math.floor(Math.random() * 100);
+
   // 如果随机数 < dodgeRate，返回 true（闪避成功）
   return random < dodgeRate;
 }
@@ -54,22 +57,24 @@ export function checkCritical(skill: BattleSkill, luck: number): boolean {
   if (skill.attackType === 'aoe' && skill.level === 2) {
     return true;
   }
-  
+
   // 如果技能攻击类型是 'multi' 且等级为 2（高级飞天连斩），返回 true
   if (skill.attackType === 'multi' && skill.level === 2) {
     return true;
   }
-  
+
   // 普通攻击（技能索引为 0）有 5% 基础暴击率 + luck * 0.1%
   if (skill.skillIndex === 0) {
     const criticalRate = 5 + luck * 0.1;
     const random = Math.floor(Math.random() * 100);
+
     return random < criticalRate;
   }
-  
+
   // 其他技能有 10% 基础暴击率
   const criticalRate = 10;
   const random = Math.floor(Math.random() * 100);
+
   return random < criticalRate;
 }
 
@@ -102,7 +107,7 @@ export function calculateDamage(
 ): DamageResult {
   // 1. 检查闪避
   const isDodged = checkDodge(defender.dodgeRate);
-  
+
   // 2. 如果闪避成功，返回 { damage: 0, isDodged: true, isCritical: false, isBreakDefense: false, combatPowerModifier: 1 }
   if (isDodged) {
     return {
@@ -113,35 +118,35 @@ export function calculateDamage(
       combatPowerModifier: 1
     };
   }
-  
+
   // 3. 计算基础伤害
   let damage = calculateBaseDamage(attacker.attackMin, attacker.attackMax);
-  
+
   // 4. 应用技能倍率：baseDamage * (skill.damagePercent / 100)
   damage = damage * (skill.damagePercent / 100);
-  
+
   // 5. 计算战斗力修正
   const combatPowerModifier = calculateCombatPowerModifier(attacker.combatPower, defender.combatPower);
-  
+
   // 6. 应用战斗力修正：damage * combatPowerModifier
   damage = damage * combatPowerModifier;
-  
+
   // 7. 检查暴击
   const isCritical = checkCritical(skill, attacker.luck);
-  
+
   // 8. 如果暴击，伤害 * 1.5
   if (isCritical) {
     damage = damage * 1.5;
   }
-  
+
   // 9. 如果不是破防攻击，减去防御力：damage - defender.defense
   if (!isBreakDefense) {
     damage = damage - defender.defense;
   }
-  
+
   // 10. 最小伤害为 1
   damage = Math.max(1, Math.floor(damage));
-  
+
   // 11. 返回结果
   return {
     damage,
@@ -162,7 +167,7 @@ export function calculateDamage(
 export function applyBuff(character: BattleCharacter, buff: Buff): BattleCharacter {
   // 将 buff 添加到 character.buffs 数组
   const newBuffs = [...character.buffs, buff];
-  
+
   // 返回新的角色对象
   return {
     ...character,
@@ -184,7 +189,7 @@ export function removeExpiredBuffs(character: BattleCharacter): BattleCharacter 
       ...buff,
       duration: buff.duration - 1
     }));
-  
+
   // 返回新的角色对象
   return {
     ...character,
@@ -206,7 +211,7 @@ export function calculateBuffedStats(
   let attackMax = character.attackMax;
   let defense = character.defense;
   let combatPower = character.combatPower;
-  
+
   // 遍历 character.buffs，根据 buff.type 和 buff.value 计算加成
   character.buffs.forEach(buff => {
     switch (buff.type) {
@@ -228,7 +233,7 @@ export function calculateBuffedStats(
         break;
     }
   });
-  
+
   // 返回计算后的属性值（取整）
   return {
     attackMin: Math.floor(attackMin),
@@ -265,13 +270,13 @@ export function executeSingleAttack(
 ): { defender: BattleCharacter; damageResult: DamageResult; logEntry: BattleLogEntry } {
   // 调用 calculateDamage 计算伤害
   const damageResult = calculateDamage(attacker, defender, skill, false);
-  
+
   // 更新防御者 currentHp：Math.max(0, currentHp - damageResult.damage)
   const updatedDefender: BattleCharacter = {
     ...defender,
     currentHp: Math.max(0, defender.currentHp - damageResult.damage)
   };
-  
+
   // 创建战斗日志条目
   const logEntry: BattleLogEntry = {
     id: generateLogId(),
@@ -288,7 +293,7 @@ export function executeSingleAttack(
     isDodged: damageResult.isDodged,
     isBreakDefense: damageResult.isBreakDefense
   };
-  
+
   // 返回结果
   return {
     defender: updatedDefender,
@@ -325,23 +330,23 @@ export function executeAoeAttack(
     damageResult: DamageResult;
     logEntry: BattleLogEntry;
   }> = [];
-  
+
   // 遍历所有存活的敌人
   const updatedEnemies = enemies.map(enemy => {
     // 跳过已死亡的敌人
     if (enemy.currentHp <= 0) {
       return enemy;
     }
-    
+
     // 对每个敌人调用 calculateDamage
     const damageResult = calculateDamage(attacker, enemy, skill, false);
-    
+
     // 更新敌人的 currentHp
     const updatedEnemy: BattleCharacter = {
       ...enemy,
       currentHp: Math.max(0, enemy.currentHp - damageResult.damage)
     };
-    
+
     // 创建战斗日志条目
     const logEntry: BattleLogEntry = {
       id: generateLogId(),
@@ -358,17 +363,17 @@ export function executeAoeAttack(
       isDodged: damageResult.isDodged,
       isBreakDefense: damageResult.isBreakDefense
     };
-    
+
     // 存储结果
     results.push({
       defender: updatedEnemy,
       damageResult,
       logEntry
     });
-    
+
     return updatedEnemy;
   });
-  
+
   // 返回结果
   return {
     enemies: updatedEnemies,
@@ -397,31 +402,31 @@ export function executeMultiAttack(
 } {
   // 根据 skill.hitCount 确定攻击次数（默认 4 次）
   const hitCount = skill.hitCount || 4;
-  
+
   // 根据 skill.breakDefenseHits 确定破防攻击次数（默认 0）
   const breakDefenseHits = skill.breakDefenseHits || 0;
-  
+
   // 存储每次攻击的伤害结果和日志
   const damageResults: DamageResult[] = [];
   const logEntries: BattleLogEntry[] = [];
-  
+
   // 累计伤害
   let totalDamage = 0;
-  
+
   // 对每次攻击进行计算
   for (let i = 0; i < hitCount; i++) {
     // 判断是否为破防攻击（前 breakDefenseHits 次为破防攻击）
     const isBreakDefense = i < breakDefenseHits;
-    
+
     // 调用 calculateDamage 计算伤害
     const damageResult = calculateDamage(attacker, defender, skill, isBreakDefense);
-    
+
     // 累计伤害
     totalDamage += damageResult.damage;
-    
+
     // 存储伤害结果
     damageResults.push(damageResult);
-    
+
     // 创建战斗日志条目
     const logEntry: BattleLogEntry = {
       id: generateLogId(),
@@ -438,16 +443,16 @@ export function executeMultiAttack(
       isDodged: damageResult.isDodged,
       isBreakDefense: damageResult.isBreakDefense
     };
-    
+
     logEntries.push(logEntry);
   }
-  
+
   // 更新防御者 currentHp（累计伤害）
   const updatedDefender: BattleCharacter = {
     ...defender,
     currentHp: Math.max(0, defender.currentHp - totalDamage)
   };
-  
+
   // 返回结果
   return {
     defender: updatedDefender,
@@ -478,10 +483,10 @@ export function executeBuffSkill(
     duration: skill.buffDuration,
     source: skill.id
   };
-  
+
   // 调用 applyBuff 应用增益
   const updatedAttacker = applyBuff(attacker, buff);
-  
+
   // 创建战斗日志条目（类型为 'buff'）
   const logEntry: BattleLogEntry = {
     id: generateLogId(),
@@ -495,7 +500,7 @@ export function executeBuffSkill(
     targetId: attacker.id,
     skillName: skill.name
   };
-  
+
   // 返回结果
   return {
     attacker: updatedAttacker,
@@ -526,7 +531,7 @@ export function executeSkill(
   | { type: 'multi'; defender: BattleCharacter; damageResults: DamageResult[]; logEntries: BattleLogEntry[] }
   | { type: 'buff'; attacker: BattleCharacter; buff: Buff; logEntry: BattleLogEntry }
   | { type: 'special'; defender: BattleCharacter; damageResult: DamageResult; logEntry: BattleLogEntry } {
-  
+
   // 根据 skill.attackType 调用对应的处理函数
   switch (skill.attackType) {
     case 'single':
@@ -535,49 +540,54 @@ export function executeSkill(
         throw new Error('单体攻击需要指定防御者');
       }
       const singleResult = executeSingleAttack(attacker, defender, skill, round);
+
       return {
         type: 'single',
         ...singleResult
       };
-    
+
     case 'aoe':
       // 群体攻击
       const aoeResult = executeAoeAttack(attacker, enemies, skill, round);
+
       return {
         type: 'aoe',
         ...aoeResult
       };
-    
+
     case 'multi':
       // 多段攻击
       if (!defender) {
         throw new Error('多段攻击需要指定防御者');
       }
       const multiResult = executeMultiAttack(attacker, defender, skill, round);
+
       return {
         type: 'multi',
         ...multiResult
       };
-    
+
     case 'buff':
       // 增益技能
       const buffResult = executeBuffSkill(attacker, skill, round);
+
       return {
         type: 'buff',
         ...buffResult
       };
-    
+
     case 'special':
       // 特殊技能（暂按单体处理）
       if (!defender) {
         throw new Error('特殊技能需要指定防御者');
       }
       const specialResult = executeSingleAttack(attacker, defender, skill, round);
+
       return {
         type: 'special',
         ...specialResult
       };
-    
+
     default:
       throw new Error(`未知的技能攻击类型: ${skill.attackType}`);
   }

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+
 import type { InventoryItem, Pet, PlayerResources } from '../../types';
 import {
   executeLottery,
-  PRIZE_LEVEL_NAMES,
   type LotteryResult,
-  type PrizeLevel,
+  PRIZE_LEVEL_NAMES,
 } from '../../utils/lotterySystem';
 
 /**
@@ -33,7 +33,7 @@ interface LotteryBoxProps {
 /**
  * 宝箱按钮组件
  * 提供抽奖功能，消耗魔石获取随机奖励
- * 
+ *
  * 功能说明：
  * - 点击时检查魔石是否足够（需要28魔石）
  * - 如果不足，显示提示消息
@@ -42,7 +42,6 @@ interface LotteryBoxProps {
  * - 显示抽奖结果，极品奖励有特殊提示
  */
 const LotteryBox: React.FC<LotteryBoxProps> = ({
-  boxId,
   magicStones,
   onUpdateMagicStones,
   playerLevel,
@@ -72,6 +71,7 @@ const LotteryBox: React.FC<LotteryBoxProps> = ({
     if (magicStones < MAGIC_STONE_COST) {
       setResultMessage('你不够28点魔石了，不能抽奖啦。');
       setShowResult(true);
+
       return;
     }
 

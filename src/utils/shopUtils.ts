@@ -7,20 +7,22 @@
  */
 
 import type {
-  ShopItem,
-  ShopType,
+  EquipmentItem,
+  EquipmentQuality,
+  EquipmentSlotType,
+  InventoryItem,
+  Pet,
+  PetQuality,
+  PetRating,
+  PetType,
+  PlayerResources,
   PurchaseResult,
   SellResult,
-  InventoryItem,
-  PlayerResources,
-  EquipmentItem,
-  Pet,
-  EquipmentSlotType,
-  EquipmentQuality,
+  ShopItem,
+  ShopType,
 } from '../types';
-import { getShopItemById } from '../data/shopData';
 
-// ==================== 货币检查函数 ====================
+// ==================== 购买函数 ====================
 
 /**
  * 检查玩家是否有足够的货币购买物品
@@ -41,10 +43,12 @@ export function canAffordPurchase(
   if (shopType === 'gold') {
     // 金币商店：检查金币是否足够
     const totalGold = item.priceGold * quantity;
+
     return playerGold >= totalGold;
   } else {
     // 魔石商店：检查魔石是否足够
     const totalMagicStone = item.priceMagicStone * quantity;
+
     return playerMagicStone >= totalMagicStone;
   }
 }
@@ -82,6 +86,7 @@ export function hasInventorySpace(
   // 检查背包是否有空位
   const usedSlots = inventoryItems.length;
   const hasEmptySlot = usedSlots < maxSlots;
+
   return hasEmptySlot;
 }
 
@@ -98,7 +103,7 @@ export function hasInventorySpace(
  */
 export function calculateSellPrice(item: InventoryItem): { gold: number; magicStone: number } {
   const quantity = item.quantity || 1;
-  
+
   // 装备类物品：根据公式计算价值
   if (item.type === 'equipment') {
     const equipmentItem = item as EquipmentItem;
@@ -114,27 +119,27 @@ export function calculateSellPrice(item: InventoryItem): { gold: number; magicSt
     const pz = pzMap[equipmentItem.equipmentQuality] || 0;
     const mhdj = equipmentItem.magicSoulLevel || 0;
     const dong = equipmentItem.holeCount || 0;
-    
+
     // 金币价值 = 100 * dj * (pz + 1) + 100 * mhdj + 10000 * dong³
     const goldValue = 100 * dj * (pz + 1) + 100 * mhdj + 10000 * dong * dong * dong;
-    
+
     // 魔石价值（仅极品 pz=4）
     let magicStoneValue = 0;
     if (pz === 4) {
       magicStoneValue = 28 * (dj * 2.5 + 50) + mhdj * 128 + 1500 * dong * dong * dong;
     }
-    
+
     // 出售价格为75%
     return {
       gold: Math.floor(goldValue * 0.75) * quantity,
       magicStone: Math.floor(magicStoneValue * 0.75) * quantity,
     };
   }
-  
+
   // 非装备类物品：使用 goldValue 和 magicStoneValue 属性
   const goldValue = item.goldValue || 0;
   const magicStoneValue = item.magicStoneValue || 0;
-  
+
   // 出售价格为75%
   return {
     gold: Math.floor(goldValue * 0.75) * quantity,
@@ -188,6 +193,7 @@ export function purchaseItem(
 
   if (!canAfford) {
     const currencyName = shopType === 'gold' ? '金币' : '魔石';
+
     return {
       success: false,
       message: `${currencyName}不足，无法购买`,
@@ -287,19 +293,19 @@ export function generateRandomWeapon(): EquipmentItem {
 
   // 2. 随机品质（普通50%、良好33%、优秀17%）
   const qualityRandom = Math.random() * 100;
-  let quality: EquipmentQuality;
+  let equipmentQuality: EquipmentQuality;
   if (qualityRandom < 50) {
-    quality = '普通品';
+    equipmentQuality = '普通品';
   } else if (qualityRandom < 83) {
-    quality = '良品';
+    equipmentQuality = '良品';
   } else {
-    quality = '上品';
+    equipmentQuality = '上品';
   }
 
   // 3. 随机洞数（0.1%概率有1-2个洞）
-  let sockets = 0;
+  let holeCount = 0;
   if (Math.random() < 0.001) {
-    sockets = Math.floor(Math.random() * 2) + 1; // 1-2个洞
+    holeCount = Math.floor(Math.random() * 2) + 1; // 1-2个洞
   }
 
   // 4. 随机魔魂等级（0-3级）
@@ -309,31 +315,67 @@ export function generateRandomWeapon(): EquipmentItem {
   const id = `random_${equipmentType}_${Date.now()}`;
 
   // 6. 根据品质计算属性
-  const qualityMultiplier = quality === '普通品' ? 1 : quality === '良品' ? 1.2 : 1.5;
+  const qualityMultiplier = equipmentQuality === '普通品' ? 1 : equipmentQuality === '良品' ? 1.2 : 1.5;
 
-  // 7. 返回装备数据
+  // 7. 计算攻击力范围
+  const baseAttack = Math.floor((10 + Math.random() * 10) * qualityMultiplier);
+  const attackMin = baseAttack;
+  const attackMax = baseAttack + Math.floor(Math.random() * 10);
+
+  // 8. 返回装备数据
   return {
     id,
     name: '随机装备',
     type: 'equipment',
     equipmentType,
-    level: 1,
-    quality,
-    attack: Math.floor((10 + Math.random() * 10) * qualityMultiplier),
-    defense: Math.floor((5 + Math.random() * 5) * qualityMultiplier),
-    maxHp: Math.floor((50 + Math.random() * 50) * qualityMultiplier),
-    maxMp: Math.floor((20 + Math.random() * 20) * qualityMultiplier),
-    sockets,
+    useLevel: 1,
+    equipmentQuality,
     magicSoulLevel,
+    holeCount,
+    attackMin,
+    attackMax,
+    defense: Math.floor((5 + Math.random() * 5) * qualityMultiplier),
     icon: '⚔️',
-    description: `随机生成的${quality}装备`,
+    description: `随机生成的${equipmentQuality}装备`,
     quantity: 1,
-    priceGold: 1000,
-    priceMagicStone: 0,
   };
 }
 
 // ==================== 幻兽生成函数 ====================
+
+/**
+ * 根据幻兽类型获取基础评分
+ * @param petType 幻兽类型
+ * @returns 基础评分
+ */
+function getPetTypeBaseScore(petType: PetType): number {
+  const baseScores: Record<PetType, number> = {
+    '攻防型': 0,
+    '调皮鬼': 280,
+    '吉鲁猪': 380,
+    '奇异兽': 450,
+    '圣天使': 280,
+    '守护': 550,
+    '年猪': 600,
+    '噜噜': 700,
+  };
+
+  return baseScores[petType] || 0;
+}
+
+/**
+ * 根据评分计算品质
+ * @param score 评分
+ * @returns 品质
+ */
+function getQualityByScore(score: number): PetQuality {
+  if (score < 300) return '普通';
+  if (score < 500) return '良品';
+  if (score < 700) return '上品';
+  if (score < 900) return '精品';
+
+  return '极品';
+}
 
 /**
  * 生成幻兽
@@ -341,91 +383,67 @@ export function generateRandomWeapon(): EquipmentItem {
  * @returns 幻兽数据
  */
 export function generatePet(petType: string): Pet {
-  // 基础品质分数（根据幻兽类型）
-  let baseQualityScore = 0;
-  switch (petType) {
-    case '攻防型':
-      baseQualityScore = 0;
-      break;
-    case '调皮猫':
-      baseQualityScore = 280;
-      break;
-    case '吉鲁猪':
-      baseQualityScore = 380;
-      break;
-    case '奇异兽':
-      baseQualityScore = 500;
-      break;
-    case '守护':
-      baseQualityScore = 1200;
-      break;
-    case '8星奇异兽':
-      baseQualityScore = 800;
-      break;
-    case '12星奇异兽':
-      baseQualityScore = 1200;
-      break;
-    default:
-      baseQualityScore = 0;
-  }
+  const petId = `shop_pet_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+  // 将字符串转换为 PetType
+  const validPetType = petType as PetType;
 
   // 随机生成初始属性
-  const initialAttack = 10 + Math.floor(Math.random() * 20);
-  const initialDefense = 5 + Math.floor(Math.random() * 10);
-  const initialHp = 20 + Math.floor(Math.random() * 30);
+  const chp = 25 + Math.floor(Math.random() * 10);
+  const cxgj = 10 + Math.floor(Math.random() * 5);
+  const cdgj = cxgj + Math.floor(Math.random() * 10);
+  const cfy = 5 + Math.floor(Math.random() * 5);
 
   // 随机生成成长属性
-  const growthAttack = 8 + Math.floor(Math.random() * 12);
-  const growthDefense = 1 + Math.floor(Math.random() * 6);
-  const growthHp = 30 + Math.floor(Math.random() * 20);
+  const cz_hp = 30 + Math.floor(Math.random() * 12);
+  const cz_xgj = 8 + Math.floor(Math.random() * 4);
+  const cz_dgj = cz_xgj + Math.floor(Math.random() * 5);
+  const cz_fy = 1 + Math.floor(Math.random() * 6);
 
-  // 计算品质分数
-  const qualityScore = baseQualityScore + 
-    Math.floor(initialAttack / 10) + 
-    Math.floor(initialDefense / 5) + 
-    Math.floor(initialHp / 20) +
-    Math.floor(growthAttack / 5) +
-    Math.floor(growthDefense / 2) +
-    Math.floor(growthHp / 10);
+  const dj = 1;
 
-  // 确定品质等级
-  let quality: '普通' | '良品' | '上品' | '精品' | '极品';
-  if (qualityScore >= 1000) {
-    quality = '极品';
-  } else if (qualityScore >= 800) {
-    quality = '精品';
-  } else if (qualityScore >= 500) {
-    quality = '上品';
-  } else if (qualityScore >= 200) {
-    quality = '良品';
-  } else {
-    quality = '普通';
-  }
+  // 计算评分
+  const rating: PetRating = {
+    pzbase: getPetTypeBaseScore(validPetType),
+    pz_chp: Math.max(0, (chp - 100) * 2),
+    pz_cxgj: Math.max(0, (cxgj - 15) * 2),
+    pz_cdgj: Math.max(0, (cdgj - 25) * 2),
+    pz_cfy: Math.max(0, (cfy - 10) * 2),
+    pz_cz_hp: Math.max(0, (cz_hp - 40) * 20),
+    pz_cz_xgj: Math.max(0, (cz_xgj - 10) * 20),
+    pz_cz_dgj: Math.max(0, (cz_dgj - 15) * 20),
+    pz_cz_fy: Math.max(0, (cz_fy - 5) * 20),
+  };
 
-  // 生成幻兽ID
-  const id = `pet_${petType}_${Date.now()}`;
+  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj +
+             rating.pz_cfy + rating.pz_cz_hp + rating.pz_cz_xgj + rating.pz_cz_dgj + rating.pz_cz_fy;
 
-  // 返回幻兽数据
   return {
-    id,
-    name: petType,
-    type: petType as any,
-    level: 1,
-    quality,
-    qualityScore,
-    initialAttack,
-    initialDefense,
-    initialHp,
-    growthAttack,
-    growthDefense,
-    growthHp,
-    currentAttack: initialAttack,
-    currentDefense: initialDefense,
-    currentHp: initialHp,
-    maxHp: initialHp,
-    deployed: false,
-    stars: 0,
-    icon: '🐾',
+    id: petId,
+    hs_name: validPetType,
+    othername: validPetType,
+    dj,
+    hp: chp,
+    mhp: chp,
+    xgj: cxgj,
+    dgj: cdgj,
+    fy: cfy,
+    jy: 0,
+    mjy: 10,
+    zs: 0,
+    pz,
+    quality: getQualityByScore(pz),
+    isDeployed: false,
+    isMerged: false,
+    chp,
+    cxgj,
+    cdgj,
+    cfy,
+    cz_hp,
+    cz_xgj,
+    cz_dgj,
+    cz_fy,
+    rating,
   };
 }
 

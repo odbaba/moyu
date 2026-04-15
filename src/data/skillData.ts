@@ -36,7 +36,7 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     learnLevel: 1,
     isLearned: true
   },
-  
+
   // 索引1: 裂地爆斩 - 群体攻击，攻击力60%（初始技能，消耗10点体力）
   {
     id: 'skill_earth_slash',
@@ -61,7 +61,7 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     learnLevel: 1,
     isLearned: true
   },
-  
+
   // 索引2: 星魔剑 - 群体攻击，攻击力100%/150%（高级）
   {
     id: 'skill_star_sword',
@@ -87,7 +87,7 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     upgradeCost: 10000,
     isLearned: isLearned
   },
-  
+
   // 索引3: 飞天连斩 - 单体四连击，其中2击破防
   {
     id: 'skill_flying_slash',
@@ -115,7 +115,7 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     upgradeCost: 15000,
     isLearned: isLearned
   },
-  
+
   // 索引4: 斗志抑扬 - 增益技能，战斗力加成5%-50%，可升级到5级
   {
     id: 'skill_fighting_spirit',
@@ -143,7 +143,7 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     upgradeCost: 5000,
     isLearned: isLearned
   },
-  
+
   // 索引5: 爱的力量 - 特殊技能，公主亲密度解锁
   {
     id: 'skill_love_power',
@@ -183,37 +183,39 @@ export const getSkillDisplayName = (skill: SkillDetail): string => {
     if (skill.level === 0) {
       return '斗志抑扬（未学习）';
     }
+
     return `斗志抑扬 Lv.${skill.level}`;
   }
-  
+
   // 爱的力量特殊处理，显示等级
   if (skill.skillIndex === 5) {
     if (skill.level === 0) {
       return '爱的力量（未解锁）';
     }
+
     return `爱的力量 Lv.${skill.level}`;
   }
-  
+
   // 风斩/高级风斩
   if (skill.skillIndex === 0) {
     return skill.level === 2 ? '高级风斩' : '风斩';
   }
-  
+
   // 裂地爆斩/高级裂地爆斩
   if (skill.skillIndex === 1) {
     return skill.level === 2 ? '高级裂地爆斩' : '裂地爆斩';
   }
-  
+
   // 星魔剑/高级星魔剑
   if (skill.skillIndex === 2) {
     return skill.level === 2 ? '高级星魔剑' : '星魔剑';
   }
-  
+
   // 飞天连斩/高级飞天连斩
   if (skill.skillIndex === 3) {
     return skill.level === 2 ? '高级飞天连斩' : '飞天连斩';
   }
-  
+
   return skill.name;
 };
 
@@ -243,22 +245,22 @@ export const getSkillDamagePercent = (skill: SkillDetail): number => {
   if (skill.skillIndex === 0) {
     return skill.level === 2 ? 150 : 100;
   }
-  
+
   // 裂地爆斩：等级1=60%，等级2=75%
   if (skill.skillIndex === 1) {
     return skill.level === 2 ? 75 : 60;
   }
-  
+
   // 星魔剑：等级1=100%，等级2=150%
   if (skill.skillIndex === 2) {
     return skill.level === 2 ? 150 : 100;
   }
-  
+
   // 飞天连斩：等级1和等级2都是100%（每击）
   if (skill.skillIndex === 3) {
     return 100;
   }
-  
+
   // 其他技能（斗志抑扬、爱的力量）返回基础伤害
   return skill.effect.damagePercent || 0;
 };
@@ -277,9 +279,10 @@ export const getSkillUpgradeCost = (skill: SkillDetail): number => {
   // 斗志抑扬升级消耗递增
   if (skill.skillIndex === 4) {
     const costs = [3000, 5000, 10000, 20000, 50000];
+
     return costs[skill.level] || 0;
   }
-  
+
   // 其他技能升级消耗
   return skill.upgradeCost || 0;
 };

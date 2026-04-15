@@ -1,9 +1,11 @@
-import React, { type JSX } from 'react';
-import type { SkillDetail } from '../../types';
-import { getAttackTypeName, getLearnMethodName, canUpgradeSkill, getSkillUpgradeCost } from '../../utils/skillUtils';
-import { getSkillDisplayName, getSkillDamagePercent, getFightingSpiritBonus } from '../../data/skillData';
-import { getRarityClassName, getRarityText } from '../common/utils';
 import './skill.css';
+
+import React, { type JSX } from 'react';
+
+import { getFightingSpiritBonus, getSkillDamagePercent, getSkillDisplayName } from '../../data/skillData';
+import type { SkillDetail } from '../../types';
+import { canUpgradeSkill, getAttackTypeName, getLearnMethodName, getSkillUpgradeCost } from '../../utils/skillUtils';
+import { getRarityClassName, getRarityText } from '../common/utils';
 
 /**
  * 技能详情弹窗组件属性接口
@@ -43,13 +45,14 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
     if (skill.cost.stamina) costs.push(`体力: ${skill.cost.stamina}`);
     if (skill.cost.hp) costs.push(`生命: ${skill.cost.hp}`);
     if (skill.cost.gold) costs.push(`金币: ${skill.cost.gold}`);
+
     return costs.length > 0 ? costs.join(' / ') : '无消耗';
   };
 
   /** 渲染技能效果信息 */
   const renderEffects = () => {
     const effects: JSX.Element[] = [];
-    
+
     // 伤害效果
     if (skill.effect.damagePercent) {
       const actualPercent = getSkillDamagePercent(skill);
@@ -60,7 +63,7 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
         </li>
       );
     }
-    
+
     // 多段攻击
     if (skill.effect.hitCount) {
       effects.push(
@@ -70,7 +73,7 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
         </li>
       );
     }
-    
+
     // 破防攻击
     if (skill.effect.breakDefenseHits) {
       effects.push(
@@ -80,7 +83,7 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
         </li>
       );
     }
-    
+
     // 战斗力加成（斗志抑扬）
     if (skill.skillIndex === 4 && skill.isLearned) {
       const bonus = getFightingSpiritBonus(skill.level);
@@ -91,7 +94,7 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
         </li>
       );
     }
-    
+
     // 增益效果
     if (skill.effect.buff) {
       effects.push(
@@ -101,7 +104,7 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
         </li>
       );
     }
-    
+
     // 持续时间
     if (skill.effect.duration && skill.effect.duration > 0) {
       effects.push(
@@ -111,7 +114,7 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
         </li>
       );
     }
-    
+
     return effects;
   };
 
@@ -177,7 +180,7 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
             </span>
           </div>
           <div className="level-progress-bar">
-            <div 
+            <div
               className="level-progress-fill"
               style={{ width: `${(skill.level / skill.maxLevel) * 100}%` }}
             />

@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react';
-import type { InventoryItem, PlayerResources, ItemType } from '../../types';
-import { exampleItems, exampleResources } from '../../data/inventoryData';
-import ResourceDisplay from './ResourceDisplay';
-import ItemGrid from './ItemGrid';
-import ItemDetailModal from './ItemDetailModal';
 import './inventory.css';
+
+import React, { useMemo, useState } from 'react';
+
+import { exampleItems, exampleResources } from '../../data/inventoryData';
+import type { InventoryItem, ItemType, PlayerResources } from '../../types';
+import ItemDetailModal from './ItemDetailModal';
+import ItemGrid from './ItemGrid';
+import ResourceDisplay from './ResourceDisplay';
 
 /**
  * 物品类型中文名称映射
@@ -17,7 +19,8 @@ const ITEM_TYPE_NAMES: Record<ItemType, string> = {
   'other': '其他',
   'skillBook': '技能书',
   'gem': '宝石',
-  'special': '特殊道具'
+  'special': '特殊道具',
+  'pet': '幻兽'
 };
 
 /**
@@ -113,6 +116,7 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
     if (selectedCategories.length === 0) {
       return [];
     }
+
     return items.filter(item => selectedCategories.includes(item.type));
   }, [items, selectedCategories]);
 

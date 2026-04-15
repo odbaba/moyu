@@ -4,7 +4,7 @@
  * 参考文档：reference/docs/project_docs/04_怪物系统.md
  */
 
-import type { MonsterTemplate, MonsterSpawnConfig } from '../types';
+import type { MonsterSpawnConfig, MonsterTemplate } from '../types';
 
 // ========== 怪物模板数据 ==========
 

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import type { Interactable } from '../../types';
 
 /**

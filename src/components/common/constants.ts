@@ -3,7 +3,7 @@
  * 统一定义各组件共用的常量，避免重复定义
  */
 
-import type { EquipmentSlotType, ItemType, ItemRarity, PetQuality } from '../../types';
+import type { EquipmentSlotType, ItemRarity, ItemType, PetQuality } from '../../types';
 
 /**
  * 幻兽品质对应的颜色映射
@@ -79,7 +79,8 @@ export const ITEM_TYPE_NAMES: Record<ItemType, string> = {
   'other': '其他',
   'skillBook': '技能书',
   'gem': '宝石',
-  'special': '特殊道具'
+  'special': '特殊道具',
+  'pet': '幻兽'
 };
 
 /**

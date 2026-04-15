@@ -1,7 +1,9 @@
+import './pet.css';
+
 import React from 'react';
+
 import type { Pet } from '../../types';
 import { getPetEmoji, getPetQualityColor } from '../common/utils';
-import './pet.css';
 
 /**
  * 幻兽详情弹窗组件属性接口
@@ -58,6 +60,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
    */
   const getExpPercent = (): string => {
     if (!pet) return '0%';
+
     return `${Math.round((pet.jy / pet.mjy) * 100)}%`;
   };
 
@@ -67,6 +70,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
    */
   const getRarityBonus = (): number => {
     if (!pet) return 0;
+
     return pet.rating.pzbase;
   };
 
@@ -74,14 +78,14 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
   if (!isVisible || !pet) return null;
 
   return (
-    <div 
-      className="pet-detail-modal-overlay" 
+    <div
+      className="pet-detail-modal-overlay"
       onClick={handleOverlayClick}
     >
       <div className="pet-detail-modal-content">
         {/* 关闭按钮 */}
-        <button 
-          className="pet-detail-close-button" 
+        <button
+          className="pet-detail-close-button"
           onClick={onClose}
           aria-label="关闭"
         >
@@ -93,7 +97,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
           <div className="pet-detail-icon-wrapper">
             <span className="pet-detail-emoji">{getPetEmoji(pet.hs_name)}</span>
           </div>
-          <h3 
+          <h3
             className="pet-detail-name"
             style={{ color: getPetQualityColor(pet.quality) }}
           >
@@ -119,7 +123,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">品质</span>
-              <span 
+              <span
                 className="cell-value quality-value"
                 style={{ color: getPetQualityColor(pet.quality) }}
               >
@@ -240,7 +244,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
           {/* 总评分 */}
           <div className="pet-detail-total">
             <div className="total-label">总评分</div>
-            <div 
+            <div
               className="total-value"
               style={{ color: getPetQualityColor(pet.quality) }}
             >

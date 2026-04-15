@@ -1,4 +1,4 @@
-import type { EquipmentDetail, CharacterData, EquipmentSlotType } from '../types';
+import type { CharacterData, EquipmentDetail, EquipmentSlotType } from '../types';
 
 /**
  * 装备基础属性系数配置
@@ -6,16 +6,16 @@ import type { EquipmentDetail, CharacterData, EquipmentSlotType } from '../types
  * 注意：CharacterData 中使用 'clothes' 作为衣服槽位名称
  */
 export const EQUIPMENT_BASE_COEFFICIENTS: Record<EquipmentSlotType, {
-  attackMin: number;  // 最小攻击系数
-  attackMax: number;  // 最大攻击系数
-  defense: number;    // 防御系数
+  attackMin: number; // 最小攻击系数
+  attackMax: number; // 最大攻击系数
+  defense: number; // 防御系数
 }> = {
-  weapon: { attackMin: 10, attackMax: 30, defense: 0 },    // 武器：10×等级 ~ 30×等级
-  helmet: { attackMin: 0, attackMax: 0, defense: 6 },      // 头盔：6×等级防御
-  clothes: { attackMin: 0, attackMax: 0, defense: 8 },     // 衣服：8×等级防御（使用 clothes 而非 armor）
-  shoes: { attackMin: 0, attackMax: 0, defense: 4 },       // 战鞋：4×等级防御
-  bracelet: { attackMin: 5, attackMax: 15, defense: 0 },   // 手镯：5×等级 ~ 15×等级
-  necklace: { attackMin: 8, attackMax: 20, defense: 0 }    // 项链：8×等级 ~ 20×等级
+  weapon: { attackMin: 10, attackMax: 30, defense: 0 }, // 武器：10×等级 ~ 30×等级
+  helmet: { attackMin: 0, attackMax: 0, defense: 6 }, // 头盔：6×等级防御
+  clothes: { attackMin: 0, attackMax: 0, defense: 8 }, // 衣服：8×等级防御（使用 clothes 而非 armor）
+  shoes: { attackMin: 0, attackMax: 0, defense: 4 }, // 战鞋：4×等级防御
+  bracelet: { attackMin: 5, attackMax: 15, defense: 0 }, // 手镯：5×等级 ~ 15×等级
+  necklace: { attackMin: 8, attackMax: 20, defense: 0 } // 项链：8×等级 ~ 20×等级
 };
 
 /**
@@ -23,11 +23,11 @@ export const EQUIPMENT_BASE_COEFFICIENTS: Record<EquipmentSlotType, {
  * 根据参考文档定义角色的基础属性
  */
 export const CHARACTER_BASE_STATS = {
-  baseHp: 500,         // 基础生命值
-  baseStamina: 100,    // 基础体力值
-  baseAttackMin: 45,   // 基础最小攻击
-  baseAttackMax: 45,   // 基础最大攻击
-  baseDefense: 80      // 基础防御力
+  baseHp: 500, // 基础生命值
+  baseStamina: 100, // 基础体力值
+  baseAttackMin: 45, // 基础最小攻击
+  baseAttackMax: 45, // 基础最大攻击
+  baseDefense: 80 // 基础防御力
 };
 
 /**
@@ -35,11 +35,11 @@ export const CHARACTER_BASE_STATS = {
  * 根据参考文档定义角色的成长系数
  */
 export const CHARACTER_GROWTH_RATES = {
-  growthHp: 50,        // 生命成长
-  growthStamina: 10,   // 体力成长
+  growthHp: 50, // 生命成长
+  growthStamina: 10, // 体力成长
   growthAttackMin: 10, // 最小攻击成长
   growthAttackMax: 10, // 最大攻击成长
-  growthDefense: 8     // 防御成长
+  growthDefense: 8 // 防御成长
 };
 
 /**
@@ -55,7 +55,7 @@ export function calculateEquipmentBaseAttributes(equipment: EquipmentDetail): {
 } {
   const coefficients = EQUIPMENT_BASE_COEFFICIENTS[equipment.type];
   const level = equipment.useLevel;
-  
+
   return {
     attackMin: coefficients.attackMin * level,
     attackMax: coefficients.attackMax * level,
@@ -76,7 +76,7 @@ export function calculateEquipmentBonusAttributes(equipment: EquipmentDetail): {
 } {
   const baseAttrs = calculateEquipmentBaseAttributes(equipment);
   const mhdj = equipment.magicSoulLevel;
-  
+
   // 追加属性 = Math.floor(基础属性 / 10) × 魔魂等级
   return {
     attackMin: Math.floor(baseAttrs.attackMin / 10) * mhdj,
@@ -98,10 +98,10 @@ export function calculateTotalEquipmentAttributes(equipment: EquipmentDetail | n
   if (!equipment) {
     return { attackMin: 0, attackMax: 0, defense: 0 };
   }
-  
+
   const baseAttrs = calculateEquipmentBaseAttributes(equipment);
   const bonusAttrs = calculateEquipmentBonusAttributes(equipment);
-  
+
   return {
     attackMin: baseAttrs.attackMin + bonusAttrs.attackMin,
     attackMax: baseAttrs.attackMax + bonusAttrs.attackMax,
@@ -121,10 +121,10 @@ export function calculateAllEquipmentBonus(equipment: CharacterData['equipment']
   dodgeRate: number;
 } {
   const result = { attackMin: 0, attackMax: 0, defense: 0, dodgeRate: 0 };
-  
+
   // 遍历所有装备槽位
   const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-  
+
   slots.forEach(slot => {
     const item = equipment[slot];
     if (item) {
@@ -132,14 +132,14 @@ export function calculateAllEquipmentBonus(equipment: CharacterData['equipment']
       result.attackMin += attrs.attackMin;
       result.attackMax += attrs.attackMax;
       result.defense += attrs.defense;
-      
+
       // 计算地魂战魂的闪避加成
       if (item.soulType === 2 && item.soulLevel) {
         result.dodgeRate += item.soulLevel * 2; // 每级地魂提供2%闪避
       }
     }
   });
-  
+
   return result;
 }
 
@@ -151,9 +151,9 @@ export function calculateAllEquipmentBonus(equipment: CharacterData['equipment']
  */
 export function calculateSoulAttackBonus(equipment: CharacterData['equipment']): number {
   let bonus = 0;
-  
+
   const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-  
+
   slots.forEach(slot => {
     const item = equipment[slot];
     // 天魂战魂提供攻击力百分比加成
@@ -161,7 +161,7 @@ export function calculateSoulAttackBonus(equipment: CharacterData['equipment']):
       bonus += item.soulLevel * 0.05; // 每级天魂提供5%攻击加成
     }
   });
-  
+
   return bonus;
 }
 
@@ -203,20 +203,20 @@ export function calculateTotalCharacterAttributes(character: CharacterData): {
 } {
   // 基础属性
   const baseAttrs = calculateCharacterBaseAttributes(character.level);
-  
+
   // 装备加成
   const equipmentBonus = calculateAllEquipmentBonus(character.equipment);
-  
+
   // 幻兽加成
   const petBonus = character.petBonus || { attackMin: 0, attackMax: 0, defense: 0 };
-  
+
   // 战魂攻击百分比加成
   const soulAttackBonus = calculateSoulAttackBonus(character.equipment);
-  
+
   // 计算总攻击力（基础 + 装备 + 幻兽）× (1 + 战魂百分比)
   const totalAttackMin = Math.round((baseAttrs.attackMin + equipmentBonus.attackMin + petBonus.attackMin) * (1 + soulAttackBonus));
   const totalAttackMax = Math.round((baseAttrs.attackMax + equipmentBonus.attackMax + petBonus.attackMax) * (1 + soulAttackBonus));
-  
+
   return {
     maxHp: baseAttrs.maxHp,
     maxStamina: baseAttrs.maxStamina,
@@ -240,6 +240,7 @@ export function getQualityValue(quality: string): number {
     '精品': 3,
     '极品': 4
   };
+
   return qualityMap[quality] || 0;
 }
 
@@ -264,6 +265,7 @@ export function calculateNextLevelMaxExp(currentLevel: number, currentMaxExp: nu
     // 在50级时计算固定值（50级所需经验的20%）
     // 注意：这里的 hun 值在50级时计算，之后保持不变
     const hun = currentLevel === 50 ? Math.round(currentMaxExp * 0.2) : 0;
+
     return currentMaxExp + hun;
   }
 }
@@ -278,13 +280,13 @@ export function calculateMaxExp(targetLevel: number): number {
   if (targetLevel === 1) {
     return 10;
   }
-  
+
   // 递归计算
   let maxExp = 10;
   for (let level = 1; level < targetLevel; level++) {
     maxExp = calculateNextLevelMaxExp(level, maxExp);
   }
-  
+
   return maxExp;
 }
 
@@ -297,9 +299,9 @@ export function preCalculateMaxExpTable(maxLevel: number = 125): Map<number, num
   const table = new Map<number, number>();
   let maxExp = 10; // 1级升2级需要10经验
   let hun = 0;
-  
+
   table.set(1, maxExp);
-  
+
   for (let level = 2; level <= maxLevel; level++) {
     // 20级前，每次升级所需经验是上一级的1.2倍
     if (level <= 20) {
@@ -317,10 +319,10 @@ export function preCalculateMaxExpTable(maxLevel: number = 125): Map<number, num
       }
       maxExp += hun;
     }
-    
+
     table.set(level, maxExp);
   }
-  
+
   return table;
 }
 

@@ -4,15 +4,15 @@
  * 参考文档：reference/docs/scripts_analysis/14_NPC系统.md
  */
 
-import {
-  NOBLE_RANKS,
-  NOBLE_RANK_REWARDS,
-  LOCATION_ACCESS_CONFIG,
-  getNobleRankByLevel,
-  getNextNobleRankMerit,
-  getLocationAccessConfig,
-} from '../data/rankData';
 import type { NobleRankConfig, NobleRankReward } from '../data/rankData';
+import {
+  getLocationAccessConfig,
+  getNextNobleRankMerit,
+  getNobleRankByLevel,
+  LOCATION_ACCESS_CONFIG,
+  NOBLE_RANK_REWARDS,
+  NOBLE_RANKS,
+} from '../data/rankData';
 
 // ========== 爵位基础功能函数 ==========
 
@@ -23,6 +23,7 @@ import type { NobleRankConfig, NobleRankReward } from '../data/rankData';
  */
 export function getNobleRankName(level: number): string {
   const config = getNobleRankByLevel(level);
+
   return config.name;
 }
 
@@ -49,7 +50,7 @@ export function canPromoteNobleRank(currentMerit: number, currentLevel: number):
 
   // 获取下一级所需功勋
   const nextRequirement = getNextNobleRankRequirement(currentLevel);
-  
+
   // 如果没有下一级配置，无法晋升
   if (nextRequirement === null) {
     return false;
@@ -68,7 +69,7 @@ export function canPromoteNobleRank(currentMerit: number, currentLevel: number):
 export function checkLocationAccess(nobleRank: number, locationId: string): boolean {
   // 获取地图权限配置
   const accessConfig = getLocationAccessConfig(locationId);
-  
+
   // 如果地图没有特殊权限要求，默认可以进入
   if (!accessConfig) {
     return true;
@@ -111,18 +112,18 @@ ${NOBLE_RANKS.map(rank => `${rank.name}（需要${rank.requiredMerit}功勋）`)
 export function getNobleRankDetail(level: number): string {
   const config = getNobleRankByLevel(level);
   const nextRequirement = getNextNobleRankRequirement(level);
-  
+
   let detail = `【${config.name}】\n\n`;
   detail += `爵位等级：${config.level}\n`;
   detail += `所需功勋：${config.requiredMerit}\n`;
   detail += `战斗力加成：${config.combatPowerBonus}\n`;
-  
+
   if (nextRequirement !== null) {
     detail += `\n下一级爵位需要：${nextRequirement} 功勋`;
   } else {
-    detail += `\n已达到最高爵位！`;
+    detail += '\n已达到最高爵位！';
   }
-  
+
   return detail;
 }
 
@@ -132,9 +133,9 @@ export function getNobleRankDetail(level: number): string {
  * 爵位奖励领取结果接口
  */
 export interface NobleRewardClaimResult {
-  success: boolean;           // 是否成功
-  message: string;            // 结果消息
-  reward?: NobleRankReward;   // 奖励详情（成功时）
+  success: boolean; // 是否成功
+  message: string; // 结果消息
+  reward?: NobleRankReward; // 奖励详情（成功时）
 }
 
 /**
@@ -157,6 +158,7 @@ export function canClaimNobleReward(nobleRank: number, lastClaimTime: number | n
   // 检查是否已经过了7天（每周领取一次）
   const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
   const now = Date.now();
+
   return (now - lastClaimTime) >= ONE_WEEK_MS;
 }
 
@@ -167,7 +169,7 @@ export function canClaimNobleReward(nobleRank: number, lastClaimTime: number | n
  */
 export function getNobleRewardPreview(nobleRank: number): string {
   const reward = NOBLE_RANK_REWARDS.find(r => r.level === nobleRank);
-  
+
   if (!reward || reward.items.length === 0) {
     return '当前爵位暂无奖励可领取';
   }
@@ -175,19 +177,19 @@ export function getNobleRewardPreview(nobleRank: number): string {
   let preview = `【${reward.rewardName}】\n\n`;
   preview += `${reward.description}\n\n`;
   preview += '奖励内容：\n';
-  
+
   reward.items.forEach(item => {
     preview += `- ${item.itemName} × ${item.quantity}\n`;
   });
-  
+
   if (reward.magicStone) {
     preview += `- 魔石 × ${reward.magicStone}\n`;
   }
-  
+
   if (reward.exp) {
     preview += `- 经验 × ${reward.exp}\n`;
   }
-  
+
   return preview;
 }
 
@@ -208,7 +210,7 @@ export function claimNobleReward(nobleRank: number, lastClaimTime: number | null
 
   // 获取奖励配置
   const reward = NOBLE_RANK_REWARDS.find(r => r.level === nobleRank);
-  
+
   if (!reward || reward.items.length === 0) {
     return {
       success: false,
@@ -283,7 +285,7 @@ export function calculatePromotionProgress(currentMerit: number, currentLevel: n
   }
 
   const percentage = (currentProgress / progressRange) * 100;
-  
+
   // 限制在0-100之间
   return Math.min(100, Math.max(0, percentage));
 }
@@ -300,13 +302,13 @@ export function getPromotionHint(currentMerit: number, currentLevel: number): st
   }
 
   const nextRequirement = getNextNobleRankRequirement(currentLevel);
-  
+
   if (nextRequirement === null) {
     return '已达到最高爵位！';
   }
 
   const remaining = nextRequirement - currentMerit;
-  
+
   if (remaining <= 0) {
     return '功勋已满足晋升条件，请前往首相处晋升爵位！';
   }
@@ -324,7 +326,7 @@ export function getPromotionHint(currentMerit: number, currentLevel: number): st
  */
 export function getLocationAccessHint(nobleRank: number, locationId: string): string {
   const accessConfig = getLocationAccessConfig(locationId);
-  
+
   if (!accessConfig) {
     return '该地图对所有玩家开放';
   }
@@ -334,6 +336,7 @@ export function getLocationAccessHint(nobleRank: number, locationId: string): st
   }
 
   const requiredRankName = getNobleRankName(accessConfig.requiredNobleRank);
+
   return `${accessConfig.locationName}需要【${requiredRankName}】以上爵位才能进入`;
 }
 
@@ -361,12 +364,12 @@ export function getAllLocationAccessStatus(nobleRank: number): Array<{
 // ========== 导出所有功能 ==========
 
 export {
-  NOBLE_RANKS,
-  NOBLE_RANK_REWARDS,
-  LOCATION_ACCESS_CONFIG,
-  getNobleRankByLevel,
-  getNextNobleRankMerit,
   getLocationAccessConfig,
+  getNextNobleRankMerit,
+  getNobleRankByLevel,
+  LOCATION_ACCESS_CONFIG,
+  NOBLE_RANK_REWARDS,
+  NOBLE_RANKS,
 };
 
 export type { NobleRankConfig, NobleRankReward };

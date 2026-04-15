@@ -1,47 +1,39 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+
+// 导入战斗数据
+import { createEnemiesForBattle } from '../../data/battleData';
 // 导入新的类型定义
-import type { 
-  BattleState, BattleResult, BattleLogEntry, BattleCharacter, BattleSkill,
-  CharacterData, SkillDetail, EnemyTemplate, GridPosition, Buff, DamageResult, EnemyData, Pet, BattlePet
-} from '../../types';
+import type {
+  BattleCharacter, BattleLogEntry, BattlePet,
+  BattleResult, BattleSkill,
+  BattleState, Buff, CharacterData, DamageResult, EnemyData, GridPosition, Pet, SkillDetail} from '../../types';
 // 导入战斗适配器工具
-import { 
-  characterToBattleCharacter, 
-  skillToBattleSkill,
-  createEnemyFromTemplate,
+import {
+  characterToBattleCharacter,
   createEnemyFromEnemyData,
   petToBattlePet
 } from '../../utils/battleAdapter';
 // 导入战斗计算工具
 import {
-  calculateDamage,
-  executeSingleAttack,
-  executeAoeAttack,
-  executeMultiAttack,
-  executeBuffSkill,
   executeSkill,
-  removeExpiredBuffs,
-  calculateBuffedStats,
-  generateLogId
-} from '../../utils/battleCalculator';
-// 导入战斗数据
-import { createEnemiesForBattle, enemyTemplates, enemySkillTemplates } from '../../data/battleData';
-import CharacterCard from './CharacterCard';
-import BattleLog from './BattleLog';
+  generateLogId,
+  removeExpiredBuffs} from '../../utils/battleCalculator';
 import ActionButtons from './ActionButtons';
+import BattleLog from './BattleLog';
+import CharacterCard from './CharacterCard';
 
 /**
  * 战斗组件属性接口
  * 接收玩家数据、技能数据、敌人配置等信息
  */
 interface BattleProps {
-  playerData: CharacterData;       // 玩家角色数据
-  playerSkills: SkillDetail[];     // 玩家技能数据
-  enemyTemplateId?: string;        // 敌人模板ID（可选，优先使用 enemiesData）
-  enemyLevel?: number;             // 敌人等级（可选）
-  enemyCount?: number;             // 敌人数量（可选）
-  enemiesData?: EnemyData[];       // 敌人数据列表（优先使用）
-  deployedPets?: Pet[];            // 出战幻兽列表（可选，最多2只）
+  playerData: CharacterData; // 玩家角色数据
+  playerSkills: SkillDetail[]; // 玩家技能数据
+  enemyTemplateId?: string; // 敌人模板ID（可选，优先使用 enemiesData）
+  enemyLevel?: number; // 敌人等级（可选）
+  enemyCount?: number; // 敌人数量（可选）
+  enemiesData?: EnemyData[]; // 敌人数据列表（优先使用）
+  deployedPets?: Pet[]; // 出战幻兽列表（可选，最多2只）
   /**
    * 战斗结束回调函数
    * @param result 战斗结果（玩家胜利/敌方胜利）
@@ -71,9 +63,9 @@ interface DamageNumber {
  * 实现玩家与敌人之间的完整战斗系统
  * 包括回合制逻辑、技能系统、伤害计算、目标选择、增益效果等
  */
-const Battle: React.FC<BattleProps> = ({ 
-  playerData, 
-  playerSkills, 
+const Battle: React.FC<BattleProps> = ({
+  playerData,
+  playerSkills,
   enemyTemplateId = 'soldier',
   enemyLevel = 1,
   enemyCount = 1,
@@ -106,8 +98,9 @@ const Battle: React.FC<BattleProps> = ({
       { x: 1, y: 2 }, // 下中
       { x: 0, y: 1 }, // 左中
       { x: 2, y: 1 }, // 右中
-      { x: 1, y: 1 }  // 中间（备用，但玩家在这里）
+      { x: 1, y: 1 } // 中间（备用，但玩家在这里）
     ];
+
     return positionMap.slice(0, Math.min(count, 8)); // 最多8个位置，避免与玩家位置冲突
   };
 
@@ -145,7 +138,7 @@ const Battle: React.FC<BattleProps> = ({
     // 处理出战幻兽，将其转换为战斗幻兽数据并分配位置
     // 最多支持2只出战幻兽
     const battlePets: BattlePet[] = [];
-    
+
     if (deployedPets && deployedPets.length > 0) {
       // 遍历出战幻兽列表，最多处理2只
       deployedPets.slice(0, 2).forEach((pet, index) => {
@@ -154,7 +147,7 @@ const Battle: React.FC<BattleProps> = ({
         // - 第二只幻兽：九宫格右下角 {x: 2, y: 2}
         // 这样可以避免与玩家位置（中心 {x: 1, y: 1}）冲突
         let petPosition: GridPosition;
-        
+
         if (index === 0) {
           // 第一只幻兽放置在左下角
           petPosition = { x: 0, y: 2 };
@@ -162,7 +155,7 @@ const Battle: React.FC<BattleProps> = ({
           // 第二只幻兽放置在右下角
           petPosition = { x: 2, y: 2 };
         }
-        
+
         // 使用 petToBattlePet 函数将幻兽数据转换为战斗幻兽数据
         const battlePet = petToBattlePet(pet, petPosition);
         battlePets.push(battlePet);
@@ -182,16 +175,16 @@ const Battle: React.FC<BattleProps> = ({
       targetEnemy: null,
       battleResult: 'in_progress',
       logIdCounter: 0,
-      currentEnemyActionIndex: 0  // 初始化敌人行动索引
+      currentEnemyActionIndex: 0 // 初始化敌人行动索引
     };
   }, [playerData, playerSkills, enemyTemplateId, enemyLevel, enemyCount, enemiesData, deployedPets]);
 
   // 战斗状态
   const [battleState, setBattleState] = useState<BattleState>(initializeBattleState);
-  
+
   // 使用 ref 存储最新的敌人列表，避免依赖 battleState.enemies 导致重复触发
   const enemiesRef = useRef(battleState.enemies);
-  
+
   // 更新 enemiesRef
   useEffect(() => {
     enemiesRef.current = battleState.enemies;
@@ -206,7 +199,7 @@ const Battle: React.FC<BattleProps> = ({
     const newId = damageIdCounterRef.current + 1;
     damageIdCounterRef.current = newId;
     setDamageNumbers(prev => [...prev, { id: newId, value: damage, targetId }]);
-    
+
     // 1.5秒后移除伤害数字
     setTimeout(() => {
       setDamageNumbers(prev => prev.filter(d => d.id !== newId));
@@ -240,6 +233,7 @@ const Battle: React.FC<BattleProps> = ({
     if (allEnemiesDead) {
       return 'player_win';
     }
+
     return 'in_progress';
   };
 
@@ -250,7 +244,7 @@ const Battle: React.FC<BattleProps> = ({
    * @returns 更新后的角色
    */
   const updateCharacterResources = (
-    character: BattleCharacter, 
+    character: BattleCharacter,
     skill: BattleSkill
   ): BattleCharacter => {
     return {
@@ -275,28 +269,28 @@ const Battle: React.FC<BattleProps> = ({
   ) => {
     // 播放攻击动画
     setAttackingCharacterId(attacker.id);
-    
+
     // 添加伤害数字
     if (result.damageResult.damage > 0) {
       addDamageNumber(result.damageResult.damage, result.defender.id);
     }
-    
+
     // 添加战斗日志
     addBattleLog(result.logEntry);
-    
+
     // 更新状态
     setBattleState(prev => {
       const newState = { ...prev };
-      
+
       // 更新攻击者资源
       if (attacker.isPlayer) {
         newState.player = updateCharacterResources(newState.player, skill);
       } else {
-        newState.enemies = newState.enemies.map(enemy => 
+        newState.enemies = newState.enemies.map(enemy =>
           enemy.id === attacker.id ? updateCharacterResources(enemy, skill) : enemy
         );
       }
-      
+
       // 更新防御者生命值
       // 需要判断防御者是玩家角色、幻兽还是敌人
       if (result.defender.isPlayer) {
@@ -305,7 +299,7 @@ const Battle: React.FC<BattleProps> = ({
       } else {
         // 检查防御者是否是幻兽（通过 ID 在 deployedPets 中查找）
         const petIndex = newState.deployedPets.findIndex(pet => pet.id === result.defender.id);
-        
+
         if (petIndex !== -1) {
           // 防御者是幻兽，更新幻兽的生命值
           // 注意：result.defender 是 BattleCharacter 类型，需要提取生命值信息
@@ -317,9 +311,10 @@ const Battle: React.FC<BattleProps> = ({
                 currentHp: result.defender.currentHp
               };
             }
+
             return pet;
           });
-          
+
           // ========== 幻兽阵亡处理 ==========
           // 检查幻兽是否阵亡（血量降为0或以下）
           // 如果幻兽阵亡，添加战斗日志记录阵亡事件
@@ -344,18 +339,18 @@ const Battle: React.FC<BattleProps> = ({
           }
         } else {
           // 防御者是敌人，更新敌人列表
-          newState.enemies = newState.enemies.map(enemy => 
+          newState.enemies = newState.enemies.map(enemy =>
             enemy.id === result.defender.id ? result.defender : enemy
           );
         }
       }
-      
+
       // 检查战斗是否结束
       newState.battleResult = checkBattleEnd(newState);
-      
+
       return newState;
     });
-    
+
     // 攻击动画结束
     setTimeout(() => {
       setAttackingCharacterId(null);
@@ -369,16 +364,16 @@ const Battle: React.FC<BattleProps> = ({
    * @param skill 使用的技能
    */
   const handleAoeAttackResult = (
-    result: { 
-      enemies: BattleCharacter[]; 
-      results: Array<{ defender: BattleCharacter; damageResult: DamageResult; logEntry: BattleLogEntry }> 
+    result: {
+      enemies: BattleCharacter[];
+      results: Array<{ defender: BattleCharacter; damageResult: DamageResult; logEntry: BattleLogEntry }>
     },
     attacker: BattleCharacter,
     skill: BattleSkill
   ) => {
     // 播放攻击动画
     setAttackingCharacterId(attacker.id);
-    
+
     // 添加所有伤害数字和日志
     result.results.forEach(res => {
       if (res.damageResult.damage > 0) {
@@ -386,29 +381,29 @@ const Battle: React.FC<BattleProps> = ({
       }
       addBattleLog(res.logEntry);
     });
-    
+
     // 更新状态
     setBattleState(prev => {
       const newState = { ...prev };
-      
+
       // 更新攻击者资源
       if (attacker.isPlayer) {
         newState.player = updateCharacterResources(newState.player, skill);
       } else {
-        newState.enemies = newState.enemies.map(enemy => 
+        newState.enemies = newState.enemies.map(enemy =>
           enemy.id === attacker.id ? updateCharacterResources(enemy, skill) : enemy
         );
       }
-      
+
       // 更新敌人列表
       newState.enemies = result.enemies;
-      
+
       // 检查战斗是否结束
       newState.battleResult = checkBattleEnd(newState);
-      
+
       return newState;
     });
-    
+
     // 攻击动画结束
     setTimeout(() => {
       setAttackingCharacterId(null);
@@ -428,7 +423,7 @@ const Battle: React.FC<BattleProps> = ({
   ) => {
     // 播放攻击动画
     setAttackingCharacterId(attacker.id);
-    
+
     // 添加所有伤害数字和日志
     result.damageResults.forEach((damageResult, index) => {
       if (damageResult.damage > 0) {
@@ -436,35 +431,35 @@ const Battle: React.FC<BattleProps> = ({
       }
       addBattleLog(result.logEntries[index]);
     });
-    
+
     // 更新状态
     setBattleState(prev => {
       const newState = { ...prev };
-      
+
       // 更新攻击者资源
       if (attacker.isPlayer) {
         newState.player = updateCharacterResources(newState.player, skill);
       } else {
-        newState.enemies = newState.enemies.map(enemy => 
+        newState.enemies = newState.enemies.map(enemy =>
           enemy.id === attacker.id ? updateCharacterResources(enemy, skill) : enemy
         );
       }
-      
+
       // 更新防御者生命值
       if (result.defender.isPlayer) {
         newState.player = result.defender;
       } else {
-        newState.enemies = newState.enemies.map(enemy => 
+        newState.enemies = newState.enemies.map(enemy =>
           enemy.id === result.defender.id ? result.defender : enemy
         );
       }
-      
+
       // 检查战斗是否结束
       newState.battleResult = checkBattleEnd(newState);
-      
+
       return newState;
     });
-    
+
     // 攻击动画结束
     setTimeout(() => {
       setAttackingCharacterId(null);
@@ -484,20 +479,20 @@ const Battle: React.FC<BattleProps> = ({
   ) => {
     // 添加战斗日志
     addBattleLog(result.logEntry);
-    
+
     // 更新状态
     setBattleState(prev => {
       const newState = { ...prev };
-      
+
       // 更新攻击者（包含增益效果）
       if (attacker.isPlayer) {
         newState.player = updateCharacterResources(result.attacker, skill);
       } else {
-        newState.enemies = newState.enemies.map(enemy => 
+        newState.enemies = newState.enemies.map(enemy =>
           enemy.id === attacker.id ? updateCharacterResources(result.attacker, skill) : enemy
         );
       }
-      
+
       return newState;
     });
   };
@@ -505,24 +500,24 @@ const Battle: React.FC<BattleProps> = ({
   /**
    * 获取敌方攻击目标
    * 实现优先攻击合体幻兽的逻辑
-   * 
+   *
    * 攻击优先级规则：
    * 1. 首先检查第一出战位幻兽（位置 {x: 0, y: 2}）是否合体且存活
    * 2. 如果第一出战位幻兽不合体或已死亡，检查第二出战位幻兽（位置 {x: 2, y: 2}）
    * 3. 如果没有合体幻兽或合体幻兽已死亡，则攻击玩家角色
-   * 
+   *
    * 幻兽阵亡处理：
    * - 当幻兽 currentHp <= 0 时，视为已阵亡，不再作为攻击目标
    * - 敌人会自动切换攻击目标到玩家角色或其他存活的合体幻兽
    * - 这确保了幻兽阵亡后战斗逻辑的正确性
-   * 
+   *
    * @param currentState 当前战斗状态
    * @returns 攻击目标（玩家角色或合体幻兽）
    */
   const getAttackTarget = (currentState: BattleState): BattleCharacter | BattlePet => {
     // 获取出战幻兽列表
     const deployedPets = currentState.deployedPets;
-    
+
     // 检查第一出战位幻兽（位置 {x: 0, y: 2}）
     // 优先级最高：如果第一出战位幻兽合体且存活，则返回该幻兽
     if (deployedPets.length > 0) {
@@ -534,7 +529,7 @@ const Battle: React.FC<BattleProps> = ({
         return firstPet;
       }
     }
-    
+
     // 检查第二出战位幻兽（位置 {x: 2, y: 2}）
     // 优先级次之：如果第二出战位幻兽合体且存活，则返回该幻兽
     if (deployedPets.length > 1) {
@@ -546,7 +541,7 @@ const Battle: React.FC<BattleProps> = ({
         return secondPet;
       }
     }
-    
+
     // 如果没有合体幻兽或合体幻兽已死亡，则攻击玩家角色
     // 这是默认的攻击目标
     return currentState.player;
@@ -561,14 +556,14 @@ const Battle: React.FC<BattleProps> = ({
    * @param skill 使用的技能
    */
   const executeSkillAttack = (
-    attacker: BattleCharacter, 
-    defender: BattleCharacter | BattlePet | null, 
+    attacker: BattleCharacter,
+    defender: BattleCharacter | BattlePet | null,
     skill: BattleSkill
   ) => {
     // 如果防御者是幻兽（BattlePet），需要转换为 BattleCharacter 格式
     // 因为 executeSkill 函数需要 BattleCharacter 类型的参数
     let targetDefender: BattleCharacter | null = null;
-    
+
     if (defender) {
       // 检查是否是幻兽（通过判断是否有 isMerged 属性来区分）
       if ('isMerged' in defender) {
@@ -581,19 +576,19 @@ const Battle: React.FC<BattleProps> = ({
           level: petDefender.level,
           maxHp: petDefender.maxHp,
           currentHp: petDefender.currentHp,
-          maxMp: 0,                    // 幻兽没有MP，设为0
-          currentMp: 0,                // 幻兽没有MP，设为0
-          maxStamina: 0,               // 幻兽没有体力，设为0
-          currentStamina: 0,           // 幻兽没有体力，设为0
+          maxMp: 0, // 幻兽没有MP，设为0
+          currentMp: 0, // 幻兽没有MP，设为0
+          maxStamina: 0, // 幻兽没有体力，设为0
+          currentStamina: 0, // 幻兽没有体力，设为0
           attackMin: petDefender.attackMin,
           attackMax: petDefender.attackMax,
           defense: petDefender.defense,
-          combatPower: 0,              // 幻兽战斗力暂时设为0，后续可以计算
-          dodgeRate: 0,                // 幻兽没有闪避率，设为0
-          luck: 0,                     // 幻兽没有幸运值，设为0
-          skills: [],                  // 幻兽没有技能列表，设为空数组
-          buffs: [],                   // 幻兽没有增益效果，设为空数组
-          isPlayer: false,             // 幻兽不是玩家
+          combatPower: 0, // 幻兽战斗力暂时设为0，后续可以计算
+          dodgeRate: 0, // 幻兽没有闪避率，设为0
+          luck: 0, // 幻兽没有幸运值，设为0
+          skills: [], // 幻兽没有技能列表，设为空数组
+          buffs: [], // 幻兽没有增益效果，设为空数组
+          isPlayer: false, // 幻兽不是玩家
           gridPosition: petDefender.gridPosition
         };
       } else {
@@ -601,10 +596,10 @@ const Battle: React.FC<BattleProps> = ({
         targetDefender = defender as BattleCharacter;
       }
     }
-    
+
     // 使用统一的 executeSkill 函数
     const result = executeSkill(attacker, targetDefender, battleState.enemies, skill, battleState.round);
-    
+
     // 根据技能类型处理结果
     switch (result.type) {
       case 'single':
@@ -642,40 +637,41 @@ const Battle: React.FC<BattleProps> = ({
    */
   const handleTargetSelect = (enemyId: string) => {
     if (!battleState.selectedAction) return;
-    
+
     // 找到选中的技能
     const skill = battleState.player.skills.find(s => s.id === battleState.selectedAction);
     if (!skill) return;
-    
+
     // 增益技能不需要选择目标
     if (skill.attackType === 'buff') {
       executeSkillAttack(battleState.player, null, skill);
-      
+
       // 清除选择并切换到敌人回合，重置敌人行动索引
       setBattleState(prev => ({
         ...prev,
         selectedAction: null,
         targetEnemy: null,
         isPlayerTurn: false,
-        currentEnemyActionIndex: 0  // 重置敌人行动索引
+        currentEnemyActionIndex: 0 // 重置敌人行动索引
       }));
+
       return;
     }
-    
+
     // 找到目标敌人
     const targetEnemy = battleState.enemies.find(e => e.id === enemyId && e.currentHp > 0);
     if (!targetEnemy) return;
-    
+
     // 执行攻击
     executeSkillAttack(battleState.player, targetEnemy, skill);
-    
+
     // 清除选择并切换到敌人回合，重置敌人行动索引
     setBattleState(prev => ({
       ...prev,
       selectedAction: null,
       targetEnemy: null,
       isPlayerTurn: false,
-      currentEnemyActionIndex: 0  // 重置敌人行动索引
+      currentEnemyActionIndex: 0 // 重置敌人行动索引
     }));
   };
 
@@ -688,10 +684,10 @@ const Battle: React.FC<BattleProps> = ({
     if (battleState.isPlayerTurn || battleState.battleResult !== 'in_progress') {
       return;
     }
-    
+
     // 使用 ref 获取最新的敌人列表，避免依赖 battleState.enemies 导致重复触发
     const aliveEnemies = enemiesRef.current.filter(enemy => enemy.currentHp > 0);
-    
+
     // 如果没有存活的敌人，直接切换回玩家回合
     if (aliveEnemies.length === 0) {
       setBattleState(prev => ({
@@ -700,9 +696,10 @@ const Battle: React.FC<BattleProps> = ({
         round: prev.round + 1,
         currentEnemyActionIndex: 0
       }));
+
       return;
     }
-    
+
     // 检查是否所有敌人都已行动
     if (battleState.currentEnemyActionIndex >= aliveEnemies.length) {
       // 所有敌人行动完毕，切换回玩家回合
@@ -710,7 +707,7 @@ const Battle: React.FC<BattleProps> = ({
         // 移除过期的增益效果
         const updatedPlayer = removeExpiredBuffs(prev.player);
         const updatedEnemies = prev.enemies.map(enemy => removeExpiredBuffs(enemy));
-        
+
         return {
           ...prev,
           player: updatedPlayer,
@@ -720,19 +717,20 @@ const Battle: React.FC<BattleProps> = ({
           currentEnemyActionIndex: 0
         };
       });
+
       return;
     }
-    
+
     // 执行当前敌人的行动
     const currentEnemy = aliveEnemies[battleState.currentEnemyActionIndex];
-    
+
     // 延迟执行，让玩家看到行动过程
     const timer = setTimeout(() => {
       // 先检查战斗状态
       if (battleState.battleResult !== 'in_progress') {
         return;
       }
-      
+
       // 获取最新的敌人状态
       const enemy = battleState.enemies.find(e => e.id === currentEnemy.id);
       if (!enemy || enemy.currentHp <= 0) {
@@ -741,13 +739,14 @@ const Battle: React.FC<BattleProps> = ({
           ...prev,
           currentEnemyActionIndex: prev.currentEnemyActionIndex + 1
         }));
+
         return;
       }
-      
+
       // 简单AI：选择技能
       const availableSkills = enemy.skills.filter(s => s.isAvailable);
       let selectedSkill = availableSkills[0];
-      
+
       if (availableSkills.length > 1) {
         const aoeSkill = availableSkills.find(s => s.attackType === 'aoe');
         if (aoeSkill && enemy.currentMp >= aoeSkill.mpCost) {
@@ -757,21 +756,21 @@ const Battle: React.FC<BattleProps> = ({
           selectedSkill = availableSkills[randomIndex];
         }
       }
-      
+
       // 获取攻击目标（优先攻击合体幻兽）
       // 使用 getAttackTarget 函数实现优先攻击合体幻兽的逻辑
       const attackTarget = getAttackTarget(battleState);
-      
+
       // 执行技能攻击（在 setBattleState 外部调用，避免嵌套状态更新）
       executeSkillAttack(enemy, attackTarget, selectedSkill);
-      
+
       // 移动到下一个敌人
       setBattleState(prev => ({
         ...prev,
         currentEnemyActionIndex: prev.currentEnemyActionIndex + 1
       }));
     }, 800); // 每个敌人行动间隔800ms
-    
+
     return () => clearTimeout(timer);
   }, [battleState.isPlayerTurn, battleState.battleResult, battleState.currentEnemyActionIndex]); // 不依赖 battleState.enemies，使用 ref 避免重复触发
 
@@ -790,6 +789,7 @@ const Battle: React.FC<BattleProps> = ({
         // 这些状态将同步回全局状态，确保幻兽血量在战斗后正确保存
         onBattleEnd(battleState.battleResult, battleState.player, battleState.deployedPets);
       }, 2000);
+
       return () => clearTimeout(timer);
     }
   }, [battleState.battleResult, battleState.player, battleState.deployedPets, onBattleEnd]);
@@ -810,23 +810,23 @@ const Battle: React.FC<BattleProps> = ({
    * 根据角色阵营渲染不同的九宫格布局
    * 敌人阵营：渲染敌人列表
    * 我方阵营：渲染玩家角色 + 出战幻兽
-   * 
+   *
    * 幻兽阵亡显示逻辑：
    * - 当幻兽的 currentHp <= 0 时，该位置显示"已阵亡"状态
    * - 阵亡的幻兽不再显示角色卡片，只显示占位符
    * - 敌人阵亡时同样显示"已阵亡"状态
-   * 
+   *
    * @param isEnemy 是否是敌人阵营的九宫格
    * @returns 九宫格 JSX 元素
    */
   const renderGrid = (isEnemy: boolean) => {
     const gridCells: React.ReactNode[] = [];
-    
+
     // 根据阵营获取要渲染的角色列表
     // 敌人阵营：渲染敌人列表
     // 我方阵营：渲染玩家 + 出战幻兽
-    const characters = isEnemy 
-      ? battleState.enemies 
+    const characters = isEnemy
+      ? battleState.enemies
       : [battleState.player, ...battleState.deployedPets];
 
     // 生成 3x3 共 9 个格子
@@ -839,14 +839,14 @@ const Battle: React.FC<BattleProps> = ({
 
         // 判断是否可以选择这个角色作为目标
         // 只有敌人阵营的角色可以被选择，且必须存活、已选择技能、玩家回合
-        const isSelectable = isEnemy && 
-          character && 
-          character.currentHp > 0 && 
-          battleState.selectedAction && 
+        const isSelectable = isEnemy &&
+          character &&
+          character.currentHp > 0 &&
+          battleState.selectedAction &&
           battleState.isPlayerTurn;
 
         // 判断这个角色是否有伤害数字
-        const characterDamageNumbers = character 
+        const characterDamageNumbers = character
           ? damageNumbers.filter(d => d.targetId === character.id)
           : [];
 
@@ -893,7 +893,7 @@ const Battle: React.FC<BattleProps> = ({
         <h2>战斗界面 - 第 {battleState.round} 回合</h2>
         {/* 离开战斗按钮 - 战斗进行中时显示 */}
         {battleState.battleResult === 'in_progress' && onLeaveBattle && (
-          <button 
+          <button
             className="leave-battle-btn"
             onClick={onLeaveBattle}
           >
@@ -934,7 +934,7 @@ const Battle: React.FC<BattleProps> = ({
 
       {/* 战斗日志区域 - 可展开收起 */}
       <div className="battle-log-section">
-        <div 
+        <div
           className="battle-log-toggle"
           onClick={() => setIsBattleLogExpanded(!isBattleLogExpanded)}
         >

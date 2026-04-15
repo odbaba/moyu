@@ -4,21 +4,17 @@
  */
 
 import type {
-  CharacterData,
-  SkillDetail,
   BattleCharacter,
+  BattleInitParams,
+  BattlePet,
   BattleSkill,
   BattleState,
-  GridPosition,
-  EnemyTemplate,
-  BattleInitParams,
+  CharacterData,
   EnemyData,
+  EnemyTemplate,
+  GridPosition,
   Pet,
-  BattlePet
-} from '../types';
-
-// 导入敌人技能模板
-import { enemySkillTemplates } from '../data/battleData';
+  SkillDetail} from '../types';
 // 导入战斗力计算函数
 import { calculateTotalCombatPower } from './combatPower';
 
@@ -40,10 +36,10 @@ export function skillToBattleSkill(
   const staminaCost = skill.cost.stamina || 0;
   // 获取当前冷却时间
   const currentCooldown = skill.currentCooldown || 0;
-  
+
   // 判断技能是否可用（MP、体力足够且冷却时间为0）
   const isAvailable = currentMp >= mpCost && currentStamina >= staminaCost && currentCooldown === 0;
-  
+
   return {
     id: skill.id,
     skillIndex: skill.skillIndex,
@@ -73,16 +69,16 @@ export function skillToBattleSkill(
 export function calculateCombatPower(character: CharacterData | BattleCharacter): number {
   // 基础战斗力 = 等级
   const basePower = character.level;
-  
+
   // 攻击力战斗力 = 平均攻击力 × 0.5
   const attackPower = ((character.attackMin + character.attackMax) / 2) * 0.5;
-  
+
   // 防御力战斗力 = 防御力 × 0.3
   const defensePower = character.defense * 0.3;
-  
+
   // 生命战斗力 = 最大生命值 × 0.01
   const hpPower = character.maxHp * 0.01;
-  
+
   // 总战斗力 = 基础 + 攻击 + 防御 + 生命
   return Math.floor(basePower + attackPower + defensePower + hpPower);
 }
@@ -105,12 +101,12 @@ export function characterToBattleCharacter(
 ): BattleCharacter {
   // 计算最大MP（简化处理：100 + 等级 × 10）
   const maxMp = 100 + characterData.level * 10;
-  
+
   // 转换所有已学习的技能为战斗技能
   const battleSkills: BattleSkill[] = skills
     .filter(skill => skill.isLearned)
     .map(skill => skillToBattleSkill(skill, maxMp, characterData.currentStamina));
-  
+
   // 创建战斗角色对象
   const battleCharacter: BattleCharacter = {
     id: characterData.id,
@@ -133,10 +129,10 @@ export function characterToBattleCharacter(
     isPlayer: isPlayer,
     gridPosition: gridPosition
   };
-  
+
   // 使用统一的战斗力计算函数（包含幻兽战斗力加成）
   battleCharacter.combatPower = calculateTotalCombatPower(characterData, pets);
-  
+
   return battleCharacter;
 }
 
@@ -156,28 +152,28 @@ export function createEnemyFromTemplate(
 ): BattleCharacter {
   // 生成唯一ID
   const id = `${template.id}_${index}`;
-  
+
   // 计算最大生命值 = 基础生命 + 成长生命 × 等级
   const maxHp = template.baseHp + template.growthHp * level;
-  
+
   // 计算最大MP = 50 + 等级 × 5
   const maxMp = 50 + level * 5;
-  
+
   // 计算最大体力 = 50 + 等级 × 5
   const maxStamina = 50 + level * 5;
-  
+
   // 计算最小攻击力 = 基础最小攻击 + 成长最小攻击 × 等级
   const attackMin = template.baseAttackMin + template.growthAttackMin * level;
-  
+
   // 计算最大攻击力 = 基础最大攻击 + 成长最大攻击 × 等级
   const attackMax = template.baseAttackMax + template.growthAttackMax * level;
-  
+
   // 计算防御力 = 基础防御 + 成长防御 × 等级
   const defense = template.baseDefense + template.growthDefense * level;
-  
+
   // 计算战斗力 = 基础战斗力 + 成长战斗力 × 等级
   const combatPower = template.baseCombatPower + template.growthCombatPower * level;
-  
+
   // 创建敌人战斗角色对象
   const enemy: BattleCharacter = {
     id: id,
@@ -200,7 +196,7 @@ export function createEnemyFromTemplate(
     isPlayer: false,
     gridPosition: gridPosition
   };
-  
+
   return enemy;
 }
 
@@ -211,7 +207,7 @@ export function createEnemyFromTemplate(
  */
 export function createBattleState(params: BattleInitParams): BattleState {
   const { playerData, playerSkills, enemyTemplate, enemyLevel, enemyCount, pets } = params;
-  
+
   // 创建玩家战斗角色（玩家位置固定在九宫格中心）
   const player = characterToBattleCharacter(
     playerData,
@@ -220,10 +216,10 @@ export function createBattleState(params: BattleInitParams): BattleState {
     { x: 1, y: 1 }, // 九宫格中心位置
     pets
   );
-  
+
   // 创建敌人列表
   const enemies: BattleCharacter[] = [];
-  
+
   // 根据敌人数量生成敌人，分布在九宫格的不同位置
   const enemyPositions: GridPosition[] = [
     { x: 0, y: 0 }, // 左上
@@ -234,9 +230,9 @@ export function createBattleState(params: BattleInitParams): BattleState {
     { x: 1, y: 2 }, // 下中
     { x: 0, y: 1 }, // 左中
     { x: 2, y: 1 }, // 右中
-    { x: 2, y: 1 }  // 备用位置
+    { x: 2, y: 1 } // 备用位置
   ];
-  
+
   // 生成指定数量的敌人
   for (let i = 0; i < enemyCount && i < enemyPositions.length; i++) {
     const enemy = createEnemyFromTemplate(
@@ -247,7 +243,7 @@ export function createBattleState(params: BattleInitParams): BattleState {
     );
     enemies.push(enemy);
   }
-  
+
   // 创建初始战斗状态
   const battleState: BattleState = {
     player: player,
@@ -263,14 +259,14 @@ export function createBattleState(params: BattleInitParams): BattleState {
     logIdCounter: 0, // 日志ID计数器初始为0
     currentEnemyActionIndex: 0 // 初始化敌人行动索引
   };
-  
+
   return battleState;
 }
 
 /**
  * 幻兽数据转换为战斗幻兽数据
  * 将 Pet 类型转换为 BattlePet 类型，用于战斗系统
- * 
+ *
  * 转换规则：
  * - id: 生成唯一ID（格式：battle_pet_${petId}_${timestamp}）
  * - name: 使用 Pet 的 othername（显示名称）
@@ -284,7 +280,7 @@ export function createBattleState(params: BattleInitParams): BattleState {
  * - isPlayer: 固定为 false（表示是幻兽）
  * - gridPosition: 由调用者提供（九宫格位置）
  * - petId: 使用 Pet 的 id（原始幻兽ID，用于同步状态）
- * 
+ *
  * @param pet 幻兽数据
  * @param gridPosition 九宫格位置
  * @returns 战斗幻兽数据
@@ -296,30 +292,30 @@ export function petToBattlePet(
   // 生成战斗中唯一的幻兽ID
   // 格式：battle_pet_${原始幻兽ID}_${时间戳}
   const battlePetId = `battle_pet_${pet.id}_${Date.now()}`;
-  
+
   // 创建战斗幻兽对象
   const battlePet: BattlePet = {
-    id: battlePetId,                    // 战斗中生成的唯一ID
-    name: pet.othername,                // 显示名称（自定义名称）
-    level: pet.dj,                      // 幻兽等级
-    maxHp: pet.mhp,                     // 最大生命值
-    currentHp: pet.hp,                  // 当前生命值
-    attackMin: pet.xgj,                 // 最小攻击力
-    attackMax: pet.dgj,                 // 最大攻击力
-    defense: pet.fy,                    // 防御力
-    isMerged: pet.isMerged,             // 是否合体状态
-    isPlayer: false,                    // 固定为 false，表示是幻兽
-    gridPosition: gridPosition,         // 九宫格位置
-    petId: pet.id                       // 原始幻兽ID，用于同步状态
+    id: battlePetId, // 战斗中生成的唯一ID
+    name: pet.othername, // 显示名称（自定义名称）
+    level: pet.dj, // 幻兽等级
+    maxHp: pet.mhp, // 最大生命值
+    currentHp: pet.hp, // 当前生命值
+    attackMin: pet.xgj, // 最小攻击力
+    attackMax: pet.dgj, // 最大攻击力
+    defense: pet.fy, // 防御力
+    isMerged: pet.isMerged, // 是否合体状态
+    isPlayer: false, // 固定为 false，表示是幻兽
+    gridPosition: gridPosition, // 九宫格位置
+    petId: pet.id // 原始幻兽ID，用于同步状态
   };
-  
+
   return battlePet;
 }
 
 /**
  * 从 EnemyData 创建敌人战斗角色
  * 用于怪物交互系统，将 EnemyData 转换为战斗角色
- * 
+ *
  * @param enemyData 敌人数据（来自怪物交互配置）
  * @param index 敌人索引（用于生成唯一ID和位置）
  * @param gridPosition 九宫格位置
@@ -332,16 +328,16 @@ export function createEnemyFromEnemyData(
 ): BattleCharacter {
   // 使用 enemyData.id 作为唯一ID（已经由 generateEnemiesForBattle 生成唯一ID）
   const id = enemyData.id || `enemy_${Date.now()}_${index}`;
-  
+
   // 使用 enemyData 中的等级，如果没有则基于生命值估算
   const level = enemyData.level || Math.max(1, Math.floor(enemyData.maxHp / 100));
-  
+
   // 计算最大MP = 50 + 等级 × 5
   const maxMp = 50 + level * 5;
-  
+
   // 计算最大体力 = 50 + 等级 × 5
   const maxStamina = 50 + level * 5;
-  
+
   // 为敌人添加默认的普通攻击技能
   const defaultSkill: BattleSkill = {
     id: 'normal_attack',
@@ -361,7 +357,7 @@ export function createEnemyFromEnemyData(
     buffDuration: 0,
     isAvailable: true,
   };
-  
+
   // 创建敌人战斗角色对象
   const enemy: BattleCharacter = {
     id: id,
@@ -384,7 +380,7 @@ export function createEnemyFromEnemyData(
     isPlayer: false,
     gridPosition: gridPosition
   };
-  
+
   return enemy;
 }
 
@@ -393,7 +389,7 @@ export function createEnemyFromEnemyData(
  * 根据参考文档 06_地图系统.md：
  * - 普通怪物战斗力 = 等级
  * - BOSS怪物战斗力 = 等级 × 1.5（约）
- * 
+ *
  * @param enemyData 敌人数据
  * @returns 战斗力数值
  */
@@ -402,21 +398,22 @@ export function calculateCombatPowerFromEnemyData(enemyData: EnemyData): number 
   if (enemyData.combatPower !== undefined) {
     return enemyData.combatPower;
   }
-  
+
   // 如果有 level 字段，使用等级作为战斗力
   if (enemyData.level !== undefined) {
     return enemyData.level;
   }
-  
+
   // 否则基于生命值估算等级，再作为战斗力
   const level = Math.max(1, Math.floor(enemyData.maxHp / 100));
+
   return level;
 }
 
 /**
  * 根据敌人数据列表创建战斗状态
  * 用于怪物交互场景，直接使用敌人数据创建战斗
- * 
+ *
  * @param playerData 玩家角色数据
  * @param playerSkills 玩家技能列表
  * @param enemiesData 敌人数据列表（来自怪物交互配置）
@@ -437,10 +434,10 @@ export function createBattleStateFromEnemies(
     { x: 1, y: 1 }, // 九宫格中心位置
     pets
   );
-  
+
   // 创建敌人列表
   const enemies: BattleCharacter[] = [];
-  
+
   // 敌人位置配置（九宫格，排除中心位置）
   const enemyPositions: GridPosition[] = [
     { x: 0, y: 0 }, // 左上
@@ -451,9 +448,9 @@ export function createBattleStateFromEnemies(
     { x: 1, y: 2 }, // 下中
     { x: 0, y: 1 }, // 左中
     { x: 2, y: 1 }, // 右中
-    { x: 2, y: 1 }  // 备用位置
+    { x: 2, y: 1 } // 备用位置
   ];
-  
+
   // 从敌人数据列表创建敌人
   for (let i = 0; i < enemiesData.length && i < enemyPositions.length; i++) {
     const enemy = createEnemyFromEnemyData(
@@ -463,7 +460,7 @@ export function createBattleStateFromEnemies(
     );
     enemies.push(enemy);
   }
-  
+
   // 创建初始战斗状态
   const battleState: BattleState = {
     player: player,
@@ -479,6 +476,6 @@ export function createBattleStateFromEnemies(
     logIdCounter: 0, // 日志ID计数器初始为0
     currentEnemyActionIndex: 0 // 初始化敌人行动索引
   };
-  
+
   return battleState;
 }

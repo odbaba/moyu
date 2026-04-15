@@ -1,8 +1,10 @@
-import React from 'react';
-import type { EquipmentDetail, EquipmentSlotType } from '../../types';
-import { getEquipmentSlotName, getEquipmentDisplayName } from '../../utils/equipmentConverter';
-import { getEquipmentIcon, getEquipmentQualityColor } from '../common/utils';
 import './character.css';
+
+import React from 'react';
+
+import type { EquipmentDetail, EquipmentSlotType } from '../../types';
+import { getEquipmentDisplayName, getEquipmentSlotName } from '../../utils/equipmentConverter';
+import { getEquipmentIcon, getEquipmentQualityColor } from '../common/utils';
 
 /**
  * 装备详情弹窗组件属性接口
@@ -34,8 +36,8 @@ interface EquipmentModalProps {
  * 装备详情弹窗组件
  * 显示已装备物品的详细信息，有"替换"和"卸下"按钮
  */
-const EquipmentModal: React.FC<EquipmentModalProps> = ({ 
-  isVisible, 
+const EquipmentModal: React.FC<EquipmentModalProps> = ({
+  isVisible,
   equipment,
   onClose,
   onUnequip,
@@ -76,8 +78,8 @@ const EquipmentModal: React.FC<EquipmentModalProps> = ({
   const isDefenseType = ['clothes', 'shoes', 'helmet'].includes(equipment.type);
 
   return (
-    <div 
-      className="equipment-modal-overlay" 
+    <div
+      className="equipment-modal-overlay"
       onClick={handleOverlayClick}
     >
       <div className="equipment-modal-content">
@@ -85,26 +87,26 @@ const EquipmentModal: React.FC<EquipmentModalProps> = ({
         <button className="equipment-close-modal" onClick={onClose}>
           ×
         </button>
-        
+
         {/* 装备标题 */}
-        <h3 
-          className="equipment-title" 
+        <h3
+          className="equipment-title"
           style={{ color: getEquipmentQualityColor(equipment.quality) }}
         >
           {fullDisplayName}
         </h3>
-        
+
         {/* 装备图标 */}
         <div className="equipment-modal-icon">
           {getEquipmentIcon(equipment.type)}
         </div>
-        
+
         {/* 使用等级 */}
         <div className="equipment-use-level">
           <span className="use-level-label">使用等级：</span>
           <span className="use-level-value">{equipment.useLevel}</span>
         </div>
-        
+
         {/* 装备属性 */}
         <div className="equipment-attributes">
           {/* 攻击型装备属性 */}
@@ -128,7 +130,7 @@ const EquipmentModal: React.FC<EquipmentModalProps> = ({
               )}
             </>
           )}
-          
+
           {/* 防御型装备属性 */}
           {isDefenseType && (
             <>
@@ -150,7 +152,7 @@ const EquipmentModal: React.FC<EquipmentModalProps> = ({
               )}
             </>
           )}
-          
+
           {/* 其他属性 */}
           {equipment.attributes.hp !== undefined && (
             <div className="attribute-item">
@@ -158,21 +160,21 @@ const EquipmentModal: React.FC<EquipmentModalProps> = ({
               <span className="attribute-value hp-value">+{equipment.attributes.hp}</span>
             </div>
           )}
-          
+
           {equipment.attributes.mp !== undefined && (
             <div className="attribute-item">
               <span className="attribute-label">魔法：</span>
               <span className="attribute-value mp-value">+{equipment.attributes.mp}</span>
             </div>
           )}
-          
+
           {equipment.attributes.dodge !== undefined && (
             <div className="attribute-item">
               <span className="attribute-label">闪避：</span>
               <span className="attribute-value">+{equipment.attributes.dodge}</span>
             </div>
           )}
-          
+
           {equipment.attributes.luck !== undefined && (
             <div className="attribute-item">
               <span className="attribute-label">幸运：</span>
@@ -180,14 +182,14 @@ const EquipmentModal: React.FC<EquipmentModalProps> = ({
             </div>
           )}
         </div>
-        
+
         {/* 宝石洞 */}
         <div className="equipment-hole-section">
           <div className="hole-count">
             <span className="hole-label">可镶嵌宝石：</span>
             <span className="hole-value">{equipment.holeCount}个</span>
           </div>
-          
+
           {equipment.gemAttributes && equipment.gemAttributes.length > 0 && (
             <div className="gem-attributes">
               <div className="gem-title">宝石属性：</div>
@@ -216,13 +218,13 @@ const EquipmentModal: React.FC<EquipmentModalProps> = ({
             </div>
           )}
         </div>
-        
+
         {/* 魔魂等级 */}
         <div className="equipment-magic-soul">
           <span className="magic-soul-label">魔魂等级：</span>
           <span className="magic-soul-value">{equipment.magicSoulLevel}</span>
         </div>
-        
+
         {/* 战魂属性 */}
         {equipment.soulType && equipment.soulType > 0 && (
           <div className="equipment-soul-section">
@@ -232,13 +234,13 @@ const EquipmentModal: React.FC<EquipmentModalProps> = ({
             </span>
           </div>
         )}
-        
+
         {/* 战斗力 */}
         <div className="equipment-combat-power">
           <span className="combat-power-label">战斗力：</span>
           <span className="combat-power-value">{equipment.combatPower}</span>
         </div>
-        
+
         {/* 卸下按钮 */}
         <div className="equipment-modal-actions">
           <button className="unequip-button" onClick={handleUnequip}>

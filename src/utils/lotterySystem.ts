@@ -1,7 +1,7 @@
 /**
  * 抽奖系统工具函数模块
  * 提供抽奖概率计算、奖品选择、装备生成等功能
- * 
+ *
  * 抽奖概率分布：
  * - 极品奖励 (0-19): 2%
  * - 高级奖励 (20-69): 5%
@@ -10,20 +10,19 @@
  */
 
 import type {
-  InventoryItem,
   EquipmentItem,
-  PlayerResources,
-  EquipmentSlotType,
+  InventoryItem,
   Pet,
+  PetQuality,
   PetRating,
   PetType,
-  PetQuality,
+  PlayerResources,
 } from '../types';
-import { 
-  createEquipmentItem, 
+import {
+  createEquipmentItem,
   createItemFromTemplate,
-  randomEquipmentType, 
-  randomMagicSoulLevel 
+  randomEquipmentType,
+  randomMagicSoulLevel
 } from './itemFactory';
 
 // ==================== 类型定义 ====================
@@ -49,23 +48,23 @@ export const PRIZE_LEVEL_NAMES: Record<PrizeLevel, string> = {
  * 定义抽奖的返回结果
  */
 export interface LotteryResult {
-  success: boolean;              // 是否成功
-  prizeLevel: PrizeLevel;        // 奖品等级
-  prizeName: string;             // 奖品名称
-  prizeItem?: InventoryItem;     // 奖品物品（如果是物品）
-  prizePet?: Pet;                // 奖品幻兽（如果是幻兽）
-  message: string;               // 结果消息
-  magicStoneCost: number;        // 消耗的魔石
+  success: boolean; // 是否成功
+  prizeLevel: PrizeLevel; // 奖品等级
+  prizeName: string; // 奖品名称
+  prizeItem?: InventoryItem; // 奖品物品（如果是物品）
+  prizePet?: Pet; // 奖品幻兽（如果是幻兽）
+  message: string; // 结果消息
+  magicStoneCost: number; // 消耗的魔石
 }
 
 /**
  * 魔石检查结果接口
  */
 export interface MagicStoneCheckResult {
-  hasEnough: boolean;            // 是否有足够魔石
-  currentAmount: number;         // 当前魔石数量
-  requiredAmount: number;        // 所需魔石数量
-  shortage: number;              // 缺少的魔石数量
+  hasEnough: boolean; // 是否有足够魔石
+  currentAmount: number; // 当前魔石数量
+  requiredAmount: number; // 所需魔石数量
+  shortage: number; // 缺少的魔石数量
 }
 
 // ==================== 极品奖品配置 ====================
@@ -131,7 +130,7 @@ const COMMON_PRIZES = [
 /**
  * 生成抽奖随机数
  * 生成0-999的随机整数，用于判定奖品等级
- * 
+ *
  * @returns 0-999之间的随机整数
  */
 export function generateLotteryNumber(): number {
@@ -141,7 +140,7 @@ export function generateLotteryNumber(): number {
 /**
  * 判定奖品等级
  * 根据随机值判定奖品等级
- * 
+ *
  * @param randomNumber 抽奖随机数 (0-999)
  * @returns 奖品等级
  */
@@ -162,7 +161,7 @@ export function determinePrizeLevel(randomNumber: number): PrizeLevel {
 /**
  * 随机选择极品奖品
  * 从6个极品奖品中随机选择1个
- * 
+ *
  * @param playerLevel 玩家等级（用于生成装备）
  * @returns 奖品信息
  */
@@ -191,7 +190,7 @@ export function selectLegendaryPrize(playerLevel: number): { name: string; item?
 /**
  * 随机选择高级奖品
  * 从7个高级奖品中随机选择1个
- * 
+ *
  * @param playerLevel 玩家等级（用于生成装备）
  * @returns 奖品信息
  */
@@ -220,7 +219,7 @@ export function selectHighPrize(playerLevel: number): { name: string; item?: Inv
 /**
  * 随机选择中级奖品
  * 从5个中级奖品中随机选择1个
- * 
+ *
  * @param playerLevel 玩家等级（用于生成装备）
  * @returns 奖品信息
  */
@@ -249,7 +248,7 @@ export function selectMediumPrize(playerLevel: number): { name: string; item?: I
 /**
  * 随机选择普通奖品
  * 从4个普通奖品中随机选择1个
- * 
+ *
  * @param playerLevel 玩家等级（用于生成装备）
  * @returns 奖品信息
  */
@@ -275,12 +274,12 @@ export function selectCommonPrize(playerLevel: number): { name: string; item?: I
 /**
  * 根据玩家等级生成装备
  * 使用统一的物品工厂模块创建装备
- * 
+ *
  * 等级规则：
  * - 玩家等级 < 10: 装备等级 = 10
  * - 玩家等级 10-39: 装备等级 = 向下取整到10的倍数
  * - 玩家等级 >= 40: 装备等级 = 50
- * 
+ *
  * @param playerLevel 玩家等级
  * @param quality 装备品质 (0-4)
  * @returns 装备物品
@@ -310,7 +309,7 @@ export function generateLotteryEquipment(playerLevel: number, quality: number = 
 
 /**
  * 创建抽奖幻兽
- * 
+ *
  * @param petType 幻兽类型
  * @param starLevel 星级
  * @returns 幻兽数据
@@ -376,7 +375,7 @@ function createLotteryPet(petType: PetType, starLevel: number): Pet {
 
 /**
  * 获取幻兽类型基础评分
- * 
+ *
  * @param petType 幻兽类型
  * @returns 基础评分
  */
@@ -391,12 +390,13 @@ function getPetTypeBaseScore(petType: PetType): number {
     '年猪': 600,
     '噜噜': 700,
   };
+
   return baseScores[petType] || 0;
 }
 
 /**
  * 根据评分计算品质
- * 
+ *
  * @param score 评分
  * @returns 品质
  */
@@ -405,6 +405,7 @@ function getQualityByScore(score: number): PetQuality {
   if (score < 500) return '良品';
   if (score < 700) return '上品';
   if (score < 900) return '精品';
+
   return '极品';
 }
 
@@ -413,18 +414,18 @@ function getQualityByScore(score: number): PetQuality {
 /**
  * 创建抽奖物品
  * 使用统一的物品工厂模块创建物品，保留原始ID以支持堆叠
- * 
+ *
  * @param itemName 物品名称
  * @returns 物品数据
  */
 function createLotteryItem(itemName: string): InventoryItem {
   // 使用 itemFactory 从模板创建物品，保留原始ID
   const item = createItemFromTemplate(itemName, 1);
-  
+
   if (item) {
     return item;
   }
-  
+
   // 如果找不到模板，创建基础物品
   return {
     id: `lottery_item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -448,7 +449,7 @@ function createLotteryItem(itemName: string): InventoryItem {
 
 /**
  * 检查玩家是否有足够的魔石
- * 
+ *
  * @param playerResources 玩家资源
  * @param requiredAmount 所需魔石数量
  * @returns 检查结果
@@ -472,7 +473,7 @@ export function checkMagicStone(
 /**
  * 扣除魔石
  * 返回扣除后的玩家资源（不修改原对象）
- * 
+ *
  * @param playerResources 玩家资源
  * @param amount 扣除数量
  * @returns 扣除后的玩家资源
@@ -491,7 +492,7 @@ export function deductMagicStone(
 
 /**
  * 执行完整抽奖流程
- * 
+ *
  * @param playerResources 玩家资源
  * @param playerLevel 玩家等级
  * @param magicStoneCost 抽奖消耗的魔石数量
@@ -554,7 +555,7 @@ export function executeLottery(
 /**
  * 获取奖品等级概率
  * 返回各奖品等级的概率百分比
- * 
+ *
  * @returns 概率映射表
  */
 export function getPrizeProbabilities(): Record<PrizeLevel, number> {
@@ -568,7 +569,7 @@ export function getPrizeProbabilities(): Record<PrizeLevel, number> {
 
 /**
  * 格式化抽奖结果消息
- * 
+ *
  * @param result 抽奖结果
  * @returns 格式化后的消息
  */

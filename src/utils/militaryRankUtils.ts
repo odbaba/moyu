@@ -4,11 +4,10 @@
  * 参考文档：reference/docs/scripts_analysis/14_NPC系统.md
  */
 
-import { 
-  MILITARY_RANKS, 
+import {
   getMilitaryRankByLevel,
-  getNextMilitaryRankExp 
-} from '../data/rankData';
+  getNextMilitaryRankExp,
+  MILITARY_RANKS} from '../data/rankData';
 import type { Weekday } from '../types';
 
 // ========== 核心工具函数 ==========
@@ -20,6 +19,7 @@ import type { Weekday } from '../types';
  */
 export function getMilitaryRankName(level: number): string {
   const rank = getMilitaryRankByLevel(level);
+
   return rank.name;
 }
 
@@ -31,6 +31,7 @@ export function getMilitaryRankName(level: number): string {
  */
 export function getMilitaryRankPay(level: number): number {
   const rank = getMilitaryRankByLevel(level);
+
   return rank.pay;
 }
 
@@ -54,13 +55,13 @@ export function canPromoteMilitaryRank(currentExp: number, currentLevel: number)
   if (currentLevel >= 11) {
     return false;
   }
-  
+
   // 获取下一级所需战功
   const nextRequirement = getNextRankRequirement(currentLevel);
   if (nextRequirement === null) {
     return false;
   }
-  
+
   // 判断战功是否足够
   return currentExp >= nextRequirement;
 }
@@ -72,6 +73,7 @@ export function canPromoteMilitaryRank(currentExp: number, currentLevel: number)
  */
 export function getMilitaryRankCombatPowerBonus(level: number): number {
   const rank = getMilitaryRankByLevel(level);
+
   return rank.combatPowerBonus;
 }
 
@@ -81,10 +83,10 @@ export function getMilitaryRankCombatPowerBonus(level: number): number {
  * 军饷领取结果接口
  */
 export interface PayClaimResult {
-  success: boolean;           // 是否成功领取
-  message: string;            // 结果消息
-  magicStone: number;         // 获得的魔石数量
-  specialReward?: string;     // 特殊奖励（少将以上）
+  success: boolean; // 是否成功领取
+  message: string; // 结果消息
+  magicStone: number; // 获得的魔石数量
+  specialReward?: string; // 特殊奖励（少将以上）
 }
 
 /**
@@ -107,7 +109,7 @@ export function canClaimMilitaryPay(weekday: Weekday): boolean {
  * @returns 领取结果
  */
 export function claimMilitaryPay(
-  militaryRankLevel: number, 
+  militaryRankLevel: number,
   weekday: Weekday,
   hasClaimedToday: boolean
 ): PayClaimResult {
@@ -119,7 +121,7 @@ export function claimMilitaryPay(
       magicStone: 0
     };
   }
-  
+
   // 检查是否已领取
   if (hasClaimedToday) {
     return {
@@ -128,7 +130,7 @@ export function claimMilitaryPay(
       magicStone: 0
     };
   }
-  
+
   // 检查军衔等级
   if (militaryRankLevel === 0) {
     return {
@@ -137,23 +139,23 @@ export function claimMilitaryPay(
       magicStone: 0
     };
   }
-  
+
   // 计算军饷
   const magicStone = getMilitaryRankPay(militaryRankLevel);
   const rankName = getMilitaryRankName(militaryRankLevel);
-  
+
   // 少将以上额外奖励
   let specialReward: string | undefined;
   if (militaryRankLevel >= 7) {
     specialReward = '高级斗志抑扬';
   }
-  
+
   // 构建成功消息
   let message = `恭喜你领取了${rankName}军衔的军饷！\n获得魔石：${magicStone.toLocaleString()}`;
   if (specialReward) {
     message += `\n额外奖励：${specialReward}`;
   }
-  
+
   return {
     success: true,
     message,
@@ -168,14 +170,14 @@ export function claimMilitaryPay(
  * 战功查询结果接口
  */
 export interface BattleExpQueryResult {
-  currentExp: number;         // 当前战功
-  currentLevel: number;       // 当前军衔等级
-  currentRankName: string;    // 当前军衔名称
-  nextLevel: number | null;   // 下一级军衔等级
+  currentExp: number; // 当前战功
+  currentLevel: number; // 当前军衔等级
+  currentRankName: string; // 当前军衔名称
+  nextLevel: number | null; // 下一级军衔等级
   nextRankName: string | null; // 下一级军衔名称
   nextRequirement: number | null; // 晋升所需战功
-  progress: number;           // 晋升进度（百分比）
-  canPromote: boolean;        // 是否可以晋升
+  progress: number; // 晋升进度（百分比）
+  canPromote: boolean; // 是否可以晋升
 }
 
 /**
@@ -188,18 +190,18 @@ export function queryBattleExp(currentExp: number): BattleExpQueryResult {
   // 获取当前军衔等级
   const currentLevel = getCurrentMilitaryRankLevel(currentExp);
   const currentRankName = getMilitaryRankName(currentLevel);
-  
+
   // 获取下一级信息
   let nextLevel: number | null = null;
   let nextRankName: string | null = null;
   let nextRequirement: number | null = null;
   let progress = 0;
-  
+
   if (currentLevel < 11) {
     nextLevel = currentLevel + 1;
     nextRankName = getMilitaryRankName(nextLevel);
     nextRequirement = getNextRankRequirement(currentLevel);
-    
+
     // 计算晋升进度
     if (nextRequirement !== null) {
       const currentRankExp = MILITARY_RANKS[currentLevel].requiredBattleExp;
@@ -208,10 +210,10 @@ export function queryBattleExp(currentExp: number): BattleExpQueryResult {
       progress = Math.min(100, Math.floor((expGained / expNeeded) * 100));
     }
   }
-  
+
   // 判断是否可以晋升
   const canPromote = canPromoteMilitaryRank(currentExp, currentLevel);
-  
+
   return {
     currentExp,
     currentLevel,
@@ -235,6 +237,7 @@ function getCurrentMilitaryRankLevel(battleExp: number): number {
       return MILITARY_RANKS[i].level;
     }
   }
+
   return 0;
 }
 
@@ -244,12 +247,12 @@ function getCurrentMilitaryRankLevel(battleExp: number): number {
  * BOSS 位置信息接口
  */
 export interface BossLocationInfo {
-  bossName: string;           // BOSS 名称
-  level: number;              // BOSS 等级
-  location: string;           // 所在地图
-  locationName: string;       // 地图中文名称
-  combatPower: number;        // 战斗力
-  battleExpReward: number;    // 战功奖励
+  bossName: string; // BOSS 名称
+  level: number; // BOSS 等级
+  location: string; // 所在地图
+  locationName: string; // 地图中文名称
+  combatPower: number; // 战斗力
+  battleExpReward: number; // 战功奖励
 }
 
 /**
@@ -332,7 +335,7 @@ export function queryMilitaryIntel(): BossLocationInfo[] {
 export function formatMilitaryIntel(bossLocations: BossLocationInfo[]): string {
   let text = '=== 军情查询 ===\n\n';
   text += '各等级BOSS位置信息：\n\n';
-  
+
   bossLocations.forEach(boss => {
     text += `【${boss.bossName}】\n`;
     text += `  所在地图：${boss.locationName}\n`;
@@ -340,9 +343,9 @@ export function formatMilitaryIntel(bossLocations: BossLocationInfo[]): string {
     text += `  战斗力：${boss.combatPower}\n`;
     text += `  战功奖励：${boss.battleExpReward.toLocaleString()}\n\n`;
   });
-  
+
   text += '提示：消灭BOSS可获得1000点战功！';
-  
+
   return text;
 }
 
@@ -354,28 +357,28 @@ export function formatMilitaryIntel(bossLocations: BossLocationInfo[]): string {
  */
 export function getMilitaryRankDescription(): string {
   let text = '=== 军衔系统说明 ===\n\n';
-  
+
   text += '【军衔等级】\n';
   text += '军衔共分12个等级：\n';
   text += '无军衔、少尉、中尉、上尉、少校、中校、上校、\n';
   text += '少将、中将、上将、大将、元帅\n\n';
-  
+
   text += '【战功获取】\n';
   text += '1. 消灭BOSS：获得1000点战功\n';
   text += '2. 消灭雪域边境冰雪巨人：获得10000点战功\n\n';
-  
+
   text += '【军衔奖励】\n';
   text += '1. 战斗力加成：根据军衔等级获得战斗力加成\n';
   text += '2. 军饷领取：周日可领取魔石奖励\n';
   text += '3. 特殊奖励：少将以上额外获得"高级斗志抑扬"\n\n';
-  
+
   text += '【军衔等级与军饷对照表】\n';
   MILITARY_RANKS.forEach(rank => {
     if (rank.level > 0) {
       text += `${rank.name}：${rank.pay.toLocaleString()}魔石\n`;
     }
   });
-  
+
   return text;
 }
 
@@ -388,16 +391,16 @@ export function getPromotionInfo(currentLevel: number): string {
   if (currentLevel >= 11) {
     return '恭喜你已达到最高军衔：元帅！';
   }
-  
+
   const currentRank = getMilitaryRankByLevel(currentLevel);
   const nextRank = getMilitaryRankByLevel(currentLevel + 1);
-  
+
   let text = `当前军衔：${currentRank.name}\n`;
   text += `下一级军衔：${nextRank.name}\n`;
   text += `所需战功：${nextRank.requiredBattleExp.toLocaleString()}\n`;
   text += `战斗力加成：${currentRank.combatPowerBonus}% → ${nextRank.combatPowerBonus}%\n`;
   text += `军饷奖励：${currentRank.pay.toLocaleString()} → ${nextRank.pay.toLocaleString()}魔石`;
-  
+
   return text;
 }
 
@@ -408,8 +411,8 @@ export function getPromotionInfo(currentLevel: number): string {
  * 参考文档：reference/docs/scripts_analysis/14_NPC系统.md
  */
 export const BATTLE_EXP_REWARDS = {
-  BOSS_KILL: 1000,              // 消灭BOSS获得战功
-  ICE_GIANT_KILL: 10000,        // 消灭雪域边境冰雪巨人获得战功
+  BOSS_KILL: 1000, // 消灭BOSS获得战功
+  ICE_GIANT_KILL: 10000, // 消灭雪域边境冰雪巨人获得战功
 };
 
 /**

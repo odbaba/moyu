@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import type { InventoryItem, EquipmentItem } from '../../types';
-import { ITEM_TYPE_NAMES, RARITY_CONFIG, EQUIPMENT_SLOT_TYPE_NAMES } from '../common/constants';
-import { getRarityColor, getEquipmentQualityColor, isEquipmentItem } from '../common/utils';
 import './ItemDetailModal.css';
+
+import React, { useState } from 'react';
+
+import type { EquipmentItem, InventoryItem } from '../../types';
+import { EQUIPMENT_SLOT_TYPE_NAMES, ITEM_TYPE_NAMES, RARITY_CONFIG } from '../common/constants';
+import { getEquipmentQualityColor, getRarityColor, isEquipmentItem } from '../common/utils';
 
 /**
  * 物品详情弹窗组件 Props 接口
  */
 interface ItemDetailModalProps {
-  isVisible: boolean;           // 是否显示弹窗
-  onClose: () => void;          // 关闭弹窗的回调函数
-  item: InventoryItem | null;   // 要显示的物品数据
-  onUseItem?: (item: InventoryItem) => void;  // 使用物品的回调函数
+  isVisible: boolean; // 是否显示弹窗
+  onClose: () => void; // 关闭弹窗的回调函数
+  item: InventoryItem | null; // 要显示的物品数据
+  onUseItem?: (item: InventoryItem) => void; // 使用物品的回调函数
 }
 
 /**
@@ -19,9 +21,9 @@ interface ItemDetailModalProps {
  * 用于显示物品的详细信息，包括名称、图标、属性、获取途径等
  * 支持点击关闭按钮或弹窗外部关闭，带有过渡动画效果
  */
-const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ 
-  isVisible, 
-  onClose, 
+const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
+  isVisible,
+  onClose,
   item,
   onUseItem
 }) => {
@@ -66,7 +68,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
         <div className="equipment-quality-section">
           <div className="info-item">
             <span className="info-label">品质</span>
-            <span 
+            <span
               className="info-value quality-value"
               style={{ color: getEquipmentQualityColor(equip.equipmentQuality) }}
             >
@@ -278,6 +280,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
         />
       );
     }
+
     return <span className="item-icon">{item.icon}</span>;
   };
 
@@ -285,38 +288,38 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
   const currentRarityColor = getRarityColor(item.rarity || 'common');
 
   return (
-    <div 
-      className="item-detail-modal-overlay" 
+    <div
+      className="item-detail-modal-overlay"
       onClick={handleOverlayClick}
     >
       <div className="item-detail-modal-content">
         {/* 关闭按钮 */}
-        <button 
-          className="item-detail-close-button" 
+        <button
+          className="item-detail-close-button"
           onClick={onClose}
           aria-label="关闭"
         >
           ×
         </button>
-        
+
         {/* 物品头部信息：图标和名称 */}
         <div className="item-detail-header">
           <div className="item-icon-wrapper">
             {renderItemIcon()}
           </div>
           {/* 装备类物品名称使用品质颜色 */}
-          <h3 
-            className="item-name" 
-            style={{ 
-              color: isEquipment 
-                ? getEquipmentQualityColor((item as EquipmentItem).equipmentQuality) 
-                : currentRarityColor 
+          <h3
+            className="item-name"
+            style={{
+              color: isEquipment
+                ? getEquipmentQualityColor((item as EquipmentItem).equipmentQuality)
+                : currentRarityColor
             }}
           >
             {item.name}
           </h3>
         </div>
-        
+
         {/* 装备类物品显示专门的装备信息 */}
         {isEquipment ? (
           renderEquipmentDetails(item as EquipmentItem)
@@ -330,7 +333,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
               </div>
               <div className="info-item">
                 <span className="info-label">稀有度</span>
-                <span 
+                <span
                   className="info-value rarity-value"
                   style={{ color: currentRarityColor }}
                 >
@@ -346,12 +349,12 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                 <span className="quantity-value">{item.quantity}</span>
               </div>
             )}
-            
+
             {/* 普通物品属性区域 */}
             {renderAttributes()}
           </>
         )}
-        
+
         {/* 获取途径 */}
         {item.source && (
           <div className="item-source-section">
@@ -359,7 +362,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             <div className="item-source">{item.source}</div>
           </div>
         )}
-        
+
         {/* 物品描述 */}
         <div className="item-description-section">
           <div className="section-title">物品描述</div>

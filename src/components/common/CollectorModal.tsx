@@ -1,11 +1,13 @@
-import React, { useState, useMemo } from 'react';
-import type { InventoryItem } from '../../types';
-import { 
-  calculateItemMagicStoneValue, 
-  calculatePurchasePrice,
-  formatMagicStoneValue 
-} from '../../utils/itemValueCalculator';
 import './CollectorModal.css';
+
+import React, { useMemo, useState } from 'react';
+
+import type { InventoryItem } from '../../types';
+import {
+  calculateItemMagicStoneValue,
+  calculatePurchasePrice,
+  formatMagicStoneValue
+} from '../../utils/itemValueCalculator';
 
 /**
  * 收藏架模态窗口组件属性接口
@@ -64,10 +66,10 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
   const [collectorSlots, setCollectorSlots] = useState<CollectorSlot[]>(
     Array.from({ length: 12 }, (_, index) => ({ index, item: null }))
   );
-  
+
   // 提示消息状态
   const [message, setMessage] = useState<string>('');
-  
+
   // 数量选择对话框状态
   const [quantitySelect, setQuantitySelect] = useState<QuantitySelectState>({
     isVisible: false,
@@ -83,11 +85,11 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
     const itemsWithValue = collectorSlots
       .filter(slot => slot.item !== null)
       .map(slot => slot.item!);
-    
+
     const totalMagicStoneValue = itemsWithValue.reduce((total, item) => {
       return total + calculateItemMagicStoneValue(item);
     }, 0);
-    
+
     return calculatePurchasePrice(totalMagicStoneValue);
   }, [collectorSlots]);
 
@@ -118,17 +120,19 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
     if (itemValue === 0) {
       setMessage('该物品没有魔石价值，无法放入收藏架！');
       setTimeout(() => setMessage(''), 2000);
+
       return;
     }
-    
+
     // 查找第一个空格子
     const emptySlotIndex = collectorSlots.findIndex(slot => slot.item === null);
     if (emptySlotIndex === -1) {
       setMessage('收藏架已满！请先出售或移除物品。');
       setTimeout(() => setMessage(''), 2000);
+
       return;
     }
-    
+
     // 如果物品数量大于1，显示数量选择对话框
     if (item.quantity && item.quantity > 1) {
       setQuantitySelect({
@@ -137,9 +141,10 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
         maxQuantity: item.quantity,
         selectedQuantity: 1
       });
+
       return;
     }
-    
+
     // 数量为1，直接放入收藏架
     addItemToCollector(item, 1);
   };
@@ -153,21 +158,22 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
     if (emptySlotIndex === -1) {
       setMessage('收藏架已满！请先出售或移除物品。');
       setTimeout(() => setMessage(''), 2000);
+
       return;
     }
-    
+
     // 创建物品副本，设置数量
     const itemToAdd: InventoryItem = {
       ...item,
       quantity: quantity,
       id: `${item.id}_collector_${Date.now()}` // 生成新的ID避免冲突
     };
-    
+
     // 将物品放入收藏架格子
     const newSlots = [...collectorSlots];
     newSlots[emptySlotIndex] = { index: emptySlotIndex, item: itemToAdd };
     setCollectorSlots(newSlots);
-    
+
     // 从背包减少物品数量
     const newInventory = inventoryItems.map(i => {
       if (i.id === item.id) {
@@ -175,13 +181,15 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
         if (newQuantity <= 0) {
           return null; // 将在filter中移除
         }
+
         return { ...i, quantity: newQuantity };
       }
+
       return i;
     }).filter(i => i !== null) as InventoryItem[];
-    
+
     onUpdateInventory(newInventory);
-    
+
     setMessage(`已将 ${item.name} x${quantity} 放入收藏架`);
     setTimeout(() => setMessage(''), 2000);
   };
@@ -220,25 +228,26 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
   const handleSlotClick = (index: number) => {
     const slot = collectorSlots[index];
     if (!slot.item) return;
-    
+
     const item = slot.item;
     const quantity = item.quantity || 1;
-    
+
     // 查找背包中是否有相同物品（可堆叠）
-    const existingItemIndex = inventoryItems.findIndex(i => 
-      i.name === item.name && 
-      i.type === item.type && 
+    const existingItemIndex = inventoryItems.findIndex(i =>
+      i.name === item.name &&
+      i.type === item.type &&
       i.rarity === item.rarity
     );
-    
+
     let newInventory: InventoryItem[];
-    
+
     if (existingItemIndex !== -1) {
       // 如果背包中已有相同物品，增加数量
       newInventory = inventoryItems.map((i, idx) => {
         if (idx === existingItemIndex) {
           return { ...i, quantity: (i.quantity || 1) + quantity };
         }
+
         return i;
       });
     } else {
@@ -250,14 +259,14 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
       };
       newInventory = [...inventoryItems, itemToReturn];
     }
-    
+
     onUpdateInventory(newInventory);
-    
+
     // 清空格子
     const newSlots = [...collectorSlots];
     newSlots[index] = { index, item: null };
     setCollectorSlots(newSlots);
-    
+
     setMessage(`已将 ${item.name} x${quantity} 放回背包`);
     setTimeout(() => setMessage(''), 2000);
   };
@@ -269,15 +278,16 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
     if (itemCount === 0) {
       setMessage('收藏架中没有物品！');
       setTimeout(() => setMessage(''), 2000);
+
       return;
     }
-    
+
     // 增加魔石
     onUpdateMagicStones(magicStones + totalValue);
-    
+
     // 清空收藏架
     setCollectorSlots(Array.from({ length: 12 }, (_, index) => ({ index, item: null })));
-    
+
     setMessage(`出售成功！获得 ${formatMagicStoneValue(totalValue)} 魔石`);
     setTimeout(() => setMessage(''), 3000);
   };
@@ -290,15 +300,15 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
       <div className="collector-modal-content">
         {/* 关闭按钮 */}
         <button className="collector-close-modal" onClick={onClose}>×</button>
-        
+
         {/* 标题 */}
         <h3 className="collector-modal-title">收藏架</h3>
-        
+
         {/* 提示信息 */}
         <div className="collector-hint">
           点击背包物品自动放入收藏架，点击收藏架物品放回背包
         </div>
-        
+
         {/* 收藏架格子区域 */}
         <div className="collector-slots-grid">
           {collectorSlots.map((slot) => (
@@ -326,7 +336,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
             </div>
           ))}
         </div>
-        
+
         {/* 背包物品区域 */}
         <div className="collector-inventory-area">
           <div className="collector-inventory-title">背包物品（点击放入收藏架）</div>
@@ -337,7 +347,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
                 const itemForPrice = { ...item, quantity: 1 };
                 const singleItemValue = calculateItemMagicStoneValue(itemForPrice);
                 const hasValue = singleItemValue > 0;
-                
+
                 return (
                   <div
                     key={item.id}
@@ -365,7 +375,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
             )}
           </div>
         </div>
-        
+
         {/* 总价值显示区域 */}
         <div className="collector-total-area">
           <div className="collector-total-info">
@@ -373,7 +383,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
             <span className="collector-total-value">{formatMagicStoneValue(totalValue)} 魔石</span>
             <span className="collector-total-count">（{itemCount} 件物品）</span>
           </div>
-          <button 
+          <button
             className="collector-sell-button"
             onClick={handleSell}
             disabled={itemCount === 0}
@@ -381,14 +391,14 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
             出售物品
           </button>
         </div>
-        
+
         {/* 消息提示 */}
         {message && (
           <div className="collector-message">
             {message}
           </div>
         )}
-        
+
         {/* 数量选择对话框 */}
         {quantitySelect.isVisible && quantitySelect.item && (
           <div className="quantity-select-overlay" onClick={(e) => e.stopPropagation()}>
@@ -401,7 +411,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
                 当前拥有：{quantitySelect.maxQuantity} 个
               </div>
               <div className="quantity-select-controls">
-                <button 
+                <button
                   className="quantity-btn"
                   onClick={() => setQuantitySelect({
                     ...quantitySelect,
@@ -425,7 +435,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
                   min={1}
                   max={quantitySelect.maxQuantity}
                 />
-                <button 
+                <button
                   className="quantity-btn"
                   onClick={() => setQuantitySelect({
                     ...quantitySelect,

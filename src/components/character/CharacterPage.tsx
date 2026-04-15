@@ -1,13 +1,15 @@
-import React, { useState, useMemo } from 'react';
-import type { CharacterData, EquipmentDetail, EquipmentSlotType, EquipmentItem, Pet } from '../../types';
+import './character.css';
+
+import React, { useMemo, useState } from 'react';
+
+import type { CharacterData, EquipmentDetail, EquipmentItem, EquipmentSlotType, Pet } from '../../types';
+import { calculateAllEquipmentBonus } from '../../utils/attributeCalculator';
 import CharacterInfo from './CharacterInfo';
-import EquipmentDisplay from './EquipmentDisplay';
 import CombatPowerModal from './CombatPowerModal';
+import EquipmentDisplay from './EquipmentDisplay';
 import EquipmentModal from './EquipmentModal';
 import EquipmentSelectModal from './EquipmentSelectModal';
 import InventoryEquipmentModal from './InventoryEquipmentModal';
-import { calculateAllEquipmentBonus } from '../../utils/attributeCalculator';
-import './character.css';
 
 /**
  * 角色信息主页面组件属性接口
@@ -65,15 +67,15 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
 }) => {
   // 战斗力详情弹窗状态
   const [showCombatPowerModal, setShowCombatPowerModal] = useState(false);
-  
+
   // 已装备详情弹窗状态
   const [showEquipmentModal, setShowEquipmentModal] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<EquipmentDetail | null>(null);
-  
+
   // 装备选择弹窗状态
   const [showSelectModal, setShowSelectModal] = useState(false);
   const [currentSlotType, setCurrentSlotType] = useState<EquipmentSlotType>('weapon');
-  
+
   // 背包装备详情弹窗状态
   const [showInventoryEquipModal, setShowInventoryEquipModal] = useState(false);
   const [selectedInventoryItem, setSelectedInventoryItem] = useState<EquipmentItem | null>(null);
@@ -81,6 +83,7 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
   // 计算带装备加成的角色数据
   const characterWithEquipment = useMemo(() => {
     const equipmentBonus = calculateAllEquipmentBonus(equippedItems);
+
     return {
       ...character,
       equipment: {

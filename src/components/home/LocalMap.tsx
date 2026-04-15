@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { locations, connections } from '../../data/gameData';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+
+import { connections, locations } from '../../data/gameData';
 
 interface LocalMapProps {
   currentLocation: string;
@@ -17,6 +18,7 @@ const calculateDisplayCoord = (
   // 如果距离超过1个单位，限制在±1范围内
   if (diff > 1) return currentCoord + 1;
   if (diff < -1) return currentCoord - 1;
+
   return adjacentCoord;
 };
 
@@ -65,10 +67,10 @@ const LocalMap: React.FC<LocalMapProps> = ({ currentLocation, onMove, isAutoMovi
   // 使用useMemo缓存计算结果，仅在位置变化时重新计算
   const displayCoords = useMemo(() => {
     const coords: { [key: string]: { x: number; y: number } } = {};
-    
+
     // 当前位置使用实际坐标
     coords[currentLocation] = { x: currentLoc.x, y: currentLoc.y };
-    
+
     // 相邻地点使用临时调整后的坐标
     currentLoc.adjacentLocations.forEach(adjId => {
       const adjLoc = locations.find(loc => loc.id === adjId);
@@ -79,7 +81,7 @@ const LocalMap: React.FC<LocalMapProps> = ({ currentLocation, onMove, isAutoMovi
         };
       }
     });
-    
+
     return coords;
   }, [currentLocation, currentLoc]);
 
@@ -101,7 +103,7 @@ const LocalMap: React.FC<LocalMapProps> = ({ currentLocation, onMove, isAutoMovi
         // 获取上一个位置的实际坐标
         const prevLoc = locations.find(loc => loc.id === prevLocRef.current);
         let duration = BASE_ANIMATION_DURATION;
-        
+
         if (prevLoc) {
           // 计算实际移动距离
           const distance = calculateDistance(
@@ -111,7 +113,7 @@ const LocalMap: React.FC<LocalMapProps> = ({ currentLocation, onMove, isAutoMovi
           // 根据距离设置动画时间：距离为1时400ms，距离为2时800ms，距离为3时1200ms
           duration = BASE_ANIMATION_DURATION * distance;
         }
-        
+
         // 使用ref存储动画时间，确保CSS transition使用正确的值
         animationDurationRef.current = duration;
         setIsAnimating(true);

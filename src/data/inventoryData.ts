@@ -5,11 +5,11 @@
  */
 
 import type {
+  EquipmentItem,
+  GemItem,
   InventoryItem,
   PlayerResources,
-  EquipmentItem,
   SkillBookItem,
-  GemItem,
   SpecialItem,
 } from '../types';
 
@@ -237,23 +237,6 @@ export const createEquipment = (
     magicStoneValue: equipmentQuality === 4 ? Math.floor(28 * (useLevel * 2.5 + 50) + magicSoulLevel * 128 + 1500 * holeCount * holeCount * holeCount) : 0,
     imagePath: `/images/equipment/${equipmentType}/lv${useLevel}.png`,
   };
-};
-
-/**
- * 批量创建某等级所有类型的装备
- * @param useLevel 使用等级
- * @param equipmentQuality 装备品质
- * @param magicSoulLevel 魔魂等级
- * @param holeCount 宝石洞数量
- */
-const createAllEquipmentAtLevel = (
-  useLevel: number,
-  equipmentQuality: number = 0,
-  magicSoulLevel: number = 0,
-  holeCount: number = 0
-): EquipmentItem[] => {
-  const types: EquipmentItem['equipmentType'][] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-  return types.map(type => createEquipment(type, useLevel, equipmentQuality, magicSoulLevel, holeCount));
 };
 
 // ==================== 所有等级装备（普通品）====================
@@ -1340,7 +1323,7 @@ const createSilverOre = (quality: number): SpecialItem => {
     type: 'special',
     rarity: quality >= 7 ? 'rare' : quality >= 4 ? 'uncommon' : 'common',
     source: '雷鸣矿洞挖矿获得',
-    description: `含有银的矿石，卖给[卡萨诺城]的[杂货商]可以得到不少金币。`,
+    description: '含有银的矿石，卖给[卡萨诺城]的[杂货商]可以得到不少金币。',
     maxStack: 999,
     usable: false,
     equippable: false,
@@ -1365,7 +1348,7 @@ const createGoldOre = (quality: number): SpecialItem => {
     type: 'special',
     rarity: quality >= 7 ? 'rare' : quality >= 4 ? 'uncommon' : 'common',
     source: '雷鸣矿洞挖矿获得',
-    description: `含有金的矿石，可以卖不菲的价钱，[卡萨诺城]的[收藏家]正在高价收购。`,
+    description: '含有金的矿石，可以卖不菲的价钱，[卡萨诺城]的[收藏家]正在高价收购。',
     maxStack: 999,
     usable: false,
     equippable: false,
@@ -1423,12 +1406,12 @@ export const exampleItems: InventoryItem[] = [
   weapon_lv90, helmet_lv90, armor_lv90, shoes_lv90, bracelet_lv90, necklace_lv90,
   weapon_lv100, helmet_lv100, armor_lv100, shoes_lv100, bracelet_lv100, necklace_lv100,
   weapon_lv110, helmet_lv110, armor_lv110, shoes_lv110, bracelet_lv110, necklace_lv110,
-  
+
   // 装备类 - 高品质示例
-  weapon_lv100_legendary, helmet_lv100_legendary, armor_lv100_legendary, 
+  weapon_lv100_legendary, helmet_lv100_legendary, armor_lv100_legendary,
   shoes_lv100_legendary, bracelet_lv100_legendary, necklace_lv100_legendary,
   weapon_lv80_epic, armor_lv80_epic,
-  
+
   // 消耗品类
   tiLiYao,
   guoZi,
@@ -1439,7 +1422,7 @@ export const exampleItems: InventoryItem[] = [
   gaoJiShengMingYaoJi,
   moLiYaoJi,
   jingLingZhiLei,
-  
+
   // 技能书类
   xingMoJian,
   gaoJiXingMoJian,
@@ -1449,7 +1432,7 @@ export const exampleItems: InventoryItem[] = [
   douZhiYiYang,
   gaoJiDouZhiYiYang,
   gaoJiDiLieBaoZhan,
-  
+
   // 宝石类 - 强化宝石
   moHunJingShi,
   moHunZhiXin,
@@ -1459,13 +1442,13 @@ export const exampleItems: InventoryItem[] = [
   huanMoZhiXin,
   zhanHunJingShi,
   zhanHunZhiXin,
-  
+
   // 宝石类 - 镶嵌宝石
   zhongJiZhanDouLiShi,
   gaoJiZhanDouLiShi,
   zhongJiJingYanShi,
   gaoJiJingYanShi,
-  
+
   // 特殊道具类
   yueGuangBaoHe,
   yueGuangBaoHeZengQiangBan,
@@ -1473,19 +1456,19 @@ export const exampleItems: InventoryItem[] = [
   jinKuang,
   baiMeiGui99,
   baiMeiGui999,
-  
+
   // 材料类
   huanShouZhiHun,
   moLingCao,
-  
+
   // 任务物品类
   shenMiJuanZhou,
   junTuanLingPai,
-  
+
   // 其他类
   yanHua,
   chuanSongJuanZhou,
-  
+
   // 矿石（品质1-10）
   silverOre1,
   silverOre2,
@@ -1512,10 +1495,10 @@ export const exampleItems: InventoryItem[] = [
 // ==================== 玩家资源数据 ====================
 
 export const exampleResources: PlayerResources = {
-  gold: 12568000000,      // 金币数量
-  magicStone: 3520,  // 魔石数量
-  battleExp: 0,      // 战功数量
-  merit: 0,          // 功勋数量
+  gold: 12568000000, // 金币数量
+  magicStone: 3520, // 魔石数量
+  battleExp: 0, // 战功数量
+  merit: 0, // 功勋数量
 };
 
 // ==================== 物品查找函数 ====================
@@ -1523,7 +1506,7 @@ export const exampleResources: PlayerResources = {
 /**
  * 根据名称查找物品模板
  * 用于从物品名称查找对应的物品数据
- * 
+ *
  * @param name 物品名称
  * @returns 物品模板，如果找不到则返回 undefined
  */
@@ -1534,7 +1517,7 @@ export function findItemByName(name: string): InventoryItem | undefined {
 /**
  * 根据ID查找物品模板
  * 用于从物品ID查找对应的物品数据
- * 
+ *
  * @param id 物品ID
  * @returns 物品模板，如果找不到则返回 undefined
  */

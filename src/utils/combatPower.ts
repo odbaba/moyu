@@ -13,6 +13,7 @@ export function calculatePetCombatPower(pet: Pet | null | undefined): number {
   if (!pet || !pet.isDeployed) {
     return 0;
   }
+
   // 幻兽战斗力 = 评分 / 100 取整
   return Math.floor(pet.pz / 100);
 }
@@ -36,16 +37,16 @@ export function calculateAllPetsCombatPower(pets: Pet[]): number {
  */
 export function calculatePetMergeBonus(pets: Pet[]): { attackMin: number; attackMax: number; defense: number } {
   const bonus = { attackMin: 0, attackMax: 0, defense: 0 };
-  
+
   pets.forEach(pet => {
     // 只有出战且合体的幻兽才提供属性加成
     if (pet.isDeployed && pet.isMerged) {
-      bonus.attackMin += pet.xgj;  // 最小攻击力加成
-      bonus.attackMax += pet.dgj;  // 最大攻击力加成
-      bonus.defense += pet.fy;     // 防御力加成
+      bonus.attackMin += pet.xgj; // 最小攻击力加成
+      bonus.attackMax += pet.dgj; // 最大攻击力加成
+      bonus.defense += pet.fy; // 防御力加成
     }
   });
-  
+
   return bonus;
 }
 
@@ -99,6 +100,7 @@ export function calculateEquipmentBaseCombatPower(equipment: CharacterData['equi
   if (equipment.bracelet) count++;
   if (equipment.necklace) count++;
   if (equipment.helmet) count++;
+
   return count;
 }
 
@@ -110,6 +112,7 @@ export function calculateEquipmentBaseCombatPower(equipment: CharacterData['equi
  */
 export function calculateEquipmentQualityCombatPower(quality: EquipmentQuality): number {
   const pz = getQualityValue(quality);
+
   return pz;
 }
 
@@ -122,6 +125,7 @@ export function calculateAllEquipmentQualityCombatPower(equipment: CharacterData
       total += calculateEquipmentQualityCombatPower(item.quality);
     }
   });
+
   return total;
 }
 
@@ -144,6 +148,7 @@ export function calculateAllHoleCountCombatPower(equipment: CharacterData['equip
       total += calculateHoleCountCombatPower(item.holeCount);
     }
   });
+
   return total;
 }
 
@@ -167,7 +172,7 @@ export function calculateTitleCombatPower(title: string): number {
  */
 export function calculateFullSetMagicSoulBonusCombatPower(equipment: CharacterData['equipment']): number {
   const slots = [equipment.weapon, equipment.clothes, equipment.shoes, equipment.bracelet, equipment.necklace, equipment.helmet];
-  
+
   // 检查是否所有装备槽位都有装备
   const equippedItems: EquipmentDetail[] = [];
   slots.forEach(item => {
@@ -175,19 +180,19 @@ export function calculateFullSetMagicSoulBonusCombatPower(equipment: CharacterDa
       equippedItems.push(item);
     }
   });
-  
+
   if (equippedItems.length < 6) {
     return 0;
   }
-  
+
   // 检查是否所有装备都有魔魂等级（>0）
   const magicSoulLevels = equippedItems.map(item => item.magicSoulLevel || 0);
   const allHaveMagicSoul = magicSoulLevels.every(level => level > 0);
-  
+
   if (!allHaveMagicSoul) {
     return 0;
   }
-  
+
   // 返回最低魔魂等级
   return Math.min(...magicSoulLevels);
 }
@@ -205,6 +210,7 @@ export function calculateAllGemCombatPower(equipment: CharacterData['equipment']
       total += calculateGemCombatPower(item.gems);
     }
   });
+
   return total;
 }
 
@@ -217,7 +223,7 @@ export function calculateAllGemCombatPower(equipment: CharacterData['equipment']
 export function calculateSoulCombatPower(equipment: CharacterData['equipment']): number {
   let total = 0;
   const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-  
+
   slots.forEach(slot => {
     const item = equipment[slot];
     if (item && item.soulType && item.soulType > 0 && item.soulLevel) {
@@ -225,7 +231,7 @@ export function calculateSoulCombatPower(equipment: CharacterData['equipment']):
       total += item.soulLevel;
     }
   });
-  
+
   return total;
 }
 
@@ -257,7 +263,7 @@ export function calculateTotalCombatPower(character: CharacterData, pets?: Pet[]
   const titlePower = calculateTitleCombatPower(character.title);
   const fullSetMagicSoulBonus = calculateFullSetMagicSoulBonusCombatPower(character.equipment);
   const soulPower = calculateSoulCombatPower(character.equipment);
-  
+
   // 计算幻兽战斗力贡献
   const petsPower = pets ? calculateAllPetsCombatPower(pets) : 0;
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+
 import type { BattleLogEntry, BattleLogType } from '../../types';
 
 /**
@@ -15,15 +16,16 @@ interface BattleLogProps {
  */
 const getLogIcon = (type: BattleLogType): string => {
   const iconMap: Record<BattleLogType, string> = {
-    attack: '⚔️',    // 攻击
-    skill: '✨',      // 技能
-    dodge: '💨',      // 闪避
-    critical: '💥',   // 暴击
-    buff: '🔥',       // 增益
-    damage: '💔',     // 伤害
-    heal: '💚',       // 治疗
-    death: '💀',      // 死亡
+    attack: '⚔️', // 攻击
+    skill: '✨', // 技能
+    dodge: '💨', // 闪避
+    critical: '💥', // 暴击
+    buff: '🔥', // 增益
+    damage: '💔', // 伤害
+    heal: '💚', // 治疗
+    death: '💀', // 死亡
   };
+
   return iconMap[type] || '📝';
 };
 
@@ -36,7 +38,7 @@ const getLogIcon = (type: BattleLogType): string => {
 const getLogClassName = (log: BattleLogEntry): string => {
   // 基础类名
   let className = 'battle-log-entry';
-  
+
   // 根据是否闪避添加样式
   if (log.isDodged) {
     className += ' log-dodge';
@@ -61,7 +63,7 @@ const getLogClassName = (log: BattleLogEntry): string => {
         break;
     }
   }
-  
+
   return className;
 };
 
@@ -73,7 +75,7 @@ const getLogClassName = (log: BattleLogEntry): string => {
  */
 const renderSpecialEvent = (log: BattleLogEntry): React.ReactNode => {
   const events: React.ReactNode[] = [];
-  
+
   // 闪避事件
   if (log.isDodged) {
     events.push(
@@ -82,7 +84,7 @@ const renderSpecialEvent = (log: BattleLogEntry): React.ReactNode => {
       </span>
     );
   }
-  
+
   // 暴击事件
   if (log.isCritical) {
     events.push(
@@ -91,7 +93,7 @@ const renderSpecialEvent = (log: BattleLogEntry): React.ReactNode => {
       </span>
     );
   }
-  
+
   // 破防事件
   if (log.isBreakDefense) {
     events.push(
@@ -100,7 +102,7 @@ const renderSpecialEvent = (log: BattleLogEntry): React.ReactNode => {
       </span>
     );
   }
-  
+
   return events.length > 0 ? <span className="special-events">{events}</span> : null;
 };
 
@@ -117,6 +119,7 @@ const formatDamage = (damage: number, isHeal: boolean = false): string => {
   if (damage > 0) {
     return `-${damage} 生命值`;
   }
+
   return '';
 };
 
@@ -150,39 +153,39 @@ const BattleLog: React.FC<BattleLogProps> = ({ logs }) => {
           <span className="log-icon">
             {getLogIcon(log.actionType)}
           </span>
-          
+
           {/* 回合数显示 */}
           <span className="log-round">
             [第 {log.round} 回合]
           </span>
-          
+
           {/* 行动者显示 */}
           <span className="log-actor">
             {log.actor}
           </span>
-          
+
           {/* 行动描述显示 */}
           <span className="log-action">
             {log.action}
           </span>
-          
+
           {/* 目标显示（如果有目标） */}
           {log.target && (
             <span className="log-target">
               → {log.target}
             </span>
           )}
-          
+
           {/* 特殊事件标签（闪避、暴击、破防） */}
           {renderSpecialEvent(log)}
-          
+
           {/* 伤害/治疗显示 */}
           {log.damage !== 0 && (
             <span className={`log-damage ${log.actionType === 'heal' ? 'damage-heal' : 'damage-positive'}`}>
               {formatDamage(log.damage, log.actionType === 'heal')}
             </span>
           )}
-          
+
           {/* 技能名称显示（如果是技能） */}
           {log.skillName && (
             <span className="log-skill-name">

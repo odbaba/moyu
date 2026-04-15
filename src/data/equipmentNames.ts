@@ -156,11 +156,11 @@ export function getEquipmentName(
   useLevel: number
 ): string {
   const nameMap = EQUIPMENT_NAME_MAPS[equipmentType];
-  
+
   if (!nameMap) {
     return '未知装备';
   }
-  
+
   // 找到小于等于当前等级的最大等级
   let targetLevel = 1;
   for (const level of EQUIPMENT_LEVELS) {
@@ -170,7 +170,7 @@ export function getEquipmentName(
       break;
     }
   }
-  
+
   return nameMap[targetLevel] || nameMap[1] || '未知装备';
 }
 
@@ -190,6 +190,7 @@ export function getEquipmentBaseLevel(useLevel: number): number {
       break;
     }
   }
+
   return targetLevel;
 }
 
@@ -209,7 +210,7 @@ export function calculateEquipmentBaseAttributes(
   defense?: number;
 } {
   const baseLevel = getEquipmentBaseLevel(useLevel);
-  
+
   switch (equipmentType) {
     case 'weapon':
       // 武器：基础最小攻击 = 10 × dj，基础最大攻击 = 30 × dj
@@ -217,39 +218,39 @@ export function calculateEquipmentBaseAttributes(
         attackMin: 10 * baseLevel,
         attackMax: 30 * baseLevel,
       };
-    
+
     case 'helmet':
       // 头盔：基础防御 = 6 × dj
       return {
         defense: 6 * baseLevel,
       };
-    
+
     case 'clothes':
       // 衣服：基础防御 = 8 × dj
       return {
         defense: 8 * baseLevel,
       };
-    
+
     case 'shoes':
       // 战鞋：基础防御 = 4 × dj
       return {
         defense: 4 * baseLevel,
       };
-    
+
     case 'bracelet':
       // 手镯：基础最小攻击 = 5 × dj，基础最大攻击 = 15 × dj
       return {
         attackMin: 5 * baseLevel,
         attackMax: 15 * baseLevel,
       };
-    
+
     case 'necklace':
       // 项链：基础最小攻击 = 8 × dj，基础最大攻击 = 20 × dj
       return {
         attackMin: 8 * baseLevel,
         attackMax: 20 * baseLevel,
       };
-    
+
     default:
       return {};
   }

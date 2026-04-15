@@ -4,8 +4,8 @@
  * 参考文档：reference/docs/装备打造师交互逻辑文档.md
  */
 
-import type { EquipmentItem, GemItem, RefineResult, EquipmentQuality } from '../types';
-import { getEquipmentName, calculateEquipmentBaseAttributes } from '../data/equipmentNames';
+import { calculateEquipmentBaseAttributes, getEquipmentName } from '../data/equipmentNames';
+import type { EquipmentItem, EquipmentQuality, GemItem, RefineResult } from '../types';
 
 /**
  * 装备类型名称列表
@@ -71,19 +71,19 @@ export function isWeaponOrStone(item: unknown): 0 | 1 | 2 {
   if (!item || typeof item !== 'object' || !('name' in item)) {
     return 0;
   }
-  
+
   const itemObj = item as { name?: string; type?: string };
-  
+
   // 检查是否为装备类型
   if (EQUIPMENT_TYPES.includes(itemObj.name || '') || itemObj.type === 'equipment') {
     return 1;
   }
-  
+
   // 检查是否为宝石类型
   if (GEM_NAMES.includes(itemObj.name || '') || itemObj.type === 'gem') {
     return 2;
   }
-  
+
   return 0;
 }
 
@@ -97,10 +97,10 @@ function updateEquipmentNameAndAttributes(equipment: EquipmentItem, newLevel: nu
   // 更新装备名称
   const newName = getEquipmentName(equipment.equipmentType, newLevel);
   equipment.name = newName;
-  
+
   // 计算新的基础属性
   const baseAttributes = calculateEquipmentBaseAttributes(equipment.equipmentType, newLevel);
-  
+
   // 更新基础属性
   if (baseAttributes.attackMin !== undefined) {
     equipment.attackMin = baseAttributes.attackMin;
@@ -111,7 +111,7 @@ function updateEquipmentNameAndAttributes(equipment: EquipmentItem, newLevel: nu
   if (baseAttributes.defense !== undefined) {
     equipment.defense = baseAttributes.defense;
   }
-  
+
   // 重新计算追加属性（魔魂追加）
   const magicSoulLevel = equipment.magicSoulLevel || 0;
   if (magicSoulLevel > 0) {
@@ -142,7 +142,7 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem): RefineRes
       message: '请放入正确的装备'
     };
   }
-  
+
   // 验证宝石类型
   if (!gem || (gem.name !== '灵魂晶石' && gem.name !== '灵魂王')) {
     return {
@@ -150,10 +150,10 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem): RefineRes
       message: '请使用灵魂晶石或灵魂王'
     };
   }
-  
+
   // 获取当前品质等级
   const currentQualityLevel = QUALITY_LEVELS[equipment.equipmentQuality];
-  
+
   // 检查是否已达到最高品质
   if (currentQualityLevel >= 4) {
     return {
@@ -161,10 +161,10 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem): RefineRes
       message: '装备已达到最高品质（极品），无法继续提升'
     };
   }
-  
+
   let success = false;
   let message = '';
-  
+
   // 灵魂王：100%成功
   if (gem.name === '灵魂王') {
     success = true;
@@ -193,16 +193,16 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem): RefineRes
       message = success ? '精炼成功！装备品质提升为极品！' : '精炼失败，灵魂晶石已消耗';
     }
   }
-  
+
   // 如果成功，更新装备品质
   if (success) {
     const newQualityLevel = currentQualityLevel + 1;
     equipment.equipmentQuality = QUALITY_NAMES[newQualityLevel];
-    
+
     // 计算战斗力变化
     const oldCombatPower = QUALITY_COMBAT_POWER[QUALITY_NAMES[currentQualityLevel]];
     const newCombatPower = QUALITY_COMBAT_POWER[equipment.equipmentQuality];
-    
+
     return {
       success: true,
       message,
@@ -212,7 +212,7 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem): RefineRes
       }
     };
   }
-  
+
   return {
     success: false,
     message
@@ -234,7 +234,7 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem): RefineR
       message: '请放入正确的装备'
     };
   }
-  
+
   // 验证宝石类型
   if (!gem || (gem.name !== '魔魂晶石' && gem.name !== '魔魂之心')) {
     return {
@@ -242,10 +242,10 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem): RefineR
       message: '请使用魔魂晶石或魔魂之心'
     };
   }
-  
+
   // 获取当前魔魂等级
   const currentLevel = equipment.magicSoulLevel || 0;
-  
+
   // 检查是否已达到最高等级
   if (currentLevel >= 12) {
     return {
@@ -253,7 +253,7 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem): RefineR
       message: '装备魔魂等级已达到最高等级（+12），无法继续提升'
     };
   }
-  
+
   // 魔魂之心：+9前100%成功
   if (gem.name === '魔魂之心') {
     if (currentLevel >= 9) {
@@ -262,9 +262,9 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem): RefineR
         message: '魔魂之心只能用于+9之前的装备'
       };
     }
-    
+
     equipment.magicSoulLevel = currentLevel + 1;
-    
+
     return {
       success: true,
       message: `使用魔魂之心精炼成功！魔魂等级提升为+${currentLevel + 1}`,
@@ -274,11 +274,11 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem): RefineR
       }
     };
   }
-  
+
   // 魔魂晶石：根据等级决定成功率
   let success = false;
   let successRate = 0;
-  
+
   // +0~+5：90%成功率
   if (currentLevel < 6) {
     successRate = 0.9;
@@ -294,10 +294,10 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem): RefineR
     successRate = 0.35;
     success = Math.random() < successRate;
   }
-  
+
   if (success) {
     equipment.magicSoulLevel = currentLevel + 1;
-    
+
     return {
       success: true,
       message: `精炼成功！魔魂等级提升为+${currentLevel + 1}`,
@@ -317,7 +317,7 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem): RefineR
       // +9前失败降1级
       const newLevel = Math.max(0, currentLevel - 1);
       equipment.magicSoulLevel = newLevel;
-      
+
       return {
         success: false,
         message: `精炼失败，魔魂等级降为+${newLevel}`,
@@ -350,7 +350,7 @@ export function refineUseLevel(
       message: '请放入正确的装备'
     };
   }
-  
+
   // 验证宝石类型
   if (!gem || (gem.name !== '幻魔晶石' && gem.name !== '幻魔之心')) {
     return {
@@ -358,10 +358,10 @@ export function refineUseLevel(
       message: '请使用幻魔晶石或幻魔之心'
     };
   }
-  
+
   // 获取当前使用等级
   const currentLevel = equipment.useLevel || 1;
-  
+
   // 检查是否已达到最高等级
   if (currentLevel >= 125) {
     return {
@@ -369,10 +369,10 @@ export function refineUseLevel(
       message: '装备使用等级已达到最高等级（125级），无法继续提升'
     };
   }
-  
+
   // 计算升级后的等级
   const newLevel = calculateNewLevel(currentLevel);
-  
+
   // 检查升级后等级是否超过玩家等级
   if (newLevel > playerLevel) {
     return {
@@ -380,14 +380,14 @@ export function refineUseLevel(
       message: `升级后等级（${newLevel}级）将超过您的当前等级（${playerLevel}级），无法升级`
     };
   }
-  
+
   // 幻魔之心：100%成功
   if (gem.name === '幻魔之心') {
     equipment.useLevel = newLevel;
-    
+
     // 更新装备名称和基础属性
     updateEquipmentNameAndAttributes(equipment, newLevel);
-    
+
     return {
       success: true,
       message: `使用幻魔之心精炼成功！装备使用等级提升为${newLevel}级，装备名称更新为【${equipment.name}】`,
@@ -397,10 +397,10 @@ export function refineUseLevel(
       }
     };
   }
-  
+
   // 幻魔晶石：根据等级决定成功率
   let successRate = 0;
-  
+
   // 1级→10级：50%成功率
   if (currentLevel < 10) {
     successRate = 0.5;
@@ -413,15 +413,15 @@ export function refineUseLevel(
   else {
     successRate = 0.2;
   }
-  
+
   const success = Math.random() < successRate;
-  
+
   if (success) {
     equipment.useLevel = newLevel;
-    
+
     // 更新装备名称和基础属性
     updateEquipmentNameAndAttributes(equipment, newLevel);
-    
+
     return {
       success: true,
       message: `精炼成功！装备使用等级提升为${newLevel}级，装备名称更新为【${equipment.name}】`,
@@ -453,7 +453,7 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem): RefineRe
       message: '请放入正确的装备'
     };
   }
-  
+
   // 验证道具类型
   if (!gem || (gem.name !== '月光宝盒' && gem.name !== '月光宝盒增强版')) {
     return {
@@ -461,10 +461,10 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem): RefineRe
       message: '请使用月光宝盒或月光宝盒增强版'
     };
   }
-  
+
   // 获取当前洞数
   const currentHoles = equipment.holeCount || 0;
-  
+
   // 月光宝盒：给无洞装备开第一个洞
   if (gem.name === '月光宝盒') {
     if (currentHoles >= 1) {
@@ -473,17 +473,17 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem): RefineRe
         message: '该装备已有洞，请使用月光宝盒增强版开第二个洞'
       };
     }
-    
+
     equipment.holeCount = 1;
-    
+
     // 3%概率激活战魂
     const soulActivated = activateSoulInternal(equipment, 0.03);
-    
+
     let message = '开洞成功！装备获得1个宝石洞';
     if (soulActivated) {
       message += '，并激活了战魂！';
     }
-    
+
     return {
       success: true,
       message,
@@ -493,7 +493,7 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem): RefineRe
       }
     };
   }
-  
+
   // 月光宝盒增强版：给一洞装备开第二个洞
   if (gem.name === '月光宝盒增强版') {
     if (currentHoles === 0) {
@@ -502,24 +502,24 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem): RefineRe
         message: '该装备还没有洞，请先使用月光宝盒开第一个洞'
       };
     }
-    
+
     if (currentHoles >= 2) {
       return {
         success: false,
         message: '装备已达到最大洞数（2个），无法继续开洞'
       };
     }
-    
+
     equipment.holeCount = 2;
-    
+
     // 10%概率激活战魂
     const soulActivated = activateSoulInternal(equipment, 0.1);
-    
+
     let message = '开洞成功！装备获得第2个宝石洞';
     if (soulActivated) {
       message += '，并激活了战魂！';
     }
-    
+
     return {
       success: true,
       message,
@@ -529,7 +529,7 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem): RefineRe
       }
     };
   }
-  
+
   return {
     success: false,
     message: '开洞失败'
@@ -551,7 +551,7 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
       message: '请放入正确的装备'
     };
   }
-  
+
   // 验证宝石类型（只能镶嵌战斗力石或经验石）
   if (!gem || !['中级战斗力石', '高级战斗力石', '中级经验石', '高级经验石'].includes(gem.name)) {
     return {
@@ -559,7 +559,7 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
       message: '请使用战斗力石或经验石进行镶嵌'
     };
   }
-  
+
   // 检查装备是否有洞
   const holeCount = equipment.holeCount || 0;
   if (holeCount === 0) {
@@ -568,7 +568,7 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
       message: '装备没有宝石洞，无法镶嵌宝石'
     };
   }
-  
+
   // 检查是否还有空洞
   const embeddedGems = equipment.gems || [];
   if (embeddedGems.length >= holeCount) {
@@ -577,18 +577,18 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
       message: '装备的所有宝石洞都已镶嵌，无法继续镶嵌'
     };
   }
-  
+
   // 镶嵌宝石
   if (!equipment.gems) {
     equipment.gems = [];
   }
   equipment.gems.push(gem.name);
-  
+
   // 计算宝石效果
   let combatPowerBonus = 0;
   let expBonus = 0;
   let soulLevelUp = false;
-  
+
   // 战斗力石
   if (gem.name === '中级战斗力石') {
     combatPowerBonus = 3;
@@ -617,12 +617,12 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
       }
     }
   }
-  
+
   let message = `成功镶嵌${gem.name}！`;
   if (soulLevelUp) {
     message += ' 高级宝石的镶入使得装备能量提升，战魂等级提高一级。';
   }
-  
+
   return {
     success: true,
     message,
@@ -650,7 +650,7 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem): RefineResu
       message: '请放入正确的装备'
     };
   }
-  
+
   // 验证宝石类型
   if (!gem || (gem.name !== '战魂晶石' && gem.name !== '战魂之心')) {
     return {
@@ -658,20 +658,20 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem): RefineResu
       message: '请使用战魂晶石或战魂之心'
     };
   }
-  
+
   // 战魂之心：100%激活或改变战魂类型
   if (gem.name === '战魂之心') {
     const hadSoul = equipment.soulType && equipment.soulType > 0;
-    
+
     // 随机战魂类型：天魂(1)或地魂(2)
     equipment.soulType = Math.random() < 0.5 ? 1 : 2;
     equipment.soulLevel = 1;
-    
+
     const soulTypeName = equipment.soulType === 1 ? '天魂' : '地魂';
     const message = hadSoul
       ? `战魂之心激活成功！装备战魂类型改变为${soulTypeName}`
       : `战魂之心激活成功！装备激活了${soulTypeName}`;
-    
+
     return {
       success: true,
       message,
@@ -681,23 +681,23 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem): RefineResu
       }
     };
   }
-  
+
   // 战魂晶石：20%概率激活或改变战魂类型
   if (gem.name === '战魂晶石') {
     const success = Math.random() < 0.2;
-    
+
     if (success) {
       const hadSoul = equipment.soulType && equipment.soulType > 0;
-      
+
       // 随机战魂类型：天魂(1)或地魂(2)
       equipment.soulType = Math.random() < 0.5 ? 1 : 2;
       equipment.soulLevel = 1;
-      
+
       const soulTypeName = equipment.soulType === 1 ? '天魂' : '地魂';
       const message = hadSoul
         ? `战魂晶石激活成功！装备战魂类型改变为${soulTypeName}`
         : `战魂晶石激活成功！装备激活了${soulTypeName}`;
-      
+
       return {
         success: true,
         message,
@@ -713,7 +713,7 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem): RefineResu
       };
     }
   }
-  
+
   return {
     success: false,
     message: '战魂激活失败'
@@ -732,11 +732,11 @@ function activateSoulInternal(equipment: EquipmentItem, probability: number): bo
   if (Math.random() >= probability) {
     return false;
   }
-  
+
   // 随机战魂类型：天魂(1)或地魂(2)
   equipment.soulType = Math.random() < 0.5 ? 1 : 2;
   equipment.soulLevel = 1;
-  
+
   return true;
 }
 
@@ -758,7 +758,7 @@ function calculateNewLevel(currentLevel: number): number {
   else if (currentLevel < 125) {
     return 125;
   }
-  
+
   return currentLevel;
 }
 
@@ -789,6 +789,7 @@ export function getQualityCombatPower(quality: EquipmentQuality): number {
 export function getSoulTypeName(soulType: number): string {
   if (soulType === 1) return '天魂';
   if (soulType === 2) return '地魂';
+
   return '无';
 }
 
@@ -809,7 +810,7 @@ export function canRefine(
       reason: '请放入正确的装备'
     };
   }
-  
+
   // 检查宝石是否有效
   if (!gem || gem.type !== 'gem') {
     return {
@@ -817,10 +818,10 @@ export function canRefine(
       reason: '请放入正确的宝石'
     };
   }
-  
+
   // 根据宝石类型检查对应的精炼条件
   const gemName = gem.name;
-  
+
   // 品质提升
   if (gemName === '灵魂晶石' || gemName === '灵魂王') {
     const qualityLevel = QUALITY_LEVELS[equipment.equipmentQuality];
@@ -831,7 +832,7 @@ export function canRefine(
       };
     }
   }
-  
+
   // 魔魂提升
   if (gemName === '魔魂晶石' || gemName === '魔魂之心') {
     if (equipment.magicSoulLevel >= 12) {
@@ -847,7 +848,7 @@ export function canRefine(
       };
     }
   }
-  
+
   // 使用等级提升
   if (gemName === '幻魔晶石' || gemName === '幻魔之心') {
     if (equipment.useLevel >= 125) {
@@ -857,7 +858,7 @@ export function canRefine(
       };
     }
   }
-  
+
   // 开洞
   if (gemName === '月光宝盒') {
     if (equipment.holeCount >= 1) {
@@ -867,7 +868,7 @@ export function canRefine(
       };
     }
   }
-  
+
   if (gemName === '月光宝盒增强版') {
     if (equipment.holeCount === 0) {
       return {
@@ -882,7 +883,7 @@ export function canRefine(
       };
     }
   }
-  
+
   // 镶嵌宝石
   if (['中级战斗力石', '高级战斗力石', '中级经验石', '高级经验石'].includes(gemName)) {
     if (equipment.holeCount === 0) {
@@ -899,7 +900,7 @@ export function canRefine(
       };
     }
   }
-  
+
   return {
     canRefine: true,
     reason: '可以精炼'

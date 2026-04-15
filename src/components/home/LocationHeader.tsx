@@ -20,7 +20,7 @@ const LocationHeader: React.FC<LocationHeaderProps> = ({ location, onShowPet }) 
   return (
     <div className="location-header">
       {/* 幻兽按钮 - 位于标题左侧 */}
-      <button 
+      <button
         className="pet-button"
         onClick={onShowPet}
         aria-label="打开幻兽页面"

@@ -1,9 +1,11 @@
+import './character.css';
+
 import React, { useMemo } from 'react';
+
 import type { EquipmentItem, EquipmentSlotType, InventoryItem } from '../../types';
 import { getEquipmentSlotName } from '../../utils/equipmentConverter';
 import { getEquipmentIcon } from '../common/utils';
 import ItemGrid from '../inventory/ItemGrid';
-import './character.css';
 
 /**
  * 装备选择弹窗组件属性接口
@@ -65,8 +67,8 @@ const EquipmentSelectModal: React.FC<EquipmentSelectModalProps> = ({
   if (!isVisible) return null;
 
   return (
-    <div 
-      className="equipment-select-modal-overlay" 
+    <div
+      className="equipment-select-modal-overlay"
       onClick={handleOverlayClick}
     >
       <div className="equipment-select-modal-content">
@@ -74,12 +76,12 @@ const EquipmentSelectModal: React.FC<EquipmentSelectModalProps> = ({
         <button className="equipment-select-close-modal" onClick={onClose}>
           ×
         </button>
-        
+
         {/* 标题 */}
         <h3 className="equipment-select-title">
           选择要装备的{getEquipmentSlotName(slotType)}
         </h3>
-        
+
         {/* 装备列表 - 复用背包的ItemGrid组件 */}
         <div className="equipment-select-grid-wrapper">
           {filteredEquipments.length === 0 ? (
