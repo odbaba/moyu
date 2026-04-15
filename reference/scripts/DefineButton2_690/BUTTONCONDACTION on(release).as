@@ -1,0 +1,10 @@
+on(release){
+   if(this.check1.getcheck())
+   {
+      manuse();
+   }
+   else
+   {
+      use();
+   }
+}

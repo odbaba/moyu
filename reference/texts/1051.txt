@@ -1,0 +1,3 @@
+小地图
+--- RECORDSEPARATOR ---
+点击会显示大地图

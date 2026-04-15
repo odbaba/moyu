@@ -1,0 +1,1346 @@
+/**
+ * 背包模块样式 (Inventory Module Styles)
+ * 包含背包系统的所有样式
+ * 移动端优化：确保一屏展示所有信息
+ */
+
+/* ========== 背包容器样式 ========== */
+
+/* 背包容器 - 主容器样式 */
+.inventory-container {
+  background-color: rgba(30, 30, 30, 0.8);
+  padding: 15px;
+  border-radius: 8px;
+  border: 2px solid #ffd700;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* ========== 背包标题样式 ========== */
+
+.inventory-header {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.inventory-header h2 {
+  color: #ffd700;
+  font-size: 1.2rem;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  margin: 0;
+  padding: 0;
+}
+
+/* ========== 玩家资源区域样式 ========== */
+
+.player-resources {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 8px;
+  border: 1px solid #555;
+  transition: all 0.3s ease;
+}
+
+/* 资源区域悬停效果 */
+.player-resources:hover {
+  border-color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+}
+
+/* 单个资源项样式 */
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+/* 资源项悬停效果 */
+.resource-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: scale(1.05);
+}
+
+/* 资源图标样式 */
+.resource-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+/* 资源图标悬停动画 */
+.resource-item:hover .resource-icon {
+  transform: scale(1.2) rotate(5deg);
+}
+
+/* 金币图标样式 */
+.resource-icon.gold {
+  color: #ffd700;
+}
+
+/* 魔石图标样式 */
+.resource-icon.magic-stone {
+  color: #9c27b0;
+}
+
+/* 资源标签样式 - 键值对形式的key部分 */
+.resource-label {
+  color: #f0f0f0;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+/* 资源数值样式 - 键值对形式的value部分 */
+.resource-value {
+  color: #f0f0f0;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+/* ========== 物品分类标签栏样式 ========== */
+
+.inventory-tabs {
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 8px;
+  border: 1px solid #555;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  scrollbar-width: thin;
+  scrollbar-color: #555 transparent;
+}
+
+/* 标签栏滚动条样式 */
+.inventory-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.inventory-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.inventory-tabs::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 2px;
+}
+
+.inventory-tabs::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* 单个分类标签样式 */
+.inventory-tab {
+  padding: 8px 12px;
+  background-color: rgba(60, 60, 60, 0.8);
+  border: 1px solid #555;
+  border-radius: 6px;
+  color: #aaa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 标签悬停发光效果 */
+.inventory-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.inventory-tab:hover::before {
+  left: 100%;
+}
+
+/* 分类标签悬停效果 */
+.inventory-tab:hover {
+  background-color: rgba(80, 80, 80, 0.9);
+  border-color: #ffd700;
+  color: #ffd700;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* 激活的分类标签样式 */
+.inventory-tab.active {
+  background-color: rgba(255, 215, 0, 0.2);
+  border-color: #ffd700;
+  color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* ========== 物品列表容器样式（两列垂直列表） ========== */
+
+/* 物品列表容器 - 两列布局 */
+.inventory-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 8px;
+  border: 1px solid #555;
+  flex: 1;
+  overflow-y: auto;
+  align-content: start;
+  scrollbar-width: thin;
+  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+}
+
+/* 物品列表滚动条样式 */
+.inventory-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.inventory-list::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 3px;
+}
+
+.inventory-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #555 0%, #777 50%, #555 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.inventory-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #666 0%, #888 50%, #666 100%);
+}
+
+/* ========== 单个物品列表条目样式 ========== */
+
+.inventory-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: rgba(50, 50, 50, 0.8);
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* 物品列表条目悬停效果 */
+.inventory-list-item:hover {
+  background-color: rgba(60, 60, 60, 0.9);
+  border-color: #ffd700;
+  transform: translateX(3px);
+}
+
+/* 物品列表条目按下效果 */
+.inventory-list-item:active {
+  transform: scale(0.98);
+}
+
+/* 物品名称样式 - 常规字体 */
+.item-list-name {
+  color: #f0f0f0;
+  font-size: 0.9rem;
+  font-weight: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* 物品数量样式 */
+.item-list-count {
+  color: #aaa;
+  font-size: 0.75rem;
+  font-weight: normal;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* 物品图标样式 */
+.item-list-icon {
+  font-size: 1.2rem;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* 物品图片样式 */
+.item-list-image {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  margin-right: 8px;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+
+/* ========== 物品列表稀有度边框颜色 ========== */
+
+.inventory-list-item.rarity-common {
+  border-left: 3px solid #666;
+}
+
+.inventory-list-item.rarity-common:hover {
+  border-color: #888;
+  border-left-color: #888;
+}
+
+.inventory-list-item.rarity-uncommon {
+  border-left: 3px solid #4caf50;
+}
+
+.inventory-list-item.rarity-uncommon:hover {
+  border-color: #66bb6a;
+  border-left-color: #66bb6a;
+}
+
+.inventory-list-item.rarity-rare {
+  border-left: 3px solid #2196f3;
+}
+
+.inventory-list-item.rarity-rare:hover {
+  border-color: #42a5f5;
+  border-left-color: #42a5f5;
+}
+
+.inventory-list-item.rarity-epic {
+  border-left: 3px solid #9c27b0;
+}
+
+.inventory-list-item.rarity-epic:hover {
+  border-color: #ba68c8;
+  border-left-color: #ba68c8;
+}
+
+.inventory-list-item.rarity-legendary {
+  border-left: 3px solid #ff9800;
+  animation: legendaryListGlow 2s ease-in-out infinite;
+}
+
+.inventory-list-item.rarity-legendary:hover {
+  border-color: #ffb74d;
+  border-left-color: #ffb74d;
+}
+
+/* 传说物品列表发光动画 */
+@keyframes legendaryListGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 152, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+  }
+}
+
+/* ========== 物品网格容器样式（保留兼容） ========== */
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 8px;
+  border: 1px solid #555;
+  flex: 1;
+  overflow-y: auto;
+  align-content: start;
+  scrollbar-width: thin;
+  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+}
+
+/* 物品网格滚动条样式 */
+.inventory-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.inventory-grid::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 3px;
+}
+
+.inventory-grid::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #555 0%, #777 50%, #555 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.inventory-grid::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #666 0%, #888 50%, #666 100%);
+}
+
+/* ========== 单个物品格子样式 ========== */
+
+.inventory-slot {
+  aspect-ratio: 1;
+  background-color: rgba(50, 50, 50, 0.8);
+  border: 2px solid #444;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 5px;
+  overflow: hidden;
+}
+
+/* 物品格子悬停光效 */
+.inventory-slot::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.inventory-slot:hover::before {
+  opacity: 1;
+}
+
+/* 物品格子悬停效果 */
+.inventory-slot:hover {
+  border-color: #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4),
+              inset 0 0 10px rgba(255, 215, 0, 0.1);
+  transform: translateY(-3px) scale(1.02);
+  z-index: 1;
+}
+
+/* 物品按下效果 */
+.inventory-slot:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* 空格子样式 */
+.inventory-slot.empty {
+  border-style: dashed;
+  border-color: #333;
+  cursor: default;
+}
+
+.inventory-slot.empty:hover {
+  border-color: #444;
+  box-shadow: none;
+  transform: none;
+}
+
+.inventory-slot.empty::before {
+  display: none;
+}
+
+/* ========== 物品图标样式 ========== */
+
+.item-icon {
+  font-size: 1.5rem;
+  margin-bottom: 2px;
+  transition: transform 0.3s ease;
+}
+
+/* 物品图标悬停动画 */
+.inventory-slot:hover .item-icon {
+  transform: scale(1.2);
+}
+
+/* ========== 物品名称样式 ========== */
+
+.item-name {
+  font-size: 0.65rem;
+  color: #f0f0f0;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+/* ========== 物品数量标签样式 ========== */
+
+.item-count {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.6rem;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(40, 40, 40, 0.9) 100%);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: bold;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* ========== 物品稀有度边框颜色 ========== */
+
+.inventory-slot.rarity-common {
+  border-color: #666;
+}
+
+.inventory-slot.rarity-common:hover {
+  border-color: #888;
+  box-shadow: 0 0 10px rgba(150, 150, 150, 0.3);
+}
+
+.inventory-slot.rarity-uncommon {
+  border-color: #4caf50;
+}
+
+.inventory-slot.rarity-uncommon:hover {
+  border-color: #66bb6a;
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+}
+
+.inventory-slot.rarity-rare {
+  border-color: #2196f3;
+}
+
+.inventory-slot.rarity-rare:hover {
+  border-color: #42a5f5;
+  box-shadow: 0 0 12px rgba(33, 150, 243, 0.4);
+}
+
+.inventory-slot.rarity-epic {
+  border-color: #9c27b0;
+}
+
+.inventory-slot.rarity-epic:hover {
+  border-color: #ba68c8;
+  box-shadow: 0 0 12px rgba(156, 39, 176, 0.4);
+}
+
+.inventory-slot.rarity-legendary {
+  border-color: #ff9800;
+  box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+  animation: legendaryGlow 2s ease-in-out infinite;
+}
+
+.inventory-slot.rarity-legendary:hover {
+  border-color: #ffb74d;
+  box-shadow: 0 0 20px rgba(255, 152, 0, 0.6),
+              inset 0 0 15px rgba(255, 152, 0, 0.2);
+}
+
+/* 传说物品发光动画 */
+@keyframes legendaryGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.6);
+  }
+}
+
+/* ========== 物品详情弹窗样式（旧版兼容） ========== */
+
+.item-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 物品详情内容样式 */
+.item-detail-content {
+  background-color: rgba(40, 40, 40, 0.95);
+  border: 2px solid #ffd700;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 320px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease;
+}
+
+/* 物品详情标题样式 */
+.item-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #555;
+}
+
+/* 物品详情图标样式 */
+.item-detail-icon {
+  font-size: 2.5rem;
+}
+
+/* 物品详情标题文字样式 */
+.item-detail-title {
+  flex: 1;
+}
+
+.item-detail-title h3 {
+  color: #ffd700;
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+}
+
+.item-detail-type {
+  color: #888;
+  font-size: 0.8rem;
+}
+
+/* 物品详情信息区域样式 */
+.item-detail-info {
+  margin-bottom: 15px;
+}
+
+/* 物品属性列表样式 */
+.item-attributes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-attributes li {
+  padding: 5px 0;
+  color: #f0f0f0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.item-attributes li:last-child {
+  border-bottom: none;
+}
+
+/* 物品描述样式 */
+.item-description {
+  color: #aaa;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: rgba(30, 30, 30, 0.5);
+  border-radius: 6px;
+}
+
+/* 物品获取途径样式 */
+.item-source {
+  color: #888;
+  font-size: 0.75rem;
+  margin-bottom: 15px;
+}
+
+/* 物品操作按钮区域样式 */
+.item-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* 物品操作按钮样式 */
+.item-action-button {
+  flex: 1;
+  min-width: 80px;
+  padding: 10px 15px;
+  background: linear-gradient(135deg, #444 0%, #333 100%);
+  color: #f0f0f0;
+  border: 2px solid #555;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+  font-weight: bold;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 按钮悬停光效 */
+.item-action-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.item-action-button:hover::before {
+  left: 100%;
+}
+
+.item-action-button:hover {
+  background: linear-gradient(135deg, #555 0%, #444 100%);
+  border-color: #ffd700;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* 使用按钮特殊样式 */
+.item-action-button.use {
+  border-color: #4caf50;
+}
+
+.item-action-button.use:hover {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  border-color: #66bb6a;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+/* 关闭按钮特殊样式 */
+.item-action-button.close {
+  border-color: #f44336;
+}
+
+.item-action-button.close:hover {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  border-color: #ef5350;
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+}
+
+/* ========== 背包主页面样式 ========== */
+
+/* 背包主页面覆盖层 */
+.inventory-page-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 2500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 背包主页面容器 */
+.inventory-page-container {
+  background-color: rgba(20, 20, 20, 0.98);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease;
+}
+
+/* 页面顶部标题和关闭按钮 */
+.inventory-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 15px;
+  background-color: rgba(30, 30, 30, 0.8);
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+}
+
+/* 背包页面标题 */
+.inventory-page-title {
+  color: #ffd700;
+  font-size: 1.2rem;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* 关闭按钮样式 */
+.inventory-page-close-button {
+  padding: 6px 15px;
+  background-color: rgba(255, 107, 107, 0.2);
+  border: 1px solid #ff6b6b;
+  border-radius: 4px;
+  color: #ff6b6b;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 关闭按钮悬停效果 */
+.inventory-page-close-button:hover {
+  background-color: rgba(255, 107, 107, 0.4);
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+  transform: translateY(-1px);
+}
+
+/* 主要内容区域 - 移动端上下布局 */
+.inventory-page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 10px;
+  gap: 10px;
+}
+
+/* 上部：资源信息展示区域 */
+.inventory-page-top {
+  flex-shrink: 0;
+}
+
+/* 下部：物品网格展示区域 */
+.inventory-page-bottom {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 分类筛选区域包装器 - 固定在顶部 */
+.inventory-category-wrapper {
+  flex-shrink: 0;
+  padding-bottom: 8px;
+}
+
+/* 使物品列表在页面中正确显示 */
+.inventory-page-bottom .inventory-list {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+}
+
+/* ========== 动画效果 ========== */
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 滑入动画 */
+@keyframes slideIn {
+  from {
+    transform: scale(0.95) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 弹出动画 */
+@keyframes popIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* 物品列表滚动条样式 */
+.inventory-page-bottom .inventory-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.inventory-page-bottom .inventory-list::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 3px;
+}
+
+.inventory-page-bottom .inventory-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #555 0%, #777 50%, #555 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.inventory-page-bottom .inventory-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #666 0%, #888 50%, #666 100%);
+}
+
+/* ========== 响应式设计 - 移动端优先 ========== */
+
+/* 小屏幕手机 (宽度 < 375px) */
+@media (max-width: 374px) {
+  .inventory-container {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .inventory-header h2 {
+    font-size: 0.9rem;
+  }
+
+  .player-resources {
+    padding: 6px;
+  }
+
+  .resource-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 0.9rem;
+  }
+
+  .resource-value {
+    font-size: 0.8rem;
+  }
+
+  .resource-label {
+    font-size: 0.8rem;
+  }
+
+  /* 物品列表样式 */
+  .inventory-list {
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .inventory-list-item {
+    padding: 8px 10px;
+  }
+
+  .item-list-name {
+    font-size: 0.8rem;
+  }
+
+  .item-list-count {
+    font-size: 0.7rem;
+  }
+
+  .inventory-page-header {
+    padding: 6px 10px;
+  }
+
+  .inventory-page-title {
+    font-size: 1rem;
+  }
+
+  .inventory-page-close-button {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+  }
+
+  .inventory-page-content {
+    padding: 8px;
+    gap: 8px;
+  }
+}
+
+/* 标准手机 (375px - 767px) */
+@media (min-width: 375px) and (max-width: 767px) {
+  .inventory-container {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .inventory-header h2 {
+    font-size: 1rem;
+  }
+
+  .player-resources {
+    padding: 8px;
+  }
+
+  .resource-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 1rem;
+  }
+
+  .resource-value {
+    font-size: 0.9rem;
+  }
+
+  .resource-label {
+    font-size: 0.9rem;
+  }
+
+  /* 物品列表样式 */
+  .inventory-list {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .inventory-list-item {
+    padding: 10px 12px;
+  }
+
+  .item-list-name {
+    font-size: 0.9rem;
+  }
+
+  .item-list-count {
+    font-size: 0.75rem;
+  }
+
+  .item-detail-content {
+    padding: 15px;
+    max-width: 280px;
+  }
+
+  .item-detail-icon {
+    font-size: 2rem;
+  }
+
+  .item-detail-title h3 {
+    font-size: 1rem;
+  }
+
+  .item-attributes li {
+    font-size: 0.8rem;
+  }
+
+  .item-description {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+
+  .item-source {
+    font-size: 0.7rem;
+  }
+
+  .item-action-button {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* 平板设备 (768px - 1023px) */
+@media (min-width: 768px) {
+  .inventory-page-overlay {
+    padding: 20px;
+  }
+
+  .inventory-page-container {
+    max-width: 900px;
+    max-height: 90vh;
+    border-radius: 10px;
+    border: 2px solid #ffd700;
+  }
+
+  .inventory-page-content {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .inventory-container {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .inventory-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .player-resources {
+    padding: 12px;
+  }
+
+  .resource-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 1.3rem;
+  }
+
+  .resource-value {
+    font-size: 1.1rem;
+  }
+
+  .resource-label {
+    font-size: 1.1rem;
+  }
+
+  /* 物品列表样式 */
+  .inventory-list {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .inventory-list-item {
+    padding: 12px 15px;
+  }
+
+  .item-list-name {
+    font-size: 1rem;
+  }
+
+  .item-list-count {
+    font-size: 0.85rem;
+  }
+
+  .item-detail-content {
+    max-width: 400px;
+  }
+}
+
+/* 大屏幕设备 (>= 1024px) */
+@media (min-width: 1024px) {
+  .inventory-page-container {
+    max-width: 1100px;
+  }
+
+  /* 物品列表样式 */
+  .inventory-list {
+    gap: 12px;
+    padding: 15px;
+  }
+
+  .inventory-list-item {
+    padding: 14px 18px;
+  }
+
+  .item-list-name {
+    font-size: 1.05rem;
+  }
+
+  .item-list-count {
+    font-size: 0.9rem;
+  }
+
+  .item-detail-content {
+    max-width: 450px;
+  }
+}
+
+/* 超大屏幕设备 (>= 1440px) */
+@media (min-width: 1440px) {
+  .inventory-page-container {
+    max-width: 1300px;
+  }
+
+  /* 物品列表样式 */
+  .inventory-list {
+    gap: 15px;
+  }
+}
+
+/* ========== 横屏模式优化 ========== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .inventory-page-content {
+    flex-direction: row;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .inventory-page-top {
+    width: 30%;
+    flex-shrink: 0;
+  }
+
+  .inventory-page-bottom {
+    width: 70%;
+  }
+
+  .player-resources {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  /* 横屏模式下保持两列列表 */
+  .inventory-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ========== 触摸设备优化 ========== */
+
+@media (hover: none) and (pointer: coarse) {
+  /* 移除悬停效果，改为点击反馈 */
+  .inventory-list-item:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .inventory-list-item:active {
+    background-color: rgba(255, 215, 0, 0.1);
+    border-color: #ffd700;
+    transform: scale(0.98);
+  }
+
+  .resource-item:hover {
+    transform: none;
+  }
+
+  .resource-item:active {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(0.95);
+  }
+}
+
+/* ========== 高对比度模式支持 ========== */
+
+@media (prefers-contrast: high) {
+  .inventory-list-item {
+    border-width: 2px;
+  }
+
+  .item-list-name {
+    color: #fff;
+  }
+
+  .resource-value {
+    color: #fff;
+  }
+}
+
+/* ========== 减少动画模式 ========== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .inventory-list-item.rarity-legendary {
+    animation: none;
+  }
+}
+
+/* ========== 物品分类筛选样式 ========== */
+
+/* 分类筛选区域容器 */
+.inventory-category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  background: rgba(30, 30, 30, 0.8);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid #444;
+}
+
+/* 单个分类复选框样式 */
+.category-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #252935;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #aaa;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.category-checkbox:hover {
+  background: #303545;
+  color: #fff;
+}
+
+.category-checkbox input {
+  margin: 0;
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+}
+
+.category-checkbox.selected {
+  background: rgba(36, 146, 209, 0.3);
+  color: #2492D1;
+  border-color: #2492D1;
+}
+
+.category-checkbox.selected:hover {
+  background: rgba(36, 146, 209, 0.5);
+  color: #fff;
+}
+
+/* 分类筛选信息提示 */
+.inventory-filter-info {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+
+/* 空状态提示 */
+.inventory-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #888;
+  text-align: center;
+}
+
+.inventory-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+
+.inventory-empty-text {
+  font-size: 0.9rem;
+}
+
+/* 响应式优化 - 小屏幕手机 */
+@media (max-width: 374px) {
+  .inventory-category-filter {
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .category-checkbox {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+
+  .category-checkbox input {
+    width: 10px;
+    height: 10px;
+  }
+}

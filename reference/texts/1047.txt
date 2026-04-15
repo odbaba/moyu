@@ -1,0 +1,3 @@
+NPC
+--- RECORDSEPARATOR ---
+点击他可以与它对话

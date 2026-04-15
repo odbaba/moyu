@@ -1,0 +1,481 @@
+/**
+ * 装备精炼模态窗口样式
+ * 移动端优先设计，确保一屏显示所有关键信息
+ */
+
+/* 模态窗口遮罩层 */
+.refine-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 3100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 模态窗口内容容器 */
+.refine-modal-content {
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 20px;
+  width: 95%;
+  max-width: 500px;
+  max-height: 90vh;
+  position: relative;
+  border: 2px solid #ffd700;
+  animation: slideIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 关闭按钮 */
+.refine-close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #f0f0f0;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.refine-close-modal:hover {
+  background-color: rgba(255, 215, 0, 0.2);
+}
+
+/* 标题 */
+.refine-modal-title {
+  color: #ffd700;
+  margin: 0 0 20px 0;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* 精炼槽位容器 */
+.refine-slots-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+/* 槽位包装器 */
+.refine-slot-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 槽位样式 */
+.refine-slot {
+  background-color: #2a2a2a;
+  border: 2px solid #444;
+  border-radius: 8px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 12px;
+}
+
+.refine-slot:hover {
+  border-color: #ffd700;
+  background-color: #333;
+}
+
+.refine-slot.filled {
+  border-color: #4caf50;
+  background-color: #1e3a1e;
+}
+
+/* 装备槽特殊样式 */
+.equipment-slot {
+  border-color: #555;
+}
+
+.equipment-slot.filled {
+  border-color: #4caf50;
+}
+
+/* 宝石槽特殊样式 */
+.gem-slot {
+  border-color: #555;
+}
+
+.gem-slot.filled {
+  border-color: #9c27b0;
+  background-color: #2a1a3a;
+}
+
+/* 槽位内容 */
+.slot-content {
+  width: 100%;
+  text-align: center;
+}
+
+.slot-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.slot-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #ffd700;
+}
+
+.slot-info {
+  font-size: 0.85rem;
+  color: #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 槽位占位符 */
+.slot-placeholder {
+  text-align: center;
+  color: #888;
+}
+
+.placeholder-icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+.placeholder-text {
+  font-size: 0.95rem;
+}
+
+/* 移除按钮 */
+.remove-button {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  align-self: center;
+}
+
+.remove-button:hover {
+  background-color: #f44336;
+  transform: translateY(-1px);
+}
+
+/* 精炼按钮容器 */
+.refine-button-container {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+/* 精炼按钮 */
+.refine-button {
+  background-color: #555;
+  color: #999;
+  border: 2px solid #666;
+  padding: 12px 40px;
+  border-radius: 8px;
+  cursor: not-allowed;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.refine-button.active {
+  background-color: #ffd700;
+  color: #1a1a1a;
+  border-color: #ffed4a;
+  cursor: pointer;
+}
+
+.refine-button.active:hover {
+  background-color: #ffed4a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.refine-button:disabled {
+  opacity: 0.6;
+}
+
+/* 结果反馈区域 */
+.refine-result {
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+.refine-result.success {
+  background-color: #1b5e20;
+  border: 2px solid #4caf50;
+}
+
+.refine-result.failure {
+  background-color: #b71c1c;
+  border: 2px solid #f44336;
+}
+
+.result-message {
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.result-changes {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.change-item {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #ffd700;
+}
+
+/* 物品选择遮罩层 */
+.selection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+/* 物品选择内容 */
+.selection-content {
+  background-color: #222;
+  border-radius: 8px;
+  width: 95%;
+  max-width: 450px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ffd700;
+}
+
+/* 选择头部 */
+.selection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #333;
+}
+
+.selection-header h4 {
+  margin: 0;
+  color: #ffd700;
+  font-size: 1.1rem;
+}
+
+.selection-close {
+  background-color: transparent;
+  color: #f0f0f0;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.selection-close:hover {
+  background-color: rgba(255, 215, 0, 0.2);
+}
+
+/* 选择标签页 */
+.selection-tabs {
+  display: flex;
+  border-bottom: 1px solid #333;
+}
+
+.tab-button {
+  flex: 1;
+  background-color: #2a2a2a;
+  color: #999;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button:hover {
+  background-color: #333;
+  color: #f0f0f0;
+}
+
+.tab-button.active {
+  background-color: #333;
+  color: #ffd700;
+  border-bottom-color: #ffd700;
+}
+
+/* 选择列表 */
+.selection-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  max-height: 400px;
+}
+
+/* 选择为空提示 */
+.selection-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 1rem;
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 滑入动画 */
+@keyframes slideIn {
+  from {
+    transform: scale(0.9) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 移动端响应式设计 */
+@media (max-width: 768px) {
+  .refine-modal-content {
+    width: 98%;
+    max-height: 95vh;
+    padding: 15px;
+  }
+
+  .refine-modal-title {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+  }
+
+  .refine-slot {
+    min-height: 90px;
+    padding: 10px;
+  }
+
+  .slot-icon {
+    font-size: 1.8rem;
+  }
+
+  .slot-name {
+    font-size: 1rem;
+  }
+
+  .slot-info {
+    font-size: 0.8rem;
+  }
+
+  .refine-button {
+    padding: 10px 30px;
+    font-size: 1rem;
+  }
+
+  .selection-content {
+    width: 98%;
+    max-height: 85vh;
+  }
+
+  .selection-list {
+    max-height: 350px;
+  }
+}
+
+/* 超小屏幕优化（如iPhone SE） */
+@media (max-width: 375px) {
+  .refine-modal-content {
+    padding: 12px;
+  }
+
+  .refine-modal-title {
+    font-size: 1.2rem;
+  }
+
+  .refine-slot {
+    min-height: 80px;
+  }
+
+  .slot-icon {
+    font-size: 1.5rem;
+  }
+
+  .slot-name {
+    font-size: 0.95rem;
+  }
+
+  .slot-info {
+    font-size: 0.75rem;
+  }
+
+  .remove-button {
+    padding: 5px 12px;
+    font-size: 0.8rem;
+  }
+
+  .refine-button {
+    padding: 8px 24px;
+    font-size: 0.95rem;
+  }
+}

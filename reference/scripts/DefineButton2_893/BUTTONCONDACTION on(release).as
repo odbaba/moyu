@@ -1,0 +1,10 @@
+on(release){
+   if(_root.beibao._visible)
+   {
+      _root.beibao.closeme();
+   }
+   else
+   {
+      _root.beibao.openme();
+   }
+}

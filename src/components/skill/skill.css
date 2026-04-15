@@ -1,0 +1,1065 @@
+/**
+ * 技能模块样式 (Skill Module Styles)
+ * 包含技能系统的所有样式
+ * 移动端优化：确保一屏展示所有信息，流畅滚动
+ */
+
+/* ========== 技能主页面样式 ========== */
+
+/* 技能主页面覆盖层 */
+.skill-page-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 2500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 技能主页面容器 */
+.skill-page-container {
+  background-color: rgba(20, 20, 20, 0.98);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease;
+}
+
+/* 页面顶部标题和关闭按钮 */
+.skill-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 15px;
+  background-color: rgba(30, 30, 30, 0.8);
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+}
+
+/* 技能页面标题 */
+.skill-page-title {
+  color: #ffd700;
+  font-size: 1.2rem;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* 关闭按钮样式 */
+.skill-page-close-button {
+  padding: 6px 15px;
+  background-color: rgba(255, 107, 107, 0.2);
+  border: 1px solid #ff6b6b;
+  border-radius: 4px;
+  color: #ff6b6b;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 关闭按钮悬停效果 */
+.skill-page-close-button:hover {
+  background-color: rgba(255, 107, 107, 0.4);
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+  transform: translateY(-1px);
+}
+
+/* 技能统计信息区域 */
+.skill-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+}
+
+/* 统计项样式 */
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.stat-label {
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.stat-value {
+  color: #ffd700;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+/* 技能列表内容区域 */
+.skill-page-content {
+  flex: 1;
+  overflow: hidden;
+  padding: 10px;
+}
+
+/* ========== 技能列表样式 ========== */
+
+/* 技能列表容器 */
+.skill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 5px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+  /* 开启硬件加速，优化滚动性能 */
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+}
+
+/* 技能列表滚动条样式 */
+.skill-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.skill-list::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 3px;
+}
+
+.skill-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #555 0%, #777 50%, #555 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skill-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #666 0%, #888 50%, #666 100%);
+}
+
+/* ========== 单个技能列表项样式 ========== */
+
+.skill-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  background-color: rgba(50, 50, 50, 0.8);
+  border: 1px solid #444;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 12px;
+  /* 开启硬件加速 */
+  transform: translateZ(0);
+  will-change: transform, background-color;
+}
+
+/* 技能列表项悬停效果 */
+.skill-list-item:hover {
+  background-color: rgba(60, 60, 60, 0.9);
+  border-color: #ffd700;
+  transform: translateX(5px);
+}
+
+/* 技能列表项按下效果 */
+.skill-list-item:active {
+  transform: scale(0.98) translateX(5px);
+}
+
+/* 选中状态样式 */
+.skill-list-item.selected {
+  background-color: rgba(255, 215, 0, 0.15);
+  border-color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* 技能图标样式 */
+.skill-icon {
+  font-size: 1.8rem;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(30, 30, 30, 0.8);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+/* 技能信息区域 */
+.skill-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+/* 技能名称样式 */
+.skill-name {
+  color: #f0f0f0;
+  font-size: 1rem;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 技能等级样式 */
+.skill-level {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+/* 技能类型标签 */
+.skill-type-tag {
+  padding: 4px 10px;
+  background-color: rgba(100, 100, 100, 0.5);
+  border-radius: 12px;
+  color: #aaa;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+/* 未学习技能样式 */
+.skill-list-item.not-learned {
+  opacity: 0.6;
+  background-color: rgba(30, 30, 30, 0.8);
+}
+
+.skill-list-item.not-learned:hover {
+  opacity: 0.8;
+}
+
+/* 学习状态标签 */
+.skill-learn-tag {
+  padding: 2px 6px;
+  background-color: rgba(255, 152, 0, 0.3);
+  border-radius: 8px;
+  color: #ffb74d;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+
+/* 详情弹窗学习状态 */
+.skill-learn-status {
+  padding: 4px 10px;
+  background-color: rgba(255, 152, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 152, 0, 0.5);
+}
+
+.learn-status-label {
+  color: #ffb74d;
+  font-size: 0.75rem;
+}
+
+/* ========== 技能升级按钮样式 ========== */
+
+.skill-upgrade-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #444;
+}
+
+.skill-upgrade-button {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.skill-upgrade-button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.skill-upgrade-button.disabled {
+  background: linear-gradient(135deg, #555 0%, #444 100%);
+  cursor: not-allowed;
+}
+
+.skill-upgrade-button.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.upgrade-text {
+  color: #000;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.upgrade-cost {
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 0.8rem;
+}
+
+.skill-upgrade-button.disabled .upgrade-text,
+.skill-upgrade-button.disabled .upgrade-cost {
+  color: #888;
+}
+
+.upgrade-warning {
+  color: #ff6b6b;
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 8px 0 0 0;
+}
+
+/* ========== 技能稀有度边框颜色 ========== */
+
+.skill-list-item.rarity-common {
+  border-left: 3px solid #666;
+}
+
+.skill-list-item.rarity-common:hover,
+.skill-list-item.rarity-common.selected {
+  border-left-color: #888;
+}
+
+.skill-list-item.rarity-uncommon {
+  border-left: 3px solid #4caf50;
+}
+
+.skill-list-item.rarity-uncommon:hover,
+.skill-list-item.rarity-uncommon.selected {
+  border-left-color: #66bb6a;
+}
+
+.skill-list-item.rarity-rare {
+  border-left: 3px solid #2196f3;
+}
+
+.skill-list-item.rarity-rare:hover,
+.skill-list-item.rarity-rare.selected {
+  border-left-color: #42a5f5;
+}
+
+.skill-list-item.rarity-epic {
+  border-left: 3px solid #9c27b0;
+}
+
+.skill-list-item.rarity-epic:hover,
+.skill-list-item.rarity-epic.selected {
+  border-left-color: #ba68c8;
+}
+
+.skill-list-item.rarity-legendary {
+  border-left: 3px solid #ff9800;
+  animation: legendarySkillGlow 2s ease-in-out infinite;
+}
+
+.skill-list-item.rarity-legendary:hover,
+.skill-list-item.rarity-legendary.selected {
+  border-left-color: #ffb74d;
+}
+
+/* 传说技能发光动画 */
+@keyframes legendarySkillGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 152, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
+  }
+}
+
+/* ========== 技能详情弹窗样式 ========== */
+
+/* 弹窗覆盖层 */
+.skill-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2600;
+  animation: fadeIn 0.2s ease;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+/* 弹窗内容区域 */
+.skill-detail-modal-content {
+  background-color: rgba(30, 30, 30, 0.98);
+  border: 2px solid #ffd700;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 380px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+}
+
+/* 弹窗滚动条样式 */
+.skill-detail-modal-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.skill-detail-modal-content::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 3px;
+}
+
+.skill-detail-modal-content::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+/* 关闭按钮 */
+.skill-detail-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background-color: rgba(255, 107, 107, 0.2);
+  border: 1px solid #ff6b6b;
+  border-radius: 50%;
+  color: #ff6b6b;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.skill-detail-close-button:hover {
+  background-color: rgba(255, 107, 107, 0.4);
+  transform: scale(1.1);
+}
+
+/* 技能头部信息 */
+.skill-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #444;
+}
+
+/* 技能详情图标 */
+.skill-detail-icon {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(40, 40, 40, 0.8);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+/* 技能详情标题区域 */
+.skill-detail-title {
+  flex: 1;
+}
+
+/* 技能详情名称 */
+.skill-detail-name {
+  color: #ffd700;
+  font-size: 1.3rem;
+  margin: 0 0 8px 0;
+}
+
+/* 技能详情名称稀有度颜色 */
+.skill-detail-name.rarity-common { color: #aaa; }
+.skill-detail-name.rarity-uncommon { color: #4caf50; }
+.skill-detail-name.rarity-rare { color: #2196f3; }
+.skill-detail-name.rarity-epic { color: #9c27b0; }
+.skill-detail-name.rarity-legendary { color: #ff9800; }
+
+/* 技能元信息 */
+.skill-detail-meta {
+  display: flex;
+  gap: 10px;
+}
+
+/* 稀有度标签 */
+.skill-detail-rarity {
+  padding: 2px 8px;
+  background-color: rgba(255, 215, 0, 0.2);
+  border-radius: 10px;
+  color: #ffd700;
+  font-size: 0.75rem;
+}
+
+/* 类型标签 */
+.skill-detail-type {
+  padding: 2px 8px;
+  background-color: rgba(100, 100, 100, 0.3);
+  border-radius: 10px;
+  color: #aaa;
+  font-size: 0.75rem;
+}
+
+/* 技能等级进度 */
+.skill-detail-level {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 8px;
+}
+
+/* 等级头部 */
+.level-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.level-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.level-value {
+  color: #ffd700;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+/* 等级进度条 */
+.level-progress-bar {
+  height: 8px;
+  background-color: rgba(60, 60, 60, 0.8);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.level-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700 0%, #ffaa00 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* 技能详情区块 */
+.skill-detail-section {
+  margin-bottom: 15px;
+}
+
+/* 区块标题 */
+.section-title {
+  color: #ffd700;
+  font-size: 0.9rem;
+  margin: 0 0 10px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #444;
+}
+
+/* 技能描述 */
+.skill-description {
+  color: #ccc;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 技能效果列表 */
+.skill-effects-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 效果项 */
+.effect-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.effect-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 效果标签 */
+.effect-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+/* 效果值 */
+.effect-value {
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+/* 伤害效果颜色 */
+.effect-item.damage .effect-value {
+  color: #ff6b6b;
+}
+
+/* 治疗效果颜色 */
+.effect-item.heal .effect-value {
+  color: #4caf50;
+}
+
+/* 增益效果颜色 */
+.effect-item.buff .effect-value {
+  color: #2196f3;
+}
+
+/* 减益效果颜色 */
+.effect-item.debuff .effect-value {
+  color: #9c27b0;
+}
+
+/* 持续时间颜色 */
+.effect-item.duration .effect-value {
+  color: #ff9800;
+}
+
+/* 技能属性区域 */
+.skill-attributes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 属性行 */
+.attribute-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 6px;
+}
+
+/* 属性标签 */
+.attribute-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+/* 属性值 */
+.attribute-value {
+  color: #f0f0f0;
+  font-size: 0.85rem;
+}
+
+/* 金币颜色 */
+.attribute-value.gold {
+  color: #ffd700;
+}
+
+/* ========== 技能学习状态样式 ========== */
+
+/* 未学习技能样式 */
+.skill-list-item.not-learned {
+  opacity: 0.6;
+  background-color: rgba(30, 30, 30, 0.8);
+}
+
+.skill-list-item.not-learned:hover {
+  opacity: 0.8;
+}
+
+/* 学习状态标签 */
+.skill-learn-tag {
+  padding: 2px 6px;
+  background-color: rgba(255, 152, 0, 0.3);
+  border-radius: 8px;
+  color: #ffb74d;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+
+/* 详情弹窗学习状态 */
+.skill-learn-status {
+  padding: 4px 10px;
+  background-color: rgba(255, 152, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 152, 0, 0.5);
+}
+
+.learn-status-label {
+  color: #ffb74d;
+  font-size: 0.75rem;
+}
+
+/* ========== 技能升级按钮样式 ========== */
+
+.skill-upgrade-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #444;
+}
+
+.skill-upgrade-button {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.skill-upgrade-button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.skill-upgrade-button.disabled {
+  background: linear-gradient(135deg, #555 0%, #444 100%);
+  cursor: not-allowed;
+}
+
+.skill-upgrade-button.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.upgrade-text {
+  color: #000;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.upgrade-cost {
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 0.8rem;
+}
+
+.skill-upgrade-button.disabled .upgrade-text,
+.skill-upgrade-button.disabled .upgrade-cost {
+  color: #888;
+}
+
+.upgrade-warning {
+  color: #ff6b6b;
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 8px 0 0 0;
+}
+
+/* ========== 动画效果 ========== */
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 滑入动画 */
+@keyframes slideIn {
+  from {
+    transform: scale(0.95) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 从下往上滑入动画 */
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ========== 响应式设计 - 移动端优先 ========== */
+
+/* 小屏幕手机 (宽度 < 375px) */
+@media (max-width: 374px) {
+  .skill-page-header {
+    padding: 6px 10px;
+  }
+
+  .skill-page-title {
+    font-size: 1rem;
+  }
+
+  .skill-page-close-button {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+  }
+
+  .skill-stats {
+    padding: 8px;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .stat-value {
+    font-size: 0.75rem;
+  }
+
+  .skill-page-content {
+    padding: 8px;
+  }
+
+  .skill-list {
+    gap: 6px;
+  }
+
+  .skill-list-item {
+    padding: 10px 12px;
+  }
+
+  .skill-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .skill-name {
+    font-size: 0.9rem;
+  }
+
+  .skill-level {
+    font-size: 0.7rem;
+  }
+
+  .skill-type-tag {
+    padding: 3px 8px;
+    font-size: 0.65rem;
+  }
+
+  .skill-detail-modal-content {
+    padding: 15px;
+  }
+
+  .skill-detail-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+  }
+
+  .skill-detail-name {
+    font-size: 1.1rem;
+  }
+}
+
+/* 标准手机 (375px - 767px) */
+@media (min-width: 375px) and (max-width: 767px) {
+  .skill-list-item {
+    padding: 12px 15px;
+  }
+
+  .skill-icon {
+    font-size: 1.6rem;
+    width: 45px;
+    height: 45px;
+  }
+
+  .skill-name {
+    font-size: 0.95rem;
+  }
+}
+
+/* 平板设备 (768px - 1023px) */
+@media (min-width: 768px) {
+  .skill-page-overlay {
+    padding: 20px;
+  }
+
+  .skill-page-container {
+    max-width: 600px;
+    max-height: 90vh;
+    border-radius: 10px;
+    border: 2px solid #ffd700;
+  }
+
+  .skill-page-content {
+    padding: 15px;
+  }
+
+  .skill-list {
+    gap: 10px;
+  }
+
+  .skill-list-item {
+    padding: 15px 18px;
+  }
+
+  .skill-icon {
+    font-size: 2rem;
+    width: 55px;
+    height: 55px;
+  }
+
+  .skill-name {
+    font-size: 1.05rem;
+  }
+
+  .skill-level {
+    font-size: 0.8rem;
+  }
+
+  .skill-type-tag {
+    padding: 5px 12px;
+    font-size: 0.75rem;
+  }
+
+  .skill-detail-modal-content {
+    max-width: 420px;
+  }
+}
+
+/* 大屏幕设备 (>= 1024px) */
+@media (min-width: 1024px) {
+  .skill-page-container {
+    max-width: 700px;
+  }
+
+  .skill-list-item {
+    padding: 18px 20px;
+  }
+
+  .skill-icon {
+    font-size: 2.2rem;
+    width: 60px;
+    height: 60px;
+  }
+
+  .skill-detail-modal-content {
+    max-width: 450px;
+  }
+}
+
+/* ========== 横屏模式优化 ========== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .skill-page-content {
+    padding: 8px;
+  }
+
+  .skill-list {
+    gap: 6px;
+  }
+
+  .skill-list-item {
+    padding: 8px 12px;
+  }
+
+  .skill-icon {
+    font-size: 1.3rem;
+    width: 35px;
+    height: 35px;
+  }
+
+  .skill-name {
+    font-size: 0.85rem;
+  }
+
+  .skill-level {
+    font-size: 0.65rem;
+  }
+
+  .skill-type-tag {
+    padding: 2px 6px;
+    font-size: 0.6rem;
+  }
+
+  .skill-detail-modal-overlay {
+    padding: 10px;
+  }
+
+  .skill-detail-modal-content {
+    max-height: 90vh;
+    padding: 15px;
+  }
+}
+
+/* ========== 触摸设备优化 ========== */
+
+@media (hover: none) and (pointer: coarse) {
+  /* 移除悬停效果，改为点击反馈 */
+  .skill-list-item:hover {
+    transform: none;
+    background-color: rgba(50, 50, 50, 0.8);
+  }
+
+  .skill-list-item:active {
+    background-color: rgba(255, 215, 0, 0.1);
+    border-color: #ffd700;
+    transform: scale(0.98);
+  }
+
+  .skill-list-item.selected:active {
+    background-color: rgba(255, 215, 0, 0.2);
+  }
+}
+
+/* ========== 高对比度模式支持 ========== */
+
+@media (prefers-contrast: high) {
+  .skill-list-item {
+    border-width: 2px;
+  }
+
+  .skill-name {
+    color: #fff;
+  }
+
+  .skill-description {
+    color: #fff;
+  }
+}
+
+/* ========== 减少动画模式 ========== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .skill-list-item.rarity-legendary {
+    animation: none;
+  }
+}

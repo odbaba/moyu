@@ -1,0 +1,11 @@
+on(release){
+   if(_root.huanshoumb._visible)
+   {
+      _root.huanshoumb.closeme();
+   }
+   else
+   {
+      _root.CloseAll();
+      _root.huanshoumb.opens();
+   }
+}

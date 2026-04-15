@@ -1,0 +1,13 @@
+on(release){
+   if(_root.zhuangbei._visible)
+   {
+      _root.zhuangbei.closeme();
+      _root.beibao.closeme();
+   }
+   else
+   {
+      _root.CloseAll();
+      _root.zhuangbei.openme();
+      _root.beibao.openme();
+   }
+}

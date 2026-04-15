@@ -1,0 +1,83 @@
+　　幻兽可以进行幻化来提高幻兽的属
+--- RECORDSEPARATOR ---
+性值。幻化的要求是：主幻兽要求
+--- RECORDSEPARATOR ---
+50
+--- RECORDSEPARATOR ---
+级
+--- RECORDSEPARATOR ---
+以上，
+--- RECORDSEPARATOR ---
+副幻兽要求幻兽类型和主幻兽相
+--- RECORDSEPARATOR ---
+同（或者是奇异兽
+--- RECORDSEPARATOR ---
+，奇异兽可以做任何
+--- RECORDSEPARATOR ---
+种类幻兽的副幻兽）。副幻兽没有等级
+--- RECORDSEPARATOR ---
+要求，但如果主幻兽星级很高时会有相
+--- RECORDSEPARATOR ---
+应的星级评分要求。幻化后，主幻兽品
+--- RECORDSEPARATOR ---
+质属性得到提高，副幻兽消失了。并且
+--- RECORDSEPARATOR ---
+主幻兽的等级回到一级。幻化时同时进
+--- RECORDSEPARATOR ---
+行主属性幻化、初始属性和副属性幻
+--- RECORDSEPARATOR ---
+化，只有主属性的成长没有极限。
+--- RECORDSEPARATOR ---
+　　
+--- RECORDSEPARATOR ---
+自动放入副幻兽
+--- RECORDSEPARATOR ---
+，会在你的幻兽背
+--- RECORDSEPARATOR ---
+包里找
+--- RECORDSEPARATOR ---
+符合幻化要求
+--- RECORDSEPARATOR ---
+的
+--- RECORDSEPARATOR ---
+最低
+--- RECORDSEPARATOR ---
+分
+--- RECORDSEPARATOR ---
+奇异兽
+--- RECORDSEPARATOR ---
+用
+--- RECORDSEPARATOR ---
+来做副幻兽。（只找奇异兽）
+--- RECORDSEPARATOR ---
+　　你也可以在
+--- RECORDSEPARATOR ---
+“
+--- RECORDSEPARATOR ---
+设置
+--- RECORDSEPARATOR ---
+”
+--- RECORDSEPARATOR ---
+里设置自动放
+--- RECORDSEPARATOR ---
+入副幻兽和自动使用经验球，这样幻化
+--- RECORDSEPARATOR ---
+会更轻松。
+--- RECORDSEPARATOR ---
+　　请
+--- RECORDSEPARATOR ---
+谨慎
+--- RECORDSEPARATOR ---
+使用
+--- RECORDSEPARATOR ---
+“
+--- RECORDSEPARATOR ---
+自动幻化
+--- RECORDSEPARATOR ---
+”
+--- RECORDSEPARATOR ---
+功能，因
+--- RECORDSEPARATOR ---
+为它用一直自动幻化到没有副幻兽或经
+--- RECORDSEPARATOR ---
+验球为止。

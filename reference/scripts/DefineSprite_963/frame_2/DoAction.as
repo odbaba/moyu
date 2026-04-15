@@ -1,0 +1,2 @@
+stopmusic();
+stop();

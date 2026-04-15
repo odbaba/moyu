@@ -1,0 +1,1070 @@
+/**
+ * 物品详情弹窗样式 (Item Detail Modal Styles)
+ * 包含物品详情弹窗的所有样式
+ * 移动端优化：适配手机一屏显示
+ */
+
+/* ========== 弹窗遮罩层样式 ========== */
+
+/* 弹窗遮罩层 - 全屏覆盖 */
+.item-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 3200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+/* ========== 弹窗内容区域样式 ========== */
+
+/* 弹窗内容容器 */
+.item-detail-modal-content {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 2px solid #ffd700;
+  animation: slideIn 0.3s ease;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+              0 0 30px rgba(255, 215, 0, 0.2);
+  scrollbar-width: thin;
+  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+}
+
+/* 弹窗内容滚动条样式 */
+.item-detail-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.item-detail-modal-content::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 3px;
+}
+
+.item-detail-modal-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #555 0%, #777 50%, #555 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.item-detail-modal-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #666 0%, #888 50%, #666 100%);
+}
+
+/* ========== 关闭按钮样式 ========== */
+
+.item-detail-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #f0f0f0;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.item-detail-close-button:hover {
+  background-color: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  transform: rotate(90deg) scale(1.1);
+}
+
+.item-detail-close-button:active {
+  transform: rotate(90deg) scale(0.95);
+}
+
+/* ========== 物品头部样式 ========== */
+
+.item-detail-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #444;
+}
+
+/* 物品图标容器 */
+.item-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(40, 40, 40, 0.8);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  border: 2px solid #555;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 图标容器光效 */
+.item-icon-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.item-icon-wrapper:hover::before {
+  opacity: 1;
+}
+
+.item-icon-wrapper:hover {
+  border-color: #ffd700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  transform: scale(1.05);
+}
+
+/* 物品图标样式 */
+.item-icon {
+  font-size: 3rem;
+  transition: transform 0.3s ease;
+}
+
+.item-icon-wrapper:hover .item-icon {
+  transform: scale(1.1);
+}
+
+/* 装备详情图片样式 */
+.item-detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* 物品名称 */
+.item-name {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+/* ========== 基本信息区域样式 ========== */
+
+.item-basic-info {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  border: 1px solid #444;
+  transition: all 0.3s ease;
+}
+
+.item-basic-info:hover {
+  border-color: #555;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.info-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+.info-label {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+.info-value {
+  color: #f0f0f0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* 稀有度值样式 */
+.rarity-value {
+  text-shadow: 0 0 5px currentColor;
+}
+
+/* ========== 数量显示样式 ========== */
+
+.item-quantity-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(78, 205, 196, 0.1);
+  border: 1px solid #4ecdc4;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.item-quantity-section:hover {
+  background-color: rgba(78, 205, 196, 0.15);
+  box-shadow: 0 0 10px rgba(78, 205, 196, 0.2);
+  transform: translateX(3px);
+}
+
+.quantity-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.quantity-value {
+  color: #4ecdc4;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* ========== 物品属性样式 ========== */
+
+.item-attributes-section {
+  margin-bottom: 12px;
+}
+
+.section-title {
+  color: #ffd700;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  padding-left: 5px;
+  border-left: 3px solid #ffd700;
+  transition: all 0.3s ease;
+}
+
+.item-attributes-section:hover .section-title {
+  padding-left: 10px;
+  border-left-width: 4px;
+}
+
+.item-attributes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 单个属性项 */
+.item-attribute {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 4px;
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 属性项悬停光效 */
+.item-attribute::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.item-attribute:hover::before {
+  left: 100%;
+}
+
+.item-attribute:hover {
+  background-color: rgba(40, 40, 40, 0.8);
+  transform: translateX(5px);
+  border-left-color: #ffd700;
+}
+
+.attribute-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.attribute-value {
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+}
+
+.item-attribute:hover .attribute-value {
+  transform: scale(1.05);
+}
+
+/* 不同属性的颜色 */
+.hp-value {
+  color: #ff6b6b;
+}
+
+.mp-value {
+  color: #4ecdc4;
+}
+
+.attack-value {
+  color: #ff9800;
+}
+
+.defense-value {
+  color: #2196f3;
+}
+
+.stamina-value {
+  color: #8bc34a;
+}
+
+.luck-value {
+  color: #9c27b0;
+}
+
+/* ========== 获取途径样式 ========== */
+
+.item-source-section {
+  margin-bottom: 12px;
+}
+
+.item-source {
+  color: #b0b0b0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  padding: 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 6px;
+  border: 1px solid #444;
+  transition: all 0.3s ease;
+}
+
+.item-source:hover {
+  background-color: rgba(40, 40, 40, 0.8);
+  border-color: #555;
+}
+
+/* ========== 物品描述样式 ========== */
+
+.item-description-section {
+  margin-bottom: 12px;
+}
+
+.item-description {
+  color: #d0d0d0;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  padding: 12px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 6px;
+  border-left: 3px solid #666;
+  transition: all 0.3s ease;
+}
+
+.item-description:hover {
+  background-color: rgba(40, 40, 40, 0.8);
+  border-left-color: #ffd700;
+}
+
+/* ========== 物品特性标签样式 ========== */
+
+.item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #444;
+}
+
+.item-tag {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+/* 可使用标签 */
+.usable-tag {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border: 1px solid #4caf50;
+}
+
+.usable-tag:hover {
+  background-color: rgba(76, 175, 80, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* 可装备标签 */
+.equippable-tag {
+  background-color: rgba(255, 152, 0, 0.2);
+  color: #ff9800;
+  border: 1px solid #ff9800;
+}
+
+/* 使用物品按钮 */
+.use-item-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3);
+}
+
+.use-item-button:hover {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+}
+
+.use-item-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+}
+
+.equippable-tag:hover {
+  background-color: rgba(255, 152, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+}
+
+/* 可堆叠标签 */
+.stack-tag {
+  background-color: rgba(33, 150, 243, 0.2);
+  color: #2196f3;
+  border: 1px solid #2196f3;
+}
+
+.stack-tag:hover {
+  background-color: rgba(33, 150, 243, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+}
+
+/* ========== 装备类物品专用样式 ========== */
+
+/* 装备品质区域 */
+.equipment-quality-section {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  border: 1px solid #444;
+}
+
+.equipment-quality-section .info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.equipment-quality-section .info-label {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+.equipment-quality-section .info-value {
+  color: #f0f0f0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* 品质值样式 */
+.quality-value {
+  text-shadow: 0 0 5px currentColor;
+}
+
+/* 装备使用等级区域 */
+.equipment-use-level-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(156, 39, 176, 0.1);
+  border: 1px solid #9c27b0;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.use-level-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.use-level-value {
+  color: #ce93d8;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* 装备属性区域 */
+.equipment-attributes-section {
+  margin-bottom: 12px;
+}
+
+.equipment-attributes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 装备属性项 */
+.equipment-attribute {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 4px;
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.equipment-attribute:hover {
+  background-color: rgba(40, 40, 40, 0.8);
+  transform: translateX(5px);
+  border-left-color: #ffd700;
+}
+
+.equipment-attribute .attribute-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.equipment-attribute .attribute-value {
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+/* 攻击力值样式 */
+.attack-value {
+  color: #ff9800;
+}
+
+/* 防御力值样式 */
+.defense-value {
+  color: #2196f3;
+}
+
+/* 魔魂等级区域 */
+.equipment-magic-soul-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(255, 152, 0, 0.1);
+  border: 1px solid #ff9800;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.magic-soul-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.magic-soul-value {
+  color: #ffb74d;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* 宝石洞区域 */
+.equipment-hole-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(33, 150, 243, 0.1);
+  border: 1px solid #2196f3;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.hole-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.hole-value {
+  color: #64b5f6;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* 装备价值区域 */
+.equipment-value-section {
+  margin-bottom: 12px;
+}
+
+.value-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.value-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 4px;
+  border-left: 3px solid #ffd700;
+}
+
+.value-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.value-value {
+  color: #ffd700;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+/* ========== 动画效果 ========== */
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 滑入动画 */
+@keyframes slideIn {
+  from {
+    transform: scale(0.95) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 弹出动画 */
+@keyframes popIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* 发光动画 */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  }
+}
+
+/* ========== 响应式设计 ========== */
+
+/* 小屏幕手机 (宽度 < 375px) */
+@media (max-width: 374px) {
+  .item-detail-modal-content {
+    padding: 15px;
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .item-icon-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+
+  .item-icon {
+    font-size: 2rem;
+  }
+
+  .item-name {
+    font-size: 1.1rem;
+  }
+
+  .item-basic-info {
+    padding: 8px;
+  }
+
+  .info-label {
+    font-size: 0.7rem;
+  }
+
+  .info-value {
+    font-size: 0.8rem;
+  }
+
+  .item-quantity-section {
+    padding: 6px 10px;
+  }
+
+  .quantity-label {
+    font-size: 0.8rem;
+  }
+
+  .quantity-value {
+    font-size: 0.9rem;
+  }
+
+  .section-title {
+    font-size: 0.85rem;
+  }
+
+  .item-attribute {
+    padding: 6px 10px;
+  }
+
+  .attribute-label {
+    font-size: 0.8rem;
+  }
+
+  .attribute-value {
+    font-size: 0.85rem;
+  }
+
+  .item-source {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+
+  .item-description {
+    font-size: 0.8rem;
+    padding: 10px;
+  }
+
+  .item-tag {
+    padding: 3px 8px;
+    font-size: 0.7rem;
+  }
+
+  .item-detail-close-button {
+    top: 8px;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    font-size: 1.3rem;
+  }
+}
+
+/* 标准手机 (375px - 767px) */
+@media (min-width: 375px) and (max-width: 767px) {
+  .item-detail-modal-content {
+    padding: 18px;
+    max-height: 85vh;
+  }
+
+  .item-icon-wrapper {
+    width: 70px;
+    height: 70px;
+  }
+
+  .item-icon {
+    font-size: 2.5rem;
+  }
+
+  .item-name {
+    font-size: 1.2rem;
+  }
+}
+
+/* 平板设备 */
+@media (min-width: 768px) {
+  .item-detail-modal-content {
+    max-width: 450px;
+    max-height: 80vh;
+  }
+
+  .item-icon-wrapper {
+    width: 100px;
+    height: 100px;
+  }
+
+  .item-icon {
+    font-size: 3.5rem;
+  }
+
+  .item-name {
+    font-size: 1.5rem;
+  }
+
+  .item-basic-info {
+    padding: 12px;
+  }
+
+  .info-label {
+    font-size: 0.8rem;
+  }
+
+  .info-value {
+    font-size: 1rem;
+  }
+
+  .item-attribute {
+    padding: 10px 15px;
+  }
+
+  .attribute-label {
+    font-size: 0.9rem;
+  }
+
+  .attribute-value {
+    font-size: 1rem;
+  }
+
+  .item-source {
+    font-size: 0.9rem;
+    padding: 12px;
+  }
+
+  .item-description {
+    font-size: 0.9rem;
+    padding: 15px;
+  }
+
+  .item-tag {
+    padding: 5px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* 大屏幕设备 */
+@media (min-width: 1024px) {
+  .item-detail-modal-content {
+    max-width: 500px;
+  }
+
+  .item-icon-wrapper {
+    width: 110px;
+    height: 110px;
+  }
+
+  .item-icon {
+    font-size: 4rem;
+  }
+
+  .item-name {
+    font-size: 1.6rem;
+  }
+}
+
+/* ========== 横屏模式优化 ========== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .item-detail-modal-content {
+    max-height: 95vh;
+    padding: 15px;
+  }
+
+  .item-detail-header {
+    flex-direction: row;
+    gap: 15px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .item-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 0;
+  }
+
+  .item-icon {
+    font-size: 2rem;
+  }
+
+  .item-name {
+    font-size: 1.1rem;
+  }
+
+  .item-basic-info {
+    margin-bottom: 8px;
+  }
+
+  .item-attributes-section,
+  .item-source-section,
+  .item-description-section {
+    margin-bottom: 8px;
+  }
+
+  .item-tags {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+}
+
+/* ========== 触摸设备优化 ========== */
+
+@media (hover: none) and (pointer: coarse) {
+  /* 移除悬停效果，改为点击反馈 */
+  .item-icon-wrapper:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .item-icon-wrapper:active {
+    border-color: #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    transform: scale(0.98);
+  }
+
+  .item-attribute:hover {
+    transform: none;
+    border-left-color: transparent;
+  }
+
+  .item-attribute:active {
+    background-color: rgba(40, 40, 40, 0.8);
+    border-left-color: #ffd700;
+  }
+
+  .item-tag:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .item-tag:active {
+    transform: scale(0.95);
+  }
+
+  .info-item:hover {
+    transform: none;
+  }
+
+  .info-item:active {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(0.98);
+  }
+
+  .item-detail-close-button:hover {
+    transform: none;
+  }
+
+  .item-detail-close-button:active {
+    background-color: rgba(255, 107, 107, 0.3);
+    transform: scale(0.9);
+  }
+}
+
+/* ========== 高对比度模式支持 ========== */
+
+@media (prefers-contrast: high) {
+  .item-detail-modal-content {
+    border-width: 3px;
+  }
+
+  .item-icon-wrapper {
+    border-width: 3px;
+  }
+
+  .item-name {
+    color: #fff;
+  }
+
+  .attribute-value {
+    color: #fff;
+  }
+
+  .info-value {
+    color: #fff;
+  }
+
+  .item-source {
+    color: #e0e0e0;
+  }
+
+  .item-description {
+    color: #e0e0e0;
+  }
+}
+
+/* ========== 减少动画模式 ========== */
+
+@media (prefers-reduced-motion: reduce) {
+  .item-detail-modal-overlay {
+    animation: none;
+  }
+
+  .item-detail-modal-content {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

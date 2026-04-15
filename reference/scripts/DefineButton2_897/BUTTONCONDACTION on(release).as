@@ -1,0 +1,13 @@
+on(release){
+   if(!_root.renwu.pking)
+   {
+      if(_root.vip._visible)
+      {
+         _root.vip.closeme();
+      }
+      else
+      {
+         _root.vip.openme(_root.xinxi.jwname);
+      }
+   }
+}

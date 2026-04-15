@@ -1,0 +1,221 @@
+/**
+ * 公共组件样式 (Common Module Styles)
+ * 包含可在多个模块中复用的通用组件样式
+ */
+
+/* 交互弹窗 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 3000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 20px;
+  width: 80%;
+  max-width: 500px;
+  position: relative;
+  border: 1px solid #ffd700;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: scale(0.9) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #f0f0f0;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-content h3 {
+  color: #ffd700;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.modal-description {
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.modal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-button {
+  background-color: #333;
+  color: #f0f0f0;
+  border: 1px solid #555;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.option-button:hover {
+  background-color: #444;
+  border-color: #ffd700;
+  transform: translateY(-2px);
+}
+
+/* NPC 结果反馈按钮样式 */
+.result-feedback-container {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.result-feedback-text {
+  padding: 16px;
+  background-color: #2a2a2a;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  line-height: 1.6;
+  color: #f0f0f0;
+  font-size: 1rem;
+  border: 1px solid #444;
+}
+
+.result-feedback-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.feedback-button {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.feedback-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cancel-button {
+  background-color: #555;
+  color: #f0f0f0;
+  border: 1px solid #777;
+}
+
+.cancel-button:hover {
+  background-color: #666;
+  border-color: #999;
+}
+
+.confirm-button {
+  background-color: #ffd700;
+  color: #1a1a1a;
+  border: 1px solid #ffed4a;
+}
+
+.confirm-button:hover {
+  background-color: #ffed4a;
+  border-color: #ffd700;
+}
+
+/* NPC 类型标签样式 */
+.npc-name {
+  margin-bottom: 8px;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.npc-meta-info {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.npc-type-tag {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.npc-type-palace {
+  background-color: #ffd700;
+  color: #8b4513;
+}
+
+.npc-type-function {
+  background-color: #4caf50;
+  color: white;
+}
+
+.npc-type-shop {
+  background-color: #2196f3;
+  color: white;
+}
+
+.npc-type-special {
+  background-color: #9c27b0;
+  color: white;
+}
+
+.npc-location {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+/* 无可用选项提示 */
+.no-options-hint {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 0.95rem;
+}
+
+/* 响应式设计 - 公共组件移动端优化 */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+  }
+}

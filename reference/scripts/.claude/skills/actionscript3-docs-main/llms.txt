@@ -1,0 +1,40 @@
+# ActionScript 3.0 Documentation
+
+Comprehensive ActionScript 3.0 and Adobe AIR documentation, manually synthesized into 41 high-density Markdown files optimized for LLM consumption.
+
+## Core Language & Types
+- `docs/Object.md`, `docs/Array.md`, `docs/Vector.md`, `docs/String.md`, `docs/Boolean.md`: Standard types.
+- `docs/NumericTypes.md`: Math, int, uint, float.
+- `docs/Math.md`, `docs/Date.md`, `docs/Function.md`, `docs/RegExp.md`, `docs/JSON.md`, `docs/XML.md`: Core utilities.
+- `docs/Errors.md`, `docs/SpecializedErrors.md`: Complete error hierarchy.
+- `docs/SpecialTypes.md`: Class, Namespace, QName, TimeZone, arguments.
+
+## Display & Interactivity
+- `docs/Display.md`: Sprite, Stage, Bitmap, Graphics.
+- `docs/Geom.md`: Matrix, Point, Rectangle.
+- `docs/Display3D.md`: Stage3D GPU rendering (AGAL).
+- `docs/Text.md`: TextField, TextFormat, StyleSheet.
+- `docs/Filters.md`: Blur, Glow, ColorMatrix, Convolution filters.
+- `docs/Events.md`: Event flow, Keyboard/Mouse/Touch events.
+- `docs/UI.md`: ContextMenu, Mouse Cursor, Multitouch, GameInput.
+
+## System & Networking
+- `docs/Net.md`: URLLoader, Sockets, FileReference.
+- `docs/Utils.md`: ByteArray, Timers, Reflection (describeType).
+- `docs/System.md`: Security, Capabilities, ApplicationDomain.
+- `docs/Concurrent.md`: Workers, Mutex, Condition variables.
+- `docs/Bridge_Sensors.md`: ExternalInterface, Accelerometer, Geolocation.
+- `docs/Globalization.md`: Locale-aware formatting and sorting.
+
+## Adobe AIR Services
+- `docs/Filesystem.md`: Native File and FileStream IO.
+- `docs/Desktop.md`: Clipboard, NativeProcess, Window management.
+- `docs/Database.md`: Local SQLite and EncryptedLocalStore.
+- `docs/HTML.md`: WebKit HTMLLoader.
+- `docs/Updates.md`: Application Update framework.
+- `docs/Notifications.md`: Push and local notifications.
+- `docs/Permissions.md`: Mobile runtime permissions.
+- `docs/Printing.md`, `docs/Profiler.md`, `docs/Accessibility.md`: Specialized APIs.
+
+## Usage
+Refer to `/docs/*.md` for consolidated package summaries. These files exclude HTML noise and focus on API signatures, behavioral notes, and idiomatic examples.

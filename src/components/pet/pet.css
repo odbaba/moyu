@@ -1,0 +1,1118 @@
+/**
+ * 幻兽模块样式 (Pet Module Styles)
+ * 包含幻兽系统的所有样式
+ * 移动端优化：确保一屏展示所有信息
+ */
+
+/* ========== 幻兽主页面样式 ========== */
+
+/* 幻兽主页面覆盖层 */
+.pet-page-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 2500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 幻兽主页面容器 */
+.pet-page-container {
+  background-color: rgba(20, 20, 20, 0.98);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease;
+}
+
+/* 页面顶部标题和关闭按钮 */
+.pet-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 15px;
+  background-color: rgba(30, 30, 30, 0.8);
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+}
+
+/* 幻兽页面标题 */
+.pet-page-title {
+  color: #ffd700;
+  font-size: 1.2rem;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* 关闭按钮样式 */
+.pet-page-close-button {
+  padding: 6px 15px;
+  background-color: rgba(255, 107, 107, 0.2);
+  border: 1px solid #ff6b6b;
+  border-radius: 4px;
+  color: #ff6b6b;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 关闭按钮悬停效果 */
+.pet-page-close-button:hover {
+  background-color: rgba(255, 107, 107, 0.4);
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+  transform: translateY(-1px);
+}
+
+/* 主要内容区域 - 移动端上下布局 */
+.pet-page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 10px;
+  gap: 10px;
+}
+
+/* 上部：出战幻兽栏区域 */
+.pet-page-top {
+  flex-shrink: 0;
+}
+
+/* 出战幻兽容器 */
+.deployed-pets-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+/* 中部：幻兽数量提示区域 */
+.pet-page-middle {
+  flex-shrink: 0;
+}
+
+/* 幻兽数量信息 */
+.pet-count-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 6px;
+  border: 1px solid #444;
+}
+
+.pet-count-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.pet-count-value {
+  color: #ffd700;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.deployed-count {
+  color: #4ecdc4;
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+
+/* 下部：幻兽列表展示区域 */
+.pet-page-bottom {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 幻兽列表容器 */
+.pet-list-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+}
+
+/* 幻兽列表滚动条样式 */
+.pet-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pet-list-container::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 3px;
+}
+
+.pet-list-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #555 0%, #777 50%, #555 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pet-list-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #666 0%, #888 50%, #666 100%);
+}
+
+/* 幻兽列表分组 */
+.pet-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pet-list-section-title {
+  color: #888;
+  font-size: 0.85rem;
+  padding: 5px 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 4px;
+  border-left: 3px solid #ffd700;
+}
+
+/* 空状态提示 */
+.pet-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #888;
+  text-align: center;
+}
+
+.pet-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+
+.pet-empty-text {
+  font-size: 0.9rem;
+}
+
+/* ========== 出战幻兽栏样式 ========== */
+
+.deployed-pet-slot {
+  background-color: rgba(40, 40, 40, 0.8);
+  border: 2px solid #555;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.deployed-pet-slot:hover {
+  border-color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* 合体状态样式 */
+.deployed-pet-slot.merged {
+  border-color: #9c27b0;
+  box-shadow: 0 0 10px rgba(156, 39, 176, 0.3);
+}
+
+/* 空槽位样式 */
+.deployed-pet-slot.empty {
+  border-style: dashed;
+  border-color: #444;
+  background-color: rgba(30, 30, 30, 0.5);
+}
+
+.deployed-pet-slot.empty:hover {
+  border-color: #555;
+  box-shadow: none;
+}
+
+/* 槽位头部 */
+.slot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slot-index {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+.merged-badge {
+  color: #9c27b0;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  background-color: rgba(156, 39, 176, 0.2);
+  border-radius: 3px;
+  border: 1px solid rgba(156, 39, 176, 0.5);
+}
+
+/* 空槽位内容 */
+.empty-slot-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+  gap: 5px;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  opacity: 0.3;
+}
+
+.empty-text {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* 幻兽信息区域 */
+.pet-info {
+  display: flex;
+  gap: 10px;
+}
+
+/* 幻兽头像 */
+.pet-avatar {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(50, 50, 50, 0.8);
+  border-radius: 8px;
+  border: 1px solid #555;
+  flex-shrink: 0;
+}
+
+.pet-emoji {
+  font-size: 1.8rem;
+}
+
+/* 幻兽详细信息 */
+.pet-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* 幻兽名称行 */
+.pet-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pet-name {
+  color: #ffd700;
+  font-size: 0.9rem;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pet-level {
+  color: #4ecdc4;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* 幻兽属性条 */
+.pet-stat-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.stat-label {
+  color: #888;
+  font-size: 0.7rem;
+  width: 45px;
+  flex-shrink: 0;
+}
+
+.stat-bar-container {
+  flex: 1;
+  height: 12px;
+  background-color: rgba(50, 50, 50, 0.8);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #333;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.hp-fill {
+  background: linear-gradient(90deg, #c62828 0%, #ff6b6b 50%, #c62828 100%);
+}
+
+.exp-fill {
+  background: linear-gradient(90deg, #558b2f 0%, #8bc34a 50%, #558b2f 100%);
+}
+
+.stat-bar-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-size: 0.6rem;
+  color: #ffffff;
+  font-weight: 100;
+  top: 50%;
+  transform: translateY(-50%);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9);
+}
+
+/* 操作按钮区域 */
+.pet-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.pet-action-button {
+  flex: 1;
+  padding: 6px 8px;
+  background: linear-gradient(135deg, #444 0%, #333 100%);
+  color: #f0f0f0;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.pet-action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.recall-button:hover {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  border-color: #ef5350;
+}
+
+.merge-button:hover {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  border-color: #66bb6a;
+}
+
+.unmerge-button:hover {
+  background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+  border-color: #ba68c8;
+}
+
+/* ========== 幻兽列表项样式 ========== */
+
+.pet-list-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: rgba(50, 50, 50, 0.8);
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  gap: 10px;
+}
+
+.pet-list-item:hover {
+  background-color: rgba(60, 60, 60, 0.9);
+  border-color: #ffd700;
+  transform: translateX(3px);
+}
+
+.pet-list-item:active {
+  transform: scale(0.98);
+}
+
+/* 幻兽头像 */
+.pet-list-avatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(40, 40, 40, 0.8);
+  border-radius: 6px;
+  border: 1px solid #555;
+  flex-shrink: 0;
+}
+
+.pet-list-emoji {
+  font-size: 1.5rem;
+}
+
+/* 幻兽信息 */
+.pet-list-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.pet-list-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pet-list-name {
+  font-size: 0.9rem;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 幻兽状态标签 */
+.pet-status-badge {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.pet-status-badge.deployed {
+  color: #4ecdc4;
+  background-color: rgba(78, 205, 196, 0.2);
+  border: 1px solid rgba(78, 205, 196, 0.5);
+}
+
+.pet-status-badge.merged {
+  color: #9c27b0;
+  background-color: rgba(156, 39, 176, 0.2);
+  border: 1px solid rgba(156, 39, 176, 0.5);
+}
+
+.pet-list-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pet-list-type {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+.pet-list-level {
+  color: #4ecdc4;
+  font-size: 0.75rem;
+}
+
+/* 品质标签 */
+.pet-list-quality {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+/* 幻兽列表项出战按钮 */
+.pet-deploy-button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #4caf50 0%, #388e3c 100%);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 1px solid #2e7d32;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.pet-deploy-button:hover {
+  background: linear-gradient(180deg, #66bb6a 0%, #43a047 100%);
+  transform: scale(1.05);
+}
+
+.pet-deploy-button:active {
+  transform: scale(0.95);
+}
+
+/* ========== 幻兽详情弹窗样式 ========== */
+
+.pet-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 2600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.pet-detail-modal-content {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 450px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 2px solid #ffd700;
+  animation: slideIn 0.3s ease;
+  position: relative;
+}
+
+.pet-detail-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pet-detail-modal-content::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 3px;
+}
+
+.pet-detail-modal-content::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.pet-detail-modal-content::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* 关闭按钮 */
+.pet-detail-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #f0f0f0;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.3s ease;
+}
+
+.pet-detail-close-button:hover {
+  color: #ff6b6b;
+}
+
+/* 幻兽头部信息 */
+.pet-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #444;
+}
+
+.pet-detail-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(40, 40, 40, 0.8);
+  border-radius: 10px;
+  border: 2px solid #555;
+  flex-shrink: 0;
+}
+
+.pet-detail-emoji {
+  font-size: 2.5rem;
+}
+
+.pet-detail-name {
+  font-size: 1.3rem;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* 详细信息表格 */
+.pet-detail-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pet-detail-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.pet-detail-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 4px;
+}
+
+.pet-detail-cell.full-width {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cell-label {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+.cell-value {
+  color: #f0f0f0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.cell-score {
+  color: #ffd700;
+  font-size: 0.7rem;
+  margin-left: 5px;
+}
+
+.quality-value {
+  font-weight: bold;
+}
+
+.hp-value {
+  color: #ff6b6b;
+}
+
+.exp-value {
+  color: #8bc34a;
+}
+
+.attack-value {
+  color: #ff9800;
+}
+
+.defense-value {
+  color: #2196f3;
+}
+
+.rarity-value {
+  color: #ffd700;
+}
+
+/* 总评分 */
+.pet-detail-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: rgba(255, 215, 0, 0.1);
+  border: 2px solid #ffd700;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+/* 详情弹窗操作按钮区域 */
+.pet-detail-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+/* 详情弹窗出战按钮 */
+.pet-detail-button {
+  padding: 10px 30px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.pet-detail-button.deploy {
+  background: linear-gradient(180deg, #4caf50 0%, #388e3c 100%);
+  color: #fff;
+  border: 1px solid #2e7d32;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.pet-detail-button.deploy:hover {
+  background: linear-gradient(180deg, #66bb6a 0%, #43a047 100%);
+  transform: scale(1.05);
+}
+
+.pet-detail-button.deploy:active {
+  transform: scale(0.95);
+}
+
+/* 已出战提示 */
+.pet-detail-deployed-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(76, 175, 80, 0.2);
+  border-radius: 6px;
+  border: 1px solid #4caf50;
+}
+
+.pet-detail-deployed-info .deployed-icon {
+  font-size: 1.2rem;
+}
+
+.pet-detail-deployed-info .deployed-text {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* 无法出战提示 */
+.pet-detail-cannot-deploy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 152, 0, 0.2);
+  border-radius: 6px;
+  border: 1px solid #ff9800;
+}
+
+.pet-detail-cannot-deploy .cannot-icon {
+  font-size: 1.2rem;
+}
+
+.pet-detail-cannot-deploy .cannot-text {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.total-label {
+  color: #888;
+  font-size: 0.95rem;
+}
+
+.total-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* ========== 动画效果 ========== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: scale(0.95) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ========== 响应式设计 - 移动端优先 ========== */
+
+/* 小屏幕手机 (宽度 < 375px) */
+@media (max-width: 374px) {
+  .pet-page-header {
+    padding: 6px 10px;
+  }
+
+  .pet-page-title {
+    font-size: 1rem;
+  }
+
+  .pet-page-close-button {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+  }
+
+  .pet-page-content {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .deployed-pets-container {
+    gap: 8px;
+  }
+
+  .deployed-pet-slot {
+    padding: 8px;
+  }
+
+  .pet-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pet-emoji {
+    font-size: 1.5rem;
+  }
+
+  .pet-name {
+    font-size: 0.85rem;
+  }
+
+  .pet-action-button {
+    padding: 5px 6px;
+    font-size: 0.7rem;
+  }
+
+  .pet-list-item {
+    padding: 8px 10px;
+  }
+
+  .pet-list-avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  .pet-list-emoji {
+    font-size: 1.3rem;
+  }
+
+  .pet-list-name {
+    font-size: 0.85rem;
+  }
+
+  .pet-detail-modal-content {
+    padding: 15px;
+  }
+
+  .pet-detail-icon-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+
+  .pet-detail-emoji {
+    font-size: 2rem;
+  }
+
+  .pet-detail-name {
+    font-size: 1.1rem;
+  }
+}
+
+/* 标准手机 (375px - 767px) */
+@media (min-width: 375px) and (max-width: 767px) {
+  .pet-detail-modal-content {
+    max-width: 350px;
+  }
+}
+
+/* 平板设备 (768px - 1023px) */
+@media (min-width: 768px) {
+  .pet-page-overlay {
+    padding: 20px;
+  }
+
+  .pet-page-container {
+    max-width: 900px;
+    max-height: 90vh;
+    border-radius: 10px;
+    border: 2px solid #ffd700;
+  }
+
+  .pet-page-content {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .deployed-pets-container {
+    gap: 15px;
+  }
+
+  .deployed-pet-slot {
+    padding: 12px;
+  }
+
+  .pet-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .pet-emoji {
+    font-size: 2rem;
+  }
+
+  .pet-name {
+    font-size: 1rem;
+  }
+
+  .pet-action-button {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .pet-list-item {
+    padding: 12px 15px;
+  }
+
+  .pet-list-avatar {
+    width: 45px;
+    height: 45px;
+  }
+
+  .pet-list-emoji {
+    font-size: 1.6rem;
+  }
+
+  .pet-list-name {
+    font-size: 0.95rem;
+  }
+
+  .pet-detail-modal-content {
+    max-width: 500px;
+  }
+}
+
+/* 大屏幕设备 (>= 1024px) */
+@media (min-width: 1024px) {
+  .pet-page-container {
+    max-width: 1100px;
+  }
+
+  .pet-list-item {
+    padding: 14px 18px;
+  }
+
+  .pet-list-name {
+    font-size: 1rem;
+  }
+
+  .pet-detail-modal-content {
+    max-width: 550px;
+  }
+}
+
+/* 超大屏幕设备 (>= 1440px) */
+@media (min-width: 1440px) {
+  .pet-page-container {
+    max-width: 1300px;
+  }
+}
+
+/* ========== 横屏模式优化 ========== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .pet-page-content {
+    flex-direction: row;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .pet-page-top {
+    width: 40%;
+    flex-shrink: 0;
+  }
+
+  .pet-page-middle {
+    display: none;
+  }
+
+  .pet-page-bottom {
+    width: 60%;
+  }
+
+  .deployed-pets-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========== 触摸设备优化 ========== */
+
+@media (hover: none) and (pointer: coarse) {
+  /* 移除悬停效果，改为点击反馈 */
+  .pet-list-item:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .pet-list-item:active {
+    background-color: rgba(255, 215, 0, 0.1);
+    border-color: #ffd700;
+    transform: scale(0.98);
+  }
+
+  .deployed-pet-slot:hover {
+    box-shadow: none;
+  }
+
+  .deployed-pet-slot:active {
+    background-color: rgba(255, 215, 0, 0.1);
+  }
+
+  .pet-action-button:hover {
+    transform: none;
+  }
+
+  .pet-action-button:active {
+    transform: scale(0.95);
+  }
+}
+
+/* ========== 高对比度模式支持 ========== */
+
+@media (prefers-contrast: high) {
+  .pet-list-item {
+    border-width: 2px;
+  }
+
+  .pet-list-name {
+    color: #fff;
+  }
+
+  .deployed-pet-slot {
+    border-width: 2px;
+  }
+}
+
+/* ========== 减少动画模式 ========== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

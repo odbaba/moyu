@@ -1,0 +1,488 @@
+/**
+ * 首页模块样式 (Home Module Styles)
+ * 包含游戏主界面（非战斗状态）的所有样式
+ * 
+ * 高度分配：标题5% + 场景描述20% + 局部地图25% + 交互按钮区15% + 时间显示5% + 交互日志区30% = 100%
+ */
+
+/* 顶部位置显示 - 高度5% */
+.location-header {
+  width: 100%;
+  height: 5vh;
+  text-align: center;
+  padding: 0;
+  border-bottom: 1px solid #000000;
+  background-color: #252935;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* 为幻兽按钮绝对定位提供参考 */
+}
+
+/* 主标题字体大小和字重减小30%：原2.5rem -> 1.75rem，原bold -> normal */
+.location-header h1 {
+  font-size: 1.75rem;
+  font-weight: normal;
+  color: #FFFFFF;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  margin: 0;
+}
+
+/* 幻兽按钮样式 - 绝对定位在标题左侧，不影响标题居中 */
+.pet-button {
+  position: absolute; /* 绝对定位，脱离文档流 */
+  left: 10px; /* 固定在左侧 */
+  background-color: #2a2a2a;
+  color: #FFFFFF;
+  border: 1px solid #ffd700;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  z-index: 10; /* 确保按钮在上层 */
+}
+
+.pet-button:hover {
+  background-color: #3a3a3a;
+  border-color: #ffed4a;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* 场景描述 - 高度20% */
+.scene-description {
+  width: 100%;
+  height: 20vh;
+  background-color: #252935;
+  padding: 10px 20px;
+  border-bottom: 1px solid #000000;
+  overflow-y: auto;
+}
+
+.scene-description p {
+  margin-bottom: 10px;
+  line-height: 1.6;
+  color: #FFFFFF;
+}
+
+.scene-description p:nth-child(2) {
+  color: #FFFFFF;
+  font-weight: bold;
+}
+
+/* 局部地图 - 高度25%，移除标题 */
+.local-map {
+  width: 100%;
+  height: 25vh;
+  background-color: #252935;
+  padding: 10px 20px;
+  border-bottom: 1px solid #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.local-map-svg {
+  background-color: #252935;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  position: relative;
+  width: 400px;
+  height: 300px;
+  justify-content: center;
+  align-items: center;
+}
+
+.map-location {
+  background-color: #333;
+  padding: 8px;
+  border-radius: 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  border: 1px solid #555;
+  width: 120px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  color: #FFFFFF;
+}
+
+.map-location:hover {
+  background-color: #444;
+  border-color: #ffd700;
+}
+
+.map-location.current-location {
+  background-color: #ffd700;
+  color: #121212;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.map-location-text {
+  cursor: pointer;
+  user-select: none;
+}
+
+.current-location-text {
+  user-select: none;
+}
+
+/* 大地图 */
+.world-map-svg {
+  background-color: #252935;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.world-map-svg:active {
+  cursor: grabbing;
+}
+
+.map-area {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.map-area-text {
+  cursor: pointer;
+  user-select: none;
+}
+
+.map-area.current {
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+/* 交互按钮 - 高度15% */
+.interaction-buttons {
+  width: 100%;
+  height: 15vh;
+  display: flex;
+  gap: 8px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #000000;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: center;
+  background-color: #252935;
+}
+
+/* 交互按钮样式 - 灰黑色，比地图按钮稍小，宽度自适应 */
+.interact-button {
+  background-color: #2a2a2a;
+  color: #FFFFFF;
+  border: 1px solid #444;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.interact-button:hover {
+  background-color: #3a3a3a;
+  border-color: #666;
+}
+
+/* 动作类按钮样式 - 蓝色边框 */
+.interact-button--action {
+  border-color: #4a9eff;
+}
+
+.interact-button--action:hover {
+  background-color: #2a3a4a;
+  border-color: #6ab0ff;
+}
+
+/* 敌人类按钮样式 - 红色边框 */
+.interact-button--enemy {
+  border-color: #ff4a4a;
+}
+
+.interact-button--enemy:hover {
+  background-color: #3a2a2a;
+  border-color: #ff6a6a;
+}
+
+/* NPC类按钮样式 - 绿色边框 */
+.interact-button--npc {
+  border-color: #4aff4a;
+}
+
+.interact-button--npc:hover {
+  background-color: #2a3a2a;
+  border-color: #6aff6a;
+}
+
+/* 按钮图标样式 */
+.interact-button__icon {
+  margin-right: 6px;
+}
+
+/* 按钮名称样式 */
+.interact-button__name {
+  font-weight: normal;
+}
+
+/* ========== 时间显示组件样式 ========== */
+
+/* 时间显示容器 - 黑色边框，与首页样式一致 */
+.time-display {
+  width: 100%;
+  height: 5vh;
+  background-color: #252935;
+  padding: 5px 15px;
+  border-bottom: 2px solid #000000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 天数和星期信息行 */
+.time-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+/* 天数显示 */
+.time-day {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+/* 星期显示 */
+.time-weekday {
+  font-size: 0.85rem;
+  color: #FFFFFF;
+}
+
+/* 时间进度条容器 */
+.time-progress {
+  display: flex;
+  gap: 3px;
+  justify-content: space-between;
+}
+
+/* 单个时间单位样式 */
+.time-unit {
+  flex: 1;
+  height: 6px;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+/* 已消耗的时间单位 - 浅灰色 */
+.time-unit--consumed {
+  background-color: #555555;
+}
+
+/* 未消耗的时间单位 - 深绿色 */
+.time-unit--remaining {
+  background-color: #2d5a27;
+}
+
+/* ========== 交互日志样式 ========== */
+
+/* 交互日志 - 高度30%，支持垂直滚动 */
+.interaction-log {
+  width: 100%;
+  height: 30vh;
+  background-color: #252935;
+  padding: 10px 20px;
+  border-bottom: 1px solid #000000;
+  overflow-y: auto;
+}
+
+.log-entry {
+  margin-bottom: 10px;
+  padding: 8px;
+  background-color: rgba(50, 50, 50, 0.5);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #FFFFFF;
+}
+
+.log-entry:nth-child(odd) {
+  background-color: rgba(60, 60, 60, 0.5);
+}
+
+/* 右下角菜单 */
+.menu-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.menu-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #ffd700;
+  color: #121212;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.menu-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+}
+
+.menu-popup {
+  position: absolute;
+  bottom: 60px;
+  right: 0;
+  background-color: #333;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 120px;
+}
+
+.menu-popup button {
+  background-color: #444;
+  color: #FFFFFF;
+  border: 1px solid #555;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  text-align: center;
+  min-width: 100px;
+}
+
+.menu-popup button:hover {
+  background-color: #555;
+  border-color: #ffd700;
+}
+
+/* 大地图弹窗 */
+.map-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.map-content {
+  background-color: #252935;
+  border-radius: 8px;
+  padding: 20px;
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow: auto;
+  position: relative;
+}
+
+.close-map {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ff6b6b;
+  color: #FFFFFF;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.world-map {
+  margin-top: 40px;
+}
+
+.world-map h2 {
+  text-align: center;
+  color: #FFFFFF;
+  margin-bottom: 20px;
+}
+
+.map-areas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.map-area {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #555;
+}
+
+.map-area:hover {
+  background-color: #444;
+}
+
+.map-area.current {
+  background-color: #ffd700;
+  color: #121212;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+/* 响应式设计 - 首页移动端优化 */
+@media (max-width: 768px) {
+  .location-header h1 {
+    font-size: 1.225rem;
+  }
+
+  .map-grid {
+    width: 300px;
+    height: 250px;
+    gap: 10px;
+  }
+
+  .interaction-buttons {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .interact-button {
+    width: auto;
+  }
+
+  .map-content {
+    width: 95%;
+  }
+}

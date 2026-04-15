@@ -1,0 +1,12 @@
+on(release){
+   if(_root.jineng._visible)
+   {
+      _root.jineng.closeme();
+   }
+   else
+   {
+      _root.CloseAll();
+      _root.huanshoumb.closeme();
+      _root.jineng.openme();
+   }
+}

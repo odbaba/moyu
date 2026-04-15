@@ -1,0 +1,1263 @@
+/**
+ * 战斗模块样式 (Battle Module Styles)
+ * 包含战斗系统的所有样式
+ */
+
+/* 战斗容器样式 */
+.battle-container {
+  background-color: rgba(30, 30, 30, 0.8);
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #ffd700;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 战斗标题样式 */
+.battle-header {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.battle-header h2 {
+  color: #ffd700;
+  font-size: 1.2rem;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  margin: 0;
+  padding: 0;
+}
+
+/* 敌人区域样式 */
+.enemy-section,
+.player-section {
+  padding: 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 8px;
+  border: 1px solid #555;
+}
+
+/* 九宫格容器样式 - 无间隙，固定高度 */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 0;
+  max-width: 420px;
+  width: 100%;
+  height: 33vh;
+  margin: 0 auto;
+  border: 2px solid #333;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* 单个格子样式 - 占满整个格子，无固定比例 */
+.grid-cell {
+  background-color: rgba(50, 50, 50, 0.8);
+  border: 1px solid #333;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+/* 有角色的格子样式 */
+.grid-cell.occupied {
+  border-color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* 角色占位样式 */
+.character-placeholder {
+  text-align: center;
+  padding: 10px;
+  width: 100%;
+}
+
+.character-name {
+  color: #ffd700;
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+.character-hp {
+  color: #4ecdc4;
+  font-size: 0.9rem;
+}
+
+/* 空位置样式 */
+.empty-placeholder {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* 战斗日志区域样式 */
+.battle-log-section {
+  padding: 10px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 8px;
+  border: 1px solid #555;
+  margin-top: 10px;
+}
+
+/* 战斗日志展开收起按钮 */
+.battle-log-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background-color: rgba(50, 50, 50, 0.8);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #444;
+}
+
+.battle-log-toggle:hover {
+  background-color: rgba(60, 60, 60, 0.9);
+  border-color: #ffd700;
+}
+
+.toggle-icon {
+  font-size: 1rem;
+  color: #ffd700;
+  transition: transform 0.3s ease;
+}
+
+.toggle-text {
+  font-size: 1rem;
+  color: #ffd700;
+  font-weight: bold;
+}
+
+/* 战斗日志容器样式 */
+.battle-log {
+  background-color: rgba(30, 30, 30, 0.9);
+  padding: 15px;
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #555;
+}
+
+/* 战斗日志条目样式 */
+.battle-log-entry {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background-color: rgba(50, 50, 50, 0.5);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  border-left: 3px solid #ffd700;
+  transition: all 0.2s ease;
+}
+
+/* 最后一条日志不需要底部间距 */
+.battle-log-entry:last-child {
+  margin-bottom: 0;
+}
+
+/* 日志条目悬停效果 */
+.battle-log-entry:hover {
+  background-color: rgba(60, 60, 60, 0.7);
+  border-left-color: #ffeb3b;
+}
+
+/* 奇偶条目交替颜色 */
+.battle-log-entry:nth-child(odd) {
+  background-color: rgba(55, 55, 55, 0.5);
+}
+
+.battle-log-entry:nth-child(odd):hover {
+  background-color: rgba(65, 65, 65, 0.7);
+}
+
+/* 回合数样式 */
+.log-round {
+  color: #888;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+/* 行动者样式 */
+.log-actor {
+  color: #ffd700;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+/* 行动样式 */
+.log-action {
+  color: #4ecdc4;
+  margin-right: 8px;
+}
+
+/* 目标样式 */
+.log-target {
+  color: #ff6b6b;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+/* 伤害通用样式 */
+.log-damage {
+  font-weight: bold;
+}
+
+/* 正伤害（造成伤害）样式 */
+.log-damage.damage-positive {
+  color: #ff4444;
+}
+
+/* 负伤害（治疗）样式 */
+.log-damage.damage-negative {
+  color: #4caf50;
+}
+
+/* 治疗样式 */
+.log-damage.damage-heal {
+  color: #4caf50;
+}
+
+/* 日志图标样式 */
+.log-icon {
+  font-size: 1.1rem;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* 技能名称样式 */
+.log-skill-name {
+  color: #9c27b0;
+  font-weight: 500;
+  margin-left: 6px;
+  font-size: 0.85rem;
+}
+
+/* 特殊事件容器样式 */
+.special-events {
+  margin-left: 8px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* 特殊事件标签通用样式 */
+.special-event {
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  animation: pulse 0.5s ease-in-out;
+}
+
+/* 闪避事件样式 - 灰色 */
+.dodge-event {
+  background-color: rgba(158, 158, 158, 0.3);
+  color: #9e9e9e;
+  border: 1px solid #9e9e9e;
+}
+
+/* 暴击事件样式 - 红色 */
+.critical-event {
+  background-color: rgba(244, 67, 54, 0.3);
+  color: #f44336;
+  border: 1px solid #f44336;
+}
+
+/* 破防事件样式 - 橙色 */
+.break-defense-event {
+  background-color: rgba(255, 152, 0, 0.3);
+  color: #ff9800;
+  border: 1px solid #ff9800;
+}
+
+/* 闪避日志样式 - 灰色背景 */
+.battle-log-entry.log-dodge {
+  background-color: rgba(158, 158, 158, 0.2);
+  border-left-color: #9e9e9e;
+}
+
+.battle-log-entry.log-dodge:hover {
+  background-color: rgba(158, 158, 158, 0.3);
+  border-left-color: #bdbdbd;
+}
+
+/* 暴击日志样式 - 红色高亮 */
+.battle-log-entry.log-critical {
+  background-color: rgba(244, 67, 54, 0.2);
+  border-left-color: #f44336;
+}
+
+.battle-log-entry.log-critical:hover {
+  background-color: rgba(244, 67, 54, 0.3);
+  border-left-color: #ef5350;
+}
+
+/* 增益日志样式 - 绿色背景 */
+.battle-log-entry.log-buff {
+  background-color: rgba(76, 175, 80, 0.2);
+  border-left-color: #4caf50;
+}
+
+.battle-log-entry.log-buff:hover {
+  background-color: rgba(76, 175, 80, 0.3);
+  border-left-color: #66bb6a;
+}
+
+/* 治疗日志样式 - 绿色背景 */
+.battle-log-entry.log-heal {
+  background-color: rgba(76, 175, 80, 0.15);
+  border-left-color: #4caf50;
+}
+
+.battle-log-entry.log-heal:hover {
+  background-color: rgba(76, 175, 80, 0.25);
+  border-left-color: #66bb6a;
+}
+
+/* 死亡日志样式 - 深色背景 */
+.battle-log-entry.log-death {
+  background-color: rgba(33, 33, 33, 0.5);
+  border-left-color: #616161;
+}
+
+.battle-log-entry.log-death:hover {
+  background-color: rgba(33, 33, 33, 0.7);
+  border-left-color: #757575;
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 战斗日志占位符样式 */
+.battle-log-placeholder {
+  background-color: rgba(50, 50, 50, 0.5);
+  padding: 20px;
+  border-radius: 4px;
+  text-align: center;
+  color: #888;
+  border: 2px dashed #555;
+}
+
+/* 角色卡片样式 - 完全占满九宫格格子 */
+.character-card {
+  background-color: rgba(40, 40, 40, 0.9);
+  border: 1px solid #ffd700;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.character-card:hover {
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+/* 角色卡片名称样式 - 极小化 */
+.character-card-name {
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 0.5rem;
+  text-align: center;
+  margin-bottom: 1px;
+  text-shadow: 0 0 3px rgba(255, 215, 0, 0.3);
+  line-height: 1.1;
+}
+
+/* 属性条容器样式 - 极紧凑 */
+.stat-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin-bottom: 1px;
+}
+
+/* 紧凑版属性条容器 - 占满宽度 */
+.stat-bar-container.compact {
+  margin-bottom: 0px;
+}
+
+/* 最后一个属性条不需要底部间距 */
+.stat-bar-container:last-child {
+  margin-bottom: 0;
+}
+
+/* 属性标签样式 - 极小化 */
+.stat-label {
+  font-weight: bold;
+  font-size: 0.45rem;
+  min-width: 10px;
+  text-align: center;
+}
+
+/* HP标签样式（红色） */
+.hp-label {
+  color: #ff6b6b;
+}
+
+/* MP标签样式（蓝色） */
+.mp-label {
+  color: #4ecdc4;
+}
+
+/* 属性条背景样式 - 加宽加高 */
+.stat-bar {
+  flex: 1;
+  height: 8px;
+  background-color: rgba(50, 50, 50, 0.8);
+  border-radius: 1px;
+  overflow: hidden;
+  border: 1px solid #555;
+  position: relative;
+}
+
+/* 紧凑版属性条 - 加宽加高 */
+.stat-bar.compact {
+  height: 10px;
+}
+
+/* HP条背景样式 */
+.hp-bar {
+  border-color: #551a1a;
+}
+
+/* MP条背景样式 */
+.mp-bar {
+  border-color: #1a4455;
+}
+
+/* 属性条填充样式 */
+.stat-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 1px;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* HP填充样式（红色） */
+.hp-fill {
+  background: linear-gradient(90deg, #ff4444 0%, #ff6b6b 50%, #ff4444 100%);
+  box-shadow: 0 0 3px rgba(255, 68, 68, 0.5);
+}
+
+/* MP填充样式（蓝色） */
+.mp-fill {
+  background: linear-gradient(90deg, #44aaff 0%, #4ecdc4 50%, #44aaff 100%);
+  box-shadow: 0 0 3px rgba(68, 170, 255, 0.5);
+}
+
+/* 属性数值样式 - 极小化 */
+.stat-value {
+  font-size: 0.45rem;
+  min-width: 20px;
+  text-align: right;
+  font-weight: 500;
+}
+
+/* 属性数值在长条上的样式 - 字体变大、纯白、不加粗、最细 */
+.stat-value-on-bar {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-size: 0.55rem;
+  font-weight: 100;
+  z-index: 10;
+  top: 50%;
+  transform: translateY(-50%);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+}
+
+/* HP数值样式（纯白色） */
+.hp-value {
+  color: #ffffff;
+}
+
+/* MP数值样式（纯白色） */
+.mp-value {
+  color: #ffffff;
+}
+
+/* ========== 战斗系统新增样式 ========== */
+
+/* 行动按钮容器 */
+.action-section {
+  padding: 8px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 8px;
+  border: 1px solid #555;
+  text-align: center;
+}
+
+.action-section h3 {
+  color: #ffd700;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  margin-top: 0;
+}
+
+/* 行动按钮容器 */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+/* 单个行动按钮 */
+.action-button {
+  background: linear-gradient(135deg, #444 0%, #333 100%);
+  color: #f0f0f0;
+  border: 2px solid #555;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  position: relative;  /* 为冷却遮罩层提供定位基准 */
+}
+
+/* 普通攻击按钮特殊样式 */
+.action-button.normal-attack {
+  border-color: #4ecdc4;
+}
+
+.action-button.normal-attack:hover:not(.disabled) {
+  border-color: #45b7aa;
+  box-shadow: 0 0 15px rgba(78, 205, 196, 0.4);
+  transform: translateY(-3px);
+}
+
+/* 技能按钮特殊样式 */
+.action-button.skill {
+  border-color: #ff6b6b;
+}
+
+.action-button.skill:hover:not(.disabled) {
+  border-color: #ff5252;
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+  transform: translateY(-3px);
+}
+
+/* 按钮悬停效果 */
+.action-button:hover:not(.disabled) {
+  background: linear-gradient(135deg, #555 0%, #444 100%);
+}
+
+/* 按钮按下效果 */
+.action-button:active:not(.disabled) {
+  transform: translateY(0);
+}
+
+/* 禁用状态 */
+.action-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #333 0%, #222 100%);
+}
+
+.action-button.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* 按钮头部容器（包含图标和名称） */
+.action-button-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* 技能图标样式 */
+.skill-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* 技能类型图标样式 */
+.skill-type-icon {
+  font-size: 0.7rem;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+/* 按钮名称 */
+.action-button-name {
+  font-weight: bold;
+  font-size: 0.8rem;
+  flex: 1;
+  text-align: center;
+}
+
+/* 技能类型标签 */
+.skill-type-label {
+  font-size: 0.6rem;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+}
+
+/* 技能等级标签 */
+.skill-level {
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 0.55rem;
+}
+
+/* 按钮消耗容器 */
+.action-button-cost {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  font-size: 0.65rem;
+  flex-wrap: wrap;
+}
+
+/* MP消耗样式 */
+.cost-mp {
+  color: #4ecdc4;
+  font-weight: 500;
+}
+
+/* 体力消耗样式 */
+.cost-stamina {
+  color: #ffa500;
+  font-weight: 500;
+}
+
+/* 按钮MP消耗（旧样式，保留兼容） */
+.action-button-mp {
+  font-size: 0.65rem;
+  color: #4ecdc4;
+}
+
+/* 冷却状态遮罩层 */
+.cooldown-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  z-index: 10;
+}
+
+/* 冷却文字 */
+.cooldown-text {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
+}
+
+/* 禁用原因提示 */
+.disable-reason {
+  font-size: 0.55rem;
+  color: #ff6b6b;
+  text-align: center;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+/* 目标选择提示 */
+.target-hint {
+  color: #ffd700;
+  font-size: 0.85rem;
+  font-weight: bold;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* 可选择的目标格子 */
+.grid-cell.selectable {
+  cursor: pointer;
+  border-color: #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  animation: targetGlow 1s ease-in-out infinite;
+}
+
+.grid-cell.selectable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+}
+
+/* 目标选择高亮动画 */
+@keyframes targetGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+  50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); }
+}
+
+/* 角色包装器（用于定位伤害数字） */
+.character-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* 伤害数字 */
+.damage-number {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ff4444;
+  text-shadow: 0 0 5px #000, 0 0 10px #000;
+  animation: damageFloat 1.5s ease-out forwards;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* 伤害数字上浮动画 */
+@keyframes damageFloat {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-50px) scale(1.5);
+  }
+}
+
+/* 攻击动画 */
+.grid-cell.attacking {
+  animation: attackShake 0.5s ease-in-out;
+}
+
+@keyframes attackShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-10px); }
+  80% { transform: translateX(10px); }
+}
+
+/* 战斗结果显示 */
+.battle-result {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-top: 10px;
+  animation: resultPulse 0.5s ease-in-out;
+}
+
+.battle-result.victory {
+  color: #4caf50;
+  text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.battle-result.defeat {
+  color: #ff4444;
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+@keyframes resultPulse {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 离开战斗按钮样式 */
+.leave-battle-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+  color: white;
+  border: 2px solid #cc4444;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.leave-battle-btn:hover {
+  background: linear-gradient(135deg, #ff5252, #e04848);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 82, 82, 0.4);
+}
+
+.leave-battle-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* 战斗触发按钮 */
+.start-battle-button {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff4444 100%);
+  color: #fff;
+  border: 2px solid #ff6b6b;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.start-battle-button:hover {
+  background: linear-gradient(135deg, #ff5252 0%, #ff3333 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+}
+
+.start-battle-button:active {
+  transform: translateY(0);
+}
+
+/* 响应式设计 - 优化战斗页面移动端显示 */
+@media (max-width: 768px) {
+  /* 战斗界面响应式优化 */
+  .battle-container {
+    padding: 10px 5px !important;
+    gap: 8px !important;
+  }
+
+  .battle-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .enemy-section,
+  .player-section {
+    padding: 6px;
+  }
+
+  /* 九宫格容器响应式 - 无间隙，固定高度33vh */
+  .grid-container {
+    max-width: 100%;
+    gap: 0 !important;
+    height: 33vh !important;
+  }
+
+  /* 单个格子响应式 - 占满整个格子，无固定比例 */
+  .grid-cell {
+    aspect-ratio: auto;
+    min-height: auto;
+    border-radius: 0;
+  }
+
+  .empty-placeholder {
+    font-size: 0.7rem;
+  }
+
+  /* 角色卡片响应式 */
+  .character-card {
+    padding: 4px 6px;
+    border-radius: 4px;
+    border-width: 1px;
+  }
+
+  .character-card-name {
+    font-size: 0.7rem;
+    margin-bottom: 3px;
+  }
+
+  .stat-bar-container {
+    gap: 3px;
+    margin-bottom: 2px;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    min-width: 16px;
+  }
+
+  .stat-bar {
+    height: 6px;
+    border-radius: 3px;
+  }
+
+  .stat-value {
+    font-size: 0.6rem;
+    min-width: 30px;
+  }
+
+  /* 行动按钮区域响应式 */
+  .action-section {
+    padding: 10px;
+  }
+
+  .action-section h3 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .action-buttons {
+    gap: 10px;
+  }
+
+  .action-button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    min-width: 100px;
+  }
+
+  .action-button-name {
+    font-size: 0.9rem;
+  }
+
+  .action-button-mp {
+    font-size: 0.7rem;
+  }
+
+  /* 技能按钮响应式样式 */
+  .action-button-header {
+    gap: 3px;
+  }
+
+  .skill-icon {
+    font-size: 0.9rem;
+  }
+
+  .skill-type-icon {
+    font-size: 0.65rem;
+  }
+
+  .skill-type-label {
+    font-size: 0.55rem;
+  }
+
+  .skill-level {
+    font-size: 0.5rem;
+  }
+
+  .action-button-cost {
+    font-size: 0.6rem;
+    gap: 4px;
+  }
+
+  .cooldown-text {
+    font-size: 0.8rem;
+  }
+
+  .disable-reason {
+    font-size: 0.5rem;
+  }
+
+  .target-hint {
+    font-size: 0.9rem;
+  }
+
+  /* 战斗日志区域响应式 */
+  .battle-log-section {
+    padding: 8px;
+    margin-top: 5px;
+  }
+
+  .battle-log-toggle {
+    padding: 8px;
+  }
+
+  .toggle-icon {
+    font-size: 0.9rem;
+  }
+
+  .toggle-text {
+    font-size: 0.9rem;
+  }
+
+  .battle-log {
+    max-height: 150px;
+    padding: 10px;
+    margin-top: 8px;
+  }
+
+  .battle-log-entry {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+  }
+
+  /* 战斗结果响应式 */
+  .battle-result {
+    font-size: 1.5rem;
+  }
+
+  /* 伤害数字响应式 */
+  .damage-number {
+    font-size: 1rem;
+    top: -15px;
+  }
+}
+
+/* ========== 角色卡片新增样式 ========== */
+
+/* 角色等级样式 */
+.character-card-level {
+  color: #4ecdc4;
+  font-size: 0.45rem;
+  text-align: center;
+  margin-bottom: 1px;
+  font-weight: bold;
+}
+
+/* 角色战斗力样式 */
+.character-card-combat-power {
+  color: #ff6b6b;
+  font-size: 0.45rem;
+  text-align: center;
+  margin-bottom: 1px;
+  font-weight: bold;
+}
+
+/* 角色攻击力范围样式 */
+.character-card-attack {
+  color: #ffd700;
+  font-size: 0.4rem;
+  text-align: center;
+  margin-bottom: 1px;
+}
+
+/* ========== 增益效果样式 ========== */
+
+/* 增益效果容器 */
+.buffs-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 2px;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+/* 单个增益效果图标 */
+.buff-icon {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 1px 3px;
+  border-radius: 3px;
+  font-size: 0.35rem;
+  font-weight: bold;
+  border: 1px solid;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* 增益图标符号 */
+.buff-icon-symbol {
+  font-size: 0.5rem;
+}
+
+/* 增益数值 */
+.buff-icon-value {
+  font-size: 0.35rem;
+}
+
+/* 战斗力增益 - 红色 */
+.buff-combat-power {
+  background-color: rgba(255, 68, 68, 0.2);
+  border-color: #ff4444;
+  color: #ff6b6b;
+}
+
+.buff-combat-power:hover {
+  background-color: rgba(255, 68, 68, 0.4);
+  box-shadow: 0 0 5px rgba(255, 68, 68, 0.5);
+}
+
+/* 攻击力增益 - 橙色 */
+.buff-attack {
+  background-color: rgba(255, 165, 0, 0.2);
+  border-color: #ffa500;
+  color: #ffb347;
+}
+
+.buff-attack:hover {
+  background-color: rgba(255, 165, 0, 0.4);
+  box-shadow: 0 0 5px rgba(255, 165, 0, 0.5);
+}
+
+/* 防御力增益 - 蓝色 */
+.buff-defense {
+  background-color: rgba(68, 170, 255, 0.2);
+  border-color: #44aaff;
+  color: #6bc5ff;
+}
+
+.buff-defense:hover {
+  background-color: rgba(68, 170, 255, 0.4);
+  box-shadow: 0 0 5px rgba(68, 170, 255, 0.5);
+}
+
+/* 速度增益 - 绿色 */
+.buff-speed {
+  background-color: rgba(76, 175, 80, 0.2);
+  border-color: #4caf50;
+  color: #66bb6a;
+}
+
+.buff-speed:hover {
+  background-color: rgba(76, 175, 80, 0.4);
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* 暴击增益 - 黄色 */
+.buff-critical {
+  background-color: rgba(255, 215, 0, 0.2);
+  border-color: #ffd700;
+  color: #ffeb3b;
+}
+
+.buff-critical:hover {
+  background-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+/* 闪避增益 - 紫色 */
+.buff-dodge {
+  background-color: rgba(156, 39, 176, 0.2);
+  border-color: #9c27b0;
+  color: #ba68c8;
+}
+
+.buff-dodge:hover {
+  background-color: rgba(156, 39, 176, 0.4);
+  box-shadow: 0 0 5px rgba(156, 39, 176, 0.5);
+}
+
+/* 默认增益 */
+.buff-default {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-color: #808080;
+  color: #a0a0a0;
+}
+
+.buff-default:hover {
+  background-color: rgba(128, 128, 128, 0.4);
+  box-shadow: 0 0 5px rgba(128, 128, 128, 0.5);
+}
+
+/* ========== 合体幻兽特殊样式 ========== */
+
+/* 合体幻兽卡片样式 - 金色发光边框 */
+.character-card.merged-pet {
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6),
+              0 0 30px rgba(255, 215, 0, 0.3),
+              inset 0 0 10px rgba(255, 215, 0, 0.1);
+  animation: mergedGlow 2s ease-in-out infinite;
+}
+
+/* 合体幻兽卡片悬停效果 */
+.character-card.merged-pet:hover {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
+              0 0 40px rgba(255, 215, 0, 0.4),
+              inset 0 0 15px rgba(255, 215, 0, 0.2);
+}
+
+/* 合体幻兽发光动画 */
+@keyframes mergedGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6),
+                0 0 30px rgba(255, 215, 0, 0.3),
+                inset 0 0 10px rgba(255, 215, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
+                0 0 40px rgba(255, 215, 0, 0.4),
+                inset 0 0 15px rgba(255, 215, 0, 0.2);
+  }
+}
+
+/* 角色名称容器 - 用于放置名称和合体标签 */
+.character-card-name-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 1px;
+}
+
+/* 合体标签样式 - 金色背景、白色文字 */
+.merged-tag {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+  color: #ffffff;
+  font-size: 0.4rem;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 3px;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  animation: tagPulse 1.5s ease-in-out infinite;
+}
+
+/* 合体标签脉冲动画 */
+@keyframes tagPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+  }
+}
+
+/* 响应式设计 - 合体幻兽标签移动端优化 */
+@media (max-width: 768px) {
+  .character-card.merged-pet {
+    border-width: 2px;
+  }
+  
+  .merged-tag {
+    font-size: 0.35rem;
+    padding: 1px 3px;
+  }
+  
+  .character-card-name-container {
+    gap: 3px;
+  }
+}

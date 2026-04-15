@@ -1,0 +1,81 @@
+游戏说明
+--- RECORDSEPARATOR ---
+　　本版本游戏时间已经取消
+--- RECORDSEPARATOR ---
+60
+--- RECORDSEPARATOR ---
+天的限制，改为完成任务后游
+--- RECORDSEPARATOR ---
+戏结束。
+--- RECORDSEPARATOR ---
+　　
+--- RECORDSEPARATOR ---
+升级
+--- RECORDSEPARATOR ---
+，可以打怪获得经验升给，也可以做任务获得经验升
+--- RECORDSEPARATOR ---
+级。
+--- RECORDSEPARATOR ---
+　　
+--- RECORDSEPARATOR ---
+军衔
+--- RECORDSEPARATOR ---
+，军衔可以增加战斗力。
+--- RECORDSEPARATOR ---
+军衔升级需要战功
+--- RECORDSEPARATOR ---
+。可以打
+--- RECORDSEPARATOR ---
+BOSS
+--- RECORDSEPARATOR ---
+获得战功，或做任务获得战功。
+--- RECORDSEPARATOR ---
+　　
+--- RECORDSEPARATOR ---
+爵位
+--- RECORDSEPARATOR ---
+，爵位可以增加战斗力，爵位也是地图占领挑战的要
+--- RECORDSEPARATOR ---
+求条件，爵位还是进入后花园的必要条件。进入后花园认识公
+--- RECORDSEPARATOR ---
+主，与公主
+--- RECORDSEPARATOR ---
+聊天
+--- RECORDSEPARATOR ---
+和
+--- RECORDSEPARATOR ---
+送礼
+--- RECORDSEPARATOR ---
+可以提高与公主友好度，当关系提高
+--- RECORDSEPARATOR ---
+后，公主还会送许多好东西给你呢。
+--- RECORDSEPARATOR ---
+爵位升级需要功勋
+--- RECORDSEPARATOR ---
+。可以
+--- RECORDSEPARATOR ---
+向国家捐献金币获得功勋，或做任务获得功勋。
+--- RECORDSEPARATOR ---
+　　
+--- RECORDSEPARATOR ---
+金币
+--- RECORDSEPARATOR ---
+，金币可以用于购买杂货商的物品。金币可以通过打
+--- RECORDSEPARATOR ---
+怪、挖矿和卖东西获得。
+--- RECORDSEPARATOR ---
+　　
+--- RECORDSEPARATOR ---
+魔石
+--- RECORDSEPARATOR ---
+，魔石是用于购买魔石商店物品的唯一货币，魔石是
+--- RECORDSEPARATOR ---
+非常昂贵的，可以通过
+--- RECORDSEPARATOR ---
+卖极品装备、金矿或稀有物品
+--- RECORDSEPARATOR ---
+给
+--- RECORDSEPARATOR ---
+收藏家
+--- RECORDSEPARATOR ---
+获得。部分任务也会有魔石奖励。

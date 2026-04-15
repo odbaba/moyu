@@ -1,0 +1,618 @@
+/**
+ * 收藏架交易模态窗口样式
+ * 移动端优先设计，确保一屏显示所有关键信息
+ */
+
+/* 模态窗口遮罩层 */
+.collector-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 3100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 模态窗口内容容器 */
+.collector-modal-content {
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 20px;
+  width: 95%;
+  max-width: 500px;
+  max-height: 90vh;
+  position: relative;
+  border: 2px solid #ffd700;
+  animation: slideIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 关闭按钮 */
+.collector-close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #f0f0f0;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+  z-index: 10;
+}
+
+.collector-close-modal:hover {
+  background-color: rgba(255, 215, 0, 0.2);
+}
+
+/* 标题 */
+.collector-modal-title {
+  color: #ffd700;
+  margin: 0 0 10px 0;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* 提示信息 */
+.collector-hint {
+  text-align: center;
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+  padding: 8px;
+  background-color: rgba(255, 215, 0, 0.1);
+  border-radius: 6px;
+}
+
+/* 收藏架格子网格（4列×3行） */
+.collector-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+/* 收藏架格子 */
+.collector-slot {
+  background-color: #2a2a2a;
+  border: 2px solid #444;
+  border-radius: 8px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 6px;
+}
+
+.collector-slot:hover {
+  border-color: #ffd700;
+  background-color: #333;
+}
+
+.collector-slot.filled {
+  border-color: #4caf50;
+  background-color: #1e3a1e;
+}
+
+/* 格子内容 */
+.collector-slot-content {
+  width: 100%;
+  text-align: center;
+  cursor: move;
+}
+
+.collector-slot-empty {
+  text-align: center;
+  color: #666;
+}
+
+.collector-empty-icon {
+  font-size: 2rem;
+  opacity: 0.3;
+}
+
+/* 物品图标 */
+.collector-item-icon {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+}
+
+/* 物品名称 */
+.collector-item-name {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #ffd700;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 物品价值 */
+.collector-item-value {
+  font-size: 0.75rem;
+  color: #4caf50;
+}
+
+/* 无价值标签 */
+.collector-item-no-value {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+/* 背包物品区域 */
+.collector-inventory-area {
+  flex: 1;
+  min-height: 120px;
+  max-height: 200px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 15px;
+  overflow-y: auto;
+  border: 2px dashed #444;
+  transition: border-color 0.3s ease;
+}
+
+.collector-inventory-area:hover {
+  border-color: #666;
+}
+
+/* 背包标题 */
+.collector-inventory-title {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* 背包物品网格 */
+.collector-inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+}
+
+/* 背包物品 */
+.collector-inventory-item {
+  background-color: #2a2a2a;
+  border: 2px solid #444;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+  cursor: move;
+  transition: all 0.3s ease;
+}
+
+.collector-inventory-item:hover {
+  border-color: #ffd700;
+  transform: translateY(-2px);
+}
+
+.collector-inventory-item.has-value {
+  border-color: #4caf50;
+}
+
+.collector-inventory-item.no-value {
+  opacity: 0.6;
+}
+
+/* 背包为空提示 */
+.collector-inventory-empty {
+  text-align: center;
+  color: #888;
+  padding: 20px;
+  font-size: 0.9rem;
+}
+
+/* 总价值显示区域 */
+.collector-total-area {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background-color: rgba(255, 215, 0, 0.1);
+  border-radius: 8px;
+  border: 1px solid #ffd700;
+}
+
+/* 总价值信息 */
+.collector-total-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.collector-total-label {
+  color: #aaa;
+  font-size: 0.95rem;
+}
+
+.collector-total-value {
+  color: #ffd700;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.collector-total-count {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+/* 出售按钮 */
+.collector-sell-button {
+  background-color: #ffd700;
+  color: #1a1a1a;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.collector-sell-button:hover:not(:disabled) {
+  background-color: #ffed4a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.collector-sell-button:disabled {
+  background-color: #555;
+  color: #999;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 消息提示 */
+.collector-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: #ffd700;
+  padding: 15px 30px;
+  border-radius: 8px;
+  border: 2px solid #ffd700;
+  font-size: 1rem;
+  font-weight: bold;
+  z-index: 20;
+  animation: fadeIn 0.3s ease;
+  text-align: center;
+  max-width: 80%;
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 滑入动画 */
+@keyframes slideIn {
+  from {
+    transform: scale(0.9) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 移动端响应式设计 */
+@media (max-width: 768px) {
+  .collector-modal-content {
+    width: 98%;
+    max-height: 95vh;
+    padding: 15px;
+  }
+
+  .collector-modal-title {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+  }
+
+  .collector-hint {
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+    padding: 6px;
+  }
+
+  .collector-slots-grid {
+    gap: 6px;
+    padding: 8px;
+    margin-bottom: 12px;
+  }
+
+  .collector-slot {
+    min-height: 70px;
+    padding: 4px;
+  }
+
+  .collector-item-icon {
+    font-size: 1.5rem;
+    margin-bottom: 2px;
+  }
+
+  .collector-item-name {
+    font-size: 0.75rem;
+  }
+
+  .collector-item-value {
+    font-size: 0.7rem;
+  }
+
+  .collector-inventory-area {
+    min-height: 100px;
+    max-height: 150px;
+    padding: 8px;
+    margin-bottom: 12px;
+  }
+
+  .collector-inventory-title {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+
+  .collector-inventory-grid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 6px;
+  }
+
+  .collector-inventory-item {
+    padding: 6px;
+  }
+
+  .collector-total-area {
+    padding: 10px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .collector-total-info {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .collector-sell-button {
+    width: 100%;
+    padding: 10px 20px;
+  }
+}
+
+/* 超小屏幕优化（如iPhone SE） */
+@media (max-width: 375px) {
+  .collector-modal-content {
+    padding: 12px;
+  }
+
+  .collector-modal-title {
+    font-size: 1.2rem;
+  }
+
+  .collector-hint {
+    font-size: 0.75rem;
+  }
+
+  .collector-slots-grid {
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .collector-slot {
+    min-height: 60px;
+    padding: 3px;
+  }
+
+  .collector-item-icon {
+    font-size: 1.3rem;
+  }
+
+  .collector-item-name {
+    font-size: 0.7rem;
+  }
+
+  .collector-item-value {
+    font-size: 0.65rem;
+  }
+
+  .collector-inventory-area {
+    min-height: 80px;
+    max-height: 120px;
+    padding: 6px;
+  }
+
+  .collector-inventory-grid {
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 4px;
+  }
+
+  .collector-inventory-item {
+    padding: 4px;
+  }
+
+  .collector-total-label {
+    font-size: 0.85rem;
+  }
+
+  .collector-total-value {
+    font-size: 1rem;
+  }
+
+  .collector-total-count {
+    font-size: 0.75rem;
+  }
+
+  .collector-sell-button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+/* 数量选择对话框样式 */
+.quantity-select-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3200;
+  border-radius: 12px;
+}
+
+.quantity-select-dialog {
+  background-color: #2a2a2a;
+  border: 2px solid #ffd700;
+  border-radius: 12px;
+  padding: 20px;
+  width: 90%;
+  max-width: 300px;
+  text-align: center;
+}
+
+.quantity-select-title {
+  color: #ffd700;
+  font-size: 1.1rem;
+  margin: 0 0 15px 0;
+}
+
+.quantity-select-item {
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  padding: 8px;
+  background-color: #1a1a1a;
+  border-radius: 6px;
+}
+
+.quantity-select-info {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+}
+
+.quantity-select-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.quantity-btn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #ffd700;
+  background-color: #1a1a1a;
+  color: #ffd700;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  background-color: #ffd700;
+  color: #1a1a1a;
+}
+
+.quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quantity-input {
+  width: 60px;
+  height: 40px;
+  text-align: center;
+  font-size: 1rem;
+  border: 2px solid #ffd700;
+  background-color: #1a1a1a;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0 5px;
+}
+
+.quantity-input::-webkit-inner-spin-button,
+.quantity-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.quantity-select-value {
+  color: #ffd700;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.quantity-select-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.quantity-confirm-btn,
+.quantity-cancel-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quantity-confirm-btn {
+  background-color: #ffd700;
+  color: #1a1a1a;
+}
+
+.quantity-confirm-btn:hover {
+  background-color: #ffed4a;
+  transform: translateY(-2px);
+}
+
+.quantity-cancel-btn {
+  background-color: #666;
+  color: #fff;
+}
+
+.quantity-cancel-btn:hover {
+  background-color: #888;
+  transform: translateY(-2px);
+}

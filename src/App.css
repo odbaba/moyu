@@ -1,0 +1,69 @@
+/**
+ * 全局公共样式 (Global Common Styles)
+ * 保留项目最基本的全局样式，所有页面特定样式已迁移到对应模块
+ */
+
+/* 全局样式 */
+:root {
+  font-family: 'Microsoft YaHei', 'SimSun', serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: #FFFFFF;
+  background-color: #252935;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #252935;
+  color: #FFFFFF;
+}
+
+/* 游戏容器 - 移除padding，使用100%宽度 */
+.game-container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #252935;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* 响应式设计 - 全局移动端优化 */
+@media (max-width: 768px) {
+  .game-container {
+    padding: 0;
+  }
+}

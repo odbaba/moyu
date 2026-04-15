@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la scripts/frame_*/)",
+      "Bash(grep \"DoAction.as$\")",
+      "Bash(find h5:*)"
+    ]
+  }
+}
