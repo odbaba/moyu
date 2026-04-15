@@ -73,14 +73,6 @@ import { getNobleRankSystemDescription, getTradeSystemMessage, claimNobleReward 
 import { getDailyTask, getTaskDescription } from './utils/dailyTaskUtils';
 import { checkChallengeRequirement, claimProtectorReward, getMapChallengeDescription, getMapChallengeConfig } from './utils/mapChallengeUtils';
 
-// 导入宝石合成工具函数
-import {
-  checkMaterials,
-  consumeMaterials,
-  createSynthesisResultItem,
-  GEM_SYNTHESIS_RECIPES
-} from './utils/gemSynthesisUtils';
-
 // 初始化空装备槽位
 const createEmptyEquippedItems = (): Record<EquipmentSlotType, EquipmentDetail | null> => ({
   weapon: null,
@@ -726,45 +718,6 @@ function App() {
         setShowLottery(true);
         setShowNPCModal(false); // 关闭NPC对话框
         setInteractionLog(prev => [...prev, '你被传送到了抽奖区！']);
-        break;
-      
-      // ========== 宝石合成师 NPC 功能 ==========
-      case 'synthesize':
-        // 宝石合成
-        if (actionParams?.item) {
-          const targetItemName = actionParams.item as string;
-          const recipe = GEM_SYNTHESIS_RECIPES[targetItemName];
-          
-          if (recipe) {
-            // 检查材料是否足够
-            const { hasEnough, missingMaterials } = checkMaterials(inventory, recipe.materials);
-            
-            if (hasEnough) {
-              // 消耗材料
-              const newInventory = consumeMaterials(inventory, recipe.materials);
-              
-              // 创建合成结果物品
-              const resultItem = createSynthesisResultItem(recipe);
-              
-              // 添加合成结果到背包
-              newInventory.push(resultItem);
-              
-              // 更新背包
-              setInventory(newInventory);
-              
-              // 显示成功消息
-              setInteractionLog(prev => [...prev, `成功合成了 ${targetItemName}！`]);
-            } else {
-              // 材料不足，显示缺少的材料
-              const missingList = Object.entries(missingMaterials)
-                .map(([name, count]) => `${name} ×${count}`)
-                .join('、');
-              setInteractionLog(prev => [...prev, `材料不足！缺少：${missingList}`]);
-            }
-          } else {
-            setInteractionLog(prev => [...prev, `未找到 ${targetItemName} 的合成配方。`]);
-          }
-        }
         break;
       
       // ========== 默认处理 ==========

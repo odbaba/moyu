@@ -28,6 +28,27 @@ const ItemGrid: React.FC<ItemGridProps> = ({
   items,
   onItemClick
 }) => {
+  /**
+   * 渲染单个物品条目
+   * 装备类物品显示图片，其他物品显示emoji图标
+   */
+  const renderItemSlot = (item: InventoryItem) => {
+    // 判断是否为装备类型
+    const isEquipment = isEquipmentItem(item);
+    const equipmentItem = isEquipment ? item as EquipmentItem : null;
+    
+    return (
+      <ItemSlotWithImage
+        key={item.id}
+        item={item}
+        isEquipment={isEquipment}
+        equipmentItem={equipmentItem}
+        rarityClassName={getRarityClassName(item.rarity || 'common')}
+        onItemClick={onItemClick}
+      />
+    );
+  };
+
   if (items.length === 0) {
     return (
       <div className="inventory-empty">
@@ -39,22 +60,7 @@ const ItemGrid: React.FC<ItemGridProps> = ({
 
   return (
     <div className="inventory-list">
-      {items.map((item, index) => {
-        // 判断是否为装备类型
-        const isEquipment = isEquipmentItem(item);
-        const equipmentItem = isEquipment ? item as EquipmentItem : null;
-        
-        return (
-          <ItemSlotWithImage
-            key={`${item.id}_${index}`}
-            item={item}
-            isEquipment={isEquipment}
-            equipmentItem={equipmentItem}
-            rarityClassName={getRarityClassName(item.rarity || 'common')}
-            onItemClick={onItemClick}
-          />
-        );
-      })}
+      {items.map(renderItemSlot)}
     </div>
   );
 };
