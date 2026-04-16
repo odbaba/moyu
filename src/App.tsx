@@ -31,7 +31,7 @@ import UseItemTargetModal from './components/inventory/UseItemTargetModal';
 // 导入组件 - 抽奖模块
 import { LotteryArea } from './components/lottery';
 // 导入组件 - 幻兽模块
-import { PetPage } from './components/pet';
+import { PetInstituteModal, PetPage } from './components/pet';
 // 导入组件 - 商店模块
 import { ShopPage } from './components/shop';
 // 导入组件 - 技能模块
@@ -45,21 +45,29 @@ import { exampleItems } from './data/inventoryData';
 import { examplePets } from './data/petData';
 import { getShopItemById } from './data/shopData';
 import { createInitialSkills, getSkillUpgradeCost } from './data/skillData';
-import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, NPCInteractable, Pet, PlayerResources, PrincessRelationship, RefineResult, SkillDetail, TimeSystem } from './types';
+import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, NPCInteractable, Pet, PetInstituteState, PlayerResources, PrincessRelationship, RefineResult, SkillDetail, TimeSystem } from './types';
 import { calculateCharacterBaseAttributes, calculateNextLevelMaxExp } from './utils/attributeCalculator';
 // 导入 BOSS 工具函数
 import { rollBossSpawns } from './utils/bossUtils';
 import { calculatePetMergeBonus } from './utils/combatPower';
 import { getDailyTask, getTaskDescription } from './utils/dailyTaskUtils';
 import { equipmentDetailToItem, equipmentItemToDetail } from './utils/equipmentConverter';
+// 导入宝石合成工具函数
+import { consumeMaterials, getRecipeById, performSynthesis } from './utils/gemSynthesisUtils';
 // 导入战利品工具函数
 import { calculateLoot, mergeLootResults } from './utils/lootUtils';
 import { checkChallengeRequirement, claimProtectorReward, getMapChallengeConfig, getMapChallengeDescription } from './utils/mapChallengeUtils';
-import { claimMilitaryPay, getMilitaryRankDescription, queryBattleExp, queryMilitaryIntel } from './utils/militaryRankUtils';
-import { claimNobleReward, getNobleRankSystemDescription, getTradeSystemMessage } from './utils/nobleRankUtils';
+import { claimMilitaryPay, getMilitaryRankDescription, queryBattleExp, queryMilitaryIntel, formatMilitaryIntel } from './utils/militaryRankUtils';
+import { claimNobleReward, getNobleRankSystemDescription, getTradeSystemMessage, donateGoldForMerit, getNobleRankName, getNextNobleRankMerit } from './utils/nobleRankUtils';
 import { findPath } from './utils/pathfinding';
 // 导入 NPC 相关工具函数
 import { getDemonArmyDialogue, performChat, performGift, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
+// 导入幻兽研究所工具函数
+import {
+  createInitialPetInstituteState,
+  getInstituteInfo,
+  consumeItemFromInventory,
+} from './utils/petInstituteUtils';
 
 // 初始化空装备槽位
 const createEmptyEquippedItems = (): Record<EquipmentSlotType, EquipmentDetail | null> => ({
@@ -154,13 +162,18 @@ function App() {
   });
 
   // 军衔和战功状态
-  const [militaryRank] = useState(0); // 军衔等级（0-11）
-  const [battleExp] = useState(0); // 累计战功
+  // 注意：setMilitaryRank和setBattleExp将在战斗结束后使用
+  const [militaryRank, _setMilitaryRank] = useState(0); // 军衔等级（0-11）
+  const [battleExp, _setBattleExp] = useState(0); // 累计战功
   const [hasClaimedMilitaryPay, setHasClaimedMilitaryPay] = useState(false); // 本周是否已领取军饷
 
   // 爵位和功勋状态
-  const [nobleRank] = useState(0); // 爵位等级（0-6）
-  const [lastNobleRewardClaimTime, setLastNobleRewardClaimTime] = useState<number | null>(null); // 上次领取爵位奖励的时间
+  const [nobleRank, setNobleRank] = useState(0); // 爵位等级（0-6）
+  const [lastNobleRewardClaimTime, setLastNobleRewardClaimTime] = useState<number | null>( null); // 上次领取爵位奖励的时间
+
+  // 国王消息系统状态
+  // 注意：setIsKingRescued将在救出国王的任务中使用
+  const [isKingRescued, _setIsKingRescued] = useState(false); // 国王是否已救出
 
   // 商店页面状态
   const [showShopPage, setShowShopPage] = useState(false);
@@ -176,6 +189,10 @@ function App() {
 
   // 抽奖区界面状态
   const [showLottery, setShowLottery] = useState(false);
+
+  // 幻兽研究所状态
+  const [petInstituteState, setPetInstituteState] = useState<PetInstituteState>(createInitialPetInstituteState());
+  const [showPetInstituteModal, setShowPetInstituteModal] = useState(false);
 
   // 自动移动状态
   const [isAutoMoving, setIsAutoMoving] = useState(false);
@@ -549,10 +566,19 @@ function App() {
 
       case 'queryBossInfo':
         // 查询军情（BOSS位置）
-        const intelList = queryMilitaryIntel();
-        const intelMessage = intelList.map(boss =>
-          `【${boss.bossName}】\n位置：${boss.locationName}\n等级：${boss.level}\n战功奖励：${boss.battleExpReward}`
-        ).join('\n\n');
+        // 根据已刷新的BOSS构建状态映射
+        const bossStatus: Record<string, boolean> = {};
+        spawnedBosses.forEach(bossId => {
+          // 从BOSS ID中提取等级信息（例如：'boss-10-leiming-dalu' -> 'boss10'）
+          const match = bossId.match(/boss-(\d+)/);
+          if (match) {
+            bossStatus[`boss${match[1]}`] = true;
+          }
+        });
+
+        // 查询军情
+        const intelList = queryMilitaryIntel(bossStatus);
+        const intelMessage = formatMilitaryIntel(intelList);
         setInteractionLog(prev => [...prev, intelMessage]);
         break;
 
@@ -576,6 +602,47 @@ function App() {
         break;
 
       // ========== 首相 NPC 功能 ==========
+      case 'donateGold':
+        // 捐献金币获得功勋
+        // TODO: 这里需要实现一个捐献界面，暂时使用固定金额测试
+        const donateAmount = actionParams?.exchangeRate ? actionParams.exchangeRate as number : 750000;
+        const donateResult = donateGoldForMerit(playerResources.gold, donateAmount, playerResources.merit, nobleRank);
+
+        if (donateResult.success) {
+          // 更新金币和功勋
+          setPlayerResources(prev => ({
+            ...prev,
+            gold: prev.gold - donateResult.donatedGold,
+            merit: donateResult.newMerit,
+          }));
+          // 更新爵位
+          if (donateResult.promoted) {
+            setNobleRank(donateResult.newNobleRank);
+          }
+          setInteractionLog(prev => [...prev, donateResult.message]);
+        } else {
+          setInteractionLog(prev => [...prev, donateResult.message]);
+        }
+        break;
+
+      case 'queryMerit':
+        // 查询功勋
+        const meritMessage = `当前爵位：${getNobleRankName(nobleRank)}\n当前功勋：${playerResources.merit}\n${
+          nobleRank < 6
+            ? `下一级爵位：${getNobleRankName(nobleRank + 1)}\n所需功勋：${getNextNobleRankMerit(nobleRank)}`
+            : '已达到最高爵位！'
+        }`;
+        setInteractionLog(prev => [...prev, meritMessage]);
+        break;
+
+      case 'queryKingStatus':
+        // 查询国王消息
+        const kingMessage = isKingRescued
+          ? '感谢勇士们，我们的国王终于回来了。\n我们的国王智勇双全，看看他有什么对付魔族大军的策略吧。'
+          : '人类的国王被前来偷袭的魔族大军先锋部队俘虏了，亚特兰蒂斯大陆已处于群龙无首的地步...\n每一个亚特兰蒂斯的人类都肩负拯救人类的使命。';
+        setInteractionLog(prev => [...prev, kingMessage]);
+        break;
+
       case 'openTrade':
         // 打开交易界面
         const tradeMessage = getTradeSystemMessage();
@@ -704,6 +771,78 @@ function App() {
         setShowLottery(true);
         setShowNPCModal(false); // 关闭NPC对话框
         setInteractionLog(prev => [...prev, '你被传送到了抽奖区！']);
+        break;
+
+      // ========== 宝石合成师 NPC 功能 ==========
+      case 'synthesize':
+        // 宝石合成
+        if (actionParams?.recipeId) {
+          const recipeId = actionParams.recipeId as string;
+          const recipe = getRecipeById(recipeId);
+
+          if (recipe) {
+            // 执行合成
+            const synthesisResult = performSynthesis(inventory, recipeId);
+
+            if (synthesisResult.success && synthesisResult.resultItem) {
+              // 消耗材料
+              let newInventory = consumeMaterials(inventory, recipe.materials);
+
+              // 检查背包中是否已有相同ID的物品（堆叠处理）
+              const existingItemIndex = newInventory.findIndex(
+                item => item.id === synthesisResult.resultItem!.id
+              );
+
+              if (existingItemIndex !== -1) {
+                // 已有相同物品，增加数量
+                newInventory[existingItemIndex] = {
+                  ...newInventory[existingItemIndex],
+                  quantity: newInventory[existingItemIndex].quantity + synthesisResult.resultItem.quantity,
+                };
+              } else {
+                // 没有相同物品，添加新物品
+                newInventory.push(synthesisResult.resultItem);
+              }
+
+              // 更新背包
+              setInventory(newInventory);
+              setInteractionLog(prev => [...prev, synthesisResult.message]);
+            } else {
+              setInteractionLog(prev => [...prev, synthesisResult.message]);
+            }
+          } else {
+            setInteractionLog(prev => [...prev, `未知的合成配方：${recipeId}`]);
+          }
+        } else {
+          setInteractionLog(prev => [...prev, '合成参数错误']);
+        }
+        break;
+
+      // ========== 幻兽研究所 NPC 功能 ==========
+      case 'openPetInstitute':
+        // 打开幻兽研究所界面
+        setShowPetInstituteModal(true);
+        setShowNPCModal(false);
+        break;
+
+      case 'viewInstituteInfo':
+        // 查看研究所信息
+        setInteractionLog(prev => [...prev, getInstituteInfo(petInstituteState)]);
+        break;
+
+      case 'improveProduction':
+        // 提高产量任务（周日开放）
+        if (petInstituteState.canDoProductionTask) {
+          setShowPetInstituteModal(true);
+          setShowNPCModal(false);
+        } else {
+          setInteractionLog(prev => [...prev, '提高产量任务仅在周日开放！']);
+        }
+        break;
+
+      case 'viewOlympicInfo':
+        // 查看奥运使者信息
+        setInteractionLog(prev => [...prev, '完成2008奥运任务后，幻兽研究所技术等级上限可提升至150级。']);
         break;
 
       // ========== 默认处理 ==========
@@ -1861,6 +2000,48 @@ function App() {
             onShowCharacter={() => setShowCharacterPage(true)}
             onShowInventory={() => setShowInventoryPage(true)}
             onShowSkill={() => setShowSkillPage(true)}
+          />
+
+          {/* 幻兽研究所界面 */}
+          <PetInstituteModal
+            isVisible={showPetInstituteModal}
+            state={petInstituteState}
+            resources={playerResources}
+            inventory={inventory}
+            onClose={() => setShowPetInstituteModal(false)}
+            onBuyPet={(pet, price) => {
+              // 添加幻兽
+              setPets(prev => [...prev, pet]);
+              // 扣除魔石
+              setPlayerResources(prev => ({
+                ...prev,
+                magicStone: prev.magicStone - price
+              }));
+              // 减少库存
+              setPetInstituteState(prev => ({
+                ...prev,
+                stock: prev.stock - 1
+              }));
+              setInteractionLog(prev => [...prev, `成功购买奇异兽！品质分：${pet.pz}，花费：${price} 魔石`]);
+            }}
+            onImproveProduction={(expGained, vipGained, consumedSoulKings) => {
+              // 消耗灵魂王
+              const newInventory = consumeItemFromInventory(inventory, '灵魂王', consumedSoulKings);
+              setInventory(newInventory);
+              // 增加经验
+              setCharacter(prev => ({
+                ...prev,
+                exp: prev.exp + expGained
+              }));
+              // 增加VIP等级
+              setPetInstituteState(prev => ({
+                ...prev,
+                productionRate: Math.min(prev.productionRate + 1, 6),
+                vipLevel: Math.min(prev.vipLevel + vipGained, 10),
+                canDoProductionTask: false
+              }));
+              setInteractionLog(prev => [...prev, `完成提高产量任务！获得经验 ${expGained}，VIP星级 +${vipGained}`]);
+            }}
           />
         </>
       )}

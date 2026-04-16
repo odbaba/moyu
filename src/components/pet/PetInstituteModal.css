@@ -1,0 +1,207 @@
+/* 幻兽研究所界面样式 */
+
+.pet-institute-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.pet-institute-modal {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 2px solid #4a90d9;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  color: #fff;
+}
+
+.pet-institute-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #4a90d9;
+}
+
+.pet-institute-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #4a90d9;
+}
+
+.close-button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.close-button:hover {
+  color: #ff6b6b;
+}
+
+.pet-institute-content {
+  padding: 15px;
+}
+
+/* 研究所信息 */
+.institute-info-section {
+  margin-bottom: 20px;
+}
+
+.institute-info-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: #4a90d9;
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.info-label {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* 奇异兽信息 */
+.pet-info-section {
+  margin-bottom: 20px;
+}
+
+.pet-info-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: #4a90d9;
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
+}
+
+.pet-quality-info {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(74, 144, 217, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.quality-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.quality-label {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.quality-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.quality-value.price {
+  color: #ffd700;
+}
+
+/* 操作按钮 */
+.action-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.action-button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.buy-button {
+  background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+  color: #fff;
+}
+
+.buy-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5ba0e9 0%, #4589cc 100%);
+}
+
+.production-button {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+  color: #fff;
+}
+
+.production-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #34c759 0%, #28a745 100%);
+}
+
+.action-button:disabled {
+  background: #333;
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* 任务提示 */
+.task-hint {
+  background: rgba(40, 167, 69, 0.2);
+  border: 1px solid #28a745;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.task-hint p {
+  margin: 5px 0;
+  font-size: 0.85rem;
+  color: #28a745;
+}
+
+/* 消息提示 */
+.message-section {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.message-section p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #fff;
+}

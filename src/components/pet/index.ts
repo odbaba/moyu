@@ -14,3 +14,7 @@ export { default as PetListItem } from './PetListItem';
 
 // 导出幻兽详情弹窗组件
 export { default as PetDetailModal } from './PetDetailModal';
+
+// 导出幻兽研究所界面组件
+export { default as PetInstituteModal } from './PetInstituteModal';
+export type { PetInstituteModalProps } from './PetInstituteModal';

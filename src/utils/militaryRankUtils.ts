@@ -321,20 +321,39 @@ export const BOSS_LOCATIONS: BossLocationInfo[] = [
 /**
  * 查询军情（BOSS 位置信息）
  * 显示各等级 BOSS 的位置和战功奖励
+ * 参考文档：reference/docs/元帅与首相交互逻辑文档.md
+ * @param bossStatus BOSS状态映射表（key为BOSS等级，value为是否出现）
  * @returns BOSS 位置信息列表
  */
-export function queryMilitaryIntel(): BossLocationInfo[] {
-  return BOSS_LOCATIONS;
+export function queryMilitaryIntel(bossStatus?: Record<string, boolean>): BossLocationInfo[] {
+  // 如果没有提供BOSS状态，返回所有BOSS信息
+  if (!bossStatus) {
+    return BOSS_LOCATIONS;
+  }
+
+  // 根据BOSS状态过滤
+  return BOSS_LOCATIONS.filter(boss => {
+    const bossKey = `boss${boss.level}`;
+    return bossStatus[bossKey] === true;
+  });
 }
 
 /**
  * 格式化军情信息为文本
+ * 参考文档：reference/docs/元帅与首相交互逻辑文档.md
  * @param bossLocations BOSS 位置信息列表
  * @returns 格式化的文本
  */
 export function formatMilitaryIntel(bossLocations: BossLocationInfo[]): string {
   let text = '=== 军情查询 ===\n\n';
-  text += '各等级BOSS位置信息：\n\n';
+  
+  if (bossLocations.length === 0) {
+    text += '目前没有BOSS活动的情报。\n';
+    text += '提示：BOSS会在特定时间刷新，请稍后再来查询。';
+    return text;
+  }
+
+  text += '国家情报机关收集了部分BOSS的行踪：\n\n';
 
   bossLocations.forEach(boss => {
     text += `【${boss.bossName}】\n`;
@@ -429,4 +448,69 @@ export function calculateBattleExp(enemyType: 'boss' | 'ice_giant'): number {
     default:
       return 0;
   }
+}
+
+// ========== 战功获取和晋升逻辑 ==========
+
+/**
+ * 战功获取结果接口
+ */
+export interface BattleExpGainResult {
+  success: boolean; // 是否成功
+  message: string; // 结果消息
+  newBattleExp: number; // 新的战功值
+  newMilitaryRank: number; // 新的军衔等级
+  promoted: boolean; // 是否晋升
+  promotedRankName?: string; // 晋升后的军衔名称
+}
+
+/**
+ * 增加战功并自动晋升军衔
+ * 参考文档：reference/docs/元帅与首相交互逻辑文档.md
+ * @param currentBattleExp 当前战功
+ * @param currentMilitaryRank 当前军衔等级
+ * @param gainBattleExp 获得的战功
+ * @returns 战功获取结果
+ */
+export function gainBattleExpAndPromote(
+  currentBattleExp: number,
+  currentMilitaryRank: number,
+  gainBattleExp: number
+): BattleExpGainResult {
+  // 增加战功
+  const newBattleExp = currentBattleExp + gainBattleExp;
+
+  // 计算新的军衔等级
+  let newMilitaryRank = currentMilitaryRank;
+  let promoted = false;
+  let promotedRankName: string | undefined;
+
+  // 自动晋升逻辑：根据战功判断军衔等级
+  for (let i = MILITARY_RANKS.length - 1; i >= 0; i--) {
+    if (newBattleExp >= MILITARY_RANKS[i].requiredBattleExp) {
+      newMilitaryRank = MILITARY_RANKS[i].level;
+      break;
+    }
+  }
+
+  // 判断是否晋升
+  if (newMilitaryRank > currentMilitaryRank) {
+    promoted = true;
+    promotedRankName = getMilitaryRankName(newMilitaryRank);
+  }
+
+  // 构建消息
+  let message = `获得 ${gainBattleExp.toLocaleString()} 点战功！`;
+  if (promoted && promotedRankName) {
+    message += `\n恭喜你荣升 ${promotedRankName}！`;
+  }
+
+  return {
+    success: true,
+    message,
+    newBattleExp,
+    newMilitaryRank,
+    promoted,
+    promotedRankName,
+  };
 }

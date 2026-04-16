@@ -659,6 +659,19 @@ export interface Pet {
   hun?: number; // 升级经验递增变量
 }
 
+/**
+ * 幻兽研究所状态接口
+ * 定义幻兽研究所的技术等级、生产量、VIP等级等状态
+ */
+export interface PetInstituteState {
+  techLevel: number;            // 技术等级 (10-120/150)
+  techLevelMax: number;         // 技术等级上限 (120/150)
+  productionRate: number;       // 每日生产量 (0-6)
+  stock: number;                // 当前库存
+  vipLevel: number;             // VIP星级 (0-10)
+  canDoProductionTask: boolean; // 是否可做提高产量任务（周日开启）
+}
+
 // ========== 战斗系统类型定义 ==========
 
 /**

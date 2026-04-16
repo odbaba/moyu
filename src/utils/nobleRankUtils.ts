@@ -361,6 +361,127 @@ export function getAllLocationAccessStatus(nobleRank: number): Array<{
   }));
 }
 
+// ========== 功勋获取和晋升逻辑 ==========
+
+/**
+ * 功勋获取结果接口
+ */
+export interface MeritGainResult {
+  success: boolean; // 是否成功
+  message: string; // 结果消息
+  newMerit: number; // 新的功勋值
+  newNobleRank: number; // 新的爵位等级
+  promoted: boolean; // 是否晋升
+  promotedRankName?: string; // 晋升后的爵位名称
+}
+
+/**
+ * 增加功勋并自动晋升爵位
+ * 参考文档：reference/docs/元帅与首相交互逻辑文档.md
+ * @param currentMerit 当前功勋
+ * @param currentNobleRank 当前爵位等级
+ * @param gainMerit 获得的功勋
+ * @returns 功勋获取结果
+ */
+export function gainMeritAndPromote(
+  currentMerit: number,
+  currentNobleRank: number,
+  gainMerit: number
+): MeritGainResult {
+  // 增加功勋
+  const newMerit = currentMerit + gainMerit;
+
+  // 计算新的爵位等级
+  let newNobleRank = currentNobleRank;
+  let promoted = false;
+  let promotedRankName: string | undefined;
+
+  // 自动晋升逻辑：根据功勋判断爵位等级
+  for (let i = NOBLE_RANKS.length - 1; i >= 0; i--) {
+    if (newMerit >= NOBLE_RANKS[i].requiredMerit) {
+      newNobleRank = NOBLE_RANKS[i].level;
+      break;
+    }
+  }
+
+  // 判断是否晋升
+  if (newNobleRank > currentNobleRank) {
+    promoted = true;
+    promotedRankName = getNobleRankName(newNobleRank);
+  }
+
+  // 构建消息
+  let message = `获得 ${gainMerit.toLocaleString()} 点功勋！`;
+  if (promoted && promotedRankName) {
+    message += `\n恭喜你被授予 ${promotedRankName}！`;
+  }
+
+  return {
+    success: true,
+    message,
+    newMerit,
+    newNobleRank,
+    promoted,
+    promotedRankName,
+  };
+}
+
+/**
+ * 捐献金币获得功勋
+ * 参考文档：reference/docs/元帅与首相交互逻辑文档.md
+ * 每750,000金币 = 1功勋
+ * @param currentGold 当前金币
+ * @param donateAmount 捐献金额
+ * @param currentMerit 当前功勋
+ * @param currentNobleRank 当前爵位等级
+ * @returns 捐献结果
+ */
+export function donateGoldForMerit(
+  currentGold: number,
+  donateAmount: number,
+  currentMerit: number,
+  currentNobleRank: number
+): MeritGainResult & { donatedGold: number } {
+  // 检查金币是否足够
+  if (currentGold < donateAmount) {
+    return {
+      success: false,
+      message: '金币不足！',
+      newMerit: currentMerit,
+      newNobleRank: currentNobleRank,
+      promoted: false,
+      donatedGold: 0,
+    };
+  }
+
+  // 计算获得的功勋（每750,000金币 = 1功勋）
+  const EXCHANGE_RATE = 750000;
+  const gainedMerit = Math.floor(donateAmount / EXCHANGE_RATE);
+
+  if (gainedMerit <= 0) {
+    return {
+      success: false,
+      message: '捐献金额不足，至少需要750,000金币才能获得1点功勋！',
+      newMerit: currentMerit,
+      newNobleRank: currentNobleRank,
+      promoted: false,
+      donatedGold: 0,
+    };
+  }
+
+  // 实际消耗的金币
+  const donatedGold = gainedMerit * EXCHANGE_RATE;
+
+  // 调用功勋获取函数
+  const meritResult = gainMeritAndPromote(currentMerit, currentNobleRank, gainedMerit);
+
+  return {
+    ...meritResult,
+    donatedGold,
+    message: `捐献 ${donatedGold.toLocaleString()} 金币，获得 ${gainedMerit} 点功勋！\n${meritResult.promoted ? meritResult.message.split('\n')[1] : ''}`,
+  };
+}
+
 // ========== 导出所有功能 ==========
 
 export {

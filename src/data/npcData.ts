@@ -166,29 +166,42 @@ const npc_marshal: NPCInteractable = {
 
 /**
  * 首相 NPC 配置
- * 功能：提供爵位系统、交易系统功能
+ * 功能：提供爵位系统、捐献金币、功勋查询、国王消息功能
  * 位置：皇宫
+ * 参考文档：reference/docs/元帅与首相交互逻辑文档.md
  */
 const npc_prime_minister: NPCInteractable = {
   id: 'npc_prime_minister',
   type: 'npc',
   name: '首相',
   icon: '🎩',
-  description: '亚特大陆的首相，负责爵位晋升和交易系统。',
+  description: '亚特大陆的首相，负责爵位晋升和功勋管理。',
   location: 'huanggong',
   npcType: 'palace',
   options: [
+    {
+      text: '捐献金币',
+      result: '捐献金币获得功勋（每750,000金币 = 1功勋）。',
+      actionType: 'donateGold',
+      actionParams: { exchangeRate: 750000 },
+    },
+    {
+      text: '功勋查询',
+      result: '查看当前功勋和晋升需求。',
+      actionType: 'queryMerit',
+      actionParams: {},
+    },
+    {
+      text: '关于国王的消息',
+      result: '查看国王的最新消息。',
+      actionType: 'queryKingStatus',
+      actionParams: {},
+    },
     {
       text: '关于爵位',
       result: '查看爵位系统说明。\n\n爵位等级：平民、勋爵、子爵、伯爵、公爵、侯爵、王\n\n爵位可以通过积累功勋来提升。',
       actionType: 'showHelp',
       actionParams: { topic: 'nobleRank' },
-    },
-    {
-      text: '交易',
-      result: '打开交易界面。',
-      actionType: 'openTrade',
-      actionParams: {},
     },
     {
       text: '领取奖励',
@@ -725,45 +738,50 @@ const npc_lottery: NPCInteractable = {
  * 宝石合成师 NPC 配置
  * 功能：提供宝石合成功能
  * 位置：树心城（使用雷鸣大陆作为位置）
+ * 参考文档：reference/docs/宝石合成师交互逻辑文档.md
  */
 const npc_gem_synthesizer: NPCInteractable = {
   id: 'npc_gem_synthesizer',
   type: 'npc',
   name: '宝石合成师',
   icon: '💎',
-  description: '精通宝石合成的工匠，可以将低级宝石合成为高级宝石。',
+  description: '精通宝石合成的工匠，可以将低级宝石合成为高级宝石。合成成功率100%！',
   location: 'leiming-dalu',
-  npcType: 'shop',
+  npcType: 'function',
   options: [
     {
-      text: '合成魔魂之心',
-      result: '使用5个魔魂晶石合成魔魂之心。',
-      actionType: 'synthesize',
-      actionParams: { item: '魔魂之心', materials: { '魔魂晶石': 5 } },
+      text: '查看合成配方',
+      result: '我可以帮你合成魔魂之心、幻魔之心、灵魂王、高级经验石、高级战斗力石。\n\n魔魂之心：需要5个魔魂晶石。\n幻魔之心：需要5个幻魔晶石。\n灵魂王：需要20个灵魂晶石。\n高级经验石：需要10个中级经验石。\n高级战斗力石：需要10个中级战斗力石。\n\n合成成功率均为100%！',
     },
     {
-      text: '合成幻魔之心',
-      result: '使用5个幻魔晶石合成幻魔之心。',
+      text: '合成魔魂之心（需5个魔魂晶石）',
+      result: '使用5个魔魂晶石合成魔魂之心，提升装备魔魂等级（+9前100%成功）。',
       actionType: 'synthesize',
-      actionParams: { item: '幻魔之心', materials: { '幻魔晶石': 5 } },
+      actionParams: { recipeId: 'mohunzhixin' },
     },
     {
-      text: '合成灵魂王',
-      result: '使用20个灵魂晶石合成灵魂王。',
+      text: '合成幻魔之心（需5个幻魔晶石）',
+      result: '使用5个幻魔晶石合成幻魔之心，提升装备使用等级（100%成功）。',
       actionType: 'synthesize',
-      actionParams: { item: '灵魂王', materials: { '灵魂晶石': 20 } },
+      actionParams: { recipeId: 'huanmozhixin' },
     },
     {
-      text: '合成高级经验石',
-      result: '使用10个中级经验石合成高级经验石。',
+      text: '合成灵魂王（需20个灵魂晶石）',
+      result: '使用20个灵魂晶石合成灵魂王，提升装备品质等级（100%成功）。',
       actionType: 'synthesize',
-      actionParams: { item: '高级经验石', materials: { '中级经验石': 10 } },
+      actionParams: { recipeId: 'linghunwang' },
     },
     {
-      text: '合成高级战斗力石',
-      result: '使用10个中级战斗力石合成高级战斗力石。',
+      text: '合成高级经验石（需10个中级经验石）',
+      result: '使用10个中级经验石合成高级经验石，镶嵌后经验值+50%。',
       actionType: 'synthesize',
-      actionParams: { item: '高级战斗力石', materials: { '中级战斗力石': 10 } },
+      actionParams: { recipeId: 'gaojijingyanshi' },
+    },
+    {
+      text: '合成高级战斗力石（需10个中级战斗力石）',
+      result: '使用10个中级战斗力石合成高级战斗力石，镶嵌后战斗力+5。',
+      actionType: 'synthesize',
+      actionParams: { recipeId: 'gaojizhandoulishi' },
     },
   ],
 };
@@ -799,41 +817,42 @@ const npc_collector: NPCInteractable = {
 
 /**
  * 幻兽研究所 NPC 配置
- * 功能：提供幻兽购买、VIP系统
+ * 功能：提供幻兽购买、VIP系统、提高产量任务
  * 位置：树心城（使用雷鸣大陆作为位置）
+ * 参考文档：reference/docs/幻兽研究所交互逻辑文档.md
  */
 const npc_pet_institute: NPCInteractable = {
   id: 'npc_pet_institute',
   type: 'npc',
   name: '幻兽研究所',
   icon: '🔬',
-  description: '专门研究幻兽培养技术的机构。可以购买幻兽，提升VIP等级享受折扣。',
+  description: '专门研究幻兽培养技术的机构。可以购买奇异兽，提升VIP等级享受折扣。',
   location: 'leiming-dalu',
-  npcType: 'shop',
+  npcType: 'function',
   options: [
     {
-      text: '进入',
+      text: '进入（购买奇异兽）',
       result: '进入幻兽购买界面。',
-      actionType: 'openPetShop',
+      actionType: 'openPetInstitute',
       actionParams: {},
     },
     {
       text: '研究所的当前信息',
-      result: '查看技术等级和库存信息。\n\n技术等级：初始10级，最高120级\n20级以上才能生产幻兽\n\nVIP系统：完成任务提高VIP星级\nVIP星级越高购买折扣越大',
+      result: '查看技术等级、库存、VIP等级等信息。',
       actionType: 'viewInstituteInfo',
       actionParams: {},
     },
     {
-      text: '关于2008奥运使者',
-      result: '接受奥运任务。',
-      actionType: 'acceptOlympicTask',
+      text: '提高产量任务（周日开放）',
+      result: '提交灵魂王提高产量，获得大量经验和VIP星级+1。\n\n所需灵魂王数量 = 当前产量 + 1\n经验奖励 = 105000 × (当前产量 + 1)',
+      actionType: 'improveProduction',
       actionParams: {},
     },
     {
-      text: '提高产量任务',
-      result: '提交灵魂王提高产量，获得大量经验和VIP星级+1。',
-      actionType: 'improveProduction',
-      actionParams: { requirement: '灵魂王 × (当前产量+1)' },
+      text: '关于2008奥运使者',
+      result: '完成奥运任务后，幻兽研究所技术等级上限可提升至150级。',
+      actionType: 'viewOlympicInfo',
+      actionParams: {},
     },
   ],
 };
