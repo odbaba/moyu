@@ -93,7 +93,7 @@ const UseItemTargetModal: React.FC<UseItemTargetModalProps> = ({
                 <div className="target-name">{pet.othername}（{pet.hs_name}）</div>
                 <div className="target-details">
                   <span>等级: {pet.dj}</span>
-                  <span>品质: {pet.quality}</span>
+                  <span>品质: {pet.qualityTitle}</span>
                   <span>经验: {pet.jy}/{pet.mjy}</span>
                 </div>
                 <div className="target-description">对幻兽使用，增加27000经验</div>

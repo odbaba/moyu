@@ -324,7 +324,7 @@ export function getInstituteInfo(state: PetInstituteState): string {
   info += `当前库存：${state.stock}\n`;
   info += `每日产量：${state.productionRate}\n`;
   info += `VIP星级：${state.vipLevel} 星（${discount}）\n\n`;
-  info += `【奇异兽品质】\n`;
+  info += '【奇异兽品质】\n';
   info += `品质分：${qualityScore}\n`;
   info += `星级：${starLevel} 星\n`;
   info += `价格：${price} 魔石\n`;

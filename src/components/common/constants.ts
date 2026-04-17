@@ -3,13 +3,13 @@
  * 统一定义各组件共用的常量，避免重复定义
  */
 
-import type { EquipmentSlotType, ItemRarity, ItemType, PetQuality } from '../../types';
+import type { EquipmentSlotType, ItemRarity, ItemType } from '../../types';
 
 /**
  * 幻兽品质对应的颜色映射
  * 不同品质使用不同颜色显示
  */
-export const PET_QUALITY_COLORS: Record<PetQuality, string> = {
+export const PET_QUALITY_COLORS: Record<string, string> = {
   '普通': '#9e9e9e',
   '良品': '#4caf50',
   '上品': '#2196f3',

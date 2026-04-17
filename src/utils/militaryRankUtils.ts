@@ -334,6 +334,7 @@ export function queryMilitaryIntel(bossStatus?: Record<string, boolean>): BossLo
   // 根据BOSS状态过滤
   return BOSS_LOCATIONS.filter(boss => {
     const bossKey = `boss${boss.level}`;
+
     return bossStatus[bossKey] === true;
   });
 }
@@ -346,10 +347,11 @@ export function queryMilitaryIntel(bossStatus?: Record<string, boolean>): BossLo
  */
 export function formatMilitaryIntel(bossLocations: BossLocationInfo[]): string {
   let text = '=== 军情查询 ===\n\n';
-  
+
   if (bossLocations.length === 0) {
     text += '目前没有BOSS活动的情报。\n';
     text += '提示：BOSS会在特定时间刷新，请稍后再来查询。';
+
     return text;
   }
 

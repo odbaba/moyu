@@ -13,8 +13,6 @@ import type {
   EquipmentItem,
   InventoryItem,
   Pet,
-  PetQuality,
-  PetRating,
   PetType,
   PlayerResources,
 } from '../types';
@@ -24,6 +22,7 @@ import {
   randomEquipmentType,
   randomMagicSoulLevel
 } from './itemFactory';
+import { generatePetByType, generateStarStrangePet } from './petGenerator';
 
 // ==================== 类型定义 ====================
 
@@ -170,9 +169,10 @@ export function selectLegendaryPrize(playerLevel: number): { name: string; item?
   const prize = LEGENDARY_PRIZES[prizeIndex];
 
   if (prize.type === 'pet') {
+    // 使用 petGenerator 的 generatePetByType 函数生成噜噜幻兽
     return {
       name: prize.name,
-      pet: createLotteryPet(prize.petType!, 1),
+      pet: generatePetByType(prize.petType!),
     };
   } else if (prize.type === 'equipment') {
     return {
@@ -199,9 +199,10 @@ export function selectHighPrize(playerLevel: number): { name: string; item?: Inv
   const prize = HIGH_PRIZES[prizeIndex];
 
   if (prize.type === 'pet') {
+    // 使用 petGenerator 的 generatePetByType 函数生成圣天使幻兽
     return {
       name: prize.name,
-      pet: createLotteryPet(prize.petType!, 1),
+      pet: generatePetByType(prize.petType!),
     };
   } else if (prize.type === 'equipment') {
     return {
@@ -228,9 +229,10 @@ export function selectMediumPrize(playerLevel: number): { name: string; item?: I
   const prize = MEDIUM_PRIZES[prizeIndex];
 
   if (prize.type === 'pet') {
+    // 使用 petGenerator 的 generateStarStrangePet 函数生成指定星级奇异兽
     return {
       name: prize.name,
-      pet: createLotteryPet(prize.petType!, prize.starLevel || 1),
+      pet: generateStarStrangePet(prize.starLevel || 8),
     };
   } else if (prize.type === 'equipment') {
     return {
@@ -303,110 +305,6 @@ export function generateLotteryEquipment(playerLevel: number, quality: number = 
     magicSoulLevel: randomMagicSoulLevel(quality),
     gemSlots: Math.random() < 0.1 ? Math.floor(Math.random() * 2) + 1 : 0,
   });
-}
-
-// ==================== 幻兽生成函数 ====================
-
-/**
- * 创建抽奖幻兽
- *
- * @param petType 幻兽类型
- * @param starLevel 星级
- * @returns 幻兽数据
- */
-function createLotteryPet(petType: PetType, starLevel: number): Pet {
-  const petId = `lottery_pet_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-  const chp = 25 + Math.floor(Math.random() * 10);
-  const cxgj = 10 + Math.floor(Math.random() * 5);
-  const cdgj = cxgj + Math.floor(Math.random() * 10);
-  const cfy = 5 + Math.floor(Math.random() * 5);
-
-  const cz_hp = 30 + Math.floor(Math.random() * 12);
-  const cz_xgj = 8 + Math.floor(Math.random() * 4);
-  const cz_dgj = cz_xgj + Math.floor(Math.random() * 5);
-  const cz_fy = 1 + Math.floor(Math.random() * 6);
-
-  const dj = starLevel > 1 ? starLevel * 10 : 1;
-
-  const rating: PetRating = {
-    pzbase: getPetTypeBaseScore(petType),
-    pz_chp: Math.max(0, (chp - 100) * 2),
-    pz_cxgj: Math.max(0, (cxgj - 15) * 2),
-    pz_cdgj: Math.max(0, (cdgj - 25) * 2),
-    pz_cfy: Math.max(0, (cfy - 10) * 2),
-    pz_cz_hp: Math.max(0, (cz_hp - 40) * 20),
-    pz_cz_xgj: Math.max(0, (cz_xgj - 10) * 20),
-    pz_cz_dgj: Math.max(0, (cz_dgj - 15) * 20),
-    pz_cz_fy: Math.max(0, (cz_fy - 5) * 20),
-  };
-
-  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj +
-             rating.pz_cfy + rating.pz_cz_hp + rating.pz_cz_xgj + rating.pz_cz_dgj + rating.pz_cz_fy;
-
-  return {
-    id: petId,
-    hs_name: petType,
-    othername: petType,
-    dj,
-    hp: Math.round(cz_hp * (dj - 1) + chp),
-    mhp: Math.round(cz_hp * (dj - 1) + chp),
-    xgj: Math.round(cz_xgj * (dj - 1) + cxgj),
-    dgj: Math.round(cz_dgj * (dj - 1) + cdgj),
-    fy: Math.round(cz_fy * (dj - 1) + cfy),
-    jy: 0,
-    mjy: 10,
-    zs: 0,
-    pz,
-    quality: getQualityByScore(pz),
-    isDeployed: false,
-    isMerged: false,
-    chp,
-    cxgj,
-    cdgj,
-    cfy,
-    cz_hp,
-    cz_xgj,
-    cz_dgj,
-    cz_fy,
-    rating,
-  };
-}
-
-/**
- * 获取幻兽类型基础评分
- *
- * @param petType 幻兽类型
- * @returns 基础评分
- */
-function getPetTypeBaseScore(petType: PetType): number {
-  const baseScores: Record<PetType, number> = {
-    '攻防型': 0,
-    '调皮鬼': 280,
-    '吉鲁猪': 380,
-    '奇异兽': 450,
-    '圣天使': 280,
-    '守护': 550,
-    '年猪': 600,
-    '噜噜': 700,
-  };
-
-  return baseScores[petType] || 0;
-}
-
-/**
- * 根据评分计算品质
- *
- * @param score 评分
- * @returns 品质
- */
-function getQualityByScore(score: number): PetQuality {
-  if (score < 300) return '普通';
-  if (score < 500) return '良品';
-  if (score < 700) return '上品';
-  if (score < 900) return '精品';
-
-  return '极品';
 }
 
 // ==================== 特殊物品生成函数 ====================

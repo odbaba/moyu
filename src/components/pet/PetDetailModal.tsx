@@ -99,7 +99,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
           </div>
           <h3
             className="pet-detail-name"
-            style={{ color: getPetQualityColor(pet.quality) }}
+            style={{ color: getPetQualityColor(pet.qualityTitle) }}
           >
             {pet.othername}
           </h3>
@@ -119,15 +119,15 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </div>
           </div>
 
-          {/* 第二行：品质和等级 */}
+          {/* 第二行：品质称号和等级 */}
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
-              <span className="cell-label">品质</span>
+              <span className="cell-label">品质称号</span>
               <span
                 className="cell-value quality-value"
-                style={{ color: getPetQualityColor(pet.quality) }}
+                style={{ color: getPetQualityColor(pet.qualityTitle) }}
               >
-                {pet.quality}
+                {pet.qualityTitle}
               </span>
             </div>
             <div className="pet-detail-cell">
@@ -246,7 +246,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             <div className="total-label">总评分</div>
             <div
               className="total-value"
-              style={{ color: getPetQualityColor(pet.quality) }}
+              style={{ color: getPetQualityColor(pet.qualityTitle) }}
             >
               {pet.pz}
             </div>

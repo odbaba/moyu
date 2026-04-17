@@ -166,42 +166,29 @@ const npc_marshal: NPCInteractable = {
 
 /**
  * 首相 NPC 配置
- * 功能：提供爵位系统、捐献金币、功勋查询、国王消息功能
+ * 功能：提供爵位系统、交易系统功能
  * 位置：皇宫
- * 参考文档：reference/docs/元帅与首相交互逻辑文档.md
  */
 const npc_prime_minister: NPCInteractable = {
   id: 'npc_prime_minister',
   type: 'npc',
   name: '首相',
   icon: '🎩',
-  description: '亚特大陆的首相，负责爵位晋升和功勋管理。',
+  description: '亚特大陆的首相，负责爵位晋升和交易系统。',
   location: 'huanggong',
   npcType: 'palace',
   options: [
-    {
-      text: '捐献金币',
-      result: '捐献金币获得功勋（每750,000金币 = 1功勋）。',
-      actionType: 'donateGold',
-      actionParams: { exchangeRate: 750000 },
-    },
-    {
-      text: '功勋查询',
-      result: '查看当前功勋和晋升需求。',
-      actionType: 'queryMerit',
-      actionParams: {},
-    },
-    {
-      text: '关于国王的消息',
-      result: '查看国王的最新消息。',
-      actionType: 'queryKingStatus',
-      actionParams: {},
-    },
     {
       text: '关于爵位',
       result: '查看爵位系统说明。\n\n爵位等级：平民、勋爵、子爵、伯爵、公爵、侯爵、王\n\n爵位可以通过积累功勋来提升。',
       actionType: 'showHelp',
       actionParams: { topic: 'nobleRank' },
+    },
+    {
+      text: '交易',
+      result: '打开交易界面。',
+      actionType: 'openTrade',
+      actionParams: {},
     },
     {
       text: '领取奖励',

@@ -14,8 +14,8 @@ import {
   calculateSellPrice,
   canAffordPurchase,
   formatCurrency,
-  generatePet,
   generateRandomWeapon,
+  generateShopPet,
   purchaseItem,
   sellItem,
 } from '../../utils/shopUtils';
@@ -128,6 +128,8 @@ interface ShopPageProps {
   maxPetSlots?: number;
   /** 购买物品回调 */
   onPurchase: (itemId: string, quantity: number, goldSpent: number, magicStoneSpent: number) => void;
+  /** 购买幻兽数回调 */
+  onPurchasePet: (pet: Pet, goldSpent: number, magicStoneSpent: number) => void;
   /** 出售物品回调 */
   onSell: (itemId: string, quantity: number, goldEarned: number, magicStoneEarned: number) => void;
   /** 关闭商店回调 */
@@ -144,8 +146,9 @@ const ShopPage: React.FC<ShopPageProps> = ({
   inventoryItems,
   maxSlots = 1000,
   pets = [],
-  maxPetSlots = 10,
+  maxPetSlots = 100,
   onPurchase,
+  onPurchasePet,
   onSell,
   onClose,
 }) => {
@@ -204,11 +207,24 @@ const ShopPage: React.FC<ShopPageProps> = ({
 
         return;
       }
-      // 生成幻兽
-      const pet = generatePet(shopItem.name);
-      // 这里需要调用父组件的添加幻兽函数
-      // 暂时显示提示
-      setMessage(`获得幻兽：${pet.othername}（${pet.quality}）`);
+
+      // 检查是否有足够的货币
+      if (!canAffordPurchase(playerResources.gold, playerResources.magicStone, shopItem, 1, shopType)) {
+        setMessage('货币不足，无法购买');
+
+        return;
+      }
+
+      // 根据商品ID生成幻兽
+      const pet = generateShopPet(shopItem.id);
+      if (!pet) {
+        setMessage('无效的幻兽商品');
+
+        return;
+      }
+
+      // 调用父组件的购买幻兽回调函数
+      onPurchasePet(pet, shopItem.priceGold, shopItem.priceMagicStone);
 
       return;
     }

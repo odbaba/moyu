@@ -98,7 +98,7 @@ const PetListItem: React.FC<PetListItemProps> = ({
         <div className="pet-list-name-row">
           <span
             className="pet-list-name"
-            style={{ color: getPetQualityColor(pet.quality) }}
+            style={{ color: getPetQualityColor(pet.qualityTitle) }}
           >
             {pet.othername}
           </span>
@@ -112,7 +112,7 @@ const PetListItem: React.FC<PetListItemProps> = ({
         </div>
       </div>
 
-      {/* 出战按钮或品质标签 */}
+      {/* 出战按钮或品质称号标签 */}
       {showDeployButton ? (
         <button
           className="pet-deploy-button"
@@ -123,9 +123,9 @@ const PetListItem: React.FC<PetListItemProps> = ({
       ) : (
         <div
           className="pet-list-quality"
-          style={{ backgroundColor: getPetQualityColor(pet.quality) }}
+          style={{ backgroundColor: getPetQualityColor(pet.qualityTitle) }}
         >
-          {pet.quality}
+          {pet.qualityTitle}
         </div>
       )}
     </div>

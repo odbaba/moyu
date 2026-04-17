@@ -57,17 +57,19 @@ import { consumeMaterials, getRecipeById, performSynthesis } from './utils/gemSy
 // 导入战利品工具函数
 import { calculateLoot, mergeLootResults } from './utils/lootUtils';
 import { checkChallengeRequirement, claimProtectorReward, getMapChallengeConfig, getMapChallengeDescription } from './utils/mapChallengeUtils';
-import { claimMilitaryPay, getMilitaryRankDescription, queryBattleExp, queryMilitaryIntel, formatMilitaryIntel } from './utils/militaryRankUtils';
-import { claimNobleReward, getNobleRankSystemDescription, getTradeSystemMessage, donateGoldForMerit, getNobleRankName, getNextNobleRankMerit } from './utils/nobleRankUtils';
+import { claimMilitaryPay, formatMilitaryIntel, getMilitaryRankDescription, queryBattleExp, queryMilitaryIntel } from './utils/militaryRankUtils';
+import { claimNobleReward, donateGoldForMerit, getNextNobleRankMerit, getNobleRankName, getNobleRankSystemDescription, getTradeSystemMessage } from './utils/nobleRankUtils';
 import { findPath } from './utils/pathfinding';
-// 导入 NPC 相关工具函数
-import { getDemonArmyDialogue, performChat, performGift, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
+// 导入幻兽生成工具函数
+import { gainExperience } from './utils/petGenerator';
 // 导入幻兽研究所工具函数
 import {
+  consumeItemFromInventory,
   createInitialPetInstituteState,
   getInstituteInfo,
-  consumeItemFromInventory,
 } from './utils/petInstituteUtils';
+// 导入 NPC 相关工具函数
+import { getDemonArmyDialogue, performChat, performGift, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
 
 // 初始化空装备槽位
 const createEmptyEquippedItems = (): Record<EquipmentSlotType, EquipmentDetail | null> => ({
@@ -169,7 +171,7 @@ function App() {
 
   // 爵位和功勋状态
   const [nobleRank, setNobleRank] = useState(0); // 爵位等级（0-6）
-  const [lastNobleRewardClaimTime, setLastNobleRewardClaimTime] = useState<number | null>( null); // 上次领取爵位奖励的时间
+  const [lastNobleRewardClaimTime, setLastNobleRewardClaimTime] = useState<number | null>(null); // 上次领取爵位奖励的时间
 
   // 国王消息系统状态
   // 注意：setIsKingRescued将在救出国王的任务中使用
@@ -663,7 +665,7 @@ function App() {
         break;
 
       // ========== 日常任务官 NPC 功能 ==========
-      case 'acceptDailyTask':
+      case 'acceptDailyTask': {
         // 接受日常任务
         const today = new Date().getDay();
         const task = getDailyTask(today);
@@ -675,6 +677,7 @@ function App() {
           setInteractionLog(prev => [...prev, '今天没有可接受的任务']);
         }
         break;
+      }
 
       // ========== 地图赛报名官 NPC 功能 ==========
       case 'challengeOrClaim':
@@ -786,7 +789,7 @@ function App() {
 
             if (synthesisResult.success && synthesisResult.resultItem) {
               // 消耗材料
-              let newInventory = consumeMaterials(inventory, recipe.materials);
+              const newInventory = consumeMaterials(inventory, recipe.materials);
 
               // 检查背包中是否已有相同ID的物品（堆叠处理）
               const existingItemIndex = newInventory.findIndex(
@@ -934,6 +937,38 @@ function App() {
     } else {
       setInteractionLog(prev => [...prev, `购买成功：${itemId} × ${quantity}`]);
     }
+  };
+
+  /**
+   * 处理购买幻兽
+   * 扣除货币并将幻兽添加到幻兽列表
+   * @param pet 购买的幻兽
+   * @param goldSpent 花费的金币
+   * @param magicStoneSpent 花费的魔石
+   */
+  const handlePurchasePet = (
+    pet: Pet,
+    goldSpent: number,
+    magicStoneSpent: number
+  ) => {
+    // 扣除货币
+    if (goldSpent > 0) {
+      setPlayerResources(prev => ({
+        ...prev,
+        gold: prev.gold - goldSpent,
+      }));
+    }
+    if (magicStoneSpent > 0) {
+      setPlayerResources(prev => ({
+        ...prev,
+        magicStone: prev.magicStone - magicStoneSpent,
+      }));
+    }
+
+    // 添加幻兽到幻兽列表
+    setPets(prev => [...prev, pet]);
+
+    setInteractionLog(prev => [...prev, `购买成功：${pet.othername}（${pet.qualityTitle}）`]);
   };
 
   /**
@@ -1474,6 +1509,26 @@ function App() {
   };
 
   /**
+   * 获取物品类型的中文名称
+   * @param type 物品类型
+   * @returns 中文名称
+   */
+  const getItemTypeName = (type: string): string => {
+    const typeNames: Record<string, string> = {
+      'equipment': '装备',
+      'consumable': '消耗品',
+      'material': '材料',
+      'gem': '宝石',
+      'skillBook': '技能书',
+      'quest': '任务物品',
+      'special': '特殊物品',
+      'other': '物品',
+    };
+
+    return typeNames[type] || '物品';
+  };
+
+  /**
    * 添加物品到背包
    * 根据物品类型处理不同类型的物品添加逻辑
    * @param item 要添加的物品
@@ -1613,31 +1668,23 @@ function App() {
 
   /**
    * 对幻兽使用满经验球
+   * 使用 gainExperience 函数统一处理经验获取和升级逻辑
    */
   const handleUseItemOnPet = useCallback((petId: string) => {
     if (!currentUseItem) return;
 
-    // 增加幻兽经验 27000
+    // 使用 gainExperience 函数处理经验获取和升级
     setPets(prev => prev.map(pet => {
       if (pet.id === petId) {
-        const newExp = pet.jy + 27000;
-        let newLevel = pet.dj;
-        let newMaxExp = pet.mjy;
-        let finalExp = newExp;
+        // 调用 gainExperience 函数，传入经验值和玩家等级
+        const result = gainExperience(pet, 27000, character.level);
 
-        // 检查是否升级
-        while (finalExp >= newMaxExp && newLevel < 130) {
-          finalExp -= newMaxExp;
-          newLevel++;
-          newMaxExp = Math.floor(100 * Math.pow(1.2, newLevel - 1));
+        // 显示消息（如果有）
+        if (result.message) {
+          setInteractionLog(prev => [...prev, result.message]);
         }
 
-        return {
-          ...pet,
-          jy: finalExp,
-          dj: newLevel,
-          mjy: newMaxExp,
-        };
+        return result.pet;
       }
 
       return pet;
@@ -1667,7 +1714,7 @@ function App() {
     setInteractionLog(prev => [...prev, `对幻兽 ${pet?.othername} 使用了 ${currentUseItem.name}，获得 27000 经验值`]);
     setShowUseItemTargetModal(false);
     setCurrentUseItem(null);
-  }, [currentUseItem, pets]);
+  }, [currentUseItem, pets, character.level]);
 
   /**
    * 添加幻兽到幻兽栏
@@ -1677,7 +1724,7 @@ function App() {
     setPets(prev => [...prev, pet]);
 
     // 显示添加成功的提示
-    setInteractionLog(prev => [...prev, `获得幻兽：${pet.othername}（${pet.hs_name}）品质：${pet.quality}`]);
+    setInteractionLog(prev => [...prev, `获得幻兽：${pet.othername}（${pet.hs_name}）品质：${pet.qualityTitle}`]);
   }, []);
 
   /**
@@ -1688,26 +1735,6 @@ function App() {
   const handleConsumeTime = useCallback((amount: number) => {
     consumeTime(amount);
   }, [consumeTime]);
-
-  /**
-   * 获取物品类型的中文名称
-   * @param type 物品类型
-   * @returns 中文名称
-   */
-  const getItemTypeName = (type: string): string => {
-    const typeNames: Record<string, string> = {
-      'equipment': '装备',
-      'consumable': '消耗品',
-      'material': '材料',
-      'gem': '宝石',
-      'skillBook': '技能书',
-      'quest': '任务物品',
-      'special': '特殊物品',
-      'other': '物品',
-    };
-
-    return typeNames[type] || '物品';
-  };
 
   // 获取当前位置数据
   const currentLoc = locations.find(loc => loc.id === currentLocation);
@@ -1921,8 +1948,9 @@ function App() {
               inventoryItems={inventory}
               maxSlots={1000}
               pets={pets}
-              maxPetSlots={10}
+              maxPetSlots={100}
               onPurchase={handlePurchaseItem}
+              onPurchasePet={handlePurchasePet}
               onSell={handleSellItem}
               onClose={() => setShowShopPage(false)}
             />

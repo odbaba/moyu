@@ -598,12 +598,6 @@ export type Weekday = '星期一' | '星期二' | '星期三' | '星期四' | '�
 export type PetType = '攻防型' | '调皮鬼' | '吉鲁猪' | '奇异兽' | '圣天使' | '守护' | '年猪' | '噜噜';
 
 /**
- * 幻兽品质枚举
- * 基于总评分划分的品质等级
- */
-export type PetQuality = '普通' | '良品' | '上品' | '精品' | '极品';
-
-/**
  * 幻兽评分接口
  * 包含各项评分的详细数据
  */
@@ -637,7 +631,7 @@ export interface Pet {
   mjy: number; // 升级所需经验
   zs: number; // 转世次数（幻化次数）
   pz: number; // 总评分
-  quality: PetQuality; // 品质（基于评分计算）
+  qualityTitle: string; // 品质称号（如"极品12星"、"万众瞩目"等）
   isDeployed: boolean; // 是否出战中
   isMerged: boolean; // 是否合体中
   // 初始属性
@@ -653,10 +647,10 @@ export interface Pet {
   // 评分详情
   rating: PetRating; // 各项评分详情
   // 幻化相关属性
-  predj?: number; // 幻化前等级
-  premjy?: number; // 幻化前升级所需经验
-  prejy?: number; // 幻化前当前经验
-  hun?: number; // 升级经验递增变量
+  predj: number; // 幻化前等级（初始值为1）
+  premjy: number; // 幻化前升级所需经验（初始值为10）
+  prejy: number; // 幻化前当前经验（初始值为0）
+  hun: number; // 升级经验递增变量（初始值为1）
 }
 
 /**
@@ -664,11 +658,11 @@ export interface Pet {
  * 定义幻兽研究所的技术等级、生产量、VIP等级等状态
  */
 export interface PetInstituteState {
-  techLevel: number;            // 技术等级 (10-120/150)
-  techLevelMax: number;         // 技术等级上限 (120/150)
-  productionRate: number;       // 每日生产量 (0-6)
-  stock: number;                // 当前库存
-  vipLevel: number;             // VIP星级 (0-10)
+  techLevel: number; // 技术等级 (10-120/150)
+  techLevelMax: number; // 技术等级上限 (120/150)
+  productionRate: number; // 每日生产量 (0-6)
+  stock: number; // 当前库存
+  vipLevel: number; // VIP星级 (0-10)
   canDoProductionTask: boolean; // 是否可做提高产量任务（周日开启）
 }
 

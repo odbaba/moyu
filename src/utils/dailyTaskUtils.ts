@@ -268,8 +268,8 @@ function checkTrainTask(_task: DailyTask, pets: Pet[]): boolean {
       return false;
     }
 
-    // 检查品质是否为极品
-    if (pet.quality !== '极品') {
+    // 检查品质是否为极品（品质称号包含"极品"）
+    if (!pet.qualityTitle.includes('极品')) {
       return false;
     }
 
@@ -320,7 +320,7 @@ function checkDungeonTask(_task: DailyTask, completedDungeons: string[]): boolea
 function calculatePetTrainingReward(pets: Pet[]): { magicStone: number; description: string } | null {
   // 找到符合条件的最高星级幻兽
   const validPets = pets.filter(pet => {
-    return pet.hs_name === '攻防型' && pet.quality === '极品';
+    return pet.hs_name === '攻防型' && pet.qualityTitle.includes('极品');
   });
 
   if (validPets.length === 0) {

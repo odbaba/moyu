@@ -4,9 +4,12 @@
  * 参考文档：reference/docs/幻兽研究所交互逻辑文档.md
  */
 
+import './PetInstituteModal.css';
+
 import React, { useMemo, useState } from 'react';
 
 import type { InventoryItem, Pet, PetInstituteState, PlayerResources } from '../../types';
+import { generateStrangePet } from '../../utils/petGenerator';
 import {
   buyPet,
   calculatePetQuality,
@@ -17,8 +20,6 @@ import {
   getVipDiscountDescription,
   improveProduction,
 } from '../../utils/petInstituteUtils';
-import { generateStrangePet } from '../../utils/petGenerator';
-import './PetInstituteModal.css';
 
 export interface PetInstituteModalProps {
   isVisible: boolean;

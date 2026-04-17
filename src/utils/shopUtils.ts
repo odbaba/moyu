@@ -12,15 +12,13 @@ import type {
   EquipmentSlotType,
   InventoryItem,
   Pet,
-  PetQuality,
-  PetRating,
-  PetType,
   PlayerResources,
   PurchaseResult,
   SellResult,
   ShopItem,
   ShopType,
 } from '../types';
+import { generatePetByType, generateStarStrangePet } from './petGenerator';
 
 // ==================== 购买函数 ====================
 
@@ -341,110 +339,45 @@ export function generateRandomWeapon(): EquipmentItem {
   };
 }
 
-// ==================== 幻兽生成函数 ====================
+// ==================== 商店幻兽生成函数 ====================
 
 /**
- * 根据幻兽类型获取基础评分
- * @param petType 幻兽类型
- * @returns 基础评分
+ * 商店商品ID到幻兽类型的映射
+ * 用于根据商品ID生成对应的幻兽
  */
-function getPetTypeBaseScore(petType: PetType): number {
-  const baseScores: Record<PetType, number> = {
-    '攻防型': 0,
-    '调皮鬼': 280,
-    '吉鲁猪': 380,
-    '奇异兽': 450,
-    '圣天使': 280,
-    '守护': 550,
-    '年猪': 600,
-    '噜噜': 700,
-  };
-
-  return baseScores[petType] || 0;
-}
+const SHOP_PET_ID_TO_TYPE: Record<string, { type: 'normal' | 'star'; petType?: string; starLevel?: number }> = {
+  'pet_attack_defense': { type: 'normal', petType: '攻防型' },
+  'pet_naughty_cat': { type: 'normal', petType: '调皮鬼' },
+  'pet_jilu_pig': { type: 'normal', petType: '吉鲁猪' },
+  'pet_strange_beast': { type: 'normal', petType: '奇异兽' },
+  'pet_guardian': { type: 'normal', petType: '守护' },
+  'pet_8star_strange_beast': { type: 'star', starLevel: 8 },
+  'pet_12star_strange_beast': { type: 'star', starLevel: 12 },
+};
 
 /**
- * 根据评分计算品质
- * @param score 评分
- * @returns 品质
+ * 根据商店商品ID生成幻兽
+ * 调用 petGenerator.ts 的生成函数
+ *
+ * @param itemId 商店商品ID
+ * @returns 生成的幻兽数据，如果商品ID无效则返回null
  */
-function getQualityByScore(score: number): PetQuality {
-  if (score < 300) return '普通';
-  if (score < 500) return '良品';
-  if (score < 700) return '上品';
-  if (score < 900) return '精品';
+export function generateShopPet(itemId: string): Pet | null {
+  const config = SHOP_PET_ID_TO_TYPE[itemId];
 
-  return '极品';
-}
+  if (!config) {
+    return null;
+  }
 
-/**
- * 生成幻兽
- * @param petType 幻兽类型
- * @returns 幻兽数据
- */
-export function generatePet(petType: string): Pet {
-  const petId = `shop_pet_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  if (config.type === 'star' && config.starLevel) {
+    return generateStarStrangePet(config.starLevel);
+  }
 
-  // 将字符串转换为 PetType
-  const validPetType = petType as PetType;
+  if (config.type === 'normal' && config.petType) {
+    return generatePetByType(config.petType as any);
+  }
 
-  // 随机生成初始属性
-  const chp = 25 + Math.floor(Math.random() * 10);
-  const cxgj = 10 + Math.floor(Math.random() * 5);
-  const cdgj = cxgj + Math.floor(Math.random() * 10);
-  const cfy = 5 + Math.floor(Math.random() * 5);
-
-  // 随机生成成长属性
-  const cz_hp = 30 + Math.floor(Math.random() * 12);
-  const cz_xgj = 8 + Math.floor(Math.random() * 4);
-  const cz_dgj = cz_xgj + Math.floor(Math.random() * 5);
-  const cz_fy = 1 + Math.floor(Math.random() * 6);
-
-  const dj = 1;
-
-  // 计算评分
-  const rating: PetRating = {
-    pzbase: getPetTypeBaseScore(validPetType),
-    pz_chp: Math.max(0, (chp - 100) * 2),
-    pz_cxgj: Math.max(0, (cxgj - 15) * 2),
-    pz_cdgj: Math.max(0, (cdgj - 25) * 2),
-    pz_cfy: Math.max(0, (cfy - 10) * 2),
-    pz_cz_hp: Math.max(0, (cz_hp - 40) * 20),
-    pz_cz_xgj: Math.max(0, (cz_xgj - 10) * 20),
-    pz_cz_dgj: Math.max(0, (cz_dgj - 15) * 20),
-    pz_cz_fy: Math.max(0, (cz_fy - 5) * 20),
-  };
-
-  const pz = rating.pzbase + rating.pz_chp + rating.pz_cxgj + rating.pz_cdgj +
-             rating.pz_cfy + rating.pz_cz_hp + rating.pz_cz_xgj + rating.pz_cz_dgj + rating.pz_cz_fy;
-
-  return {
-    id: petId,
-    hs_name: validPetType,
-    othername: validPetType,
-    dj,
-    hp: chp,
-    mhp: chp,
-    xgj: cxgj,
-    dgj: cdgj,
-    fy: cfy,
-    jy: 0,
-    mjy: 10,
-    zs: 0,
-    pz,
-    quality: getQualityByScore(pz),
-    isDeployed: false,
-    isMerged: false,
-    chp,
-    cxgj,
-    cdgj,
-    cfy,
-    cz_hp,
-    cz_xgj,
-    cz_dgj,
-    cz_fy,
-    rating,
-  };
+  return null;
 }
 
 // ==================== 辅助函数 ====================

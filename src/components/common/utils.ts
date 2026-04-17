@@ -3,7 +3,7 @@
  * 统一定义各组件共用的工具函数，避免重复定义
  */
 
-import type { EquipmentItem, EquipmentSlotType, InventoryItem, ItemRarity, PetQuality } from '../../types';
+import type { EquipmentItem, EquipmentSlotType, InventoryItem, ItemRarity } from '../../types';
 import {
   EQUIPMENT_ICON_MAP,
   EQUIPMENT_QUALITY_COLORS,
@@ -13,12 +13,23 @@ import {
   RARITY_CONFIG} from './constants';
 
 /**
- * 根据幻兽品质获取对应的颜色
- * @param quality 幻兽品质
+ * 根据幻兽品质称号获取对应的颜色
+ * @param qualityTitle 幻兽品质称号（如"极品12星"、"万众瞩目"等）
  * @returns 对应的颜色值
  */
-export const getPetQualityColor = (quality: PetQuality): string => {
-  return PET_QUALITY_COLORS[quality] || '#9e9e9e';
+export const getPetQualityColor = (qualityTitle: string): string => {
+  // 根据品质称号判断颜色
+  if (qualityTitle.includes('极品')) {
+    return PET_QUALITY_COLORS['极品'];
+  } else if (qualityTitle === '万众瞩目') {
+    return PET_QUALITY_COLORS['精品'];
+  } else if (qualityTitle === '千载难逢') {
+    return PET_QUALITY_COLORS['上品'];
+  } else if (qualityTitle === '百里挑一') {
+    return PET_QUALITY_COLORS['良品'];
+  } else {
+    return PET_QUALITY_COLORS['普通'];
+  }
 };
 
 /**
