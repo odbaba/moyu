@@ -400,7 +400,7 @@ export const manJingYanQiu: InventoryItem = {
   id: 'consumable_manjingyanqiu',
   name: '满经验球',
   icon: '🔮',
-  quantity: 5,
+  quantity: 555,
   type: 'consumable',
   rarity: 'rare',
   source: 'BOSS掉落、活动奖励',
@@ -925,7 +925,7 @@ const zhanHunJingShi: GemItem = {
 /**
  * 战魂之心 - 激活战魂属性，成功率100%
  */
-const zhanHunZhiXin: GemItem = {
+export const zhanHunZhiXin: GemItem = {
   id: 'gem_zhanhunzhixin',
   name: '战魂之心',
   icon: '❤️‍🔥',

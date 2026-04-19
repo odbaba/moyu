@@ -14,6 +14,7 @@ import {
   manJingYanQiu,
   yueGuangBaoHe,
   yueGuangBaoHeZengQiangBan,
+  zhanHunZhiXin,
 } from '../data/inventoryData';
 import type {
   EquipmentItem,
@@ -277,6 +278,7 @@ export const ITEM_TEMPLATES = {
   // 宝石类
   lingHunJingShi,
   lingHunWang,
+  zhanHunZhiXin,
 
   // 特殊道具类
   yueGuangBaoHe,

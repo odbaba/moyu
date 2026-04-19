@@ -2,7 +2,7 @@ import './EquipmentDetailModal.css';
 
 import React, { useState } from 'react';
 
-import type { EquipmentDetail, EquipmentSlotType } from '../../types';
+import type { EquipmentDetail } from '../../types';
 import { EQUIPMENT_SLOT_TYPE_NAMES } from '../common/constants';
 import { getEquipmentQualityColor } from '../common/utils';
 
