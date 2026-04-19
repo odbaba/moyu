@@ -3,6 +3,8 @@
  * 提供角色数据、技能数据到战斗数据的转换功能
  */
 
+// 导入技能伤害计算函数
+import { getBreakDefenseHits, getSkillDamagePercent } from '../data/skillData';
 import type {
   BattleCharacter,
   BattleInitParams,
@@ -15,30 +17,34 @@ import type {
   GridPosition,
   Pet,
   SkillDetail} from '../types';
+// 导入角色属性计算函数
+import { calculateTotalCharacterAttributes } from './attributeCalculator';
 // 导入战斗力计算函数
 import { calculateTotalCombatPower } from './combatPower';
 
 /**
  * 技能数据转换为战斗技能数据
  * @param skill 技能详情数据
- * @param currentMp 当前MP值
  * @param currentStamina 当前体力值
  * @returns 战斗技能数据
  */
 export function skillToBattleSkill(
   skill: SkillDetail,
-  currentMp: number,
   currentStamina: number
 ): BattleSkill {
-  // 获取MP消耗，默认为0
-  const mpCost = skill.cost.mp || 0;
   // 获取体力消耗，默认为0
   const staminaCost = skill.cost.stamina || 0;
   // 获取当前冷却时间
   const currentCooldown = skill.currentCooldown || 0;
 
-  // 判断技能是否可用（MP、体力足够且冷却时间为0）
-  const isAvailable = currentMp >= mpCost && currentStamina >= staminaCost && currentCooldown === 0;
+  // 判断技能是否可用（体力足够且冷却时间为0）
+  const isAvailable = currentStamina >= staminaCost && currentCooldown === 0;
+
+  // 获取实际伤害百分比（考虑技能等级）
+  const damagePercent = getSkillDamagePercent(skill);
+
+  // 获取破防击数（仅对飞天连斩系列有效）
+  const breakDefenseHits = getBreakDefenseHits(skill);
 
   return {
     id: skill.id,
@@ -47,40 +53,16 @@ export function skillToBattleSkill(
     icon: skill.icon,
     attackType: skill.attackType,
     level: skill.level,
-    damagePercent: skill.effect.damagePercent || 100,
-    mpCost: mpCost,
+    damagePercent: damagePercent,
     staminaCost: staminaCost,
     cooldown: skill.cooldown,
     currentCooldown: currentCooldown,
     hitCount: skill.effect.hitCount || 1,
-    breakDefenseHits: skill.effect.breakDefenseHits || 0,
+    breakDefenseHits: breakDefenseHits,
     battlePowerBonus: skill.effect.battlePowerBonus || 0,
     buffDuration: skill.effect.duration || 0,
     isAvailable: isAvailable
   };
-}
-
-/**
- * 计算战斗力
- * 简化版战斗力计算，用于战斗场景
- * @param character 角色数据（CharacterData 或 BattleCharacter）
- * @returns 战斗力数值
- */
-export function calculateCombatPower(character: CharacterData | BattleCharacter): number {
-  // 基础战斗力 = 等级
-  const basePower = character.level;
-
-  // 攻击力战斗力 = 平均攻击力 × 0.5
-  const attackPower = ((character.attackMin + character.attackMax) / 2) * 0.5;
-
-  // 防御力战斗力 = 防御力 × 0.3
-  const defensePower = character.defense * 0.3;
-
-  // 生命战斗力 = 最大生命值 × 0.01
-  const hpPower = character.maxHp * 0.01;
-
-  // 总战斗力 = 基础 + 攻击 + 防御 + 生命
-  return Math.floor(basePower + attackPower + defensePower + hpPower);
 }
 
 /**
@@ -99,30 +81,30 @@ export function characterToBattleCharacter(
   gridPosition: GridPosition,
   pets?: Pet[]
 ): BattleCharacter {
-  // 计算最大MP（简化处理：100 + 等级 × 10）
-  const maxMp = 100 + characterData.level * 10;
-
   // 转换所有已学习的技能为战斗技能
   const battleSkills: BattleSkill[] = skills
     .filter(skill => skill.isLearned)
-    .map(skill => skillToBattleSkill(skill, maxMp, characterData.currentStamina));
+    .map(skill => skillToBattleSkill(skill, characterData.currentStamina));
+
+  // ========== 使用 calculateTotalCharacterAttributes 计算总属性 ==========
+  // 复用角色面板的属性计算逻辑，确保战斗中使用的属性与面板一致
+  // 包含：基础属性 + 装备加成 + 幻兽加成 + 战魂加成
+  const totalAttributes = calculateTotalCharacterAttributes(characterData);
 
   // 创建战斗角色对象
   const battleCharacter: BattleCharacter = {
     id: characterData.id,
     name: characterData.playerName,
     level: characterData.level,
-    maxHp: characterData.maxHp,
-    currentHp: characterData.currentHp, // 使用当前HP，保持战斗结束时的状态
-    maxMp: maxMp,
-    currentMp: maxMp, // MP每次战斗恢复满（根据游戏设计）
-    maxStamina: characterData.maxStamina,
-    currentStamina: characterData.currentStamina, // 使用当前体力，保持战斗结束时的状态
-    attackMin: characterData.attackMin,
-    attackMax: characterData.attackMax,
-    defense: characterData.defense,
+    maxHp: totalAttributes.maxHp, // 使用总生命值（包含成长加成）
+    currentHp: characterData.currentHp, // 保持当前HP，保持战斗结束时的状态
+    maxStamina: totalAttributes.maxStamina, // 使用总体力值（包含成长加成）
+    currentStamina: characterData.currentStamina, // 保持当前体力，保持战斗结束时的状态
+    attackMin: totalAttributes.attackMin, // 使用总最小攻击力（包含装备、幻兽、战魂加成）
+    attackMax: totalAttributes.attackMax, // 使用总最大攻击力（包含装备、幻兽、战魂加成）
+    defense: totalAttributes.defense, // 使用总防御力（包含装备、幻兽加成）
     combatPower: 0, // 先设为0，后面计算
-    dodgeRate: characterData.dodgeRate,
+    dodgeRate: totalAttributes.dodgeRate, // 使用总闪避率（包含地魂战魂加成）
     luck: characterData.luck,
     skills: battleSkills,
     buffs: [], // 初始无增益效果
@@ -156,9 +138,6 @@ export function createEnemyFromTemplate(
   // 计算最大生命值 = 基础生命 + 成长生命 × 等级
   const maxHp = template.baseHp + template.growthHp * level;
 
-  // 计算最大MP = 50 + 等级 × 5
-  const maxMp = 50 + level * 5;
-
   // 计算最大体力 = 50 + 等级 × 5
   const maxStamina = 50 + level * 5;
 
@@ -181,8 +160,6 @@ export function createEnemyFromTemplate(
     level: level,
     maxHp: maxHp,
     currentHp: maxHp,
-    maxMp: maxMp,
-    currentMp: maxMp,
     maxStamina: maxStamina,
     currentStamina: maxStamina,
     attackMin: attackMin,
@@ -332,9 +309,6 @@ export function createEnemyFromEnemyData(
   // 使用 enemyData 中的等级，如果没有则基于生命值估算
   const level = enemyData.level || Math.max(1, Math.floor(enemyData.maxHp / 100));
 
-  // 计算最大MP = 50 + 等级 × 5
-  const maxMp = 50 + level * 5;
-
   // 计算最大体力 = 50 + 等级 × 5
   const maxStamina = 50 + level * 5;
 
@@ -347,7 +321,6 @@ export function createEnemyFromEnemyData(
     attackType: 'single',
     level: 1,
     damagePercent: 100,
-    mpCost: 0,
     staminaCost: 0,
     cooldown: 0,
     currentCooldown: 0,
@@ -365,8 +338,6 @@ export function createEnemyFromEnemyData(
     level: level,
     maxHp: enemyData.maxHp,
     currentHp: enemyData.maxHp,
-    maxMp: maxMp,
-    currentMp: maxMp,
     maxStamina: maxStamina,
     currentStamina: maxStamina,
     attackMin: enemyData.attack, // 使用攻击力作为最小攻击

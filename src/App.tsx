@@ -12,9 +12,11 @@ import { Battle } from './components/battle';
 // 导入组件 - 角色模块
 import { CharacterPage } from './components/character';
 // 导入组件 - 公共模块
-import { EnemyModal, NPCModal } from './components/common';
+import { DonationModal, EnemyModal, NPCModal } from './components/common';
 import CollectorModal from './components/common/CollectorModal';
 import EquipmentRefineModal from './components/common/EquipmentRefineModal';
+import ExperienceExchangeModal from './components/common/ExperienceExchangeModal';
+import InfoModal from './components/common/InfoModal';
 // 导入组件 - 首页模块
 import {
   InteractionButtons,
@@ -31,7 +33,7 @@ import UseItemTargetModal from './components/inventory/UseItemTargetModal';
 // 导入组件 - 抽奖模块
 import { LotteryArea } from './components/lottery';
 // 导入组件 - 幻兽模块
-import { PetInstituteModal, PetPage } from './components/pet';
+import { PetFusionModal, PetInstituteModal, PetPage } from './components/pet';
 // 导入组件 - 商店模块
 import { ShopPage } from './components/shop';
 // 导入组件 - 技能模块
@@ -43,25 +45,61 @@ import { locations } from './data/gameData';
 import { generateBossInteractables, interactableConfig } from './data/interactableData';
 import { exampleItems } from './data/inventoryData';
 import { examplePets } from './data/petData';
+import { getMeritReward } from './data/rankData';
 import { getShopItemById } from './data/shopData';
 import { createInitialSkills, getSkillUpgradeCost } from './data/skillData';
-import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, NPCInteractable, Pet, PetInstituteState, PlayerResources, PrincessRelationship, RefineResult, SkillDetail, TimeSystem } from './types';
-import { calculateCharacterBaseAttributes, calculateNextLevelMaxExp } from './utils/attributeCalculator';
+import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, DailyTaskState, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, NPCInteractable, Pet, PetInstituteState, PlayerResources, PrincessRelationship, RefineResult, SkillDetail, TimeSystem } from './types';
+import { gainCharacterExperience } from './utils/attributeCalculator';
 // 导入 BOSS 工具函数
 import { rollBossSpawns } from './utils/bossUtils';
-import { calculatePetMergeBonus } from './utils/combatPower';
-import { getDailyTask, getTaskDescription } from './utils/dailyTaskUtils';
+import { calculatePetMergeBonus, calculateTotalCombatPower } from './utils/combatPower';
+// 导入日常任务状态管理工具函数
+import { completeTask, createInitialDailyTaskState, resetDailyTaskState } from './utils/dailyTaskStateUtils';
+import {
+  calculateGemRequirement,
+  calculateGemReward,
+  calculatePetRewardByQuality,
+  checkGemInInventory,
+  consumeGemFromInventory,
+  getDailyTask,
+  getDailyTaskDescriptionByWeekday,
+  getValidPetsForTraining,
+  removePetFromList
+} from './utils/dailyTaskUtils';
 import { equipmentDetailToItem, equipmentItemToDetail } from './utils/equipmentConverter';
+// 导入装备检测工具函数
+import { checkAllEquipmentLegendary } from './utils/equipmentUtils';
+// 导入经验计算工具函数
+import { calculateCombatPowerBonusExp } from './utils/experienceUtils';
 // 导入宝石合成工具函数
 import { consumeMaterials, getRecipeById, performSynthesis } from './utils/gemSynthesisUtils';
+// 导入物品工厂工具函数
+import { cloneItem, createEquipmentItem, createItemFromTemplate, ITEM_TEMPLATES, randomGemSlots } from './utils/itemFactory';
 // 导入战利品工具函数
 import { calculateLoot, mergeLootResults } from './utils/lootUtils';
-import { checkChallengeRequirement, claimProtectorReward, getMapChallengeConfig, getMapChallengeDescription } from './utils/mapChallengeUtils';
-import { claimMilitaryPay, formatMilitaryIntel, getMilitaryRankDescription, queryBattleExp, queryMilitaryIntel } from './utils/militaryRankUtils';
-import { claimNobleReward, donateGoldForMerit, getNextNobleRankMerit, getNobleRankName, getNobleRankSystemDescription, getTradeSystemMessage } from './utils/nobleRankUtils';
+import type { MapChallengeState } from './utils/mapChallengeUtils';
+import {
+  canChallengeToday,
+  canClaimReward,
+  checkChallengeRequirement,
+  claimReward,
+  createInitialMapChallengeState,
+  getChallengerConfig,
+  getChallengeRequirementReason,
+  getMapChallengeConfig,
+  getNPCDialog,
+  getNPCDialogOptions,
+  getProtectorRewardPreview,
+  isMapProtector,
+  markChallengedToday,
+  resetMapChallengeDaily,
+  setAsMapProtector,
+} from './utils/mapChallengeUtils';
+import { claimMilitaryPay, formatMilitaryIntel, gainBattleExpAndPromote, getMilitaryRankDescription, getMilitaryRankName, queryBattleExp, queryMilitaryIntel } from './utils/militaryRankUtils';
+import { claimNobleReward, gainMeritAndPromote, getNextNobleRankMerit, getNobleRankName, getNobleRankSystemDescription } from './utils/nobleRankUtils';
 import { findPath } from './utils/pathfinding';
 // 导入幻兽生成工具函数
-import { gainExperience } from './utils/petGenerator';
+import { gainExperience, generatePetByType, generateStarStrangePet } from './utils/petGenerator';
 // 导入幻兽研究所工具函数
 import {
   consumeItemFromInventory,
@@ -70,6 +108,10 @@ import {
 } from './utils/petInstituteUtils';
 // 导入 NPC 相关工具函数
 import { getDemonArmyDialogue, performChat, performGift, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
+// 导入存档系统工具函数
+import { loadGame, saveGame } from './utils/saveUtils';
+// 导入战魂物品掉落工具函数
+import { checkWarSoulDrop } from './utils/warSoulDropUtils';
 
 // 初始化空装备槽位
 const createEmptyEquippedItems = (): Record<EquipmentSlotType, EquipmentDetail | null> => ({
@@ -99,7 +141,7 @@ function App() {
   // 玩家资源状态
   const [playerResources, setPlayerResources] = useState<PlayerResources>({
     gold: 12568000000, // 初始金币
-    magicStone: 1000, // 初始魔石
+    magicStone: 100000000, // 初始魔石
     battleExp: 0, // 战功
     merit: 0, // 功勋
   });
@@ -177,6 +219,41 @@ function App() {
   // 注意：setIsKingRescued将在救出国王的任务中使用
   const [isKingRescued, _setIsKingRescued] = useState(false); // 国王是否已救出
 
+  // 探险家解锁状态（戈壁探险家）
+  // 当角色全身6件装备都是极品品质时，到达卡萨诺城会触发解锁
+  const [explorerUnlocked, setExplorerUnlocked] = useState(false);
+
+  // 神秘人触发状态（战魂封印迷宫）
+  // 当玩家与神秘人NPC交互后，神秘人消失，无名氏敌人出现
+  const [mysteriousPersonTriggered, setMysteriousPersonTriggered] = useState(false);
+
+  // 尝试从存档加载数据
+  // 在组件初始化时加载存档中的战魂系统状态
+  const savedData = loadGame();
+
+  // 无名氏击败状态（战魂封印迷宫）
+  // 当玩家击败无名氏后，获得战魂之心
+  // 优先使用存档中的数据，如果没有存档则使用默认值 false
+  const [wumingshiDefeated, setWumingshiDefeated] = useState(savedData?.wumingshiDefeated ?? false);
+
+  // 战魂系统开启状态
+  // 当玩家击败无名氏后，战魂系统开启，可以与装备打造师讨论战魂
+  // 优先使用存档中的数据，如果没有存档则使用默认值 false
+  const [warSoulSystemEnabled, setWarSoulSystemEnabled] = useState(savedData?.warSoulSystemEnabled ?? false);
+
+  // 日常任务状态
+  const [_dailyTaskState, setDailyTaskState] = useState<DailyTaskState>(
+    createInitialDailyTaskState()
+  );
+
+  // 地图挑战状态
+  const [mapChallengeState, setMapChallengeState] = useState<MapChallengeState>(
+    createInitialMapChallengeState()
+  );
+
+  // 正在挑战的地图ID（用于战斗胜利后处理）
+  const [currentChallengingMap, setCurrentChallengingMap] = useState<string | null>(null);
+
   // 商店页面状态
   const [showShopPage, setShowShopPage] = useState(false);
   const [currentShopType, setCurrentShopType] = useState<'gold' | 'magicStone'>('gold');
@@ -189,6 +266,9 @@ function App() {
   // 收藏架界面状态
   const [showCollectorModal, setShowCollectorModal] = useState(false);
 
+  // 经验交换界面状态
+  const [showExperienceExchangeModal, setShowExperienceExchangeModal] = useState(false);
+
   // 抽奖区界面状态
   const [showLottery, setShowLottery] = useState(false);
 
@@ -196,9 +276,94 @@ function App() {
   const [petInstituteState, setPetInstituteState] = useState<PetInstituteState>(createInitialPetInstituteState());
   const [showPetInstituteModal, setShowPetInstituteModal] = useState(false);
 
+  // 幻兽幻化界面状态
+  const [showPetFusionModal, setShowPetFusionModal] = useState(false);
+
+  // 信息弹窗状态
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [infoModalTitle, setInfoModalTitle] = useState('');
+  const [infoModalContent, setInfoModalContent] = useState('');
+  const [infoModalOnConfirm, setInfoModalOnConfirm] = useState<(() => void) | undefined>(undefined);
+
+  // 捐献金币弹窗状态
+  const [showDonationModal, setShowDonationModal] = useState(false);
+
   // 自动移动状态
   const [isAutoMoving, setIsAutoMoving] = useState(false);
   const [moveQueue, setMoveQueue] = useState<string[]>([]);
+
+  // ========== 功勋和战功统一处理函数 ==========
+
+  /**
+   * 处理获得功勋
+   * 统一处理功勋获取、爵位晋升和日志打印
+   * @param amount 获得的功勋数量
+   * @param source 来源描述（可选，用于日志）
+   * @returns 功勋获取结果
+   */
+  const handleGainMerit = (amount: number, source?: string) => {
+    // 调用工具函数计算结果
+    const result = gainMeritAndPromote(playerResources.merit, nobleRank, amount);
+
+    // 更新功勋
+    setPlayerResources(prev => ({
+      ...prev,
+      merit: result.newMerit,
+    }));
+
+    // 如果晋升，更新爵位
+    if (result.promoted) {
+      setNobleRank(result.newNobleRank);
+    }
+
+    // 打印日志
+    const logMessages: string[] = [];
+    if (source) {
+      logMessages.push(`${source}，获得 ${amount.toLocaleString()} 点功勋！`);
+    } else {
+      logMessages.push(`获得 ${amount.toLocaleString()} 点功勋！`);
+    }
+    if (result.promoted && result.promotedRankName) {
+      logMessages.push(`🎉 恭喜你被授予 ${result.promotedRankName}！`);
+    }
+    setInteractionLog(prev => [...prev, ...logMessages]);
+
+    return result;
+  };
+
+  /**
+   * 处理获得战功
+   * 统一处理战功获取、军衔晋升和日志打印
+   * @param amount 获得的战功数量
+   * @param source 来源描述（可选，用于日志）
+   * @returns 战功获取结果
+   */
+  const handleGainBattleExp = (amount: number, source?: string) => {
+    // 调用工具函数计算结果
+    const result = gainBattleExpAndPromote(battleExp, militaryRank, amount);
+
+    // 更新战功
+    _setBattleExp(result.newBattleExp);
+
+    // 如果晋升，更新军衔
+    if (result.promoted) {
+      _setMilitaryRank(result.newMilitaryRank);
+    }
+
+    // 打印日志
+    const logMessages: string[] = [];
+    if (source) {
+      logMessages.push(`${source}，获得 ${amount.toLocaleString()} 点战功！`);
+    } else {
+      logMessages.push(`获得 ${amount.toLocaleString()} 点战功！`);
+    }
+    if (result.promoted && result.promotedRankName) {
+      logMessages.push(`🎖️ 恭喜你荣升 ${result.promotedRankName}！`);
+    }
+    setInteractionLog(prev => [...prev, ...logMessages]);
+
+    return result;
+  };
 
   // 用于防止 React StrictMode 导致的重复初始化
   const isInitializedRef = useRef(false);
@@ -208,6 +373,14 @@ function App() {
 
   // currentLocation 引用，用于解决闭包问题
   const currentLocationRef = useRef(currentLocation);
+
+  // 当战魂系统状态或无名氏击败状态变化时，自动保存到存档
+  useEffect(() => {
+    saveGame({
+      warSoulSystemEnabled,
+      wumingshiDefeated,
+    });
+  }, [warSoulSystemEnabled, wumingshiDefeated]);
 
   // 游戏初始化时的第一天日志和 BOSS 刷新
   useEffect(() => {
@@ -233,6 +406,22 @@ function App() {
   useEffect(() => {
     currentLocationRef.current = currentLocation;
   }, [currentLocation]);
+
+  // 自动同步角色战斗力（当等级或幻兽变化时重新计算）
+  useEffect(() => {
+    setCharacter(prev => {
+      const newCombatPower = calculateTotalCombatPower(prev, pets);
+      // 如果战斗力没有变化，不更新状态
+      if (prev.combatPower === newCombatPower) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        combatPower: newCombatPower
+      };
+    });
+  }, [character.level, pets]); // 依赖等级和幻兽，当它们变化时重新计算战斗力
 
   // 自动移动队列处理
   useEffect(() => {
@@ -261,6 +450,22 @@ function App() {
     if (location) {
       setCurrentLocation(locationId);
       setInteractionLog(prev => [...prev, `你移动到了${location.name}`]);
+
+      // 检测到达卡萨诺城时是否触发探险家解锁
+      // 条件：未解锁 + 全身6件装备都是极品品质
+      if (locationId === 'kasanuocheng' && !explorerUnlocked) {
+        if (checkAllEquipmentLegendary(equippedItems)) {
+          // 在日志区打印提示
+          setInteractionLog(prev => [...prev, '飞翔：噢，你的全身装备都是极品啊，看来这位你是位不同寻常的人。听装备打造师说从戈壁可以找到有关战魂的秘密...你应该去看一看。']);
+          // 显示解锁弹窗
+          setInfoModalTitle('飞翔');
+          setInfoModalContent('噢，你的全身装备都是极品啊，看来这位你是位不同寻常的人。听装备打造师说从戈壁可以找到有关战魂的秘密...你应该去看一看。');
+          setInfoModalOnConfirm(() => {
+            setExplorerUnlocked(true);
+          });
+          setShowInfoModal(true);
+        }
+      }
     }
   };
 
@@ -319,6 +524,13 @@ function App() {
         currentStamina: prev.maxStamina,
       }));
 
+      // Recover all pets to max HP at the start of a new day
+      setPets(prevPets => prevPets.map(pet =>
+        pet.hp < pet.mhp
+          ? { ...pet, hp: pet.mhp }
+          : pet
+      ));
+
       // 新的一天刷新所有怪物
       setKilledMonsters(new Set());
 
@@ -332,6 +544,12 @@ function App() {
         const bossMessages = bossSpawnResults.map(result => result.message);
         setInteractionLog(logs => [...logs, ...bossMessages]);
       }
+
+      // 重置日常任务状态（对应参考文档的 nextday() 函数）
+      setDailyTaskState(prev => resetDailyTaskState(prev, timeSystem.nowday));
+
+      // 重置地图挑战状态
+      setMapChallengeState(prev => resetMapChallengeDaily(prev));
     }
   }, [timeSystem.nowday]);
 
@@ -409,7 +627,46 @@ function App() {
    * @param interactable NPC交互数据
    */
   const handleNPCInteract = (interactable: NPCInteractable) => {
-    setCurrentNPCData(interactable);
+    // 如果是日常任务官，动态生成包含当天任务描述的NPC描述
+    if (interactable.id === 'npc_daily_task') {
+      const weekday = timeSystem.nowday % 7;
+      const taskDescription = getDailyTaskDescriptionByWeekday(weekday, character.level, isKingRescued);
+
+      // 创建包含任务描述的NPC数据
+      const npcDataWithTask: NPCInteractable = {
+        ...interactable,
+        description: `${interactable.description}\n\n${taskDescription}`,
+      };
+
+      setCurrentNPCData(npcDataWithTask);
+    } else if (interactable.id.startsWith('npc_map_challenge')) {
+      // 如果是地图赛报名官，动态生成对话和选项
+      if (interactable.location) {
+        const dialog = getNPCDialog(mapChallengeState, interactable.location, nobleRank);
+        const options = getNPCDialogOptions(mapChallengeState, interactable.location);
+
+        // 转换选项格式
+        const npcOptions = options.map(opt => ({
+          text: opt.text,
+          result: opt.text,
+          actionType: opt.actionType,
+          actionParams: {},
+        }));
+
+        // 创建动态NPC数据
+        const npcDataDynamic: NPCInteractable = {
+          ...interactable,
+          description: dialog,
+          options: npcOptions,
+        };
+
+        setCurrentNPCData(npcDataDynamic);
+      } else {
+        setCurrentNPCData(interactable);
+      }
+    } else {
+      setCurrentNPCData(interactable);
+    }
     setShowNPCModal(true);
   };
 
@@ -433,6 +690,17 @@ function App() {
   };
 
   /**
+   * 显示信息弹窗的辅助函数
+   * @param title 弹窗标题
+   * @param content 弹窗内容
+   */
+  const showInfoModalWithContent = useCallback((title: string, content: string) => {
+    setInfoModalTitle(title);
+    setInfoModalContent(content);
+    setShowInfoModal(true);
+  }, []);
+
+  /**
    * 处理NPC选项选择
    * 根据选项的 actionType 调用相应的功能函数
    * @param result 选项结果文本
@@ -447,6 +715,10 @@ function App() {
     // 如果没有 actionType，只显示结果文本
     if (!actionType) {
       setInteractionLog(prev => [...prev, result]);
+      // 如果result包含换行符或文本较长，显示弹窗
+      if (result.includes('\n') || result.length > 50) {
+        showInfoModalWithContent('信息', result);
+      }
 
       return;
     }
@@ -460,6 +732,8 @@ function App() {
           const demonId = actionParams.enemyType as string;
           const dialogue = getDemonArmyDialogue(demonId);
           setInteractionLog(prev => [...prev, dialogue]);
+          // 添加弹窗显示
+          showInfoModalWithContent('魔族大军情报', dialogue);
         }
         break;
 
@@ -486,7 +760,8 @@ function App() {
         // 送礼给公主
         if (actionParams?.giftType) {
           const giftType = actionParams.giftType as '99朵白玫瑰' | '999朵白玫瑰';
-          const isSunday = new Date().getDay() === 0; // 判断是否是周日
+          // 使用游戏时间系统判断是否是周日（nowday % 7 === 0 表示周日）
+          const isSunday = timeSystem.nowday % 7 === 0;
           const giftResult = performGift(princessRelationship, giftType, 1, isSunday);
 
           if (giftResult.success) {
@@ -504,11 +779,38 @@ function App() {
         break;
 
       case 'receiveWeeklyGift':
-        // 领取周日礼物
-        const isSunday = new Date().getDay() === 0;
-        const sundayGiftResult = receiveSundayGift(princessRelationship, isSunday, false);
+        // 领取周日礼物（公主星期天礼物逻辑）
+        // 条件1：检查是否为星期天（nowday % 7 === 0 表示周日）
+        // 条件2：检查关系等级是否为6（亲密恋人）
+        // 礼物内容根据战魂系统开启状态决定：
+        //   - 战魂系统开启：战魂之心
+        //   - 战魂系统未开启：电浆药水
+        const isSunday = timeSystem.nowday % 7 === 0;
+        const sundayGiftResult = receiveSundayGift(princessRelationship, isSunday, warSoulSystemEnabled);
 
         if (sundayGiftResult.success && sundayGiftResult.gift) {
+          // 根据礼物名称创建物品并添加到背包
+          // 使用 cloneItem 函数从 ITEM_TEMPLATES 克隆物品
+          const giftName = sundayGiftResult.gift.itemName;
+          let giftItem: InventoryItem | null = null;
+
+          // 根据礼物名称选择对应的物品模板
+          if (giftName === '战魂之心') {
+            // 战魂之心：使用 ITEM_TEMPLATES.zhanHunZhiXin
+            giftItem = cloneItem(ITEM_TEMPLATES.zhanHunZhiXin);
+          } else if (giftName === '电浆药水') {
+            // 电浆药水：使用 ITEM_TEMPLATES.dianJiangYaoShui
+            giftItem = cloneItem(ITEM_TEMPLATES.dianJiangYaoShui);
+          } else {
+            // 其他礼物：使用 createItemFromTemplate 从模板创建
+            giftItem = createItemFromTemplate(giftName, 1);
+          }
+
+          // 将礼物添加到背包
+          if (giftItem) {
+            setInventory(prev => [...prev, giftItem!]);
+          }
+
           // 更新公主关系状态
           setPrincessRelationship(prev => ({
             ...prev,
@@ -539,7 +841,8 @@ function App() {
       // ========== 元帅 NPC 功能 ==========
       case 'receiveSalary':
         // 领取军饷
-        const weekday = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][new Date().getDay()] as any;
+        // 使用游戏时间系统获取星期几
+        const weekday = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][timeSystem.nowday % 7] as any;
         const payResult = claimMilitaryPay(militaryRank, weekday, hasClaimedMilitaryPay);
 
         if (payResult.success) {
@@ -550,6 +853,33 @@ function App() {
             magicStone: prev.magicStone + payResult.magicStone,
           }));
           setInteractionLog(prev => [...prev, payResult.message]);
+
+          // 少将以上额外获得"高级斗志抑扬"
+          if (payResult.specialReward) {
+            // 创建高级斗志抑扬物品并添加到背包
+            const skillBook = {
+              id: 'skillbook_gaojidouzhiyiyang',
+              name: '高级斗志抑扬',
+              icon: '📓',
+              quantity: 1,
+              type: 'skillBook' as const,
+              rarity: 'legendary' as const,
+              source: '军饷奖励',
+              description: '记载着高级斗志抑扬技能的秘籍，是斗志抑扬的升级版，大幅提升战斗力。',
+              maxStack: 1,
+              usable: true,
+              equippable: false,
+              skillId: 'skill_gaojidouzhiyiyang',
+              skillName: '高级斗志抑扬',
+              skillType: 'buff',
+              skillEffect: '大幅提升战斗力',
+              goldValue: 82800000,
+              magicStoneValue: 25000,
+              imagePath: '/images/items/skillbook/gaojidouzhiyiyang.png',
+            };
+            setInventory(prev => [...prev, skillBook]);
+            setInteractionLog(prev => [...prev, `额外获得：${payResult.specialReward}`]);
+          }
         } else {
           setInteractionLog(prev => [...prev, payResult.message]);
         }
@@ -564,6 +894,8 @@ function App() {
             : '已达到最高军衔！'
         }`;
         setInteractionLog(prev => [...prev, expMessage]);
+        // 添加弹窗显示
+        showInfoModalWithContent('战功查询', expMessage);
         break;
 
       case 'queryBossInfo':
@@ -582,6 +914,8 @@ function App() {
         const intelList = queryMilitaryIntel(bossStatus);
         const intelMessage = formatMilitaryIntel(intelList);
         setInteractionLog(prev => [...prev, intelMessage]);
+        // 添加弹窗显示
+        showInfoModalWithContent('军情查询', intelMessage);
         break;
 
       case 'showHelp':
@@ -590,51 +924,99 @@ function App() {
           // 显示军衔系统说明
           const rankDesc = getMilitaryRankDescription();
           setInteractionLog(prev => [...prev, rankDesc]);
+          // 添加弹窗显示
+          showInfoModalWithContent('军衔系统说明', rankDesc);
         } else if (actionParams?.topic === 'nobleRank') {
           // 显示爵位系统说明
           const nobleDesc = getNobleRankSystemDescription();
           setInteractionLog(prev => [...prev, nobleDesc]);
+          // 添加弹窗显示
+          showInfoModalWithContent('爵位系统说明', nobleDesc);
         } else if (actionParams?.topic === 'dailyTask') {
           // 显示日常任务说明（已在 result 中）
           setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('日常任务说明', result);
+        } else if (actionParams?.topic === 'gameTips') {
+          // 显示游戏提示
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('游戏提示', result);
+        } else if (actionParams?.topic === 'petSystem') {
+          // 显示关于幻兽
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('关于幻兽', result);
+        } else if (actionParams?.topic === 'pkReward') {
+          // 显示PK赛奖励
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('PK赛奖励', result);
+        } else if (actionParams?.topic === 'lottery') {
+          // 显示抽奖系统说明
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('抽奖系统说明', result);
+        } else if (actionParams?.topic === 'petFusion') {
+          // 显示幻化系统说明
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('幻化系统说明', result);
+        } else if (actionParams?.topic === 'explore') {
+          // 显示探险说明
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('探险说明', result);
+        } else if (actionParams?.topic === 'soulLevel') {
+          // 显示提升魔魂等级
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('提升魔魂等级', result);
+        } else if (actionParams?.topic === 'quality') {
+          // 显示提升品质
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('提升品质', result);
+        } else if (actionParams?.topic === 'socket') {
+          // 显示装备开洞
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('装备开洞', result);
+        } else if (actionParams?.topic === 'gemInlay') {
+          // 显示镶嵌宝石
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('镶嵌宝石', result);
+        } else if (actionParams?.topic === 'warSoul') {
+          // 显示战魂系统
+          setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('战魂系统', result);
         } else {
           // 其他帮助信息
           setInteractionLog(prev => [...prev, result]);
+          // 添加弹窗显示
+          showInfoModalWithContent('帮助信息', result);
         }
         break;
 
       // ========== 首相 NPC 功能 ==========
       case 'donateGold':
-        // 捐献金币获得功勋
-        // TODO: 这里需要实现一个捐献界面，暂时使用固定金额测试
-        const donateAmount = actionParams?.exchangeRate ? actionParams.exchangeRate as number : 750000;
-        const donateResult = donateGoldForMerit(playerResources.gold, donateAmount, playerResources.merit, nobleRank);
-
-        if (donateResult.success) {
-          // 更新金币和功勋
-          setPlayerResources(prev => ({
-            ...prev,
-            gold: prev.gold - donateResult.donatedGold,
-            merit: donateResult.newMerit,
-          }));
-          // 更新爵位
-          if (donateResult.promoted) {
-            setNobleRank(donateResult.newNobleRank);
-          }
-          setInteractionLog(prev => [...prev, donateResult.message]);
-        } else {
-          setInteractionLog(prev => [...prev, donateResult.message]);
-        }
+        // 打开捐献金币弹窗
+        setShowNPCModal(false); // 关闭NPC对话框
+        setShowDonationModal(true);
         break;
 
       case 'queryMerit':
         // 查询功勋
-        const meritMessage = `当前爵位：${getNobleRankName(nobleRank)}\n当前功勋：${playerResources.merit}\n${
+        const meritMessage = `当前爵位：${getNobleRankName(nobleRank)}\n当前功勋：${playerResources.merit.toLocaleString()}\n${
           nobleRank < 6
-            ? `下一级爵位：${getNobleRankName(nobleRank + 1)}\n所需功勋：${getNextNobleRankMerit(nobleRank)}`
+            ? `下一级爵位：${getNobleRankName(nobleRank + 1)}\n所需功勋：${getNextNobleRankMerit(nobleRank)?.toLocaleString()}`
             : '已达到最高爵位！'
         }`;
         setInteractionLog(prev => [...prev, meritMessage]);
+        // 添加弹窗显示
+        showInfoModalWithContent('功勋查询', meritMessage);
         break;
 
       case 'queryKingStatus':
@@ -643,12 +1025,8 @@ function App() {
           ? '感谢勇士们，我们的国王终于回来了。\n我们的国王智勇双全，看看他有什么对付魔族大军的策略吧。'
           : '人类的国王被前来偷袭的魔族大军先锋部队俘虏了，亚特兰蒂斯大陆已处于群龙无首的地步...\n每一个亚特兰蒂斯的人类都肩负拯救人类的使命。';
         setInteractionLog(prev => [...prev, kingMessage]);
-        break;
-
-      case 'openTrade':
-        // 打开交易界面
-        const tradeMessage = getTradeSystemMessage();
-        setInteractionLog(prev => [...prev, tradeMessage]);
+        // 添加弹窗显示
+        showInfoModalWithContent('关于国王的消息', kingMessage);
         break;
 
       case 'receiveNobleReward':
@@ -667,48 +1045,416 @@ function App() {
       // ========== 日常任务官 NPC 功能 ==========
       case 'acceptDailyTask': {
         // 接受日常任务
-        const today = new Date().getDay();
-        const task = getDailyTask(today);
+        // 使用游戏时间系统计算星期几（1=周一, 2=周二, ..., 6=周六, 0=周日）
+        const weekday = timeSystem.nowday % 7;
+        const task = getDailyTask(weekday);
 
-        if (task) {
-          const taskDesc = getTaskDescription(task);
-          setInteractionLog(prev => [...prev, taskDesc]);
-        } else {
+        if (!task) {
           setInteractionLog(prev => [...prev, '今天没有可接受的任务']);
+          break;
+        }
+
+        // 根据任务类型执行不同操作
+        switch (task.type) {
+          case 'collect': {
+            // 收集宝石任务
+            const requirement = calculateGemRequirement(character.level);
+            const reward = calculateGemReward(requirement.type, requirement.quantity);
+
+            // 检查背包中是否有足够的物品
+            if (checkGemInInventory(inventory, requirement.type, requirement.quantity)) {
+              // 弹出确认弹窗
+              setInfoModalTitle('确认提交物品');
+              setInfoModalContent(
+                `确定要提交 ${requirement.quantity} 个${requirement.type}吗？\n\n` +
+                `奖励：${reward.description}`
+              );
+
+              // 设置确认回调
+              setInfoModalOnConfirm(() => () => {
+                // 消耗物品
+                const newInventory = consumeGemFromInventory(inventory, requirement.type, requirement.quantity);
+                setInventory(newInventory);
+
+                // 发放奖励
+                if (reward.exp) {
+                  // 计算带战斗力加成的经验值
+                  const bonusExp = calculateCombatPowerBonusExp(reward.exp!, character.combatPower, character.level);
+
+                  // 使用统一的升级函数处理角色经验获取（使用加成后的经验）
+                  setCharacter(prev => {
+                    const result = gainCharacterExperience(prev, bonusExp);
+
+                    // 如果升级了，显示提示消息
+                    if (result.message) {
+                      setInteractionLog(logs => [...logs, result.message!]);
+                    }
+
+                    return result.character;
+                  });
+
+                  // 给战中幻兽增加相同经验（带加成）
+                  setPets(prevPets => {
+                    return prevPets.map(pet => {
+                      // 只给出战的幻兽分配经验
+                      if (!pet.isDeployed) {
+                        return pet;
+                      }
+
+                      // 使用 gainExperience 函数处理经验获取和升级
+                      const result = gainExperience(pet, bonusExp, character.level);
+
+                      // 如果有升级消息，打印到日志
+                      if (result.message) {
+                        setInteractionLog(logs => [...logs, result.message!]);
+                      }
+
+                      return result.pet;
+                    });
+                  });
+
+                  // 打印战中幻兽获得经验的日志
+                  const deployedCount = pets.filter(p => p.isDeployed).length;
+                  if (deployedCount > 0) {
+                    setInteractionLog(prev => [...prev, `🐉 战中幻兽（${deployedCount}只）各获得了 ${bonusExp.toLocaleString()} 经验！`]);
+                  }
+                }
+                if (reward.merit) {
+                  // 使用统一处理函数获取功勋
+                  handleGainMerit(reward.merit, '完成收集宝石任务');
+                }
+
+                // 标记任务完成
+                setDailyTaskState(prev => completeTask(prev, 'collect'));
+
+                setInteractionLog(prev => [...prev, `任务完成！获得奖励：${reward.description}`]);
+              });
+
+              setShowInfoModal(true);
+            } else {
+              setInteractionLog(prev => [...prev,
+                `背包中没有足够的${requirement.type}！\n需要：${requirement.quantity}个`
+              ]);
+            }
+            break;
+          }
+
+          case 'train': {
+            // 训练幻兽任务
+            const validPets = getValidPetsForTraining(pets);
+
+            if (validPets.length > 0) {
+              // 显示符合条件的幻兽列表
+              const petListText = validPets.map((pet, index) =>
+                `${index + 1}. ${pet.othername} - ${pet.qualityTitle}（品质分：${pet.pz}）`
+              ).join('\n');
+
+              setInfoModalTitle('选择幻兽');
+              setInfoModalContent(
+                `请选择要上交的幻兽：\n\n${petListText}\n\n` +
+                '提示：第一个幻兽将被上交'
+              );
+
+              // 设置确认回调（暂时只上交第一个幻兽）
+              setInfoModalOnConfirm(() => () => {
+                const selectedPet = validPets[0];
+                const petReward = calculatePetRewardByQuality(selectedPet.pz);
+
+                // 移除幻兽
+                const newPets = removePetFromList(pets, selectedPet.id);
+                setPets(newPets);
+
+                // 发放奖励
+                setPlayerResources(prev => ({
+                  ...prev,
+                  magicStone: prev.magicStone + petReward.magicStone,
+                }));
+                // 使用统一处理函数获取战功
+                handleGainBattleExp(1000, '完成训练幻兽任务');
+
+                // 标记任务完成
+                setDailyTaskState(prev => completeTask(prev, 'train'));
+
+                setInteractionLog(prev => [...prev,
+                  `任务完成！上交了${selectedPet.othername}（${petReward.starLevel}）\n` +
+                  `获得奖励：${petReward.magicStone}魔石 + 1000战功`
+                ]);
+              });
+
+              setShowInfoModal(true);
+            } else {
+              setInteractionLog(prev => [...prev,
+                '没有符合条件的幻兽！\n需要：攻防型幻兽，品质分≥500'
+              ]);
+            }
+            break;
+          }
+
+          case 'raid': {
+            // 突袭任务：自动寻路到雪域边境
+            setShowNPCModal(false); // 关闭NPC对话框
+            handleAutoMove('xueyu-bianjing');
+            setInteractionLog(prev => [...prev, '正在前往雪域边境...消灭冰雪巨人完成任务！']);
+            break;
+          }
+
+          case 'pk': {
+            // PK赛任务：自动寻路到皇宫
+            setShowNPCModal(false); // 关闭NPC对话框
+            handleAutoMove('huanggong');
+            setInteractionLog(prev => [...prev, '正在前往皇宫...请找PK赛报名官报名参加比赛！']);
+            break;
+          }
+
+          case 'dungeon': {
+            // 地下城任务：暂时不做
+            setInteractionLog(prev => [...prev, '地下城任务暂未开放，敬请期待！']);
+            break;
+          }
+
+          default:
+            setInteractionLog(prev => [...prev, '未知的任务类型']);
         }
         break;
       }
 
       // ========== 地图赛报名官 NPC 功能 ==========
-      case 'challengeOrClaim':
-        // 挑战地图或领取保护者奖励
+      case 'viewMapProtectorReward':
+        // 查看保护者奖励
         if (currentNPCData?.location) {
-          const config = getMapChallengeConfig(currentNPCData.location);
+          const preview = getProtectorRewardPreview(currentNPCData.location);
+          setInteractionLog(prev => [...prev, preview]);
+          showInfoModalWithContent('保护者奖励', preview);
+        }
+        break;
 
-          if (config) {
-            // 检查是否满足挑战要求
-            const canChallenge = checkChallengeRequirement(nobleRank, currentNPCData.location);
+      case 'challengeMap':
+        // 挑战地图
+        if (currentNPCData?.location) {
+          const locationId = currentNPCData.location;
 
-            if (canChallenge) {
-              // 尝试领取保护者奖励
-              const rewardResult = claimProtectorReward(currentNPCData.location, nobleRank);
-              setInteractionLog(prev => [...prev, rewardResult.message]);
-            } else {
-              setInteractionLog(prev => [...prev, `需要【${config.requiredNobleRankName}】以上爵位才能挑战${config.locationName}`]);
+          // 检查挑战要求
+          const canChallenge = checkChallengeRequirement(nobleRank, locationId);
+          if (!canChallenge) {
+            const reason = getChallengeRequirementReason(nobleRank, locationId);
+            if (reason) {
+              setInteractionLog(prev => [...prev, reason]);
+              showInfoModalWithContent('挑战失败', reason);
             }
+            break;
+          }
+
+          // 检查今天是否已经挑战过（所有地图共享一次机会）
+          if (!canChallengeToday(mapChallengeState)) {
+            const message = '你今天已经挑战过了，明天再来挑战吧！';
+            setInteractionLog(prev => [...prev, message]);
+            showInfoModalWithContent('今日已挑战', message);
+            break;
+          }
+
+          // 获取挑战者配置
+          const challenger = getChallengerConfig(locationId);
+          if (!challenger) {
+            setInteractionLog(prev => [...prev, '挑战者配置不存在！']);
+            break;
+          }
+
+          // 使用属性成长系统计算挑战者属性
+          // 公式：属性 = 基础值 + 成长值 × 等级
+          // 生命成长是随机值，范围在 hpGrowthMin 和 hpGrowthMax 之间
+          const hpGrowth = challenger.hpGrowthMin + Math.random() * (challenger.hpGrowthMax - challenger.hpGrowthMin);
+          const maxHp = Math.floor(challenger.baseHp + hpGrowth * challenger.level);
+          const minAttack = Math.floor(challenger.baseMinAttack + challenger.minAttackGrowth * challenger.level);
+          const maxAttack = Math.floor(challenger.baseMaxAttack + challenger.maxAttackGrowth * challenger.level);
+          const defense = Math.floor(challenger.baseDefense + challenger.defenseGrowth * challenger.level);
+
+          // 创建挑战者战斗数据
+          const challengerData: EnemyData = {
+            id: 'map_challenger',
+            name: challenger.name,
+            level: challenger.level,
+            maxHp: maxHp,
+            attack: Math.floor((minAttack + maxAttack) / 2), // 使用平均攻击力
+            defense: defense,
+          };
+
+          // 关闭NPC对话
+          setShowNPCModal(false);
+
+          // 保存正在挑战的地图ID
+          setCurrentChallengingMap(locationId);
+
+          // 开始战斗
+          setBattleParams({
+            enemyTemplateId: challenger.isBoss ? 'boss' : 'soldier',
+            enemyLevel: challenger.level,
+            enemyCount: 1,
+            enemiesData: [challengerData],
+          });
+
+          setInBattle(true);
+
+          const config = getMapChallengeConfig(locationId);
+          if (config) {
+            setInteractionLog(prev => [...prev, `开始挑战${config.locationName}的挑战者：${challenger.name}！`]);
           }
         }
         break;
 
-      case 'viewProtectorReward':
-        // 查看保护者奖励
+      case 'claimMapReward':
+        // 领取保护者奖励
         if (currentNPCData?.location) {
-          const config = getMapChallengeConfig(currentNPCData.location);
+          const locationId = currentNPCData.location;
 
-          if (config) {
-            const desc = getMapChallengeDescription(config);
-            setInteractionLog(prev => [...prev, desc]);
+          // 检查是否是当前地图的保护者
+          if (!isMapProtector(mapChallengeState, locationId)) {
+            const message = `你不是${locationId}的保护者！`;
+            setInteractionLog(prev => [...prev, message]);
+            showInfoModalWithContent('领取失败', message);
+            break;
           }
+
+          // 检查今天是否已经领取过
+          if (!canClaimReward(mapChallengeState)) {
+            const message = '你今天已经领取过奖励了，明天再来领取吧！';
+            setInteractionLog(prev => [...prev, message]);
+            showInfoModalWithContent('今日已领取', message);
+            break;
+          }
+
+          // 获取奖励配置
+          const config = getMapChallengeConfig(locationId);
+          if (!config) {
+            setInteractionLog(prev => [...prev, '地图配置不存在！']);
+            break;
+          }
+
+          const reward = config.protectorReward;
+          const rewardMessages: string[] = [];
+
+          // 发放满经验球
+          if (reward.expBalls > 0) {
+            const expBallItem = createItemFromTemplate('满经验球', reward.expBalls);
+            if (expBallItem) {
+              setInventory(prev => {
+                const existing = prev.find(item => item.name === '满经验球');
+                if (existing) {
+                  return prev.map(item =>
+                    item.name === '满经验球'
+                      ? { ...item, quantity: item.quantity + reward.expBalls }
+                      : item
+                  );
+                }
+
+                return [...prev, expBallItem];
+              });
+              rewardMessages.push(`• 满经验球 × ${reward.expBalls}`);
+            }
+          }
+
+          // 发放灵魂晶石或灵魂王
+          if (reward.soulStones > 0) {
+            const soulStoneItem = createItemFromTemplate(reward.soulStoneType, reward.soulStones);
+            if (soulStoneItem) {
+              setInventory(prev => {
+                const existing = prev.find(item => item.name === reward.soulStoneType);
+                if (existing) {
+                  return prev.map(item =>
+                    item.name === reward.soulStoneType
+                      ? { ...item, quantity: item.quantity + reward.soulStones }
+                      : item
+                  );
+                }
+
+                return [...prev, soulStoneItem];
+              });
+              rewardMessages.push(`• ${reward.soulStoneType} × ${reward.soulStones}`);
+            }
+          }
+
+          // 发放白玫瑰
+          if (reward.whiteRoses && reward.whiteRoses > 0 && reward.roseType) {
+            const roseName = reward.roseType;
+            const roseItem = createItemFromTemplate(roseName, reward.whiteRoses);
+            if (roseItem) {
+              setInventory(prev => {
+                const existing = prev.find(item => item.name === roseName);
+                if (existing) {
+                  return prev.map(item =>
+                    item.name === roseName
+                      ? { ...item, quantity: item.quantity + reward.whiteRoses! }
+                      : item
+                  );
+                }
+
+                return [...prev, roseItem];
+              });
+              rewardMessages.push(`• ${roseName} × ${reward.whiteRoses}`);
+            }
+          }
+
+          // 发放装备奖励
+          if (reward.equipmentReward) {
+            const qualityMap: Record<string, number> = {
+              '精品': 3,
+              '极品': 4
+            };
+            const quality = qualityMap[reward.equipmentReward.quality] || 3;
+
+            // 根据玩家等级计算装备等级
+            // 规则：< 10级 → 10级，10-99级 → 取整到十位，≥ 100级 → 100级
+            let equipmentLevel: number;
+            if (character.level < 10) {
+              equipmentLevel = 10;
+            } else if (character.level >= 100) {
+              equipmentLevel = 100;
+            } else {
+              // 取整到十位（例如：35级→30级，78级→70级）
+              equipmentLevel = Math.floor(character.level / 10) * 10;
+            }
+
+            // 随机选择装备类型
+            const equipmentTypes: EquipmentSlotType[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
+            const randomType = equipmentTypes[Math.floor(Math.random() * equipmentTypes.length)];
+
+            // 使用 itemFactory 创建装备
+            const equipmentItem = createEquipmentItem({
+              equipmentType: randomType,
+              level: equipmentLevel,
+              quality: quality,
+              magicSoulLevel: reward.equipmentReward.bonusLevel,
+              gemSlots: randomGemSlots(quality)
+            });
+
+            setInventory(prev => [...prev, equipmentItem]);
+            rewardMessages.push(`• ${reward.equipmentReward.quality}+${reward.equipmentReward.bonusLevel}装备`);
+          }
+
+          // 发放幻兽奖励
+          if (reward.petReward) {
+            // 根据星级选择生成函数
+            // 8、12、19星使用 generateStarStrangePet，其他星级使用 generatePetByType
+            const validStarLevels = [8, 12, 19];
+            let pet;
+
+            if (validStarLevels.includes(reward.petReward.star)) {
+              // 生成指定星级的奇异兽
+              pet = generateStarStrangePet(reward.petReward.star);
+            } else {
+              // 生成普通奇异兽
+              pet = generatePetByType(reward.petReward.petType);
+            }
+
+            setPets(prev => [...prev, pet]);
+            rewardMessages.push(`• ${reward.petReward.star}星${reward.petReward.petType}`);
+          }
+
+          // 更新状态：标记已领取
+          setMapChallengeState(prev => claimReward(prev));
+
+          const rewardMessage = `🎁 领取${config.locationName}保护者奖励：\n${ rewardMessages.join('\n')}`;
+          setInteractionLog(prev => [...prev, rewardMessage]);
+          showInfoModalWithContent('领取奖励成功', rewardMessage);
         }
         break;
 
@@ -745,6 +1491,62 @@ function App() {
         }
         break;
 
+      // ========== 探险家 NPC 功能 ==========
+      case 'payForExplore':
+        // 探险家带路功能（传送到战魂封印迷宫）
+        {
+          const cost = (actionParams?.cost as number) || 50000;
+          // 检查魔石是否足够
+          if (playerResources.magicStone >= cost) {
+            // 扣除魔石
+            setPlayerResources(prev => ({
+              ...prev,
+              magicStone: prev.magicStone - cost,
+            }));
+            // 消耗15个时间单位（整整一天）
+            consumeTime(15);
+            // 显示骗局提示
+            const scamMessage = '经过了一天的辛苦跋涉，那家伙带你转了一圈沙漠后，又把你带回到原来不远的地方。你还没反应过来，他就跑了......';
+            setInteractionLog(prev => [...prev, scamMessage]);
+            // 关闭NPC对话框
+            setShowNPCModal(false);
+            // 显示弹窗提示
+            setInfoModalTitle('探险家');
+            setInfoModalContent(scamMessage);
+            setInfoModalOnConfirm(() => {
+              // 传送到战魂封印迷宫
+              setCurrentLocation('zhanhun-fengyin-migong');
+              setInteractionLog(prev => [...prev, '你到达了战魂封印迷宫。']);
+            });
+            setShowInfoModal(true);
+          } else {
+            // 魔石不足
+            setInteractionLog(prev => [...prev, '你的魔石不够。']);
+            showInfoModalWithContent('提示', '你的魔石不够。');
+            setShowNPCModal(false);
+          }
+        }
+        break;
+
+      // ========== 神秘人 NPC 功能 ==========
+      case 'triggerMysteriousPerson':
+        // 神秘人触发功能（显示对话，然后神秘人消失，无名氏出现）
+        {
+          const dialogMessage = '小子，你的装备也不错啊。想有打探有关战魂的秘密吧，先打赢我再说吧。';
+          setInteractionLog(prev => [...prev, `神秘人：${dialogMessage}`]);
+          // 关闭NPC对话框
+          setShowNPCModal(false);
+          // 显示弹窗提示
+          setInfoModalTitle('神秘人');
+          setInfoModalContent(dialogMessage);
+          setInfoModalOnConfirm(() => {
+            // 触发神秘人，神秘人消失，无名氏出现
+            setMysteriousPersonTriggered(true);
+          });
+          setShowInfoModal(true);
+        }
+        break;
+
       case 'close':
         // 关闭NPC对话框
         setShowNPCModal(false);
@@ -763,6 +1565,14 @@ function App() {
       case 'openCollector':
         // 打开收藏架界面
         setShowCollectorModal(true);
+        setShowNPCModal(false); // 关闭NPC对话框
+        setInteractionLog(prev => [...prev, result]);
+        break;
+
+      // ========== 经验导师 NPC 功能 ==========
+      case 'openExperienceExchange':
+        // 打开经验交换界面
+        setShowExperienceExchangeModal(true);
         setShowNPCModal(false); // 关闭NPC对话框
         setInteractionLog(prev => [...prev, result]);
         break;
@@ -830,7 +1640,10 @@ function App() {
 
       case 'viewInstituteInfo':
         // 查看研究所信息
-        setInteractionLog(prev => [...prev, getInstituteInfo(petInstituteState)]);
+        const instituteInfo = getInstituteInfo(petInstituteState);
+        setInteractionLog(prev => [...prev, instituteInfo]);
+        // 添加弹窗显示
+        showInfoModalWithContent('幻兽研究所信息', instituteInfo);
         break;
 
       case 'improveProduction':
@@ -845,7 +1658,17 @@ function App() {
 
       case 'viewOlympicInfo':
         // 查看奥运使者信息
-        setInteractionLog(prev => [...prev, '完成2008奥运任务后，幻兽研究所技术等级上限可提升至150级。']);
+        const olympicInfo = '完成2008奥运任务后，幻兽研究所技术等级上限可提升至150级。';
+        setInteractionLog(prev => [...prev, olympicInfo]);
+        // 添加弹窗显示
+        showInfoModalWithContent('关于2008奥运使者', olympicInfo);
+        break;
+
+      // ========== 幻兽幻化 NPC 功能 ==========
+      case 'openPetFusion':
+        // 打开幻兽幻化界面
+        setShowPetFusionModal(true);
+        setShowNPCModal(false);
         break;
 
       // ========== 默认处理 ==========
@@ -1076,35 +1899,112 @@ function App() {
   };
 
   /**
-   * 检查并处理角色升级
-   * 当经验值达到上限时，升级并恢复HP/MP
-   * @param currentExp 当前经验值
-   * @param maxExp 升级所需经验值
-   * @param currentLevel 当前等级
-   * @returns 升级后的数据
+   * 处理单个敌人阵亡
+   * 敌人阵亡时立即分配经验给角色和幻兽
+   * @param enemy 阵亡的敌人数据
    */
-  const checkAndLevelUp = useCallback((
-    currentExp: number,
-    maxExp: number,
-    currentLevel: number
-  ): { newExp: number; newMaxExp: number; newLevel: number; leveledUp: boolean } => {
-    let exp = currentExp;
-    let level = currentLevel;
-    let currentMaxExp = maxExp;
-    let leveledUp = false;
+  const handleEnemyDeath = useCallback((enemy: BattleCharacter) => {
+    // 计算战利品（主要是经验）
+    const isBoss = enemy.name.includes('BOSS') || enemy.name.includes('boss');
+    const loot = calculateLoot(
+      Math.floor(enemy.maxHp / 100), // 估算等级
+      enemy.maxHp,
+      isBoss,
+      character.luck, // 使用角色的幸运值
+      character.combatPower, // 玩家战斗力（用于经验加成）
+      character.level, // 玩家等级（用于经验加成）
+      0 // 宝石经验加成（暂时为0，宝石系统未实现）
+    );
 
-    // 检查是否可以升级（经验值溢出）
-    while (exp >= currentMaxExp && level < 125) { // 最高等级125
-      exp -= currentMaxExp;
-      level++;
-      leveledUp = true;
+    // ========== 角色获得经验 ==========
+    // 使用统一的升级函数处理角色经验获取
+    setCharacter(prev => {
+      const result = gainCharacterExperience(prev, loot.experience);
 
-      // 计算下一级所需经验（使用参考代码的逻辑）
-      currentMaxExp = calculateNextLevelMaxExp(level - 1, currentMaxExp);
-    }
+      // 如果升级了，显示提示消息
+      if (result.message) {
+        setInteractionLog(logs => [...logs, result.message!]);
+      }
 
-    return { newExp: exp, newMaxExp: currentMaxExp, newLevel: level, leveledUp };
-  }, []);
+      return result.character;
+    });
+
+    // ========== 幻兽获得同等经验 ==========
+    // 给所有出战的幻兽分配相同的经验
+    setPets(prevPets => {
+      return prevPets.map(pet => {
+        // 只给出战的幻兽分配经验
+        if (!pet.isDeployed) {
+          return pet;
+        }
+
+        // 增加经验值
+        let newExp = pet.jy + loot.experience;
+        let newLevel = pet.dj;
+        let newMaxExp = pet.mjy;
+        let newHun = pet.hun;
+        let leveledUp = false;
+
+        // 检查是否可以升级（最高130级）
+        while (newExp >= newMaxExp && newLevel < 130) {
+          newExp -= newMaxExp;
+          newLevel++;
+          leveledUp = true;
+
+          // 计算下一级所需经验（参考文档：02.1_幻兽升级经验系统.md）
+          if (newLevel < 20) {
+            // 1-19级：每次乘以1.2
+            newMaxExp = Math.round(newMaxExp * 1.2);
+          } else if (newLevel <= 50) {
+            // 20-50级：每次乘以1.1
+            newMaxExp = Math.round(newMaxExp * 1.1);
+          } else if (newLevel < 130) {
+            // 51-129级：每次加hun值
+            // 在50级时计算hun值
+            if (newLevel === 51) {
+              newHun = Math.round(newMaxExp * 0.2);
+            }
+            newMaxExp += newHun;
+          }
+        }
+
+        // 如果升级了，更新幻兽属性
+        if (leveledUp) {
+          // 添加幻兽升级提示到交互日志
+          setInteractionLog(logs => [...logs, `🎉 ${pet.othername}升级了！等级提升到 ${newLevel} 级！`]);
+
+          // 计算新的属性（基于成长率）
+          // 公式：初始值 + 成长率 × (等级 - 1)
+          const newMaxHp = pet.chp + pet.cz_hp * (newLevel - 1);
+          const newAttackMin = pet.cxgj + pet.cz_xgj * (newLevel - 1);
+          const newAttackMax = pet.cdgj + pet.cz_dgj * (newLevel - 1);
+          const newDefense = pet.cfy + pet.cz_fy * (newLevel - 1);
+
+          return {
+            ...pet,
+            dj: newLevel,
+            jy: newExp,
+            mjy: newMaxExp,
+            hun: newHun,
+            mhp: newMaxHp,
+            hp: newMaxHp, // 升级恢复满生命值
+            xgj: newAttackMin,
+            dgj: newAttackMax,
+            fy: newDefense,
+          };
+        }
+
+        // 没有升级，只更新经验
+        return {
+          ...pet,
+          jy: newExp,
+        };
+      });
+    });
+
+    // 添加经验获得消息到交互日志
+    setInteractionLog(prev => [...prev, `击败 ${enemy.name}，获得经验: ${loot.experience}`]);
+  }, [character.luck, character.combatPower, character.level]);
 
   /**
    * 战斗结束处理
@@ -1122,13 +2022,29 @@ function App() {
     consumeTime(3);
 
     // ========== 玩家状态同步 ==========
-    // 保存战斗结束后的HP/MP状态（无论胜负都保存）
+    // 保存战斗结束后的HP状态（无论胜负都保存）
+    // 战斗结束后体力自动恢复至最大值
     if (finalPlayerState) {
-      setCharacter(prev => ({
-        ...prev,
-        currentHp: Math.max(1, finalPlayerState.currentHp), // 至少保留1点HP
-        currentStamina: finalPlayerState.currentStamina,
-      }));
+      setCharacter(prev => {
+        // 检查角色是否升级了
+        // 如果角色的最大生命值（maxHp）大于战斗结束时的最大生命值，说明升级了
+        // 升级后应该保持满血状态，而不是用战斗中的血量覆盖
+        if (prev.maxHp > finalPlayerState.maxHp) {
+          // 角色升级了，保持升级后的满血状态
+          return {
+            ...prev,
+            currentHp: prev.maxHp, // 使用升级后的最大生命值作为当前生命值
+            currentStamina: prev.maxStamina, // 战斗结束后体力恢复至最大值
+          };
+        }
+
+        // 没有升级，正常同步战斗中的血量
+        return {
+          ...prev,
+          currentHp: Math.max(1, finalPlayerState.currentHp), // 至少保留1点HP
+          currentStamina: prev.maxStamina, // 战斗结束后体力恢复至最大值
+        };
+      });
     }
 
     // ========== 幻兽状态同步 ==========
@@ -1144,6 +2060,17 @@ function App() {
             // 找到对应的幻兽，同步战斗后的血量
             // 注意：幻兽血量不能为负数，最小为0
             const newCurrentHp = Math.max(0, battlePet.currentHp);
+
+            // 检查幻兽是否升级了
+            // 如果幻兽的最大生命值（mhp）大于战斗结束时的最大生命值，说明升级了
+            // 升级后应该保持满血状态，而不是用战斗中的血量覆盖
+            if (pet.mhp > battlePet.maxHp) {
+              // 幻兽升级了，保持升级后的满血状态
+              return {
+                ...pet,
+                hp: pet.mhp, // 使用升级后的最大生命值作为当前生命值
+              };
+            }
 
             // 返回更新后的幻兽数据
             // 如果幻兽在战斗中阵亡（currentHp <= 0），血量会被设为0
@@ -1172,12 +2099,16 @@ function App() {
           // 根据敌人名称判断是否为BOSS
           const isBoss = enemy.name.includes('BOSS') || enemy.name.includes('boss');
 
-          // 使用敌人生命值作为经验值（参考文档：经验值 = 怪物最大生命值）
+          // 计算战利品（使用新的经验值计算公式）
+          // 参数：怪物等级、怪物最大生命值、是否BOSS、幸运值、玩家战斗力、玩家等级、宝石经验加成
           return calculateLoot(
             Math.floor(enemy.maxHp / 100), // 估算等级
             enemy.maxHp,
             isBoss,
-            character.luck // 使用角色的幸运值
+            character.luck, // 使用角色的幸运值
+            character.combatPower, // 玩家战斗力（用于经验加成）
+            character.level, // 玩家等级（用于经验加成）
+            0 // 宝石经验加成（暂时为0，宝石系统未实现）
           );
         });
 
@@ -1221,45 +2152,7 @@ function App() {
           });
         }
 
-        // 增加经验值并检查升级
-        setCharacter(prev => {
-          const newExp = prev.exp + totalLoot.experience;
-          const { newExp: finalExp, newMaxExp, newLevel, leveledUp } = checkAndLevelUp(
-            newExp,
-            prev.maxExp,
-            prev.level
-          );
-
-          // 如果升级了，恢复HP和MP到最大值，并更新属性
-          if (leveledUp) {
-            const baseAttrs = calculateCharacterBaseAttributes(newLevel);
-
-            // 添加升级提示到交互日志
-            setInteractionLog(logs => [...logs, `🎉 恭喜升级！等级提升到 ${newLevel} 级！`]);
-
-            return {
-              ...prev,
-              level: newLevel,
-              exp: finalExp,
-              maxExp: newMaxExp,
-              maxHp: baseAttrs.maxHp,
-              currentHp: baseAttrs.maxHp, // 升级恢复HP
-              maxStamina: baseAttrs.maxStamina,
-              currentStamina: baseAttrs.maxStamina, // 升级恢复体力
-              attackMin: baseAttrs.attackMin,
-              attackMax: baseAttrs.attackMax,
-              defense: baseAttrs.defense,
-            };
-          }
-
-          return {
-            ...prev,
-            exp: finalExp,
-            maxExp: newMaxExp,
-          };
-        });
-
-        // 添加战利品消息到交互日志
+        // 添加战利品消息到交互日志（经验已经在敌人阵亡时分配）
         const lootMessages = [
           '战斗胜利！你击败了所有敌人。',
           `获得金币: ${totalLoot.gold}`,
@@ -1267,12 +2160,144 @@ function App() {
           ...totalLoot.messages.filter(msg => !msg.includes('获得金币') && !msg.includes('获得经验'))
         ];
         setInteractionLog(prev => [...prev, ...lootMessages]);
+
+        // ========== 战功和功勋获取 ==========
+        // 遍历所有敌人，根据敌人类型给予战功和功勋
+        battleParams.enemiesData.forEach(enemy => {
+          const isBoss = enemy.name.includes('BOSS') || enemy.name.includes('boss');
+          const isIceGiant = enemy.name.includes('冰雪巨人') || enemy.name.includes('冰巨人');
+
+          // 战功获取
+          if (isBoss) {
+            // 击败BOSS获得1000战功
+            handleGainBattleExp(1000, '击败BOSS');
+          } else if (isIceGiant) {
+            // 击败冰雪巨人获得10000战功
+            handleGainBattleExp(10000, '击败冰雪巨人');
+          }
+
+          // 功勋获取（击败BOSS根据等级获得功勋）
+          if (isBoss) {
+            // 从敌人名称中提取BOSS等级（例如：'10级BOSS' -> 'boss-10'）
+            const levelMatch = enemy.name.match(/(\d+)级/);
+            if (levelMatch) {
+              const bossLevel = levelMatch[1];
+              const enemyId = `boss-${bossLevel}`;
+              const meritReward = getMeritReward(enemyId);
+              if (meritReward > 0) {
+                handleGainMerit(meritReward, '击败BOSS');
+              }
+            }
+          }
+        });
+
+        // ========== 战魂物品掉落处理 ==========
+        // 遍历所有敌人，检查是否有战魂物品掉落
+        // 战魂物品掉落规则：
+        // 1. 无名氏：100%掉落战魂之心（不受战魂系统开启状态限制）
+        // 2. 其他怪物：需要战魂系统已开启才会掉落
+        const warSoulDropMessages: string[] = [];
+
+        battleParams.enemiesData.forEach(enemy => {
+          // 调用 checkWarSoulDrop 检查战魂物品掉落
+          // 参数：敌人ID、战魂系统开启状态
+          const warSoulItems = checkWarSoulDrop(enemy.id, warSoulSystemEnabled);
+
+          // 如果有战魂物品掉落，添加到背包并记录消息
+          if (warSoulItems.length > 0) {
+            // 添加战魂物品到背包
+            setInventory(prev => {
+              const newInventory = [...prev];
+
+              for (const warSoulItem of warSoulItems) {
+                // 查找背包中是否已有相同ID的可堆叠物品
+                const existingIndex = newInventory.findIndex(item =>
+                  item.id === warSoulItem.id &&
+                  (item.maxStack && item.maxStack > 1)
+                );
+
+                if (existingIndex !== -1) {
+                  // 已存在，增加数量
+                  newInventory[existingIndex] = {
+                    ...newInventory[existingIndex],
+                    quantity: newInventory[existingIndex].quantity + warSoulItem.quantity,
+                  };
+                } else {
+                  // 不存在，添加新物品
+                  newInventory.push(warSoulItem);
+                }
+              }
+
+              return newInventory;
+            });
+
+            // 记录掉落消息
+            warSoulItems.forEach(item => {
+              warSoulDropMessages.push(`✨ 获得战魂物品: ${item.name}`);
+            });
+          }
+        });
+
+        // 将战魂物品掉落消息添加到交互日志
+        if (warSoulDropMessages.length > 0) {
+          setInteractionLog(prev => [...prev, ...warSoulDropMessages]);
+        }
       } else {
         setInteractionLog(prev => [...prev, '战斗胜利！你击败了所有敌人。']);
+      }
+
+      // ========== 无名氏战斗胜利处理 ==========
+      // 如果击败无名氏，开启战魂系统，并自动回到戈壁
+      // 注意：战魂之心已通过 checkWarSoulDrop 自动掉落，无需手动添加
+      if (currentBattleInteractableId === 'enemy_wumingshi') {
+        // 标记无名氏已被击败
+        setWumingshiDefeated(true);
+        // 开启战魂系统
+        setWarSoulSystemEnabled(true);
+        // 探险家NPC从戈壁消失（任务完成）
+        setExplorerUnlocked(false);
+        // 显示提示（更新提示信息，告知战魂系统已开启）
+        const victoryMessage = '战魂系统已开启！快去找装备打造师吧，他知道如何激发装备的战魂。';
+        setInteractionLog(prev => [...prev, victoryMessage]);
+        // 显示弹窗
+        setInfoModalTitle('战魂系统开启');
+        setInfoModalContent(victoryMessage);
+        setInfoModalOnConfirm(() => {
+          // 确认后自动回到戈壁
+          setCurrentLocation('gebi');
+          setInteractionLog(prev => [...prev, '你回到了戈壁。']);
+        });
+        setShowInfoModal(true);
       }
     } else {
       // 战斗失败
       setInteractionLog(prev => [...prev, '战斗失败...下次再来挑战吧。']);
+
+      // ========== 无名氏战斗失败处理 ==========
+      // 如果是无名氏战斗失败，自动传送到卡萨诺城
+      if (currentBattleInteractableId === 'enemy_wumingshi') {
+        setInteractionLog(prev => [...prev, '你被无名氏击败了，被传送回了卡萨诺城。']);
+        setCurrentLocation('kasanuocheng');
+      }
+    }
+
+    // ========== 地图挑战胜利处理 ==========
+    if (result === 'player_win' && currentChallengingMap) {
+      // 标记挑战成功（今日已挑战，所有地图共享）
+      setMapChallengeState(prev => {
+        let newState = markChallengedToday(prev);
+        newState = setAsMapProtector(newState, currentChallengingMap!);
+
+        return newState;
+      });
+
+      const config = getMapChallengeConfig(currentChallengingMap);
+      if (config) {
+        setInteractionLog(prev => [...prev, `🎉 恭喜！你成为了${config.locationName}的保护者！`, '每天可以领取保护者奖励！']);
+      }
+
+      // 清空正在挑战的地图
+      setCurrentChallengingMap(null);
     }
 
     // 清空当前战斗交互ID
@@ -1283,13 +2308,67 @@ function App() {
    * 离开战斗处理
    * 玩家主动离开战斗，消耗3个时间单位，不获得任何奖励
    */
-  const handleLeaveBattle = useCallback(() => {
+  /**
+   * 离开战斗处理
+   * 与正常战斗结束相同，同步角色和幻兽的当前状态
+   * @param finalPlayerState 离开战斗时的玩家状态
+   * @param finalDeployedPets 离开战斗时的幻兽状态列表
+   */
+  const handleLeaveBattle = useCallback((finalPlayerState?: BattleCharacter, finalDeployedPets?: BattlePet[]) => {
     setInBattle(false);
     setBattleParams(null);
     setCurrentBattleInteractableId(null);
 
     // 消耗3个时间单位（与正常战斗结束相同）
     consumeTime(3);
+
+    // ========== 同步角色状态 ==========
+    // 战斗结束后体力自动恢复至最大值
+    if (finalPlayerState) {
+      setCharacter(prev => {
+        // 如果角色升级了，保持满血状态
+        if (prev.maxHp > finalPlayerState.maxHp) {
+          return {
+            ...prev,
+            currentHp: prev.maxHp,
+            currentStamina: prev.maxStamina, // 战斗结束后体力恢复至最大值
+          };
+        }
+
+        // 正常同步战斗中的血量
+        return {
+          ...prev,
+          currentHp: Math.max(1, finalPlayerState.currentHp),
+          currentStamina: prev.maxStamina, // 战斗结束后体力恢复至最大值
+        };
+      });
+    }
+
+    // ========== 同步幻兽状态 ==========
+    if (finalDeployedPets && finalDeployedPets.length > 0) {
+      setPets(prevPets => {
+        return prevPets.map(pet => {
+          const battlePet = finalDeployedPets.find(bp => bp.petId === pet.id);
+          if (battlePet) {
+            const newCurrentHp = Math.max(0, battlePet.currentHp);
+            // 如果幻兽升级了，保持满血状态
+            if (pet.mhp > battlePet.maxHp) {
+              return {
+                ...pet,
+                hp: pet.mhp,
+              };
+            }
+
+            return {
+              ...pet,
+              hp: newCurrentHp,
+            };
+          }
+
+          return pet;
+        });
+      });
+    }
 
     // 添加离开战斗消息到交互日志
     setInteractionLog(prev => [...prev, '你离开了战斗。']);
@@ -1497,10 +2576,37 @@ function App() {
     // 记录到交互日志
     setInteractionLog(prev => [...prev, result.message]);
 
-    // 如果精炼成功，更新装备属性（这里需要根据实际精炼逻辑实现）
+    // 如果精炼成功，更新装备属性
     if (result.success && refineEquipment) {
-      // TODO: 实现装备属性更新逻辑
-      // 例如：更新装备的魔魂等级、品质等
+      // 检查是否是角色装备
+      const isEquipped = Object.values(equippedItems).some(
+        item => item?.id === refineEquipment.id
+      );
+
+      if (isEquipped) {
+        // 更新角色装备
+        setEquippedItems(prev => {
+          const updated = { ...prev };
+          const slotType = refineEquipment.equipmentType;
+          if (updated[slotType]) {
+            // 将精炼后的装备转换为 EquipmentDetail 并更新
+            updated[slotType] = equipmentItemToDetail(refineEquipment);
+          }
+
+          return updated;
+        });
+      } else {
+        // 更新背包装备
+        setInventory(prev => {
+          return prev.map(item => {
+            if (item.id === refineEquipment.id && item.type === 'equipment') {
+              return refineEquipment;
+            }
+
+            return item;
+          });
+        });
+      }
     }
 
     // 清空选择的装备和宝石
@@ -1603,42 +2709,16 @@ function App() {
   const handleUseItemOnPlayer = useCallback(() => {
     if (!currentUseItem) return;
 
-    // 增加玩家经验 2700
+    // 使用统一的升级函数处理角色经验获取
     setCharacter(prev => {
-      const newExp = prev.exp + 2700;
-      const { newExp: finalExp, newMaxExp, newLevel, leveledUp } = checkAndLevelUp(
-        newExp,
-        prev.maxExp,
-        prev.level
-      );
+      const result = gainCharacterExperience(prev, 2700);
 
-      // 如果升级了，恢复HP和MP到最大值，并更新属性
-      if (leveledUp) {
-        const baseAttrs = calculateCharacterBaseAttributes(newLevel);
-
-        // 添加升级提示到交互日志
-        setInteractionLog(logs => [...logs, `🎉 恭喜升级！等级提升到 ${newLevel} 级！`]);
-
-        return {
-          ...prev,
-          level: newLevel,
-          exp: finalExp,
-          maxExp: newMaxExp,
-          maxHp: baseAttrs.maxHp,
-          currentHp: baseAttrs.maxHp, // 升级恢复HP
-          maxStamina: baseAttrs.maxStamina,
-          currentStamina: baseAttrs.maxStamina, // 升级恢复体力
-          attackMin: baseAttrs.attackMin,
-          attackMax: baseAttrs.attackMax,
-          defense: baseAttrs.defense,
-        };
+      // 如果升级了，显示提示消息
+      if (result.message) {
+        setInteractionLog(logs => [...logs, result.message!]);
       }
 
-      return {
-        ...prev,
-        exp: finalExp,
-        maxExp: newMaxExp,
-      };
+      return result.character;
     });
 
     // 减少物品数量
@@ -1681,7 +2761,7 @@ function App() {
 
         // 显示消息（如果有）
         if (result.message) {
-          setInteractionLog(prev => [...prev, result.message]);
+          setInteractionLog(prev => [...prev, result.message!]);
         }
 
         return result.pet;
@@ -1725,6 +2805,27 @@ function App() {
 
     // 显示添加成功的提示
     setInteractionLog(prev => [...prev, `获得幻兽：${pet.othername}（${pet.hs_name}）品质：${pet.qualityTitle}`]);
+  }, []);
+
+  /**
+   * 更新幻兽数据
+   * 用于幻兽幻化后更新主幻兽的属性
+   * @param petId 要更新的幻兽ID
+   * @param updatedPet 更新后的幻兽数据
+   */
+  const handleUpdatePet = useCallback((petId: string, updatedPet: Pet) => {
+    setPets(prevPets => prevPets.map(pet =>
+      pet.id === petId ? updatedPet : pet
+    ));
+  }, []);
+
+  /**
+   * 移除幻兽数据
+   * 用于幻兽幻化后移除副幻兽
+   * @param petId 要移除的幻兽ID
+   */
+  const handleRemovePet = useCallback((petId: string) => {
+    setPets(prevPets => prevPets.filter(pet => pet.id !== petId));
   }, []);
 
   /**
@@ -1775,11 +2876,39 @@ function App() {
       }
     }
 
-    return [...staticInteractables, ...locationBossInteractables.filter(Boolean)] as (ActionInteractable | EnemyInteractable | NPCInteractable)[];
-  }, [currentLoc, killedMonsters, bossInteractables, spawnedBosses]);
+    // 动态添加戈壁探险家（如果已解锁）
+    const dynamicInteractables: (ActionInteractable | EnemyInteractable | NPCInteractable)[] = [];
+    if (currentLocation === 'gebi' && explorerUnlocked) {
+      const explorerGebi = interactableConfig['npc_explorer_gebi'];
+      if (explorerGebi) {
+        dynamicInteractables.push(explorerGebi as NPCInteractable);
+      }
+    }
+
+    // 动态添加战魂封印迷宫的交互对象
+    // 根据状态显示神秘人或无名氏
+    if (currentLocation === 'zhanhun-fengyin-migong' && !wumingshiDefeated) {
+      if (mysteriousPersonTriggered) {
+        // 神秘人已触发，显示无名氏敌人
+        const wumingshi = interactableConfig['enemy_wumingshi'];
+        if (wumingshi) {
+          dynamicInteractables.push(wumingshi as EnemyInteractable);
+        }
+      } else {
+        // 神秘人未触发，显示神秘人NPC
+        const mysteriousPerson = interactableConfig['npc_mysterious_person'];
+        if (mysteriousPerson) {
+          dynamicInteractables.push(mysteriousPerson as NPCInteractable);
+        }
+      }
+    }
+
+    return [...staticInteractables, ...locationBossInteractables.filter(Boolean), ...dynamicInteractables] as (ActionInteractable | EnemyInteractable | NPCInteractable)[];
+  }, [currentLoc, killedMonsters, bossInteractables, spawnedBosses, currentLocation, explorerUnlocked, mysteriousPersonTriggered, wumingshiDefeated]);
 
   // 计算带幻兽合体加成的角色数据
   // 同时使用最新的装备槽位数据作为 equipment 字段
+  // 同步爵位和军衔信息
   const characterWithPetBonus: CharacterData = useMemo(() => {
     const petBonus = calculatePetMergeBonus(pets);
 
@@ -1793,17 +2922,24 @@ function App() {
         bracelet: equippedItems.bracelet,
         necklace: equippedItems.necklace
       },
-      petBonus
+      petBonus,
+      // 同步爵位和军衔信息
+      nobleRankLevel: nobleRank,
+      nobleRankName: getNobleRankName(nobleRank),
+      militaryRankLevel: militaryRank,
+      militaryRankName: getMilitaryRankName(militaryRank),
     };
-  }, [pets, character, equippedItems]);
+  }, [pets, character, equippedItems, nobleRank, militaryRank]);
 
   // 构建 NPC 游戏状态对象
+  // 包含战魂系统开启状态，用于NPC选项条件判断
   const npcGameState = useMemo(() => ({
-    currentWeekday: new Date().getDay(), // 当前星期（0=周日, 1=周一, ..., 6=周六）
+    currentWeekday: timeSystem.nowday % 7, // 当前星期（使用游戏时间系统，0=周日, 1=周一, ..., 6=周六）
     relationshipLevel: princessRelationship.level, // 公主关系等级
     militaryRank, // 军衔等级
     nobleRank, // 爵位等级
-  }), [princessRelationship.level, militaryRank, nobleRank]);
+    warSoulSystemEnabled, // 战魂系统是否已开启（用于装备打造师"关于战魂"选项的条件显示）
+  }), [timeSystem.nowday, princessRelationship.level, militaryRank, nobleRank, warSoulSystemEnabled]);
 
   // 获取当前位置数据
 
@@ -1819,6 +2955,7 @@ function App() {
           enemyCount={battleParams?.enemyCount || 1}
           enemiesData={battleParams?.enemiesData}
           deployedPets={getDeployedPets()}
+          onEnemyDeath={handleEnemyDeath}
           onBattleEnd={handleBattleEnd}
           onLeaveBattle={handleLeaveBattle}
         />
@@ -1828,6 +2965,7 @@ function App() {
           {/* 顶部位置显示 */}
           <LocationHeader
             location={currentLoc?.name || ''}
+            onShowCharacter={() => setShowCharacterPage(true)}
             onShowPet={() => setShowPetPage(true)}
           />
 
@@ -1867,6 +3005,7 @@ function App() {
             onShowCharacter={() => setShowCharacterPage(true)}
             onShowInventory={() => setShowInventoryPage(true)}
             onShowSkill={() => setShowSkillPage(true)}
+            onShowPet={() => setShowPetPage(true)}
           />
 
           {/* 大地图 */}
@@ -1897,6 +3036,18 @@ function App() {
               gameState={npcGameState}
             />
           )}
+
+          {/* 信息弹窗 */}
+          <InfoModal
+            isVisible={showInfoModal}
+            onClose={() => {
+              setShowInfoModal(false);
+              setInfoModalOnConfirm(undefined);
+            }}
+            title={infoModalTitle}
+            content={infoModalContent}
+            onConfirm={infoModalOnConfirm}
+          />
 
           {/* 角色信息页面 */}
           <CharacterPage
@@ -1972,6 +3123,7 @@ function App() {
             playerLevel={character.level}
             inventoryEquipments={inventoryEquipments}
             inventoryGems={inventoryGems}
+            equippedItems={equippedItems}
           />
 
           {/* 收藏架界面 */}
@@ -1986,6 +3138,17 @@ function App() {
                 ...prev,
                 magicStone: amount
               }));
+            }}
+          />
+
+          {/* 经验交换界面 */}
+          <ExperienceExchangeModal
+            isVisible={showExperienceExchangeModal}
+            onClose={() => setShowExperienceExchangeModal(false)}
+            inventoryItems={inventory}
+            onUpdateInventory={setInventory}
+            onShowMessage={(message) => {
+              setInteractionLog(prev => [...prev, message]);
             }}
           />
 
@@ -2028,6 +3191,7 @@ function App() {
             onShowCharacter={() => setShowCharacterPage(true)}
             onShowInventory={() => setShowInventoryPage(true)}
             onShowSkill={() => setShowSkillPage(true)}
+            onShowPet={() => setShowPetPage(true)}
           />
 
           {/* 幻兽研究所界面 */}
@@ -2056,11 +3220,47 @@ function App() {
               // 消耗灵魂王
               const newInventory = consumeItemFromInventory(inventory, '灵魂王', consumedSoulKings);
               setInventory(newInventory);
-              // 增加经验
-              setCharacter(prev => ({
-                ...prev,
-                exp: prev.exp + expGained
-              }));
+
+              // 计算带战斗力加成的经验值
+              const bonusExp = calculateCombatPowerBonusExp(expGained, character.combatPower, character.level);
+
+              // 使用统一的升级函数处理角色经验获取（使用加成后的经验）
+              setCharacter(prev => {
+                const result = gainCharacterExperience(prev, bonusExp);
+
+                if (result.message) {
+                  setInteractionLog(logs => [...logs, result.message!]);
+                }
+
+                return result.character;
+              });
+
+              // 给战中幻兽增加相同经验（带加成）
+              setPets(prevPets => {
+                return prevPets.map(pet => {
+                  // 只给出战的幻兽分配经验
+                  if (!pet.isDeployed) {
+                    return pet;
+                  }
+
+                  // 使用 gainExperience 函数处理经验获取和升级
+                  const result = gainExperience(pet, bonusExp, character.level);
+
+                  // 如果有升级消息，打印到日志
+                  if (result.message) {
+                    setInteractionLog(logs => [...logs, result.message!]);
+                  }
+
+                  return result.pet;
+                });
+              });
+
+              // 打印战中幻兽获得经验的日志
+              const deployedCount = pets.filter(p => p.isDeployed).length;
+              if (deployedCount > 0) {
+                setInteractionLog(prev => [...prev, `🐉 战中幻兽（${deployedCount}只）各获得了 ${bonusExp.toLocaleString()} 经验！`]);
+              }
+
               // 增加VIP等级
               setPetInstituteState(prev => ({
                 ...prev,
@@ -2068,7 +3268,38 @@ function App() {
                 vipLevel: Math.min(prev.vipLevel + vipGained, 10),
                 canDoProductionTask: false
               }));
-              setInteractionLog(prev => [...prev, `完成提高产量任务！获得经验 ${expGained}，VIP星级 +${vipGained}`]);
+              setInteractionLog(prev => [...prev, `完成提高产量任务！获得经验 ${bonusExp.toLocaleString()}，VIP星级 +${vipGained}`]);
+            }}
+          />
+
+          {/* 幻兽幻化界面 */}
+          <PetFusionModal
+            isVisible={showPetFusionModal}
+            onClose={() => setShowPetFusionModal(false)}
+            pets={pets}
+            deployedPetIds={getDeployedPets().map(p => p.id)}
+            playerLevel={character.level}
+            inventory={inventory}
+            onUpdatePet={handleUpdatePet}
+            onRemovePet={handleRemovePet}
+            onUpdateInventory={setInventory}
+          />
+
+          {/* 捐献金币弹窗 */}
+          <DonationModal
+            isVisible={showDonationModal}
+            onClose={() => setShowDonationModal(false)}
+            currentGold={playerResources.gold}
+            currentMerit={playerResources.merit}
+            currentNobleRank={nobleRank}
+            onDonate={(donatedGold, gainedMerit) => {
+              // 更新金币
+              setPlayerResources(prev => ({
+                ...prev,
+                gold: prev.gold - donatedGold,
+              }));
+              // 使用统一处理函数获取功勋
+              handleGainMerit(gainedMerit, `捐献 ${donatedGold.toLocaleString()} 金币`);
             }}
           />
         </>

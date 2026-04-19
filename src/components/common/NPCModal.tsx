@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import type { NPCInteractable, NPCInteractionOption, NPCType } from '../../types';
 import { checkNPCOptionCondition, type NPCGameState } from '../../utils/npcUtils';
@@ -64,27 +64,6 @@ const NPCModal: React.FC<NPCModalProps> = ({
   onSelectOption,
   gameState
 }) => {
-  // 结果反馈状态：存储当前显示的结果文本
-  const [resultFeedback, setResultFeedback] = useState<string | null>(null);
-
-  /**
-   * 当模态窗口关闭时，清理结果反馈状态
-   * 避免下次打开其他 NPC 时显示上次的信息
-   */
-  useEffect(() => {
-    if (!isVisible) {
-      setResultFeedback(null);
-    }
-  }, [isVisible]);
-
-  /**
-   * 当 NPC 数据变化时，清理结果反馈状态
-   * 确保切换不同 NPC 时不会残留上次的信息
-   */
-  useEffect(() => {
-    setResultFeedback(null);
-  }, [npcData.id]);
-
   /**
    * 过滤满足条件的选项
    * 使用 useMemo 优化性能，避免每次渲染都重新计算
@@ -100,42 +79,19 @@ const NPCModal: React.FC<NPCModalProps> = ({
 
   /**
    * 处理选项点击事件
+   * 直接执行选项，不需要二次确认
    * @param option 选中的选项
    */
   const handleOptionClick = (option: NPCInteractionOption) => {
-    // 显示结果反馈
-    setResultFeedback(option.result);
-  };
+    // 直接调用回调函数，传递结果、动作类型和动作参数
+    onSelectOption(
+      option.result,
+      option.actionType,
+      option.actionParams
+    );
 
-  /**
-   * 确认结果反馈
-   * 关闭反馈显示，执行回调并关闭模态窗口
-   */
-  const handleConfirmResult = () => {
-    if (resultFeedback) {
-      // 查找对应选项以获取 actionType 和 actionParams
-      const selectedOption = npcData.options.find(opt => opt.result === resultFeedback);
-
-      // 调用回调函数，传递结果、动作类型和动作参数
-      onSelectOption(
-        resultFeedback,
-        selectedOption?.actionType,
-        selectedOption?.actionParams
-      );
-
-      // 清空结果反馈
-      setResultFeedback(null);
-      // 关闭模态窗口
-      onClose();
-    }
-  };
-
-  /**
-   * 关闭结果反馈
-   * 仅关闭反馈显示，不关闭模态窗口
-   */
-  const handleCloseFeedback = () => {
-    setResultFeedback(null);
+    // 关闭模态窗口
+    onClose();
   };
 
   /**
@@ -143,7 +99,6 @@ const NPCModal: React.FC<NPCModalProps> = ({
    * 清理状态并关闭模态窗口
    */
   const handleCloseModal = () => {
-    setResultFeedback(null);
     onClose();
   };
 
@@ -171,50 +126,25 @@ const NPCModal: React.FC<NPCModalProps> = ({
         {/* NPC描述文本区域 */}
         <p className="modal-description">{npcData.description}</p>
 
-        {/* 结果反馈显示区域 */}
-        {resultFeedback ? (
-          <div className="result-feedback-container">
-            {/* 结果反馈文本 */}
-            <div className="result-feedback-text">
-              {resultFeedback}
-            </div>
-            {/* 操作按钮组 */}
-            <div className="result-feedback-buttons">
+        {/* 交互选项列表 - 垂直列表形式 */}
+        <div className="modal-options">
+          {availableOptions.length > 0 ? (
+            availableOptions.map((option, index) => (
               <button
-                className="feedback-button cancel-button"
-                onClick={handleCloseFeedback}
+                key={index}
+                className="option-button"
+                onClick={() => handleOptionClick(option)}
               >
-                返回
+                {option.text}
               </button>
-              <button
-                className="feedback-button confirm-button"
-                onClick={handleConfirmResult}
-              >
-                确定
-              </button>
+            ))
+          ) : (
+            /* 无可用选项时的提示信息 */
+            <div className="no-options-hint">
+              当前没有可用的交互选项
             </div>
-          </div>
-        ) : (
-          /* 交互选项列表 - 垂直列表形式 */
-          <div className="modal-options">
-            {availableOptions.length > 0 ? (
-              availableOptions.map((option, index) => (
-                <button
-                  key={index}
-                  className="option-button"
-                  onClick={() => handleOptionClick(option)}
-                >
-                  {option.text}
-                </button>
-              ))
-            ) : (
-              /* 无可用选项时的提示信息 */
-              <div className="no-options-hint">
-                当前没有可用的交互选项
-              </div>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

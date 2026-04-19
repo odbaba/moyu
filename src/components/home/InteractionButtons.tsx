@@ -43,11 +43,10 @@ const InteractionButtons: React.FC<InteractionButtonsProps> = ({ interactables, 
       {interactables.map((interactable) => (
         <button
           key={interactable.id}
-          className={getButtonClassName(interactable.type)}
+          className={`game-btn ${getButtonClassName(interactable.type)}`}
           onClick={() => onInteract(interactable)}
         >
-          {/* 显示图标和名称 */}
-          <span className="interact-button__icon">{interactable.icon}</span>
+          {/* 只显示名称 */}
           <span className="interact-button__name">{interactable.name}</span>
         </button>
       ))}

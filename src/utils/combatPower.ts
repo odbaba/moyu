@@ -1,3 +1,4 @@
+import { getMilitaryRankByLevel, getNobleRankByLevel, MILITARY_RANKS, NOBLE_RANKS } from '../data/rankData';
 import type { CharacterData, EquipmentDetail, EquipmentQuality, Pet } from '../types';
 import { getQualityValue } from './attributeCalculator';
 import { calculateGemCombatPower } from './equipmentConverter';
@@ -50,41 +51,37 @@ export function calculatePetMergeBonus(pets: Pet[]): { attackMin: number; attack
   return bonus;
 }
 
-// 军衔战斗力加成映射
-const militaryRankCombatPowerMap: Record<string, number> = {
-  '平民': 0,
-  '士兵': 1,
-  '下士': 2,
-  '中士': 3,
-  '上士': 4,
-  '少尉': 5,
-  '中尉': 6,
-  '上尉': 7,
-  '少校': 8,
-  '中校': 9,
-  '上校': 10,
-  '大校': 11,
-  '少将': 12,
-  '中将': 13,
-  '上将': 14,
-  '大将军': 15,
-  '元帅': 16,
-  '大元帅': 17
-};
+// 计算军衔加成战斗力
+// 根据军衔等级从 rankData.ts 获取战斗力加成
+export function calculateMilitaryRankCombatPower(militaryRankName: string): number {
+  // 从军衔名称查找对应的配置
+  const rank = MILITARY_RANKS.find(r => r.name === militaryRankName);
 
-// 爵位战斗力加成映射
-const titleCombatPowerMap: Record<string, number> = {
-  '平民': 0,
-  '勋爵': 1,
-  '男爵': 2,
-  '子爵': 3,
-  '伯爵': 4,
-  '侯爵': 5,
-  '公爵': 6,
-  '亲王': 7,
-  '国王': 8,
-  '皇帝': 9
-};
+  return rank ? rank.combatPowerBonus : 0;
+}
+
+// 计算军衔等级加成战斗力（通过等级直接计算）
+export function calculateMilitaryRankCombatPowerByLevel(militaryRankLevel: number): number {
+  const rank = getMilitaryRankByLevel(militaryRankLevel);
+
+  return rank.combatPowerBonus;
+}
+
+// 计算爵位加成战斗力
+// 根据爵位等级从 rankData.ts 获取战斗力加成
+export function calculateTitleCombatPower(title: string): number {
+  // 从爵位名称查找对应的配置
+  const rank = NOBLE_RANKS.find(r => r.name === title);
+
+  return rank ? rank.combatPowerBonus : 0;
+}
+
+// 计算爵位等级加成战斗力（通过等级直接计算）
+export function calculateNobleRankCombatPowerByLevel(nobleRankLevel: number): number {
+  const rank = getNobleRankByLevel(nobleRankLevel);
+
+  return rank.combatPowerBonus;
+}
 
 // 计算人物等级贡献战斗力
 export function calculateLevelCombatPower(level: number): number {
@@ -150,16 +147,6 @@ export function calculateAllHoleCountCombatPower(equipment: CharacterData['equip
   });
 
   return total;
-}
-
-// 计算军衔加成战斗力
-export function calculateMilitaryRankCombatPower(militaryRank: string): number {
-  return militaryRankCombatPowerMap[militaryRank] || 0;
-}
-
-// 计算爵位加成战斗力
-export function calculateTitleCombatPower(title: string): number {
-  return titleCombatPowerMap[title] || 0;
 }
 
 /**

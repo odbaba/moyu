@@ -5,6 +5,25 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>nilaizijianghu</title>
+    <!-- 引入本地 LXGW WenKai 霞鹜文楷字体 - 使用本地文件加载，避免 CDN 加载导致的文字闪烁 -->
+    <link rel="stylesheet" href="/fonts/lxgwwenkai-local.css" />
+    <style>
+      /* 页面初始字体设置 - 手机优先使用 LXGW WenKai */
+      body {
+        /* 手机端优先使用 LXGW WenKai */
+        font-family: 'LXGW WenKai', cursive, sans-serif;
+        /* 确保页面加载时字体已经稳定 */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+      /* 桌面端（平板及以上）优先尝试系统楷体 */
+      @media (min-width: 768px) {
+        body {
+          font-family: 'KaiTi', '楷体', 'STKaiti', 'LXGW WenKai', cursive, sans-serif;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

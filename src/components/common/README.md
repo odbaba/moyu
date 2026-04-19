@@ -8,7 +8,7 @@
 |------|------|------|----------|
 | 动作类 | `action` | 执行预设动作（如挖矿、钓鱼等） | 点击后直接执行动作 |
 | 敌人类 | `enemy` | 遭遇敌人并可选择战斗 | 点击后弹出敌人信息弹窗 |
-| NPC类 | `npc` | 与NPC进行对话交互 | 点击后弹出NPC对话弹窗 |
+| NPC类 | `npc` | 与NPC进行对话交互 | 点击后弹出NPC对话弹窗，选择选项后直接执行 |
 
 ---
 
@@ -149,7 +149,7 @@ const patrol_soldiers: EnemyInteractable = {
 
 ### NPCInteractable（NPC类交互）
 
-NPC类交互用于定义与NPC的对话交互，支持多个对话选项。
+NPC类交互用于定义与NPC的对话交互，支持多个对话选项。**点击选项后直接执行，无需二次确认**。
 
 ```typescript
 interface NPCInteractable {
@@ -159,6 +159,8 @@ interface NPCInteractable {
   icon: string;                     // 显示图标（emoji格式）
   description: string;              // NPC描述文本
   options: NPCInteractionOption[];  // 交互选项列表
+  npcType?: NPCType;                // 可选：NPC类型（palace | function | shop | special）
+  location?: string;                // 可选：NPC位置信息
 }
 
 // NPCInteractionOption 结构定义
@@ -167,6 +169,7 @@ interface NPCInteractionOption {
   result: string;                           // 选项执行结果描述
   actionType?: string;                      // 可选：执行的动作类型
   actionParams?: Record<string, unknown>;   // 可选：动作参数
+  condition?: NPCCondition;                 // 可选：选项显示条件
 }
 ```
 

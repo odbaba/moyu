@@ -1,6 +1,6 @@
 import './character.css';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import type { EquipmentDetail, EquipmentSlotType } from '../../types';
 import { ALL_EQUIPMENT_SLOTS, getEquipmentDisplayName, getEquipmentSlotName } from '../../utils/equipmentConverter';
@@ -24,6 +24,46 @@ interface EquipmentDisplayProps {
    */
   onEmptySlotClick?: (slotType: EquipmentSlotType) => void;
 }
+
+/**
+ * 装备图标组件
+ * 优先显示装备图片，图片加载失败或无图片时显示emoji图标
+ */
+interface EquipmentIconProps {
+  equipment: EquipmentDetail;
+  slotType: EquipmentSlotType;
+}
+
+const EquipmentIcon: React.FC<EquipmentIconProps> = ({ equipment, slotType }) => {
+  // 图片加载失败状态
+  const [imageError, setImageError] = useState(false);
+
+  /**
+   * 处理图片加载失败
+   */
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  // 如果有图片路径且图片未加载失败，显示图片
+  if (equipment.imagePath && !imageError) {
+    return (
+      <img
+        src={equipment.imagePath}
+        alt={equipment.name}
+        className="equipment-image-compact"
+        onError={handleImageError}
+      />
+    );
+  }
+
+  // 其他情况显示emoji图标
+  return (
+    <span className="equipment-emoji-compact">
+      {equipment.icon || getEquipmentIcon(slotType)}
+    </span>
+  );
+};
 
 /**
  * 装备展示组件
@@ -53,9 +93,9 @@ const EquipmentDisplay: React.FC<EquipmentDisplayProps> = ({
           className="equipment-card-compact"
           onClick={() => onEquipmentClick && onEquipmentClick(equipment)}
         >
-          {/* 装备图标 */}
+          {/* 装备图标/图片 */}
           <div className="equipment-icon-compact">
-            {getEquipmentIcon(slotType)}
+            <EquipmentIcon equipment={equipment} slotType={slotType} />
           </div>
 
           {/* 装备信息 */}

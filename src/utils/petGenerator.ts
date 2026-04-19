@@ -23,6 +23,7 @@ const petTypeBaseScore: Record<PetType, number> = {
 // 参考文档：reference/docs/project_docs/02_幻兽系统.md 第386-398行
 // 罕见度加分是固定的，加上基础评分450和属性评分后，总评分至少达到对应星级
 const strangePetStarBonus: Record<number, number> = {
+  1: 0, // 1星：基础450 + 罕见度0 = 450
   8: 350, // 8星：基础450 + 罕见度350 = 800（至少8星）
   12: 750, // 12星：基础450 + 罕见度750 = 1200（至少12星）
   19: 1450 // 19星：基础450 + 罕见度1450 = 1900（至少19星）
@@ -68,6 +69,7 @@ export function getQualityTitle(score: number): string {
 /**
  * 计算初始属性评分
  * 基于标准值差值×2
+ * 评分保留整数
  */
 function calculateInitialRating(
   chp: number,
@@ -76,10 +78,10 @@ function calculateInitialRating(
   cfy: number
 ): { pz_chp: number; pz_cxgj: number; pz_cdgj: number; pz_cfy: number } {
   return {
-    pz_chp: Math.max(0, (chp - 100) * 2),
-    pz_cxgj: Math.max(0, (cxgj - 15) * 2),
-    pz_cdgj: Math.max(0, (cdgj - 25) * 2),
-    pz_cfy: Math.max(0, (cfy - 10) * 2)
+    pz_chp: Math.round(Math.max(0, (chp - 100) * 2)),
+    pz_cxgj: Math.round(Math.max(0, (cxgj - 15) * 2)),
+    pz_cdgj: Math.round(Math.max(0, (cdgj - 25) * 2)),
+    pz_cfy: Math.round(Math.max(0, (cfy - 10) * 2))
   };
 }
 
@@ -87,6 +89,7 @@ function calculateInitialRating(
  * 计算成长属性评分
  * 差值≤10时：差值×20
  * 差值>10时：(差值-10)×100 + 200
+ * 评分保留整数
  */
 function calculateGrowthRating(
   cz_hp: number,
@@ -103,9 +106,9 @@ function calculateGrowthRating(
     const diff = value - base;
 
     if (diff <= 0) return 0;
-    if (diff <= 10) return diff * 20;
+    if (diff <= 10) return Math.round(diff * 20);
 
-    return (diff - 10) * 100 + 200;
+    return Math.round((diff - 10) * 100 + 200);
   };
 
   return {
@@ -119,15 +122,16 @@ function calculateGrowthRating(
 /**
  * 计算总评分
  * 总评分 = 基础评分 + 初始属性评分 + 成长属性评分
+ * 评分保留整数
  */
 function calculateTotalScore(
   pzbase: number,
   initialRating: { pz_chp: number; pz_cxgj: number; pz_cdgj: number; pz_cfy: number },
   growthRating: { pz_cz_hp: number; pz_cz_xgj: number; pz_cz_dgj: number; pz_cz_fy: number }
 ): number {
-  return pzbase +
+  return Math.round(pzbase +
     initialRating.pz_chp + initialRating.pz_cxgj + initialRating.pz_cdgj + initialRating.pz_cfy +
-    growthRating.pz_cz_hp + growthRating.pz_cz_xgj + growthRating.pz_cz_dgj + growthRating.pz_cz_fy;
+    growthRating.pz_cz_hp + growthRating.pz_cz_xgj + growthRating.pz_cz_dgj + growthRating.pz_cz_fy);
 }
 
 // ========== 属性计算函数 ==========
@@ -405,6 +409,8 @@ export function generatePetByType(petType: PetType, options?: PetGenerateOptions
  * - 12星奇异兽：罕见度加分750（总评分至少1200）
  * - 19星奇异兽：罕见度加分1450（总评分至少1900）
  *
+ * 如果是生成普通奇异兽，直接调用generatePetByType函数
+ *
  * 总评分 = 基础评分(450) + 属性评分 + 罕见度加分
  *
  * @param starLevel 星级 (8, 12, 19)
@@ -413,7 +419,7 @@ export function generatePetByType(petType: PetType, options?: PetGenerateOptions
  */
 export function generateStarStrangePet(starLevel: number, options?: PetGenerateOptions): Pet {
   // 验证星级
-  if (!strangePetStarBonus[starLevel]) {
+  if (!strangePetStarBonus[starLevel] || strangePetStarBonus[starLevel] === 0) {
     throw new Error(`无效的奇异兽星级: ${starLevel}。有效星级为: 8, 12, 19`);
   }
 
@@ -558,12 +564,14 @@ export function upgradePetLevel(pet: Pet, newLevel: number): Pet {
  * @param pet 幻兽对象
  * @param expAmount 获得的经验值（基础值，会自动翻倍）
  * @param playerLevel 玩家等级（用于等级限制检查）
+ * @param skipLevelLimit 是否跳过等级限制（幻化场景下使用）
  * @returns 更新后的幻兽数据和升级信息
  */
 export function gainExperience(
   pet: Pet,
   expAmount: number,
-  playerLevel: number
+  playerLevel: number,
+  skipLevelLimit: boolean = false
 ): {
   pet: Pet; // 更新后的幻兽数据
   leveledUp: boolean; // 是否升级
@@ -578,8 +586,8 @@ export function gainExperience(
     };
   }
 
-  // 2. 人物等级关联检查
-  if (pet.dj >= playerLevel + 10) {
+  // 2. 人物等级关联检查（幻化场景下跳过）
+  if (!skipLevelLimit && pet.dj >= playerLevel + 10) {
     return {
       pet,
       leveledUp: false,

@@ -1,0 +1,550 @@
+/**
+ * 统一装备详情弹窗样式
+ * 整合角色面板和背包的装备详情显示
+ * 移动端优化：适配手机一屏显示
+ */
+
+/* ========== 弹窗遮罩层样式 ========== */
+
+.equipment-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 3500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+/* ========== 弹窗内容区域样式 ========== */
+
+.equipment-detail-modal-content {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 2px solid #ffd700;
+  animation: slideIn 0.3s ease;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+              0 0 30px rgba(255, 215, 0, 0.2);
+  scrollbar-width: thin;
+  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+}
+
+.equipment-detail-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.equipment-detail-modal-content::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 3px;
+}
+
+.equipment-detail-modal-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #555 0%, #777 50%, #555 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.equipment-detail-modal-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #666 0%, #888 50%, #666 100%);
+}
+
+/* ========== 关闭按钮样式 ========== */
+
+.equipment-detail-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #f0f0f0;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.equipment-detail-close-button:hover {
+  background-color: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  transform: rotate(90deg) scale(1.1);
+}
+
+.equipment-detail-close-button:active {
+  transform: rotate(90deg) scale(0.95);
+}
+
+/* ========== 装备头部样式 ========== */
+
+.equipment-detail-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #444;
+}
+
+/* 装备图标容器 - 带背景和光效 */
+.equipment-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(40, 40, 40, 0.8);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  border: 2px solid #555;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 图标容器光效 */
+.equipment-icon-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.equipment-icon-wrapper:hover::before {
+  opacity: 1;
+}
+
+.equipment-icon-wrapper:hover {
+  border-color: #ffd700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  transform: scale(1.05);
+}
+
+/* 装备图片样式 */
+.equipment-detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* 装备emoji图标样式 */
+.equipment-detail-icon {
+  font-size: 3rem;
+  transition: transform 0.3s ease;
+}
+
+.equipment-icon-wrapper:hover .equipment-detail-icon {
+  transform: scale(1.1);
+}
+
+/* 装备名称 */
+.equipment-detail-name {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+/* ========== 信息行样式 ========== */
+
+.equipment-detail-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.equipment-detail-info-row:hover {
+  background-color: rgba(40, 40, 40, 0.8);
+  transform: translateX(3px);
+}
+
+.equipment-detail-info-row .info-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.equipment-detail-info-row .info-value {
+  color: #f0f0f0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* ========== 装备属性区域样式 ========== */
+
+.equipment-detail-attributes {
+  margin-bottom: 8px;
+}
+
+.attribute-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.attribute-row:hover {
+  background-color: rgba(40, 40, 40, 0.8);
+  transform: translateX(5px);
+  border-left-color: #ffd700;
+}
+
+.attribute-row .attribute-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.attribute-row .attribute-value {
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+/* 属性值颜色 */
+.attack-value {
+  color: #ff9800;
+}
+
+.defense-value {
+  color: #2196f3;
+}
+
+.hp-value {
+  color: #4caf50;
+}
+
+.mp-value {
+  color: #4ecdc4;
+}
+
+/* 魔魂等级特殊颜色 */
+.magic-soul-value {
+  color: #ffb74d;
+}
+
+/* 战魂特殊颜色 */
+.soul-value {
+  color: #9c27b0;
+}
+
+/* ========== 宝石属性区域样式 ========== */
+
+.gem-attributes-section {
+  margin-bottom: 8px;
+  padding: 10px;
+  background-color: rgba(33, 150, 243, 0.1);
+  border: 1px solid #2196f3;
+  border-radius: 6px;
+}
+
+.gem-title {
+  color: #888;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.gem-attributes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gem-attribute-item {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gem-value {
+  display: inline-block;
+  padding: 3px 8px;
+  background-color: rgba(40, 40, 40, 0.8);
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+/* ========== 操作按钮区域样式 ========== */
+
+.equipment-detail-footer {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #444;
+  display: flex;
+  gap: 10px;
+}
+
+/* 装备按钮 */
+.equip-button {
+  flex: 1;
+  padding: 12px;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3);
+}
+
+.equip-button:hover {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+}
+
+.equip-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+}
+
+/* 卸下装备按钮 */
+.unequip-button {
+  flex: 1;
+  padding: 12px;
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(244, 67, 54, 0.3);
+}
+
+.unequip-button:hover {
+  background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(244, 67, 54, 0.4);
+}
+
+.unequip-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+}
+
+/* 替换按钮 */
+.replace-button {
+  flex: 1;
+  padding: 12px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffcc00 100%);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(255, 215, 0, 0.3);
+}
+
+.replace-button:hover {
+  background: linear-gradient(135deg, #ffcc00 0%, #ffb300 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 215, 0, 0.4);
+}
+
+.replace-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+}
+
+/* ========== 动画效果 ========== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: scale(0.95) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ========== 响应式设计 ========== */
+
+/* 小屏幕手机 */
+@media (max-width: 374px) {
+  .equipment-detail-modal-content {
+    padding: 15px;
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .equipment-icon-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+
+  .equipment-detail-icon {
+    font-size: 2rem;
+  }
+
+  .equipment-detail-name {
+    font-size: 1.1rem;
+  }
+
+  .equipment-detail-info-row,
+  .attribute-row {
+    padding: 6px 10px;
+  }
+
+  .info-label,
+  .attribute-label {
+    font-size: 0.8rem;
+  }
+
+  .info-value,
+  .attribute-value {
+    font-size: 0.85rem;
+  }
+}
+
+/* 平板设备 */
+@media (min-width: 768px) {
+  .equipment-detail-modal-content {
+    max-width: 450px;
+    max-height: 80vh;
+  }
+
+  .equipment-icon-wrapper {
+    width: 100px;
+    height: 100px;
+  }
+
+  .equipment-detail-icon {
+    font-size: 3.5rem;
+  }
+
+  .equipment-detail-name {
+    font-size: 1.5rem;
+  }
+}
+
+/* 大屏幕设备 */
+@media (min-width: 1024px) {
+  .equipment-detail-modal-content {
+    max-width: 500px;
+  }
+
+  .equipment-icon-wrapper {
+    width: 110px;
+    height: 110px;
+  }
+
+  .equipment-detail-icon {
+    font-size: 4rem;
+  }
+
+  .equipment-detail-name {
+    font-size: 1.6rem;
+  }
+}
+
+/* ========== 触摸设备优化 ========== */
+
+@media (hover: none) and (pointer: coarse) {
+  .equipment-icon-wrapper:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .equipment-icon-wrapper:active {
+    border-color: #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    transform: scale(0.98);
+  }
+
+  .attribute-row:hover {
+    transform: none;
+    border-left-color: transparent;
+  }
+
+  .attribute-row:active {
+    background-color: rgba(40, 40, 40, 0.8);
+    border-left-color: #ffd700;
+  }
+
+  .equipment-detail-info-row:hover {
+    transform: none;
+  }
+
+  .equipment-detail-info-row:active {
+    background-color: rgba(40, 40, 40, 0.8);
+    transform: scale(0.98);
+  }
+
+  .equipment-detail-close-button:hover {
+    transform: none;
+  }
+
+  .equipment-detail-close-button:active {
+    background-color: rgba(255, 107, 107, 0.3);
+    transform: scale(0.9);
+  }
+}
+
+/* ========== 减少动画模式 ========== */
+
+@media (prefers-reduced-motion: reduce) {
+  .equipment-detail-modal-overlay {
+    animation: none;
+  }
+
+  .equipment-detail-modal-content {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

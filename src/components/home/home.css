@@ -28,10 +28,32 @@
   margin: 0;
 }
 
-/* 幻兽按钮样式 - 绝对定位在标题左侧，不影响标题居中 */
-.pet-button {
+/* 角色按钮样式 - 绝对定位在标题左侧，不影响标题居中 */
+.character-button {
   position: absolute; /* 绝对定位，脱离文档流 */
   left: 10px; /* 固定在左侧 */
+  background-color: #2a2a2a;
+  color: #FFFFFF;
+  border: 1px solid #4ecdc4;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  z-index: 10; /* 确保按钮在上层 */
+}
+
+.character-button:hover {
+  background-color: #3a3a3a;
+  border-color: #6bc5ff;
+  box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+}
+
+/* 幻兽按钮样式 - 绝对定位在标题右侧，不影响标题居中 */
+.pet-button {
+  position: absolute; /* 绝对定位，脱离文档流 */
+  right: 10px; /* 固定在右侧 */
   background-color: #2a2a2a;
   color: #FFFFFF;
   border: 1px solid #ffd700;
@@ -171,67 +193,95 @@
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
 }
 
-/* 交互按钮 - 高度15% */
+/* 交互按钮 - 高度15%，溢出时显示滚动 */
 .interaction-buttons {
   width: 100%;
   height: 15vh;
   display: flex;
   gap: 8px;
-  padding: 10px 20px;
+  padding: 5px 10px;
   border-bottom: 1px solid #000000;
   flex-wrap: wrap;
   justify-content: flex-start;
-  align-content: center;
+  align-content: flex-start;
   background-color: #252935;
+  overflow-y: auto;
+  /* 滚动条悬浮显示，适合移动端 */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
-/* 交互按钮样式 - 灰黑色，比地图按钮稍小，宽度自适应 */
+/* Webkit 浏览器滚动条样式 */
+.interaction-buttons::-webkit-scrollbar {
+  width: 4px;
+}
+
+.interaction-buttons::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.interaction-buttons::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.interaction-buttons::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* 交互按钮样式 - 纯黑背景，手写字体，毛笔笔触边框效果 */
 .interact-button {
-  background-color: #2a2a2a;
+  background-color: #000000;
   color: #FFFFFF;
-  border: 1px solid #444;
-  padding: 8px 16px;
-  border-radius: 4px;
+  border: none;
+  padding: 3px 12px;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  font-family: 'LXGW WenKai', cursive, sans-serif;
   width: auto;
   flex-shrink: 0;
+  position: relative;
+  /* 使用不规则边框模拟毛笔笔触效果 */
+  clip-path: polygon(
+    2% 8%, 8% 3%, 15% 5%, 25% 2%, 35% 6%, 45% 3%, 55% 7%, 65% 2%, 75% 5%, 85% 3%, 92% 7%, 98% 4%,
+    97% 15%, 99% 25%, 96% 35%, 98% 45%, 95% 55%, 97% 65%, 94% 75%, 96% 85%, 93% 92%, 97% 96%,
+    90% 98%, 80% 95%, 70% 97%, 60% 94%, 50% 96%, 40% 93%, 30% 95%, 20% 92%, 10% 94%, 5% 91%,
+    3% 80%, 1% 70%, 4% 60%, 2% 50%, 5% 40%, 3% 30%, 6% 20%, 4% 10%
+  );
 }
 
 .interact-button:hover {
-  background-color: #3a3a3a;
-  border-color: #666;
+  background-color: #1a1a1a;
+  transform: scale(1.05);
 }
 
-/* 动作类按钮样式 - 蓝色边框 */
+/* 动作类按钮样式 */
 .interact-button--action {
-  border-color: #4a9eff;
+  /* 保持基础样式 */
 }
 
 .interact-button--action:hover {
-  background-color: #2a3a4a;
-  border-color: #6ab0ff;
+  background-color: #1a1a1a;
 }
 
-/* 敌人类按钮样式 - 红色边框 */
+/* 敌人类按钮样式 */
 .interact-button--enemy {
-  border-color: #ff4a4a;
+  color: #ff4444;
 }
 
 .interact-button--enemy:hover {
-  background-color: #3a2a2a;
-  border-color: #ff6a6a;
+  background-color: #1a1a1a;
 }
 
-/* NPC类按钮样式 - 绿色边框 */
+/* NPC类按钮样式 */
 .interact-button--npc {
-  border-color: #4aff4a;
+  /* 保持基础样式 */
 }
 
 .interact-button--npc:hover {
-  background-color: #2a3a2a;
-  border-color: #6aff6a;
+  background-color: #1a1a1a;
 }
 
 /* 按钮图标样式 */
@@ -484,5 +534,12 @@
 
   .map-content {
     width: 95%;
+  }
+}
+
+/* 桌面端（平板及以上）优先尝试系统楷体 */
+@media (min-width: 768px) {
+  .interact-button {
+    font-family: 'KaiTi', '楷体', 'STKaiti', 'LXGW WenKai', cursive, sans-serif;
   }
 }

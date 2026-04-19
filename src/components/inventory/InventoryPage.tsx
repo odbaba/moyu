@@ -3,7 +3,10 @@ import './inventory.css';
 import React, { useMemo, useState } from 'react';
 
 import { exampleItems, exampleResources } from '../../data/inventoryData';
-import type { InventoryItem, ItemType, PlayerResources } from '../../types';
+import type { EquipmentItem, InventoryItem, ItemType, PlayerResources } from '../../types';
+import { equipmentItemToDetail } from '../../utils/equipmentConverter';
+import EquipmentDetailModal from '../common/EquipmentDetailModal';
+import { isEquipmentItem } from '../common/utils';
 import ItemDetailModal from './ItemDetailModal';
 import ItemGrid from './ItemGrid';
 import ResourceDisplay from './ResourceDisplay';
@@ -55,6 +58,10 @@ interface InventoryPageProps {
    * 使用物品回调
    */
   onUseItem?: (item: InventoryItem) => void;
+  /**
+   * 装备物品回调（用于装备详情弹窗）
+   */
+  onEquipItem?: (item: EquipmentItem) => void;
 }
 
 /**
@@ -68,7 +75,8 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
   items = exampleItems,
   resources = exampleResources,
   onClose,
-  onUseItem
+  onUseItem,
+  onEquipItem
 }) => {
   /**
    * 物品详情弹窗显示状态
@@ -94,7 +102,7 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
     setSelectedCategories(prev =>
       prev.includes(category)
         ? prev.filter(c => c !== category)
-        : [...prev, category]
+        : [...prev, c]
     );
   };
 
@@ -148,8 +156,22 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
     }
   };
 
+  /**
+   * 处理装备物品（从装备详情弹窗）
+   */
+  const handleEquipItem = () => {
+    if (selectedItem && isEquipmentItem(selectedItem) && onEquipItem) {
+      onEquipItem(selectedItem);
+    }
+    handleCloseItemDetailModal();
+  };
+
   // 如果不可见，不渲染任何内容
   if (!isVisible) return null;
+
+  // 判断选中的物品是否是装备类型
+  const isSelectedEquipment = selectedItem && isEquipmentItem(selectedItem);
+  const selectedEquipmentItem = isSelectedEquipment ? selectedItem as EquipmentItem : null;
 
   return (
     <div className="inventory-page-overlay" onClick={handleOverlayClick}>
@@ -215,13 +237,23 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
           </div>
         </div>
 
-        {/* 物品详情弹窗 */}
-        <ItemDetailModal
-          isVisible={showItemDetailModal}
-          onClose={handleCloseItemDetailModal}
-          item={selectedItem}
-          onUseItem={onUseItem}
-        />
+        {/* 装备类型使用统一的装备详情弹窗 */}
+        {isSelectedEquipment && selectedEquipmentItem ? (
+          <EquipmentDetailModal
+            isVisible={showItemDetailModal}
+            equipment={equipmentItemToDetail(selectedEquipmentItem)}
+            onClose={handleCloseItemDetailModal}
+            onEquip={onEquipItem ? handleEquipItem : undefined}
+          />
+        ) : (
+          /* 其他类型使用通用物品详情弹窗 */
+          <ItemDetailModal
+            isVisible={showItemDetailModal}
+            onClose={handleCloseItemDetailModal}
+            item={selectedItem}
+            onUseItem={onUseItem}
+          />
+        )}
       </div>
     </div>
   );

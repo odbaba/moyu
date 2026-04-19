@@ -4,6 +4,8 @@ import { defineConfig } from 'vite';
 
 // https://vite.dev/config/
 export default defineConfig({
+  // 使用相对路径，确保打包后可以在任何静态服务器上正常运行
+  base: './',
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] })

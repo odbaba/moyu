@@ -88,7 +88,7 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     isLearned: isLearned
   },
 
-  // 索引3: 飞天连斩 - 单体四连击，其中2击破防
+  // 索引3: 飞天连斩 - 单体四连击
   {
     id: 'skill_flying_slash',
     skillIndex: 3 as SkillIndex,
@@ -99,11 +99,11 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     rarity: 'epic',
     level: 1,
     maxLevel: 2,
-    description: '发动四连斩击，对单个敌人造成4次伤害，其中2次攻击无视防御。消耗30点体力。',
+    description: '发动四连斩击，对单个敌人造成4次伤害。消耗30点体力。',
     effect: {
-      damagePercent: 40,
+      damagePercent: 100,
       hitCount: 4,
-      breakDefenseHits: 2
+      breakDefenseHits: 0
     },
     cost: { stamina: 30 },
     cooldown: 3,
@@ -127,13 +127,13 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     rarity: 'legendary',
     level: 0,
     maxLevel: 5,
-    description: '激发斗志，提升战斗力。等级越高，战斗力加成越大。最高可提升50%战斗力。',
+    description: '激发斗志，提升战斗力。等级越高，战斗力加成越大。最高可提升50%战斗力。消耗25点体力。',
     effect: {
       battlePowerBonus: 5,
       buff: '战斗力加成',
       duration: 3
     },
-    cost: { mp: 25 },
+    cost: { stamina: 25 },
     cooldown: 5,
     currentCooldown: 0,
     range: '自身',
@@ -161,7 +161,7 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
       buff: '全属性提升',
       duration: 5
     },
-    cost: { mp: 0 },
+    cost: { stamina: 0 },
     cooldown: 10,
     currentCooldown: 0,
     range: '自身',
@@ -263,6 +263,22 @@ export const getSkillDamagePercent = (skill: SkillDetail): number => {
 
   // 其他技能（斗志抑扬、爱的力量）返回基础伤害
   return skill.effect.damagePercent || 0;
+};
+
+/**
+ * 获取飞天连斩的破防击数
+ * 根据技能等级返回破防击数
+ * @param skill 技能数据
+ * @returns 破防击数
+ */
+export const getBreakDefenseHits = (skill: SkillDetail): number => {
+  // 高级飞天连斩（等级2）：前2击破防
+  if (skill.skillIndex === 3 && skill.level === 2) {
+    return 2;
+  }
+
+  // 其他情况不破防
+  return 0;
 };
 
 /**

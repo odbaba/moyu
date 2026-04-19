@@ -425,6 +425,26 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     baseDefense: 300,
     growthDefense: 45,
   },
+  // 无名氏：战魂封印迷宫的特殊怪物，击败后获得战魂之心
+  // 属性根据玩家等级动态计算：等级=max(玩家等级,50)，生命值=4000×等级，攻击=112.5~168×等级，防御=96×等级
+  'wumingshi': {
+    id: 'wumingshi',
+    name: '无名氏',
+    type: 'special',
+    level: 50, // 基础等级，实际等级在战斗时动态计算
+    combatPower: 150, // 基础战斗力，实际战斗力 = 100 + 等级
+    location: 'zhanhun-fengyin-migong',
+    icon: '🎭',
+    description: '守护战魂秘密的神秘人，击败后将获得战魂之心。\n等级会根据你的等级动态调整，最低50级。',
+    baseHp: 0,
+    growthHp: 4000, // 生命值 = 4000 × 等级
+    baseAttackMin: 0,
+    growthAttackMin: 112.5, // 最小攻击 = 112.5 × 等级
+    baseAttackMax: 0,
+    growthAttackMax: 168, // 最大攻击 = 168 × 等级
+    baseDefense: 0,
+    growthDefense: 96, // 防御 = 96 × 等级
+  },
 };
 
 // ========== 怪物刷新配置 ==========
@@ -725,6 +745,18 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     spawnVariable: 'shenyuan_random2',
     isSpawned: true,
     interactableId: 'interact-shenyuan-random2',
+  },
+
+  // ========== 战魂封印迷宫怪物刷新配置 ==========
+  // 无名氏（特殊怪物，击败后获得战魂之心）
+  // 注意：此怪物不通过静态配置显示，而是在神秘人NPC交互后动态显示
+  {
+    id: 'spawn-zhanhun-wumingshi',
+    templateId: 'wumingshi',
+    location: 'zhanhun-fengyin-migong',
+    spawnVariable: 'zhanhun_wumingshi',
+    isSpawned: false, // 初始不刷新，通过神秘人NPC触发
+    interactableId: 'enemy_wumingshi',
   },
 ];
 

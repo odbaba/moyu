@@ -123,6 +123,7 @@ const npc_princess: NPCInteractable = {
  * 元帅 NPC 配置
  * 功能：提供军衔系统、军饷领取、BOSS情报功能
  * 位置：皇宫
+ * 参考文档：reference/docs/元帅与首相交互逻辑文档.md
  */
 const npc_marshal: NPCInteractable = {
   id: 'npc_marshal',
@@ -135,7 +136,7 @@ const npc_marshal: NPCInteractable = {
   options: [
     {
       text: '领取军饷',
-      result: '领取本周军饷（魔石奖励）。',
+      result: '领取本周军饷（魔石奖励）。\n少将以上额外获得"高级斗志抑扬"。',
       actionType: 'receiveSalary',
       actionParams: { weeklyLimit: true },
       condition: {
@@ -161,23 +162,48 @@ const npc_marshal: NPCInteractable = {
       actionType: 'showHelp',
       actionParams: { topic: 'militaryRank' },
     },
+    {
+      text: '没事',
+      result: '好的，有需要再来找我。',
+      actionType: 'close',
+      actionParams: {},
+    },
   ],
 };
 
 /**
  * 首相 NPC 配置
- * 功能：提供爵位系统、交易系统功能
+ * 功能：提供爵位系统、捐献金币、功勋查询、国王消息功能
  * 位置：皇宫
+ * 参考文档：reference/docs/元帅与首相交互逻辑文档.md
  */
 const npc_prime_minister: NPCInteractable = {
   id: 'npc_prime_minister',
   type: 'npc',
   name: '首相',
   icon: '🎩',
-  description: '亚特大陆的首相，负责爵位晋升和交易系统。',
+  description: '亚特大陆的首相，负责爵位晋升和功勋管理。',
   location: 'huanggong',
   npcType: 'palace',
   options: [
+    {
+      text: '捐献金币',
+      result: '捐献金币获得功勋。\n兑换比例：每750,000金币 = 1功勋',
+      actionType: 'donateGold',
+      actionParams: {},
+    },
+    {
+      text: '功勋查询',
+      result: '查看当前功勋和晋升需求。',
+      actionType: 'queryMerit',
+      actionParams: {},
+    },
+    {
+      text: '关于国王的消息',
+      result: '查看国王当前状态。',
+      actionType: 'queryKingStatus',
+      actionParams: {},
+    },
     {
       text: '关于爵位',
       result: '查看爵位系统说明。\n\n爵位等级：平民、勋爵、子爵、伯爵、公爵、侯爵、王\n\n爵位可以通过积累功勋来提升。',
@@ -185,15 +211,15 @@ const npc_prime_minister: NPCInteractable = {
       actionParams: { topic: 'nobleRank' },
     },
     {
-      text: '交易',
-      result: '打开交易界面。',
-      actionType: 'openTrade',
-      actionParams: {},
-    },
-    {
       text: '领取奖励',
       result: '领取爵位奖励。',
       actionType: 'receiveNobleReward',
+      actionParams: {},
+    },
+    {
+      text: '没事',
+      result: '好的，有需要再来找我。',
+      actionType: 'close',
       actionParams: {},
     },
   ],
@@ -263,6 +289,7 @@ const npc_maid_2: NPCInteractable = {
  * 日常任务官 NPC 配置
  * 功能：提供每日任务系统
  * 位置：树心城（使用雷鸣大陆作为位置）
+ * 参考文档：reference/docs/日常任务官交互逻辑文档.md
  */
 const npc_daily_task: NPCInteractable = {
   id: 'npc_daily_task',
@@ -295,14 +322,14 @@ const npc_daily_task: NPCInteractable = {
 };
 
 /**
- * 地图赛报名官 NPC 配置
+ * 地图占领赛报名官 NPC 配置
  * 功能：提供地图挑战系统、保护者奖励
  * 位置：各地图
  */
 const npc_map_challenge: NPCInteractable = {
   id: 'npc_map_challenge',
   type: 'npc',
-  name: '地图赛报名官',
+  name: '地图占领赛报名官',
   icon: '🗺️',
   description: '负责地图挑战系统的官员。成为地图保护者可以获得每日奖励！',
   location: 'leiming-dalu',
@@ -330,49 +357,14 @@ const npc_map_challenge: NPCInteractable = {
 };
 
 /**
- * 雷鸣矿洞地图赛报名官 NPC 配置
- * 功能：提供雷鸣矿洞地图挑战系统
- * 位置：雷鸣矿洞
- */
-const npc_map_challenge_leiming_kuangdong: NPCInteractable = {
-  id: 'npc_map_challenge_leiming_kuangdong',
-  type: 'npc',
-  name: '地图赛报名官',
-  icon: '🗺️',
-  description: '负责雷鸣矿洞地图挑战系统的官员。成为地图保护者可以获得每日奖励！',
-  location: 'leiming-kuangdong',
-  npcType: 'function',
-  options: [
-    {
-      text: '查看保护者每天的奖励',
-      result: '查看当前地图保护者奖励。',
-      actionType: 'viewProtectorReward',
-      actionParams: {},
-    },
-    {
-      text: '我来挑战/领取奖励',
-      result: '挑战地图或领取保护者奖励。',
-      actionType: 'challengeOrClaim',
-      actionParams: {},
-    },
-    {
-      text: '随便看看',
-      result: '好的，有需要随时来找我。',
-      actionType: 'close',
-      actionParams: {},
-    },
-  ],
-};
-
-/**
- * 卡萨诺城地图赛报名官 NPC 配置
+ * 卡萨诺城地图占领赛报名官 NPC 配置
  * 功能：提供卡萨诺城地图挑战系统
  * 位置：卡萨诺城
  */
 const npc_map_challenge_kasanuocheng: NPCInteractable = {
   id: 'npc_map_challenge_kasanuocheng',
   type: 'npc',
-  name: '地图赛报名官',
+  name: '地图占领赛报名官',
   icon: '🗺️',
   description: '负责卡萨诺城地图挑战系统的官员。成为地图保护者可以获得每日奖励！',
   location: 'kasanuocheng',
@@ -400,14 +392,14 @@ const npc_map_challenge_kasanuocheng: NPCInteractable = {
 };
 
 /**
- * 亚维特岛地图赛报名官 NPC 配置
+ * 亚维特岛地图占领赛报名官 NPC 配置
  * 功能：提供亚维特岛地图挑战系统
  * 位置：亚维特岛
  */
 const npc_map_challenge_yaweite_dao: NPCInteractable = {
   id: 'npc_map_challenge_yaweite_dao',
   type: 'npc',
-  name: '地图赛报名官',
+  name: '地图占领赛报名官',
   icon: '🗺️',
   description: '负责亚维特岛地图挑战系统的官员。成为地图保护者可以获得每日奖励！',
   location: 'yaweite-dao',
@@ -435,49 +427,14 @@ const npc_map_challenge_yaweite_dao: NPCInteractable = {
 };
 
 /**
- * 火山地图赛报名官 NPC 配置
- * 功能：提供火山地图挑战系统
- * 位置：火山
- */
-const npc_map_challenge_huoshan: NPCInteractable = {
-  id: 'npc_map_challenge_huoshan',
-  type: 'npc',
-  name: '地图赛报名官',
-  icon: '🗺️',
-  description: '负责火山地图挑战系统的官员。成为地图保护者可以获得每日奖励！',
-  location: 'huoshan',
-  npcType: 'function',
-  options: [
-    {
-      text: '查看保护者每天的奖励',
-      result: '查看当前地图保护者奖励。',
-      actionType: 'viewProtectorReward',
-      actionParams: {},
-    },
-    {
-      text: '我来挑战/领取奖励',
-      result: '挑战地图或领取保护者奖励。',
-      actionType: 'challengeOrClaim',
-      actionParams: {},
-    },
-    {
-      text: '随便看看',
-      result: '好的，有需要随时来找我。',
-      actionType: 'close',
-      actionParams: {},
-    },
-  ],
-};
-
-/**
- * 戈壁地图赛报名官 NPC 配置
+ * 戈壁地图占领赛报名官 NPC 配置
  * 功能：提供戈壁地图挑战系统
  * 位置：戈壁
  */
 const npc_map_challenge_gebi: NPCInteractable = {
   id: 'npc_map_challenge_gebi',
   type: 'npc',
-  name: '地图赛报名官',
+  name: '地图占领赛报名官',
   icon: '🗺️',
   description: '负责戈壁地图挑战系统的官员。成为地图保护者可以获得每日奖励！',
   location: 'gebi',
@@ -505,49 +462,14 @@ const npc_map_challenge_gebi: NPCInteractable = {
 };
 
 /**
- * 深渊迷宫地图赛报名官 NPC 配置
- * 功能：提供深渊迷宫地图挑战系统
- * 位置：深渊迷宫
- */
-const npc_map_challenge_shenyuan_migong: NPCInteractable = {
-  id: 'npc_map_challenge_shenyuan_migong',
-  type: 'npc',
-  name: '地图赛报名官',
-  icon: '🗺️',
-  description: '负责深渊迷宫地图挑战系统的官员。成为地图保护者可以获得每日奖励！',
-  location: 'shenyuan-migong',
-  npcType: 'function',
-  options: [
-    {
-      text: '查看保护者每天的奖励',
-      result: '查看当前地图保护者奖励。',
-      actionType: 'viewProtectorReward',
-      actionParams: {},
-    },
-    {
-      text: '我来挑战/领取奖励',
-      result: '挑战地图或领取保护者奖励。',
-      actionType: 'challengeOrClaim',
-      actionParams: {},
-    },
-    {
-      text: '随便看看',
-      result: '好的，有需要随时来找我。',
-      actionType: 'close',
-      actionParams: {},
-    },
-  ],
-};
-
-/**
- * 迷梦沼泽地图赛报名官 NPC 配置
+ * 迷梦沼泽地图占领赛报名官 NPC 配置
  * 功能：提供迷梦沼泽地图挑战系统
  * 位置：迷梦沼泽
  */
 const npc_map_challenge_mimeng_zhaozhe: NPCInteractable = {
   id: 'npc_map_challenge_mimeng_zhaozhe',
   type: 'npc',
-  name: '地图赛报名官',
+  name: '地图占领赛报名官',
   icon: '🗺️',
   description: '负责迷梦沼泽地图挑战系统的官员。成为地图保护者可以获得每日奖励！',
   location: 'mimeng-zhaozhe',
@@ -575,52 +497,17 @@ const npc_map_challenge_mimeng_zhaozhe: NPCInteractable = {
 };
 
 /**
- * 冰宫地图赛报名官 NPC 配置
+ * 冰宫地图占领赛报名官 NPC 配置
  * 功能：提供冰宫地图挑战系统
  * 位置：冰宫
  */
 const npc_map_challenge_binggong: NPCInteractable = {
   id: 'npc_map_challenge_binggong',
   type: 'npc',
-  name: '地图赛报名官',
+  name: '地图占领赛报名官',
   icon: '🗺️',
   description: '负责冰宫地图挑战系统的官员。成为地图保护者可以获得每日奖励！',
   location: 'binggong',
-  npcType: 'function',
-  options: [
-    {
-      text: '查看保护者每天的奖励',
-      result: '查看当前地图保护者奖励。',
-      actionType: 'viewProtectorReward',
-      actionParams: {},
-    },
-    {
-      text: '我来挑战/领取奖励',
-      result: '挑战地图或领取保护者奖励。',
-      actionType: 'challengeOrClaim',
-      actionParams: {},
-    },
-    {
-      text: '随便看看',
-      result: '好的，有需要随时来找我。',
-      actionType: 'close',
-      actionParams: {},
-    },
-  ],
-};
-
-/**
- * 雪域边境地图赛报名官 NPC 配置
- * 功能：提供雪域边境地图挑战系统
- * 位置：雪域边境
- */
-const npc_map_challenge_xueyu_bianjing: NPCInteractable = {
-  id: 'npc_map_challenge_xueyu_bianjing',
-  type: 'npc',
-  name: '地图赛报名官',
-  icon: '🗺️',
-  description: '负责雪域边境地图挑战系统的官员。成为地图保护者可以获得每日奖励！',
-  location: 'xueyu-bianjing',
   npcType: 'function',
   options: [
     {
@@ -714,6 +601,95 @@ const npc_lottery: NPCInteractable = {
       text: '我没什么兴趣',
       result: '好的，有需要再来找我。',
       actionType: 'close',
+      actionParams: {},
+    },
+  ],
+};
+
+/**
+ * 幻兽幻化师 NPC 配置
+ * 功能：提供幻兽幻化功能，将副幻兽属性转移给主幻兽
+ * 位置：卡萨诺城
+ */
+const npc_pet_fusion_master: NPCInteractable = {
+  id: 'npc_pet_fusion_master',
+  type: 'npc',
+  name: '幻兽幻化师',
+  icon: '🔮',
+  description: '精通幻兽幻化之术的大师，可以将副幻兽的属性转移给主幻兽，大幅提升主幻兽的成长率和属性值。',
+  location: 'kasanuocheng',
+  npcType: 'function',
+  options: [
+    {
+      text: '进行幻化',
+      result: '打开幻兽幻化界面。',
+      actionType: 'openPetFusion',
+      actionParams: {},
+    },
+    {
+      text: '关于幻化',
+      result: '幻化系统说明：\n\n【幻化条件】\n- 主幻兽等级必须达到50级\n- 副幻兽类型必须与主幻兽相同或为奇异兽\n- 副幻兽评分需达到要求（主幻兽评分越高，要求越高）\n\n【幻化效果】\n- 主属性幻化：根据幻兽类型获得不同的成长率加成\n- 副属性幻化：继承副幻兽较高的生命和防御成长率（90%）\n- 初始属性幻化：继承副幻兽较高的初始属性（85%）\n\n【评分要求】\n- 主幻兽评分 < 1500：无要求\n- 主幻兽评分 >= 1500：要求 = (主幻兽评分 - 500) / 2\n\n【顿悟机制】\n- 幻化后升级到50级时有概率触发顿悟\n- 顿悟可恢复到幻化前的等级\n\n【注意事项】\n- 副幻兽会被消耗，请谨慎选择\n- 幻化后主幻兽等级重置为1级',
+      actionType: 'showHelp',
+      actionParams: { topic: 'petFusion' },
+    },
+    {
+      text: '离开',
+      result: '期待你的下次光临！',
+      actionType: 'close',
+      actionParams: {},
+    },
+  ],
+};
+
+/**
+ * 戈壁探险家 NPC 配置
+ * 功能：声称知道战魂秘密，实则是骗局NPC（解锁条件：全身极品装备到达卡萨诺城）
+ * 位置：戈壁
+ * 参考文档：reference/docs/探险家NPC交互逻辑文档.md
+ */
+const npc_explorer_gebi: NPCInteractable = {
+  id: 'npc_explorer_gebi',
+  type: 'npc',
+  name: '探险家',
+  icon: '🧭',
+  description: '　　小伙子，看你东张西望的，是不是在寻找有关战魂的秘密？这里有条路是通往一个地方，我在那里见过一个箱子，也许有关战魂的秘密就在里面......\n　　如果你愿意付给我50,000魔石作路费我可以带你去。\n　　不过，要还看你有没有本事拿得到箱子里的东西。',
+  location: 'gebi',
+  npcType: 'special',
+  options: [
+    {
+      text: '太好了，那正是我要找的地方',
+      result: '支付50,000魔石，让探险家带路。',
+      actionType: 'payForExplore',
+      actionParams: { cost: 50000 },
+    },
+    {
+      text: '要那么多钱啊。我还是自己找算了',
+      result: '好的，有需要再来找我。',
+      actionType: 'close',
+      actionParams: {},
+    },
+  ],
+};
+
+/**
+ * 神秘人 NPC 配置
+ * 功能：战魂封印迷宫的前置NPC，点击后消失并出现无名氏敌人
+ * 位置：战魂封印迷宫
+ * 参考文档：reference/docs/无名氏NPC交互逻辑文档.md
+ */
+const npc_mysterious_person: NPCInteractable = {
+  id: 'npc_mysterious_person',
+  type: 'npc',
+  name: '神秘人',
+  icon: '👤',
+  description: '一个神秘的身影，似乎知道战魂的秘密。',
+  location: 'zhanhun-fengyin-migong',
+  npcType: 'special',
+  options: [
+    {
+      text: '打探战魂的秘密',
+      result: '小子，你的装备也不错啊。想有打探有关战魂的秘密吧，先打赢我再说吧。',
+      actionType: 'triggerMysteriousPerson',
       actionParams: {},
     },
   ],
@@ -881,41 +857,6 @@ const npc_olympic_envoy: NPCInteractable = {
   ],
 };
 
-/**
- * 探险家 NPC 配置
- * 功能：提供探险任务和奖励
- * 位置：各地图
- */
-const npc_explorer: NPCInteractable = {
-  id: 'npc_explorer',
-  type: 'npc',
-  name: '探险家',
-  icon: '🧭',
-  description: '经验丰富的探险家，在各地图游历，提供探险任务和奖励。',
-  location: 'leiming-dalu',
-  npcType: 'special',
-  options: [
-    {
-      text: '接受探险任务',
-      result: '接受探险任务，探索未知的领域。',
-      actionType: 'acceptExploreTask',
-      actionParams: {},
-    },
-    {
-      text: '领取探险奖励',
-      result: '领取已完成的探险任务奖励。',
-      actionType: 'claimExploreReward',
-      actionParams: {},
-    },
-    {
-      text: '关于探险',
-      result: '探险说明：\n\n探险任务会引导你前往各个地图探索。\n完成探险任务可以获得丰厚奖励。\n\n祝你好运，冒险者！',
-      actionType: 'showHelp',
-      actionParams: { topic: 'explore' },
-    },
-  ],
-};
-
 // ==================== 商店 NPC 配置 ====================
 
 /**
@@ -1045,6 +986,35 @@ const npc_equipment_refiner: NPCInteractable = {
   ],
 };
 
+/**
+ * 经验导师 NPC 配置
+ * 功能：提供装备换经验球功能
+ * 位置：卡萨诺城
+ */
+const npc_experience_mentor: NPCInteractable = {
+  id: 'npc_experience_mentor',
+  type: 'npc',
+  name: '经验导师',
+  icon: '🔮',
+  description: '每一件装备都有都有一股神秘的力量，我可以帮你将其提练出来放到经验球里面。只有良品以上或都有洞的装备才可以提练。\n\n良品可以换1个满的经验球，上品可以换2个，精品可以换3个，极品可以换4个。如果装备有一个洞的话可以多2个经验球，二洞多5个。魔魂等级达到+9的可以多换1，达到+12的多2个。',
+  location: 'kasanuocheng',
+  npcType: 'function',
+  options: [
+    {
+      text: '用装备换经验球',
+      result: '打开装备交换界面。',
+      actionType: 'openExperienceExchange',
+      actionParams: {},
+    },
+    {
+      text: '哦，知道了',
+      result: '好的，有需要再来找我。',
+      actionType: 'close',
+      actionParams: {},
+    },
+  ],
+};
+
 // ==================== NPC 配置映射表 ====================
 
 /**
@@ -1064,16 +1034,14 @@ export const npcConfig: Record<string, NPCInteractable> = {
   npc_map_challenge,
   npc_pk_match,
   npc_lottery,
-  // 各地图地图赛报名官 NPC
-  npc_map_challenge_leiming_kuangdong,
+  npc_pet_fusion_master,
+  npc_experience_mentor,
+  // 各地图地图占领赛报名官 NPC
   npc_map_challenge_kasanuocheng,
   npc_map_challenge_yaweite_dao,
-  npc_map_challenge_huoshan,
   npc_map_challenge_gebi,
-  npc_map_challenge_shenyuan_migong,
   npc_map_challenge_mimeng_zhaozhe,
   npc_map_challenge_binggong,
-  npc_map_challenge_xueyu_bianjing,
   // 商店 NPC
   npc_gem_synthesizer,
   npc_collector,
@@ -1083,7 +1051,8 @@ export const npcConfig: Record<string, NPCInteractable> = {
   npc_equipment_refiner,
   // 特殊 NPC
   npc_olympic_envoy,
-  npc_explorer,
+  npc_explorer_gebi,
+  npc_mysterious_person,
 };
 
 /**
@@ -1096,18 +1065,16 @@ export const npcByType: Record<string, NPCInteractable[]> = {
     npc_map_challenge,
     npc_pk_match,
     npc_lottery,
-    npc_map_challenge_leiming_kuangdong,
+    npc_pet_fusion_master,
+    npc_experience_mentor,
     npc_map_challenge_kasanuocheng,
     npc_map_challenge_yaweite_dao,
-    npc_map_challenge_huoshan,
     npc_map_challenge_gebi,
-    npc_map_challenge_shenyuan_migong,
     npc_map_challenge_mimeng_zhaozhe,
     npc_map_challenge_binggong,
-    npc_map_challenge_xueyu_bianjing,
   ],
   shop: [npc_gem_synthesizer, npc_collector, npc_pet_institute, npc_grocery_merchant, npc_magic_stone_merchant, npc_equipment_refiner],
-  special: [npc_olympic_envoy, npc_explorer],
+  special: [npc_olympic_envoy, npc_explorer_gebi, npc_mysterious_person],
 };
 
 /**
@@ -1116,16 +1083,13 @@ export const npcByType: Record<string, NPCInteractable[]> = {
 export const npcByLocation: Record<string, NPCInteractable[]> = {
   huanggong: [npc_king, npc_marshal, npc_prime_minister, npc_maid_1, npc_maid_2, npc_pk_match],
   houhuayuan: [npc_princess],
-  'leiming-dalu': [npc_daily_task, npc_map_challenge, npc_gem_synthesizer, npc_pet_institute, npc_olympic_envoy, npc_explorer],
-  'leiming-kuangdong': [npc_map_challenge_leiming_kuangdong],
-  kasanuocheng: [npc_lottery, npc_map_challenge_kasanuocheng, npc_collector, npc_grocery_merchant, npc_magic_stone_merchant, npc_equipment_refiner],
+  'leiming-dalu': [npc_daily_task, npc_map_challenge, npc_gem_synthesizer, npc_pet_institute, npc_olympic_envoy],
+  kasanuocheng: [npc_lottery, npc_pet_fusion_master, npc_map_challenge_kasanuocheng, npc_collector, npc_grocery_merchant, npc_magic_stone_merchant, npc_equipment_refiner, npc_experience_mentor],
   'yaweite-dao': [npc_map_challenge_yaweite_dao],
-  huoshan: [npc_map_challenge_huoshan],
-  gebi: [npc_map_challenge_gebi],
-  'shenyuan-migong': [npc_map_challenge_shenyuan_migong],
+  gebi: [npc_map_challenge_gebi, npc_explorer_gebi],
   'mimeng-zhaozhe': [npc_map_challenge_mimeng_zhaozhe],
   binggong: [npc_map_challenge_binggong],
-  'xueyu-bianjing': [npc_map_challenge_xueyu_bianjing],
+  'zhanhun-fengyin-migong': [npc_mysterious_person],
 };
 
 /**

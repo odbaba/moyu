@@ -32,15 +32,14 @@ components/
 │   ├── constants.ts   # 公共常量
 │   ├── utils.ts       # 公共工具函数
 │   ├── NPCModal.tsx
-│   └── EnemyModal.tsx
+│   ├── EnemyModal.tsx
+│   └── EquipmentDetailModal.tsx  # 统一装备详情弹窗
 ├── character/         # 角色模块
 │   ├── index.ts
 │   ├── CharacterPage.tsx
 │   ├── CharacterInfo.tsx
 │   ├── EquipmentDisplay.tsx
-│   ├── EquipmentModal.tsx
 │   ├── EquipmentSelectModal.tsx
-│   ├── InventoryEquipmentModal.tsx
 │   └── CombatPowerModal.tsx
 ├── inventory/         # 背包模块
 │   ├── index.ts

@@ -97,7 +97,7 @@ const renderBuff = (buff: Buff) => {
 
 /**
  * 角色卡片组件
- * 显示角色的基本信息，包括等级、战斗力、攻击力、生命值和魔法值进度条、增益效果
+ * 显示角色的基本信息，包括等级、战斗力、攻击力、生命值和体力进度条、增益效果
  * 支持显示 BattleCharacter（角色）和 BattlePet（幻兽）两种类型
  * 合体幻兽会显示特殊的"合体"标签和金色边框
  * @param props 组件属性，包含战斗角色或幻兽数据
@@ -113,13 +113,13 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
   // 判断是否为合体幻兽（只有幻兽才有 isMerged 属性）
   const isMerged = isPet && character.isMerged;
 
-  // 判断是否为角色类型（有 MP 和 buffs 属性）
-  const hasMp = !isPet;
+  // 判断是否为角色类型（有体力属性和 buffs 属性）
+  const hasStamina = !isPet;
   const hasBuffs = !isPet && character.buffs && character.buffs.length > 0;
 
-  // 计算魔法值百分比（仅角色有 MP）
-  const mpPercentage = hasMp
-    ? Math.max(0, Math.min(100, ((character as BattleCharacter).currentMp / (character as BattleCharacter).maxMp) * 100))
+  // 计算体力百分比（仅角色有体力）
+  const staminaPercentage = hasStamina
+    ? Math.max(0, Math.min(100, ((character as BattleCharacter).currentStamina / (character as BattleCharacter).maxStamina) * 100))
     : 0;
 
   return (
@@ -170,19 +170,19 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
         </div>
       </div>
 
-      {/* 魔法值进度条区域（仅角色显示） */}
-      {hasMp && (
+      {/* 体力进度条区域（仅角色显示） */}
+      {hasStamina && (
         <div className="stat-bar-container compact">
-          {/* 魔法值进度条背景 */}
-          <div className="stat-bar mp-bar compact">
-            {/* 魔法值数值显示（当前/最大）*/}
-            <span className="stat-value-on-bar mp-value">
-              {(character as BattleCharacter).currentMp}/{(character as BattleCharacter).maxMp}
+          {/* 体力进度条背景 */}
+          <div className="stat-bar stamina-bar compact">
+            {/* 体力数值显示（当前/最大）*/}
+            <span className="stat-value-on-bar stamina-value">
+              {(character as BattleCharacter).currentStamina}/{(character as BattleCharacter).maxStamina}
             </span>
-            {/* 魔法值进度条填充 */}
+            {/* 体力进度条填充 */}
             <div
-              className="stat-bar-fill mp-fill"
-              style={{ width: `${mpPercentage}%` }}
+              className="stat-bar-fill stamina-fill"
+              style={{ width: `${staminaPercentage}%` }}
             />
           </div>
         </div>

@@ -164,6 +164,9 @@ export interface EquipmentDetail {
   bonusAttackMin?: number; // 追加最小攻击
   bonusAttackMax?: number; // 追加最大攻击
   bonusDefense?: number; // 追加防御
+  // 图标信息（用于保持装备图标的连续性）
+  icon?: string; // 装备图标（emoji或图片路径）
+  imagePath?: string; // 装备图片路径
 }
 
 // 详细角色信息接口定义（扩展版）
@@ -224,6 +227,8 @@ export interface CharacterData {
     attackMax: number; // 幻兽最大攻击力加成
     defense: number; // 幻兽防御力加成
   };
+  // 战斗力（动态计算，必须有值）
+  combatPower: number; // 角色战斗力
 }
 
 // ========== 背包系统类型定义 ==========
@@ -409,7 +414,6 @@ export type SkillRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
 // 技能消耗接口
 export interface SkillCost {
-  mp?: number; // 魔法值消耗
   stamina?: number; // 体力消耗
   hp?: number; // 生命值消耗（血祭类技能）
   gold?: number; // 金币消耗
@@ -699,7 +703,6 @@ export interface BattleSkill {
   attackType: SkillAttackType; // 攻击类型（single/aoe/multi/buff/special）
   level: number; // 技能等级
   damagePercent: number; // 伤害百分比
-  mpCost: number; // MP消耗
   staminaCost: number; // 体力消耗
   cooldown: number; // 冷却时间（回合）
   currentCooldown: number; // 当前冷却时间
@@ -720,8 +723,6 @@ export interface BattleCharacter {
   level: number; // 角色等级
   maxHp: number; // 最大生命值
   currentHp: number; // 当前生命值
-  maxMp: number; // 最大MP（用于技能消耗）
-  currentMp: number; // 当前MP
   maxStamina: number; // 最大体力值
   currentStamina: number; // 当前体力值
   attackMin: number; // 最小攻击力
@@ -759,7 +760,7 @@ export interface BattlePet {
 /**
  * 战斗日志类型枚举
  */
-export type BattleLogType = 'attack' | 'skill' | 'dodge' | 'critical' | 'buff' | 'damage' | 'heal' | 'death';
+export type BattleLogType = 'attack' | 'skill' | 'dodge' | 'buff' | 'damage' | 'heal' | 'death';
 
 /**
  * 战斗日志条目接口（扩展版）
@@ -775,9 +776,9 @@ export interface BattleLogEntry {
   target: string; // 目标名称
   targetId: string; // 目标ID
   skillName?: string; // 使用的技能名称
-  isCritical?: boolean; // 是否暴击
   isDodged?: boolean; // 是否被闪避
   isBreakDefense?: boolean; // 是否破防攻击
+  isCritical?: boolean; // 是否暴击
 }
 
 /**
@@ -809,9 +810,9 @@ export interface BattleState {
 export interface DamageResult {
   damage: number; // 最终伤害
   isDodged: boolean; // 是否被闪避
-  isCritical: boolean; // 是否暴击
   isBreakDefense: boolean; // 是否破防攻击
   combatPowerModifier: number; // 战斗力修正系数
+  isCritical: boolean; // 是否暴击
 }
 
 /**
@@ -1155,6 +1156,38 @@ export interface PetTrainingReward {
   description: string; // 奖励描述
 }
 
+/**
+ * 日常任务状态管理接口
+ * 定义日常任务系统的状态，包括任务完成标记和怪物刷新状态
+ * 参考文档：reference/docs/日常任务官交互逻辑文档.md
+ */
+export interface DailyTaskState {
+  // 任务完成标记（对应参考文档中的 rw_bs, rw_hs, rw_dxc）
+  rw_bs: boolean; // BOSS任务（收集宝石）是否可完成，true表示可以完成任务
+  rw_hs: boolean; // 幻兽任务（训练幻兽）是否可完成，true表示可以完成任务
+  rw_dxc: boolean; // 地下城任务是否可完成，true表示可以完成任务
+
+  // 地下城怪物状态（对应参考文档中的 rw_gw1_1 等）
+  rw_gw1_1: boolean; // 地下城1层怪物1是否存在，true表示存在
+  rw_gw1_2: boolean; // 地下城1层怪物2是否存在，true表示存在
+  rw_gw1_3: boolean; // 地下城1层怪物3是否存在，true表示存在
+  rw_gw2_1: boolean; // 地下城2层怪物1是否存在，true表示存在
+  rw_gw2_2: boolean; // 地下城2层怪物2是否存在，true表示存在
+  rw_gw3_1: boolean; // 地下城3层怪物是否存在，true表示存在
+
+  // 雪域边境怪物状态（周五任务）
+  gw_xybj_1: boolean; // 雪域边境怪物1是否存在，true表示存在
+  gw_xybj_2: boolean; // 雪域边境怪物2是否存在，true表示存在
+  gw_xybj_3: boolean; // 雪域边境怪物3是否存在，true表示存在
+  gw_xybj_4: boolean; // 雪域边境怪物4是否存在，true表示存在
+  gw_xybj_5: boolean; // 雪域边境怪物5是否存在，true表示存在
+
+  // 任务进度追踪
+  currentTaskId?: string; // 当前接受的任务ID
+  taskAcceptedAt?: number; // 任务接受时间戳
+  taskProgress: number; // 任务进度（已完成的数量）
+}
+
 // ==================== 商店系统类型定义 ====================
 
 /**
@@ -1221,5 +1254,26 @@ export interface SellResult {
   magicStoneEarned?: number; // 获得的魔石
   itemId?: string; // 物品ID
   quantity?: number; // 出售数量
+}
+
+// ========== 战魂系统类型定义 ==========
+
+/**
+ * 战魂物品类型
+ * 定义战魂物品的具体类型
+ * - zhanHunZhiXin: 战魂之心
+ * - zhanHunJingShi: 战魂晶石
+ */
+export type WarSoulItemType = 'zhanHunZhiXin' | 'zhanHunJingShi';
+
+/**
+ * 战魂掉落配置接口
+ * 定义怪物掉落战魂物品的配置
+ */
+export interface WarSoulDropConfig {
+  monsterId: string; // 怪物ID
+  itemType: WarSoulItemType; // 战魂物品类型（战魂之心/战魂晶石）
+  dropRate: number; // 掉落概率（0-1之间）
+  requireSystemEnabled: boolean; // 是否需要战魂系统开启才能掉落
 }
 

@@ -142,33 +142,30 @@ export const getSkillUpgradeCost = (skill: SkillDetail): number => {
 };
 
 /**
- * 获取技能MP消耗
+ * 获取技能体力消耗
  * @param skill 技能数据
- * @returns MP消耗
+ * @returns 体力消耗
  */
-export const getSkillMpCost = (skill: SkillDetail): number => {
-  return skill.cost.mp || 0;
+export const getSkillStaminaCost = (skill: SkillDetail): number => {
+  return skill.cost.stamina || 0;
 };
 
 /**
  * 检查是否可以使用技能
  * @param skill 技能数据
- * @param currentMp 当前MP
  * @param currentStamina 当前体力
  * @returns 是否可以使用
  */
 export const canUseSkill = (
   skill: SkillDetail,
-  currentMp: number,
   currentStamina: number = 100
 ): boolean => {
   if (!skill.isLearned) return false;
   if (skill.currentCooldown > 0) return false;
 
-  const mpCost = skill.cost.mp || 0;
   const staminaCost = skill.cost.stamina || 0;
 
-  return currentMp >= mpCost && currentStamina >= staminaCost;
+  return currentStamina >= staminaCost;
 };
 
 /**

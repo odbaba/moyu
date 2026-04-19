@@ -21,9 +21,13 @@ home/
 ## 组件说明
 
 ### LocationHeader
-- **功能**: 显示当前位置的标题
+- **功能**: 显示当前位置的标题，提供角色和幻兽系统入口
 - **位置**: 页面顶部
-- **Props**: `location: string` - 当前位置名称
+- **布局**: 左侧角色按钮 + 中间位置名称 + 右侧幻兽按钮
+- **Props**: 
+  - `location: string` - 当前位置名称
+  - `onShowCharacter: () => void` - 显示角色信息页面的回调
+  - `onShowPet: () => void` - 显示幻兽页面的回调
 
 ### SceneDescription
 - **功能**: 显示当前场景的文字描述
@@ -51,12 +55,16 @@ home/
 - **Props**: `logs: string[]` - 日志条目数组
 
 ### Menu
-- **功能**: 右下角的悬浮菜单，提供大地图等功能入口
+- **功能**: 右下角的悬浮菜单，提供角色信息、幻兽、背包、技能、大地图等功能入口
 - **位置**: 页面右下角固定
 - **Props**:
   - `isOpen: boolean` - 菜单是否展开
   - `onToggle: () => void` - 切换菜单状态
   - `onShowMap: () => void` - 显示大地图回调
+  - `onShowCharacter: () => void` - 显示角色信息页面回调
+  - `onShowInventory: () => void` - 显示背包页面回调
+  - `onShowSkill: () => void` - 显示技能页面回调
+  - `onShowPet: () => void` - 显示幻兽页面回调
 
 ### WorldMap
 - **功能**: 全屏大地图，显示所有地点，支持拖拽和点击移动
@@ -90,12 +98,24 @@ import {
 } from './components/home';
 
 // 在主应用中使用
-<LocationHeader location={currentLocation.name} />
+<LocationHeader 
+  location={currentLocation.name} 
+  onShowCharacter={() => setShowCharacterPage(true)}
+  onShowPet={() => setShowPetPage(true)}
+/>
 <SceneDescription description={currentLocation.description} />
 <LocalMap currentLocation={currentLocationId} onMove={handleMove} />
 <InteractionButtons interactables={interactables} onInteract={handleInteract} />
 <InteractionLog logs={logs} />
-<Menu isOpen={menuOpen} onToggle={toggleMenu} onShowMap={showMap} />
+<Menu 
+  isOpen={menuOpen} 
+  onToggle={toggleMenu} 
+  onShowMap={showMap}
+  onShowCharacter={() => setShowCharacterPage(true)}
+  onShowInventory={() => setShowInventoryPage(true)}
+  onShowSkill={() => setShowSkillPage(true)}
+  onShowPet={() => setShowPetPage(true)}
+/>
 <WorldMap isVisible={showMap} onClose={closeMap} currentLocation={currentLocationId} onMove={handleMove} />
 ```
 

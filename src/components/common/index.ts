@@ -9,6 +9,18 @@ export { default as NPCModal } from './NPCModal';
 // 敌人交互弹窗组件
 export { default as EnemyModal } from './EnemyModal';
 
+// 经验交换弹窗组件
+export { default as ExperienceExchangeModal } from './ExperienceExchangeModal';
+
+// 捐献金币弹窗组件
+export { default as DonationModal } from './DonationModal';
+
+// 信息弹窗组件
+export { default as InfoModal } from './InfoModal';
+
+// 统一装备详情弹窗组件
+export { default as EquipmentDetailModal } from './EquipmentDetailModal';
+
 // 公共常量导出
 export * from './constants';
 

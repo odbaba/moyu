@@ -245,52 +245,6 @@ export function getQualityValue(quality: string): number {
 }
 
 /**
- * 计算下一级所需经验
- * 根据参考代码 DefineSprite_932/frame_1/DoAction.as 的逻辑
- * @param currentLevel 当前等级
- * @param currentMaxExp 当前升级所需经验
- * @returns 下一级升级所需经验
- */
-export function calculateNextLevelMaxExp(currentLevel: number, currentMaxExp: number): number {
-  // 20级前，每次升级所需经验是上一级的1.2倍
-  if (currentLevel < 20) {
-    return Math.round(currentMaxExp * 1.2);
-  }
-  // 20-50级，每次升级所需经验是上一级的1.1倍
-  else if (currentLevel <= 50) {
-    return Math.round(currentMaxExp * 1.1);
-  }
-  // 50级以上，每次升级增加固定值
-  else {
-    // 在50级时计算固定值（50级所需经验的20%）
-    // 注意：这里的 hun 值在50级时计算，之后保持不变
-    const hun = currentLevel === 50 ? Math.round(currentMaxExp * 0.2) : 0;
-
-    return currentMaxExp + hun;
-  }
-}
-
-/**
- * 计算指定等级的升级所需经验
- * @param targetLevel 目标等级
- * @returns 升级所需经验
- */
-export function calculateMaxExp(targetLevel: number): number {
-  // 1级升2级需要10经验
-  if (targetLevel === 1) {
-    return 10;
-  }
-
-  // 递归计算
-  let maxExp = 10;
-  for (let level = 1; level < targetLevel; level++) {
-    maxExp = calculateNextLevelMaxExp(level, maxExp);
-  }
-
-  return maxExp;
-}
-
-/**
  * 预计算所有等级的升级所需经验
  * @param maxLevel 最高等级（默认125）
  * @returns 等级 -> 升级所需经验的映射表
@@ -328,3 +282,114 @@ export function preCalculateMaxExpTable(maxLevel: number = 125): Map<number, num
 
 // 导出预计算表（提高性能）
 export const MAX_EXP_TABLE = preCalculateMaxExpTable();
+
+// ==================== 角色经验获取和升级逻辑 ====================
+
+/**
+ * 角色获得经验并处理升级的结果接口
+ */
+export interface CharacterExperienceResult {
+  character: CharacterData; // 更新后的角色数据
+  leveledUp: boolean; // 是否升级
+  levelUpCount: number; // 升级次数
+  message?: string; // 提示消息
+}
+
+/**
+ * 角色获得经验并处理升级
+ * 参考幻兽升级逻辑，实现完整的角色升级机制
+ *
+ * 功能：
+ * 1. 检查经验值是否足够升级
+ * 2. 升级循环处理（可能连续升级）
+ * 3. 升级后更新属性（HP、MP、攻击、防御等）
+ * 4. 等级上限检查（最高125级）
+ *
+ * @param character 角色对象
+ * @param expAmount 获得的经验值
+ * @returns 更新后的角色数据和升级信息
+ */
+export function gainCharacterExperience(
+  character: CharacterData,
+  expAmount: number
+): CharacterExperienceResult {
+  // 1. 等级上限检查
+  if (character.level >= 125) {
+    return {
+      character: { ...character, exp: 0 },
+      leveledUp: false,
+      levelUpCount: 0,
+      message: '角色等级已满，无法再获得经验值了。'
+    };
+  }
+
+  // 2. 增加经验值
+  let newExp = character.exp + expAmount;
+  let newLevel = character.level;
+  let newMaxExp = character.maxExp;
+  let levelUpCount = 0;
+  let leveledUp = false;
+
+  // 3. 升级循环处理
+  while (newExp >= newMaxExp && newLevel < 125) {
+    newExp -= newMaxExp;
+    newLevel++;
+    levelUpCount++;
+    leveledUp = true;
+
+    // 从预计算表中获取下一级所需经验
+    newMaxExp = MAX_EXP_TABLE.get(newLevel) || newMaxExp;
+  }
+
+  // 4. 如果升级了，更新属性
+  let updatedCharacter: CharacterData;
+  if (newLevel !== character.level) {
+    // 先更新等级和经验值
+    const tempCharacter: CharacterData = {
+      ...character,
+      level: newLevel,
+      exp: newExp,
+      maxExp: newMaxExp,
+    };
+
+    // 重新计算总属性（基础 + 装备 + 幻兽）
+    const totalAttrs = calculateTotalCharacterAttributes(tempCharacter);
+
+    updatedCharacter = {
+      ...tempCharacter,
+      maxHp: totalAttrs.maxHp,
+      maxStamina: totalAttrs.maxStamina,
+      attackMin: totalAttrs.attackMin,
+      attackMax: totalAttrs.attackMax,
+      defense: totalAttrs.defense,
+      dodgeRate: totalAttrs.dodgeRate,
+      // 升级时恢复HP和MP到最大值
+      currentHp: totalAttrs.maxHp,
+      currentStamina: totalAttrs.maxStamina,
+    };
+  } else {
+    // 没有升级，只更新经验值
+    updatedCharacter = {
+      ...character,
+      exp: newExp,
+      maxExp: newMaxExp,
+    };
+  }
+
+  // 5. 生成提示消息
+  let message: string | undefined;
+  if (leveledUp) {
+    if (levelUpCount === 1) {
+      message = `🎉 恭喜升级！等级提升到 ${newLevel} 级！`;
+    } else {
+      message = `🎉 恭喜连升 ${levelUpCount} 级！等级提升到 ${newLevel} 级！`;
+    }
+  }
+
+  return {
+    character: updatedCharacter,
+    leveledUp,
+    levelUpCount,
+    message,
+  };
+}

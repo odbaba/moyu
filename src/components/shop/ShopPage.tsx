@@ -167,6 +167,9 @@ const ShopPage: React.FC<ShopPageProps> = ({
   // 提示消息
   const [message, setMessage] = useState<string | null>(null);
 
+  // 消息类型：success（成功，绿色）或 error（失败，红色）
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+
   /**
    * 处理物品点击事件
    */
@@ -195,36 +198,53 @@ const ShopPage: React.FC<ShopPageProps> = ({
       // 这里需要调用父组件的添加装备函数
       // 暂时显示提示
       setMessage(`获得随机装备：${weapon.name}（${weapon.quality}）`);
+      setMessageType('success');
 
       return;
     }
 
     // 检查是否是幻兽
     if (shopItem.type === 'pet') {
-      // 检查幻兽背包是否已满
-      if (pets.length >= maxPetSlots) {
-        setMessage('幻兽背包已满，无法购买幻兽');
+      // 检查幻兽背包是否有足够空间
+      if (pets.length + quantity > maxPetSlots) {
+        setMessage(`幻兽背包空间不足，需要 ${quantity} 个空格，当前剩余 ${maxPetSlots - pets.length} 个空格`);
+        setMessageType('error');
 
         return;
       }
+
+      // 计算总价格
+      const totalGoldCost = shopItem.priceGold * quantity;
+      const totalMagicStoneCost = shopItem.priceMagicStone * quantity;
 
       // 检查是否有足够的货币
-      if (!canAffordPurchase(playerResources.gold, playerResources.magicStone, shopItem, 1, shopType)) {
+      const totalAffordable = shopType === 'gold'
+        ? playerResources.gold >= totalGoldCost
+        : playerResources.magicStone >= totalMagicStoneCost;
+
+      if (!totalAffordable) {
         setMessage('货币不足，无法购买');
+        setMessageType('error');
 
         return;
       }
 
-      // 根据商品ID生成幻兽
-      const pet = generateShopPet(shopItem.id);
-      if (!pet) {
-        setMessage('无效的幻兽商品');
+      // 根据商品ID生成多只幻兽
+      for (let i = 0; i < quantity; i++) {
+        const pet = generateShopPet(shopItem.id);
+        if (!pet) {
+          setMessage('无效的幻兽商品');
+          setMessageType('error');
 
-        return;
+          return;
+        }
+
+        // 调用父组件的购买幻兽回调函数
+        onPurchasePet(pet, shopItem.priceGold, shopItem.priceMagicStone);
       }
 
-      // 调用父组件的购买幻兽回调函数
-      onPurchasePet(pet, shopItem.priceGold, shopItem.priceMagicStone);
+      setMessage(`成功购买 ${quantity} 只幻兽！`);
+      setMessageType('success');
 
       return;
     }
@@ -247,8 +267,10 @@ const ShopPage: React.FC<ShopPageProps> = ({
         result.magicStoneSpent || 0
       );
       setMessage(result.message);
+      setMessageType('success');
     } else {
       setMessage(result.message);
+      setMessageType('error');
     }
   };
 
@@ -269,8 +291,10 @@ const ShopPage: React.FC<ShopPageProps> = ({
     if (result.success) {
       onSell(result.itemId!, result.quantity!, result.goldEarned || 0, result.magicStoneEarned || 0);
       setMessage(result.message);
+      setMessageType('success');
     } else {
       setMessage(result.message);
+      setMessageType('error');
     }
   };
 
@@ -280,6 +304,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
   const handleCloseDetail = () => {
     setSelectedItem(null);
     setMessage(null);
+    setMessageType('success');
   };
 
   /**
@@ -533,7 +558,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
 
       {/* 提示消息 */}
       {message && (
-        <div className="shop-message">
+        <div className={messageType === 'success' ? 'shop-message' : 'shop-error-message'}>
           {message}
         </div>
       )}

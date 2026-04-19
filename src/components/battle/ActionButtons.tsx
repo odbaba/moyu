@@ -7,7 +7,6 @@ import type { BattleSkill, SkillAttackType } from '../../types';
  */
 interface ActionButtonsProps {
   skills: BattleSkill[]; // 技能列表
-  currentMp: number; // 当前MP值
   currentStamina: number; // 当前体力值
   onActionSelect: (skillId: string) => void; // 技能选择回调
   disabled?: boolean; // 是否禁用所有按钮
@@ -50,11 +49,10 @@ const getSkillTypeName = (attackType: SkillAttackType): string => {
 /**
  * 行动按钮组件
  * 显示普攻和技能按钮
- * 根据MP、体力、冷却时间控制技能按钮状态
+ * 根据体力、冷却时间控制技能按钮状态
  */
 const ActionButtons: React.FC<ActionButtonsProps> = ({
   skills,
-  currentMp,
   currentStamina,
   onActionSelect,
   disabled = false
@@ -65,8 +63,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
    * @returns 是否可以使用
    */
   const canUseSkill = (skill: BattleSkill): boolean => {
-    // 检查MP是否足够
-    const hasEnoughMp = currentMp >= skill.mpCost;
     // 检查体力是否足够
     const hasEnoughStamina = currentStamina >= skill.staminaCost;
     // 检查是否在冷却中
@@ -74,7 +70,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     // 检查是否全局禁用
     const notDisabled = !disabled;
 
-    return hasEnoughMp && hasEnoughStamina && notOnCooldown && notDisabled;
+    return hasEnoughStamina && notOnCooldown && notDisabled;
   };
 
   /**
@@ -84,11 +80,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
    */
   const getDisableReason = (skill: BattleSkill): string => {
     const reasons: string[] = [];
-
-    // 检查MP不足
-    if (currentMp < skill.mpCost) {
-      reasons.push(`MP不足(${skill.mpCost})`);
-    }
 
     // 检查体力不足
     if (currentStamina < skill.staminaCost) {
@@ -132,15 +123,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               {skill.level > 1 && <span className="skill-level">Lv.{skill.level}</span>}
             </div>
 
-            {/* 显示消耗的MP和体力 */}
-            {(skill.mpCost > 0 || skill.staminaCost > 0) && (
+            {/* 显示消耗的体力 */}
+            {skill.staminaCost > 0 && (
               <div className="action-button-cost">
-                {skill.mpCost > 0 && (
-                  <span className="cost-mp">MP {skill.mpCost}</span>
-                )}
-                {skill.staminaCost > 0 && (
-                  <span className="cost-stamina">体力 {skill.staminaCost}</span>
-                )}
+                <span className="cost-stamina">体力 {skill.staminaCost}</span>
               </div>
             )}
 

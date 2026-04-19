@@ -1,6 +1,7 @@
 import type { CharacterData, EquipmentDetail, PrincessRelationship } from '../types';
 import { CHARACTER_BASE_STATS, CHARACTER_GROWTH_RATES } from '../utils/attributeCalculator';
-
+import { calculateTotalCombatPower } from '../utils/combatPower';
+import { examplePets } from './petData';
 
 // 示例装备数据 - 武器
 const weapon: EquipmentDetail = {
@@ -181,11 +182,17 @@ const playerCharacter: CharacterData = {
   growthStamina: CHARACTER_GROWTH_RATES.growthStamina,
   growthAttackMin: CHARACTER_GROWTH_RATES.growthAttackMin,
   growthAttackMax: CHARACTER_GROWTH_RATES.growthAttackMax,
-  growthDefense: CHARACTER_GROWTH_RATES.growthDefense
+  growthDefense: CHARACTER_GROWTH_RATES.growthDefense,
+  // 战斗力（初始值，导出时重新计算）
+  combatPower: 0
 };
 
-// 导出示例角色数据
-export const exampleCharacter: CharacterData = playerCharacter;
+// 导出示例角色数据（计算战斗力）
+export const exampleCharacter: CharacterData = {
+  ...playerCharacter,
+  // 使用完整的战斗力计算函数，包含幻兽战斗力加成
+  combatPower: calculateTotalCombatPower(playerCharacter, examplePets)
+};
 
 // 导出示例装备数据
 export const exampleEquipments: EquipmentDetail[] = [

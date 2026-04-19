@@ -15,5 +15,5 @@ export { default as CombatPowerModal } from './CombatPowerModal';
 // 装备展示组件
 export { default as EquipmentDisplay } from './EquipmentDisplay';
 
-// 装备详情弹窗组件
-export { default as EquipmentModal } from './EquipmentModal';
+// 装备选择弹窗组件
+export { default as EquipmentSelectModal } from './EquipmentSelectModal';

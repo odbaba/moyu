@@ -19,7 +19,6 @@ const getLogIcon = (type: BattleLogType): string => {
     attack: '⚔️', // 攻击
     skill: '✨', // 技能
     dodge: '💨', // 闪避
-    critical: '💥', // 暴击
     buff: '🔥', // 增益
     damage: '💔', // 伤害
     heal: '💚', // 治疗
@@ -43,10 +42,6 @@ const getLogClassName = (log: BattleLogEntry): string => {
   if (log.isDodged) {
     className += ' log-dodge';
   }
-  // 根据是否暴击添加样式
-  else if (log.isCritical) {
-    className += ' log-critical';
-  }
   // 根据行动类型添加样式
   else {
     switch (log.actionType) {
@@ -69,7 +64,7 @@ const getLogClassName = (log: BattleLogEntry): string => {
 
 /**
  * 渲染特殊事件标签
- * 显示闪避、暴击、破防等特殊事件
+ * 显示闪避、破防等特殊事件
  * @param log 日志条目
  * @returns 特殊事件标签JSX元素
  */
@@ -81,15 +76,6 @@ const renderSpecialEvent = (log: BattleLogEntry): React.ReactNode => {
     events.push(
       <span key="dodge" className="special-event dodge-event">
         闪避!
-      </span>
-    );
-  }
-
-  // 暴击事件
-  if (log.isCritical) {
-    events.push(
-      <span key="critical" className="special-event critical-event">
-        暴击!
       </span>
     );
   }
@@ -127,7 +113,7 @@ const formatDamage = (damage: number, isHeal: boolean = false): string => {
  * 战斗日志组件
  * 显示战斗过程中的详细日志信息
  * 包括回合数、行动者、行动、伤害、目标等信息
- * 支持特殊事件显示（闪避、暴击、破防、增益）
+ * 支持特殊事件显示（闪避、破防、增益）
  * 并自动滚动到底部
  */
 const BattleLog: React.FC<BattleLogProps> = ({ logs }) => {

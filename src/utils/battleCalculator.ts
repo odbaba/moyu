@@ -46,39 +46,6 @@ export function checkDodge(dodgeRate: number): boolean {
 }
 
 /**
- * 检查是否暴击
- * 根据技能类型和幸运值判断是否触发暴击
- * @param skill 战斗技能对象
- * @param luck 幸运值
- * @returns 是否暴击
- */
-export function checkCritical(skill: BattleSkill, luck: number): boolean {
-  // 如果技能攻击类型是 'aoe' 且等级为 2（高级星魔剑），返回 true
-  if (skill.attackType === 'aoe' && skill.level === 2) {
-    return true;
-  }
-
-  // 如果技能攻击类型是 'multi' 且等级为 2（高级飞天连斩），返回 true
-  if (skill.attackType === 'multi' && skill.level === 2) {
-    return true;
-  }
-
-  // 普通攻击（技能索引为 0）有 5% 基础暴击率 + luck * 0.1%
-  if (skill.skillIndex === 0) {
-    const criticalRate = 5 + luck * 0.1;
-    const random = Math.floor(Math.random() * 100);
-
-    return random < criticalRate;
-  }
-
-  // 其他技能有 10% 基础暴击率
-  const criticalRate = 10;
-  const random = Math.floor(Math.random() * 100);
-
-  return random < criticalRate;
-}
-
-/**
  * 计算基础伤害
  * 在最小攻击力和最大攻击力之间随机生成伤害值
  * @param attackMin 最小攻击力
@@ -88,6 +55,22 @@ export function checkCritical(skill: BattleSkill, luck: number): boolean {
 export function calculateBaseDamage(attackMin: number, attackMax: number): number {
   // 生成 attackMin 到 attackMax 之间的随机数
   return attackMin + Math.floor(Math.random() * (attackMax - attackMin + 1));
+}
+
+/**
+ * 检查是否暴击
+ * 根据幸运值判断是否暴击
+ * @param luck 幸运值
+ * @returns 是否暴击
+ */
+export function checkCritical(luck: number): boolean {
+  // 基础暴击率 = 幸运值 / 100，最大 50%
+  const criticalRate = Math.min(luck / 100, 50);
+  // 生成 0-99 的随机数
+  const random = Math.floor(Math.random() * 100);
+
+  // 如果随机数 < 暴击率，返回 true（暴击成功）
+  return random < criticalRate;
 }
 
 /**
@@ -108,36 +91,36 @@ export function calculateDamage(
   // 1. 检查闪避
   const isDodged = checkDodge(defender.dodgeRate);
 
-  // 2. 如果闪避成功，返回 { damage: 0, isDodged: true, isCritical: false, isBreakDefense: false, combatPowerModifier: 1 }
+  // 2. 如果闪避成功，返回伤害为0
   if (isDodged) {
     return {
       damage: 0,
       isDodged: true,
-      isCritical: false,
       isBreakDefense: false,
-      combatPowerModifier: 1
+      combatPowerModifier: 1,
+      isCritical: false
     };
   }
 
-  // 3. 计算基础伤害
+  // 3. 检查暴击
+  const isCritical = checkCritical(attacker.luck);
+
+  // 4. 计算基础伤害
   let damage = calculateBaseDamage(attacker.attackMin, attacker.attackMax);
 
-  // 4. 应用技能倍率：baseDamage * (skill.damagePercent / 100)
+  // 5. 应用技能倍率：baseDamage * (skill.damagePercent / 100)
   damage = damage * (skill.damagePercent / 100);
 
-  // 5. 计算战斗力修正
+  // 6. 如果暴击，伤害翻倍
+  if (isCritical) {
+    damage = damage * 2;
+  }
+
+  // 7. 计算战斗力修正
   const combatPowerModifier = calculateCombatPowerModifier(attacker.combatPower, defender.combatPower);
 
-  // 6. 应用战斗力修正：damage * combatPowerModifier
+  // 8. 应用战斗力修正：damage * combatPowerModifier
   damage = damage * combatPowerModifier;
-
-  // 7. 检查暴击
-  const isCritical = checkCritical(skill, attacker.luck);
-
-  // 8. 如果暴击，伤害 * 1.5
-  if (isCritical) {
-    damage = damage * 1.5;
-  }
 
   // 9. 如果不是破防攻击，减去防御力：damage - defender.defense
   if (!isBreakDefense) {
@@ -151,9 +134,9 @@ export function calculateDamage(
   return {
     damage,
     isDodged: false,
-    isCritical,
     isBreakDefense,
-    combatPowerModifier
+    combatPowerModifier,
+    isCritical
   };
 }
 
@@ -194,52 +177,6 @@ export function removeExpiredBuffs(character: BattleCharacter): BattleCharacter 
   return {
     ...character,
     buffs: updatedBuffs
-  };
-}
-
-/**
- * 计算增益后的属性值
- * 根据角色当前的增益效果计算最终的属性加成
- * @param character 战斗角色数据
- * @returns 增益后的属性值对象
- */
-export function calculateBuffedStats(
-  character: BattleCharacter
-): { attackMin: number; attackMax: number; defense: number; combatPower: number } {
-  // 初始化为基础属性值
-  let attackMin = character.attackMin;
-  let attackMax = character.attackMax;
-  let defense = character.defense;
-  let combatPower = character.combatPower;
-
-  // 遍历 character.buffs，根据 buff.type 和 buff.value 计算加成
-  character.buffs.forEach(buff => {
-    switch (buff.type) {
-      case 'combat_power':
-        // combat_power 类型：combatPower *= (1 + buff.value / 100)
-        combatPower *= (1 + buff.value / 100);
-        break;
-      case 'attack':
-        // attack 类型：attackMin 和 attackMax *= (1 + buff.value / 100)
-        attackMin *= (1 + buff.value / 100);
-        attackMax *= (1 + buff.value / 100);
-        break;
-      case 'defense':
-        // defense 类型：defense *= (1 + buff.value / 100)
-        defense *= (1 + buff.value / 100);
-        break;
-      // 其他类型的增益暂不处理
-      default:
-        break;
-    }
-  });
-
-  // 返回计算后的属性值（取整）
-  return {
-    attackMin: Math.floor(attackMin),
-    attackMax: Math.floor(attackMax),
-    defense: Math.floor(defense),
-    combatPower: Math.floor(combatPower)
   };
 }
 

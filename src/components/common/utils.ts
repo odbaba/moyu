@@ -109,3 +109,13 @@ export const formatNumber = (num: number): string => {
 
   return num.toLocaleString();
 };
+
+/**
+ * 格式化成长率显示
+ * 成长率保留一位小数，解决浮点数精度问题
+ * @param value 成长率数值
+ * @returns 格式化后的字符串
+ */
+export const formatGrowthRate = (value: number): string => {
+  return value.toFixed(1);
+};

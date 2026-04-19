@@ -72,8 +72,8 @@ export const locations: LocationData = [
     name: '雷鸣矿洞',
     description: '雷鸣矿洞是亚特大陆最大的矿区，蕴含着丰富的矿藏。',
     adjacentLocations: ['leiming-dalu'],
-    // 雷鸣矿洞：4个采矿按钮 + 地图赛报名官
-    interactables: ['mining_1', 'mining_2', 'mining_3', 'mining_4', 'npc_map_challenge_leiming_kuangdong'],
+    // 雷鸣矿洞：4个采矿按钮
+    interactables: ['mining_1', 'mining_2', 'mining_3', 'mining_4'],
     x: 0,
     y: 0
   },
@@ -104,7 +104,7 @@ export const locations: LocationData = [
     name: '雷鸣大陆',
     description: '雷鸣大陆是亚特大陆的核心区域，连接各方势力交汇之地。',
     adjacentLocations: ['leiming-kuangdong', 'kasanuocheng'],
-    // 雷鸣大陆：3个怪物按钮（龙怪x1、巨杰士x2）+ 功能 NPC（日常任务官、地图赛报名官、宝石合成师、幻兽研究所、2008奥运使者、探险家）
+    // 雷鸣大陆：3个怪物按钮（龙怪x1、巨杰士x2）+ 功能 NPC（日常任务官、地图占领赛报名官、宝石合成师、幻兽研究所、2008奥运使者）
     interactables: [
       'interact-leiming-longguai',
       'interact-leiming-jujieshi-1',
@@ -113,8 +113,7 @@ export const locations: LocationData = [
       'npc_map_challenge',
       'npc_gem_synthesizer',
       'npc_pet_institute',
-      'npc_olympic_envoy',
-      'npc_explorer'
+      'npc_olympic_envoy'
     ],
     x: 1,
     y: 1
@@ -124,8 +123,8 @@ export const locations: LocationData = [
     name: '卡萨诺城',
     description: '卡萨诺城是亚特大陆最繁华的城市，商贸云集。',
     adjacentLocations: ['huanggong', 'leiming-dalu', 'yaweite-dao', 'gebi'],
-    // 卡萨诺城 NPC：地图赛报名官、收藏家、杂货商、魔石商人、装备打造师
-    interactables: ['npc_map_challenge_kasanuocheng', 'npc_collector', 'npc_grocery_merchant', 'npc_magic_stone_merchant', 'npc_equipment_refiner'],
+    // 卡萨诺城 NPC：地图占领赛报名官、收藏家、杂货商、魔石商人、装备打造师、幻兽幻化师、经验导师
+    interactables: ['npc_map_challenge_kasanuocheng', 'npc_collector', 'npc_grocery_merchant', 'npc_magic_stone_merchant', 'npc_equipment_refiner', 'npc_pet_fusion_master', 'npc_experience_mentor'],
     x: 2,
     y: 1
   },
@@ -134,7 +133,7 @@ export const locations: LocationData = [
     name: '亚维特岛',
     description: '亚维特岛是一座神秘的岛屿，充满了未知的宝藏。',
     adjacentLocations: ['kasanuocheng', 'binggong', 'huoshan'],
-    // 亚维特岛：4个怪物按钮（鱼妖、恐兽、巨斧怪、蜘蛛王后艾达）+ 地图赛报名官
+    // 亚维特岛：4个怪物按钮（鱼妖、恐兽、巨斧怪、蜘蛛王后艾达）+ 地图占领赛报名官
     interactables: [
       'interact-yaweite-yuyao',
       'interact-yaweite-kongshou',
@@ -150,14 +149,13 @@ export const locations: LocationData = [
     name: '火山',
     description: '火山是一座活火山，熔岩滚滚，危险重重。',
     adjacentLocations: ['yaweite-dao', 'shenyuan-migong'],
-    // 火山：5个怪物按钮（蝎怪、四牙怪、炎女、随机怪物x2）+ 地图赛报名官
+    // 火山：5个怪物按钮（蝎怪、四牙怪、炎女、随机怪物x2）
     interactables: [
       'interact-huoshan-xieguai',
       'interact-huoshan-siyaguai',
-      'interact-huoshan-yannu',
+      'interact-huoshan-yannv',
       'interact-huoshan-random1',
-      'interact-huoshan-random2',
-      'npc_map_challenge_huoshan'
+      'interact-huoshan-random2'
     ],
     x: 5,
     y: 1
@@ -188,7 +186,7 @@ export const locations: LocationData = [
     name: '戈壁',
     description: '戈壁是一片荒凉的沙漠地带，风沙漫天。',
     adjacentLocations: ['kasanuocheng', 'mimeng-zhaozhe'],
-    // 戈壁：5个怪物按钮（冰妖剑士、杰克灯笼、提风、随机怪物x2）+ 地图赛报名官
+    // 戈壁：5个怪物按钮（冰妖剑士、杰克灯笼、提风、随机怪物x2）+ 地图占领赛报名官
     interactables: [
       'interact-gebi-bingyaojianshi',
       'interact-gebi-jiekedenglong',
@@ -205,15 +203,14 @@ export const locations: LocationData = [
     name: '深渊迷宫',
     description: '深渊迷宫是一座错综复杂的地下迷宫，充满了危险。',
     adjacentLocations: ['huoshan'],
-    // 深渊迷宫：6个怪物按钮（暗黑格拉斯、叹息骑士、暗黑弥塞亚、骑士亡魂、随机怪物x2）+ 地图赛报名官
+    // 深渊迷宫：6个怪物按钮（暗黑格拉斯、叹息骑士、暗黑弥塞亚、骑士亡魂、随机怪物x2）
     interactables: [
       'interact-shenyuan-anheigelasi',
       'interact-shenyuan-tanxiqishi',
       'interact-shenyuan-anheimisaiya',
       'interact-shenyuan-qishiwanghun',
       'interact-shenyuan-random1',
-      'interact-shenyuan-random2',
-      'npc_map_challenge_shenyuan_migong'
+      'interact-shenyuan-random2'
     ],
     x: 5,
     y: 2
@@ -225,7 +222,7 @@ export const locations: LocationData = [
     name: '迷梦沼泽',
     description: '迷梦沼泽是一片充满迷雾的沼泽地，令人迷失方向。',
     adjacentLocations: ['gebi', 'binggong'],
-    // 迷梦沼泽：4个怪物按钮（角蜥、望齿魔人、蜘蛛、随机怪物x1）+ 地图赛报名官
+    // 迷梦沼泽：4个怪物按钮（角蜥、望齿魔人、蜘蛛、随机怪物x1）+ 地图占领赛报名官
     interactables: [
       'interact-mimeng-jiaoxi',
       'interact-mimeng-wangchimoren',
@@ -241,7 +238,7 @@ export const locations: LocationData = [
     name: '冰宫',
     description: '冰宫是一座由寒冰建造的宫殿，寒冷刺骨。',
     adjacentLocations: ['yaweite-dao', 'mimeng-zhaozhe', 'xueyu-bianjing'],
-    // 冰宫：4个怪物按钮（塔亚龙、死亡骑士、随机怪物x2）+ 地图赛报名官
+    // 冰宫：4个怪物按钮（塔亚龙、死亡骑士、随机怪物x2）+ 地图占领赛报名官
     interactables: [
       'interact-binggong-tayalong',
       'interact-binggong-siwangqishi',
@@ -257,10 +254,20 @@ export const locations: LocationData = [
     name: '雪域边境',
     description: '雪域边境是亚特大陆的最北端，终年积雪。',
     adjacentLocations: ['binggong'],
-    // 雪域边境：地图赛报名官
-    interactables: ['npc_map_challenge_xueyu_bianjing'],
+    // 雪域边境：无特殊交互
+    interactables: [],
     x: 4,
     y: 3
+  },
+  // 战魂封印迷宫：独立地点，通过探险家NPC传送到达
+  {
+    id: 'zhanhun-fengyin-migong',
+    name: '战魂封印迷宫',
+    description: '神秘的战魂封印之地，传说这里隐藏着战魂的秘密。',
+    adjacentLocations: [], // 独立地点，无法通过地图移动到达
+    interactables: [], // 初始为空，根据状态动态显示神秘人或无名氏
+    x: 10, // 独立坐标
+    y: 5,
   }
 ];
 

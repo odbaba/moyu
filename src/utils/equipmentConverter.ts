@@ -258,7 +258,9 @@ export function equipmentItemToDetail(item: EquipmentItem): EquipmentDetail {
     baseDefense: baseDefense,
     bonusAttackMin: bonusAttackMin,
     bonusAttackMax: bonusAttackMax,
-    bonusDefense: bonusDefense
+    bonusDefense: bonusDefense,
+    icon: item.icon, // 保存原始图标
+    imagePath: item.imagePath // 保存原始图片路径
   };
 
   // 计算总战斗力
@@ -276,7 +278,7 @@ export function equipmentDetailToItem(detail: EquipmentDetail): EquipmentItem {
   return {
     id: detail.id,
     name: detail.name,
-    icon: getEquipmentIcon(detail.type),
+    icon: detail.icon || getEquipmentIcon(detail.type), // 优先使用保存的图标，否则使用默认图标
     quantity: 1,
     type: 'equipment',
     rarity: getRarityFromQuality(detail.quality),
@@ -302,7 +304,8 @@ export function equipmentDetailToItem(detail: EquipmentDetail): EquipmentItem {
     soulLevel: detail.soulLevel,
     attackMin: detail.attributes.attackMin,
     attackMax: detail.attributes.attackMax,
-    defense: detail.attributes.defense
+    defense: detail.attributes.defense,
+    imagePath: detail.imagePath // 恢复原始图片路径
   };
 }
 

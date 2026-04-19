@@ -4,12 +4,12 @@ import React, { useMemo, useState } from 'react';
 
 import type { CharacterData, EquipmentDetail, EquipmentItem, EquipmentSlotType, Pet } from '../../types';
 import { calculateAllEquipmentBonus } from '../../utils/attributeCalculator';
+import { equipmentItemToDetail } from '../../utils/equipmentConverter';
+import EquipmentDetailModal from '../common/EquipmentDetailModal';
 import CharacterInfo from './CharacterInfo';
 import CombatPowerModal from './CombatPowerModal';
 import EquipmentDisplay from './EquipmentDisplay';
-import EquipmentModal from './EquipmentModal';
 import EquipmentSelectModal from './EquipmentSelectModal';
-import InventoryEquipmentModal from './InventoryEquipmentModal';
 
 /**
  * 角色信息主页面组件属性接口
@@ -68,17 +68,15 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
   // 战斗力详情弹窗状态
   const [showCombatPowerModal, setShowCombatPowerModal] = useState(false);
 
-  // 已装备详情弹窗状态
-  const [showEquipmentModal, setShowEquipmentModal] = useState(false);
+  // 统一装备详情弹窗状态
+  const [showEquipmentDetailModal, setShowEquipmentDetailModal] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<EquipmentDetail | null>(null);
+  // 标记是否为已装备状态（用于区分操作按钮）
+  const [isEquippedState, setIsEquippedState] = useState(false);
 
   // 装备选择弹窗状态
   const [showSelectModal, setShowSelectModal] = useState(false);
   const [currentSlotType, setCurrentSlotType] = useState<EquipmentSlotType>('weapon');
-
-  // 背包装备详情弹窗状态
-  const [showInventoryEquipModal, setShowInventoryEquipModal] = useState(false);
-  const [selectedInventoryItem, setSelectedInventoryItem] = useState<EquipmentItem | null>(null);
 
   // 计算带装备加成的角色数据
   const characterWithEquipment = useMemo(() => {
@@ -111,13 +109,8 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
   // 处理已装备栏位点击
   const handleEquipmentClick = (equipment: EquipmentDetail) => {
     setSelectedEquipment(equipment);
-    setShowEquipmentModal(true);
-  };
-
-  // 关闭已装备详情弹窗
-  const handleCloseEquipmentModal = () => {
-    setShowEquipmentModal(false);
-    setSelectedEquipment(null);
+    setIsEquippedState(true);
+    setShowEquipmentDetailModal(true);
   };
 
   // 处理空栏位点击
@@ -133,35 +126,49 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
 
   // 处理选择背包装备（打开详情）
   const handleSelectInventoryEquipment = (item: EquipmentItem) => {
-    setSelectedInventoryItem(item);
-    setShowInventoryEquipModal(true);
+    // 将 EquipmentItem 转换为 EquipmentDetail
+    const equipmentDetail = equipmentItemToDetail(item);
+    setSelectedEquipment(equipmentDetail);
+    setIsEquippedState(false);
+    setShowEquipmentDetailModal(true);
   };
 
-  // 关闭背包装备详情弹窗
-  const handleCloseInventoryEquipModal = () => {
-    setShowInventoryEquipModal(false);
-    setSelectedInventoryItem(null);
+  // 关闭装备详情弹窗
+  const handleCloseEquipmentDetailModal = () => {
+    setShowEquipmentDetailModal(false);
+    setSelectedEquipment(null);
   };
 
   // 处理装备背包装备
-  const handleEquipInventoryItem = (item: EquipmentItem) => {
-    onEquipItem(item);
-    setShowInventoryEquipModal(false);
+  const handleEquipInventoryItem = () => {
+    if (selectedEquipment) {
+      // 找到对应的 EquipmentItem
+      const item = inventoryEquipments.find(i => i.id === selectedEquipment.id);
+      if (item) {
+        onEquipItem(item);
+      }
+    }
+    setShowEquipmentDetailModal(false);
     setShowSelectModal(false);
-    setSelectedInventoryItem(null);
+    setSelectedEquipment(null);
   };
 
   // 处理卸下装备
-  const handleUnequipItem = (slotType: EquipmentSlotType) => {
-    onUnequipItem(slotType);
-    setShowEquipmentModal(false);
+  const handleUnequipItem = () => {
+    if (selectedEquipment) {
+      onUnequipItem(selectedEquipment.type);
+    }
+    setShowEquipmentDetailModal(false);
     setSelectedEquipment(null);
   };
 
   // 处理替换装备（打开装备选择弹窗）
-  const handleReplaceEquipment = (slotType: EquipmentSlotType) => {
-    setCurrentSlotType(slotType);
-    setShowSelectModal(true);
+  const handleReplaceEquipment = () => {
+    if (selectedEquipment) {
+      setCurrentSlotType(selectedEquipment.type);
+      setShowEquipmentDetailModal(false);
+      setShowSelectModal(true);
+    }
   };
 
   // 处理覆盖层点击
@@ -216,13 +223,14 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
           pets={pets}
         />
 
-        {/* 已装备详情弹窗 */}
-        <EquipmentModal
-          isVisible={showEquipmentModal}
-          onClose={handleCloseEquipmentModal}
+        {/* 统一装备详情弹窗 */}
+        <EquipmentDetailModal
+          isVisible={showEquipmentDetailModal}
           equipment={selectedEquipment}
-          onUnequip={handleUnequipItem}
-          onReplace={handleReplaceEquipment}
+          onClose={handleCloseEquipmentDetailModal}
+          onEquip={isEquippedState ? undefined : handleEquipInventoryItem}
+          onUnequip={isEquippedState ? handleUnequipItem : undefined}
+          onReplace={isEquippedState ? handleReplaceEquipment : undefined}
         />
 
         {/* 装备选择弹窗 */}
@@ -232,14 +240,6 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
           inventoryEquipments={inventoryEquipments}
           onClose={handleCloseSelectModal}
           onSelectEquipment={handleSelectInventoryEquipment}
-        />
-
-        {/* 背包装备详情弹窗 */}
-        <InventoryEquipmentModal
-          isVisible={showInventoryEquipModal}
-          item={selectedInventoryItem}
-          onClose={handleCloseInventoryEquipModal}
-          onEquip={handleEquipInventoryItem}
         />
       </div>
     </div>

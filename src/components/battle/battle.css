@@ -1261,3 +1261,392 @@
     gap: 3px;
   }
 }
+
+/* ========== 详情弹窗样式 ========== */
+
+/* 敌人详情弹窗覆盖层 */
+.enemy-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 2600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 敌人详情弹窗内容 */
+.enemy-detail-modal-content {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 450px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 2px solid #ff4444;
+  animation: slideIn 0.3s ease;
+  position: relative;
+}
+
+/* 角色详情弹窗覆盖层 */
+.character-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 2600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 角色详情弹窗内容 */
+.character-detail-modal-content {
+  background-color: #222;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 450px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 2px solid #4ecdc4;
+  animation: slideIn 0.3s ease;
+  position: relative;
+}
+
+/* 滚动条样式 */
+.enemy-detail-modal-content::-webkit-scrollbar,
+.character-detail-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.enemy-detail-modal-content::-webkit-scrollbar-track,
+.character-detail-modal-content::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+  border-radius: 3px;
+}
+
+.enemy-detail-modal-content::-webkit-scrollbar-thumb,
+.character-detail-modal-content::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.enemy-detail-modal-content::-webkit-scrollbar-thumb:hover,
+.character-detail-modal-content::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* 关闭按钮 */
+.enemy-detail-close-button,
+.character-detail-close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #f0f0f0;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.3s ease;
+}
+
+.enemy-detail-close-button:hover,
+.character-detail-close-button:hover {
+  color: #ff6b6b;
+}
+
+/* 详情头部信息 */
+.enemy-detail-header,
+.character-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #444;
+}
+
+.enemy-detail-icon-wrapper,
+.character-detail-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(40, 40, 40, 0.8);
+  border-radius: 10px;
+  border: 2px solid #555;
+  flex-shrink: 0;
+}
+
+.enemy-detail-emoji,
+.character-detail-emoji {
+  font-size: 2.5rem;
+}
+
+.enemy-detail-name,
+.character-detail-name {
+  font-size: 1.3rem;
+  margin: 0;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* 详细信息表格 */
+.enemy-detail-table,
+.character-detail-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 详情行 */
+.enemy-detail-row,
+.character-detail-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* 详情单元格 */
+.enemy-detail-cell,
+.character-detail-cell {
+  background-color: rgba(40, 40, 40, 0.5);
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 全宽单元格 */
+.enemy-detail-cell.full-width,
+.character-detail-cell.full-width {
+  grid-column: 1 / -1;
+}
+
+/* 单元格标签 */
+.cell-label {
+  font-size: 0.75rem;
+  color: #888;
+  font-weight: 500;
+}
+
+/* 单元格数值 */
+.cell-value {
+  font-size: 0.9rem;
+  color: #f0f0f0;
+  font-weight: bold;
+}
+
+/* 百分比 */
+.cell-percent {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-left: 5px;
+}
+
+/* HP数值样式 */
+.hp-value {
+  color: #ff6b6b;
+}
+
+/* MP数值样式 */
+.mp-value {
+  color: #4ecdc4;
+}
+
+/* 体力数值样式 */
+.stamina-value {
+  color: #ffa500;
+}
+
+/* 攻击力数值样式 */
+.attack-value {
+  color: #ffd700;
+}
+
+/* 防御力数值样式 */
+.defense-value {
+  color: #4ecdc4;
+}
+
+/* 战斗力数值样式 */
+.combat-power-value {
+  color: #ff6b6b;
+}
+
+/* 技能列表 */
+.enemy-detail-skills,
+.character-detail-skills {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #444;
+}
+
+.skills-label,
+.buffs-label {
+  font-size: 0.9rem;
+  color: #ffd700;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.skills-list,
+.buffs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skill-item,
+.buff-item {
+  background-color: rgba(40, 40, 40, 0.5);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skill-name,
+.buff-name {
+  font-size: 0.85rem;
+  color: #f0f0f0;
+  font-weight: bold;
+}
+
+.skill-info,
+.buff-info {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+/* 增益效果图标 */
+.buff-icon {
+  font-size: 1rem;
+  margin-right: 5px;
+}
+
+/* 增益效果颜色类 */
+.buff-item.buff-combat-power {
+  border-color: #ff4444;
+  background-color: rgba(255, 68, 68, 0.1);
+}
+
+.buff-item.buff-attack {
+  border-color: #ffa500;
+  background-color: rgba(255, 165, 0, 0.1);
+}
+
+.buff-item.buff-defense {
+  border-color: #44aaff;
+  background-color: rgba(68, 170, 255, 0.1);
+}
+
+.buff-item.buff-speed {
+  border-color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.buff-item.buff-critical {
+  border-color: #ffd700;
+  background-color: rgba(255, 215, 0, 0.1);
+}
+
+.buff-item.buff-dodge {
+  border-color: #9c27b0;
+  background-color: rgba(156, 39, 176, 0.1);
+}
+
+/* ========== 点击提示样式 ========== */
+
+/* 可点击的格子样式 */
+.grid-cell.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.grid-cell.clickable:hover {
+  background-color: rgba(60, 60, 60, 0.9);
+  transform: scale(1.02);
+}
+
+/* 响应式设计 - 详情弹窗移动端优化 */
+@media (max-width: 768px) {
+  .enemy-detail-modal-content,
+  .character-detail-modal-content {
+    width: 95%;
+    max-height: 90vh;
+    padding: 15px;
+  }
+
+  .enemy-detail-header,
+  .character-detail-header {
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+  }
+
+  .enemy-detail-icon-wrapper,
+  .character-detail-icon-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+
+  .enemy-detail-emoji,
+  .character-detail-emoji {
+    font-size: 2rem;
+  }
+
+  .enemy-detail-name,
+  .character-detail-name {
+    font-size: 1.1rem;
+  }
+
+  .enemy-detail-row,
+  .character-detail-row {
+    gap: 8px;
+  }
+
+  .enemy-detail-cell,
+  .character-detail-cell {
+    padding: 8px;
+  }
+
+  .cell-label {
+    font-size: 0.7rem;
+  }
+
+  .cell-value {
+    font-size: 0.85rem;
+  }
+
+  .skill-item,
+  .buff-item {
+    padding: 6px 10px;
+  }
+
+  .skill-name,
+  .buff-name {
+    font-size: 0.8rem;
+  }
+
+  .skill-info,
+  .buff-info {
+    font-size: 0.7rem;
+  }
+}

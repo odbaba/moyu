@@ -7,6 +7,8 @@ import type {
   BattleCharacter, BattleLogEntry, BattlePet,
   BattleResult, BattleSkill,
   BattleState, Buff, CharacterData, DamageResult, EnemyData, GridPosition, Pet, SkillDetail} from '../../types';
+// 导入角色属性计算函数
+import { calculateTotalCharacterAttributes } from '../../utils/attributeCalculator';
 // 导入战斗适配器工具
 import {
   characterToBattleCharacter,
@@ -18,9 +20,15 @@ import {
   executeSkill,
   generateLogId,
   removeExpiredBuffs} from '../../utils/battleCalculator';
+// 导入战斗力计算函数
+import { calculateTotalCombatPower } from '../../utils/combatPower';
+import PetDetailModal from '../pet/PetDetailModal';
 import ActionButtons from './ActionButtons';
 import BattleLog from './BattleLog';
 import CharacterCard from './CharacterCard';
+// 导入详情弹窗组件
+import CharacterDetailModal from './CharacterDetailModal';
+import EnemyDetailModal from './EnemyDetailModal';
 
 /**
  * 战斗组件属性接口
@@ -35,6 +43,12 @@ interface BattleProps {
   enemiesData?: EnemyData[]; // 敌人数据列表（优先使用）
   deployedPets?: Pet[]; // 出战幻兽列表（可选，最多2只）
   /**
+   * 敌人阵亡回调函数
+   * 单个敌人阵亡时立即调用，用于分配经验
+   * @param enemy 阵亡的敌人数据
+   */
+  onEnemyDeath?: (enemy: BattleCharacter) => void;
+  /**
    * 战斗结束回调函数
    * @param result 战斗结果（玩家胜利/敌方胜利）
    * @param finalPlayerState 战斗结束时的玩家状态（包含HP、MP、体力等）
@@ -44,8 +58,10 @@ interface BattleProps {
   /**
    * 离开战斗回调函数
    * 玩家主动离开战斗，消耗时间单位
+   * @param finalPlayerState 离开战斗时的玩家状态（包含HP、MP、体力等）
+   * @param finalDeployedPets 离开战斗时的幻兽状态列表（包含petId和currentHp）
    */
-  onLeaveBattle?: () => void;
+  onLeaveBattle?: (finalPlayerState?: BattleCharacter, finalDeployedPets?: BattlePet[]) => void;
 }
 
 /**
@@ -71,6 +87,7 @@ const Battle: React.FC<BattleProps> = ({
   enemyCount = 1,
   enemiesData,
   deployedPets = [], // 出战幻兽列表，默认为空数组
+  onEnemyDeath,
   onBattleEnd,
   onLeaveBattle
 }) => {
@@ -82,6 +99,16 @@ const Battle: React.FC<BattleProps> = ({
   const [attackingCharacterId, setAttackingCharacterId] = useState<string | null>(null);
   // 战斗日志展开/收起状态
   const [isBattleLogExpanded, setIsBattleLogExpanded] = useState(false);
+
+  // ========== 详情弹窗状态管理 ==========
+  // 详情弹窗显示状态
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  // 选中的角色（用于角色详情和敌人详情）
+  const [selectedCharacter, setSelectedCharacter] = useState<BattleCharacter | null>(null);
+  // 选中的幻兽（用于幻兽详情）
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  // 详情类型：'character' | 'pet' | 'enemy'
+  const [detailType, setDetailType] = useState<'character' | 'pet' | 'enemy' | null>(null);
 
   /**
    * 获取九宫格上方位置坐标数组
@@ -191,6 +218,66 @@ const Battle: React.FC<BattleProps> = ({
   }, [battleState.enemies]);
 
   /**
+   * 监听props变化，更新战斗状态中的玩家和幻兽数据
+   * 当角色或幻兽在战斗中升级时，需要更新战斗状态中的属性
+   */
+  useEffect(() => {
+    setBattleState(prev => {
+      // 使用calculateTotalCharacterAttributes计算角色总属性
+      // 包含：基础属性 + 装备加成 + 幻兽加成 + 战魂加成
+      const totalAttributes = calculateTotalCharacterAttributes(playerData);
+
+      // 检查玩家是否升级（最大生命值增加）
+      const playerLeveledUp = totalAttributes.maxHp > prev.player.maxHp;
+
+      // 更新玩家数据（使用总属性）
+      const updatedPlayer: BattleCharacter = {
+        ...prev.player,
+        level: playerData.level,
+        maxHp: totalAttributes.maxHp, // 使用总生命值
+        maxStamina: totalAttributes.maxStamina, // 使用总体力值
+        attackMin: totalAttributes.attackMin, // 使用总最小攻击力
+        attackMax: totalAttributes.attackMax, // 使用总最大攻击力
+        defense: totalAttributes.defense, // 使用总防御力
+        combatPower: calculateTotalCombatPower(playerData, deployedPets), // 使用完整的战斗力计算
+        dodgeRate: totalAttributes.dodgeRate, // 使用总闪避率
+        // 如果升级了，恢复满血；否则保持当前HP
+        currentHp: playerLeveledUp ? totalAttributes.maxHp : prev.player.currentHp,
+        // 如果升级了，使用playerData.currentStamina（升级恢复的体力）；否则保持战斗中消耗后的体力
+        currentStamina: playerLeveledUp ? playerData.currentStamina : prev.player.currentStamina,
+      };
+
+      // 更新幻兽数据
+      const updatedPets = prev.deployedPets.map(battlePet => {
+        // 在deployedPets中找到对应的幻兽
+        const pet = deployedPets.find(p => p.id === battlePet.petId);
+        if (!pet) return battlePet;
+
+        // 检查幻兽是否升级（最大生命值增加）
+        const petLeveledUp = pet.mhp > battlePet.maxHp;
+
+        // 更新幻兽属性
+        return {
+          ...battlePet,
+          level: pet.dj,
+          maxHp: pet.mhp,
+          attackMin: pet.xgj,
+          attackMax: pet.dgj,
+          defense: pet.fy,
+          // 如果升级了，恢复满血；否则保持当前HP
+          currentHp: petLeveledUp ? pet.mhp : battlePet.currentHp,
+        };
+      });
+
+      return {
+        ...prev,
+        player: updatedPlayer,
+        deployedPets: updatedPets,
+      };
+    });
+  }, [playerData, deployedPets]);
+
+  /**
    * 添加伤害数字显示
    * @param damage 伤害数值
    * @param targetId 目标ID
@@ -218,6 +305,31 @@ const Battle: React.FC<BattleProps> = ({
     }));
   };
 
+  // 使用ref跟踪已经处理过的阵亡敌人ID，避免重复调用回调
+  const processedDeadEnemiesRef = useRef<Set<string>>(new Set());
+
+  /**
+   * 监听敌人阵亡，调用回调函数
+   * 使用useEffect延迟调用，避免在渲染过程中更新父组件状态
+   */
+  useEffect(() => {
+    if (!onEnemyDeath) return;
+
+    // 检查每个敌人的生命值
+    battleState.enemies.forEach(enemy => {
+      // 如果敌人阵亡且还没有处理过
+      if (enemy.currentHp <= 0 && !processedDeadEnemiesRef.current.has(enemy.id)) {
+        // 标记为已处理
+        processedDeadEnemiesRef.current.add(enemy.id);
+
+        // 延迟调用回调，避免在渲染过程中更新父组件状态
+        setTimeout(() => {
+          onEnemyDeath(enemy);
+        }, 0);
+      }
+    });
+  }, [battleState.enemies, onEnemyDeath]);
+
   /**
    * 检查战斗是否结束
    * @param currentState 当前战斗状态
@@ -238,7 +350,7 @@ const Battle: React.FC<BattleProps> = ({
   };
 
   /**
-   * 更新角色MP和体力
+   * 更新角色体力
    * @param character 战斗角色
    * @param skill 使用的技能
    * @returns 更新后的角色
@@ -249,7 +361,6 @@ const Battle: React.FC<BattleProps> = ({
   ): BattleCharacter => {
     return {
       ...character,
-      currentMp: character.currentMp - skill.mpCost,
       currentStamina: character.currentStamina - skill.staminaCost
     };
   };
@@ -258,6 +369,11 @@ const Battle: React.FC<BattleProps> = ({
    * 处理单体攻击结果
    * 支持更新玩家角色或幻兽的生命值
    * 当幻兽血量降为0时，添加阵亡战斗日志
+   *
+   * 合体幻兽伤害扣除逻辑：
+   * - 优先从幻兽血条扣除
+   * - 如果幻兽血量不足，将幻兽血量清零，溢出伤害消失，不再扣除主角血量
+   *
    * @param result 攻击结果
    * @param attacker 攻击者
    * @param skill 使用的技能
@@ -291,57 +407,97 @@ const Battle: React.FC<BattleProps> = ({
         );
       }
 
-      // 更新防御者生命值
-      // 需要判断防御者是玩家角色、幻兽还是敌人
-      if (result.defender.isPlayer) {
-        // 防御者是玩家角色，更新玩家状态
-        newState.player = result.defender;
-      } else {
-        // 检查防御者是否是幻兽（通过 ID 在 deployedPets 中查找）
-        const petIndex = newState.deployedPets.findIndex(pet => pet.id === result.defender.id);
+      // ========== 合体幻兽伤害扣除逻辑 ==========
+      // 检查是否有合体幻兽
+      const mergedPet = newState.deployedPets.find(pet => pet.isMerged && pet.currentHp > 0);
 
-        if (petIndex !== -1) {
-          // 防御者是幻兽，更新幻兽的生命值
-          // 注意：result.defender 是 BattleCharacter 类型，需要提取生命值信息
-          newState.deployedPets = newState.deployedPets.map((pet, index) => {
-            if (index === petIndex) {
-              // 更新幻兽的当前生命值
+      if (mergedPet && result.defender.isPlayer) {
+        // 有合体幻兽，优先从幻兽血条扣除
+        const damage = result.damageResult.damage;
+
+        if (mergedPet.currentHp >= damage) {
+          // 幻兽血量足够，全部从幻兽扣除
+          newState.deployedPets = newState.deployedPets.map(pet => {
+            if (pet.id === mergedPet.id) {
               return {
                 ...pet,
-                currentHp: result.defender.currentHp
+                currentHp: pet.currentHp - damage
               };
             }
 
             return pet;
           });
 
-          // ========== 幻兽阵亡处理 ==========
-          // 检查幻兽是否阵亡（血量降为0或以下）
-          // 如果幻兽阵亡，添加战斗日志记录阵亡事件
-          if (result.defender.currentHp <= 0) {
-            // 获取阵亡幻兽的名称
-            const deadPetName = result.defender.name;
-            // 创建幻兽阵亡战斗日志
-            // 日志格式："[回合数] {幻兽名称} 阵亡了！"
+          // 检查幻兽是否阵亡
+          if (mergedPet.currentHp - damage <= 0) {
             const deathLogEntry: BattleLogEntry = {
               id: generateLogId(),
               round: newState.round,
-              actor: deadPetName,
-              actorId: result.defender.id,
-              action: `${deadPetName} 阵亡了！`,
+              actor: mergedPet.name,
+              actorId: mergedPet.id,
+              action: `${mergedPet.name} 阵亡了！`,
               actionType: 'death',
               damage: 0,
-              target: deadPetName,
-              targetId: result.defender.id
+              target: mergedPet.name,
+              targetId: mergedPet.id
             };
-            // 将阵亡日志添加到战斗日志列表
             newState.battleLogs = [...newState.battleLogs, deathLogEntry];
           }
+        } else {
+          // 幻兽血量不足，将幻兽血量清零，溢出伤害不再扣除主角血量
+          // 扣除幻兽血量（降为0）
+          newState.deployedPets = newState.deployedPets.map(pet => {
+            if (pet.id === mergedPet.id) {
+              return {
+                ...pet,
+                currentHp: 0
+              };
+            }
+
+            return pet;
+          });
+
+          // 添加幻兽阵亡日志
+          const deathLogEntry: BattleLogEntry = {
+            id: generateLogId(),
+            round: newState.round,
+            actor: mergedPet.name,
+            actorId: mergedPet.id,
+            action: `${mergedPet.name} 阵亡了！`,
+            actionType: 'death',
+            damage: 0,
+            target: mergedPet.name,
+            targetId: mergedPet.id
+          };
+          newState.battleLogs = [...newState.battleLogs, deathLogEntry];
+
+          // 溢出伤害消失，不再扣除主角血量
+        }
+      } else {
+        // 没有合体幻兽，直接扣除主角血量
+        if (result.defender.isPlayer) {
+          newState.player = result.defender;
         } else {
           // 防御者是敌人，更新敌人列表
           newState.enemies = newState.enemies.map(enemy =>
             enemy.id === result.defender.id ? result.defender : enemy
           );
+
+          // 检查敌人是否阵亡，添加阵亡日志
+          if (result.defender.currentHp <= 0) {
+            const deathLogEntry: BattleLogEntry = {
+              id: generateLogId(),
+              round: newState.round,
+              actor: result.defender.name,
+              actorId: result.defender.id,
+              action: `${result.defender.name} 阵亡了！`,
+              actionType: 'death',
+              damage: 0,
+              target: result.defender.name,
+              targetId: result.defender.id
+            };
+            newState.battleLogs = [...newState.battleLogs, deathLogEntry];
+          }
         }
       }
 
@@ -398,6 +554,24 @@ const Battle: React.FC<BattleProps> = ({
       // 更新敌人列表
       newState.enemies = result.enemies;
 
+      // 检查是否有敌人阵亡，添加阵亡日志
+      result.results.forEach(res => {
+        if (res.defender.currentHp <= 0) {
+          const deathLogEntry: BattleLogEntry = {
+            id: generateLogId(),
+            round: newState.round,
+            actor: res.defender.name,
+            actorId: res.defender.id,
+            action: `${res.defender.name} 阵亡了！`,
+            actionType: 'death',
+            damage: 0,
+            target: res.defender.name,
+            targetId: res.defender.id
+          };
+          newState.battleLogs = [...newState.battleLogs, deathLogEntry];
+        }
+      });
+
       // 检查战斗是否结束
       newState.battleResult = checkBattleEnd(newState);
 
@@ -449,9 +623,26 @@ const Battle: React.FC<BattleProps> = ({
       if (result.defender.isPlayer) {
         newState.player = result.defender;
       } else {
+        // 更新敌人列表
         newState.enemies = newState.enemies.map(enemy =>
           enemy.id === result.defender.id ? result.defender : enemy
         );
+
+        // 检查敌人是否阵亡，添加阵亡日志
+        if (result.defender.currentHp <= 0) {
+          const deathLogEntry: BattleLogEntry = {
+            id: generateLogId(),
+            round: newState.round,
+            actor: result.defender.name,
+            actorId: result.defender.id,
+            action: `${result.defender.name} 阵亡了！`,
+            actionType: 'death',
+            damage: 0,
+            target: result.defender.name,
+            targetId: result.defender.id
+          };
+          newState.battleLogs = [...newState.battleLogs, deathLogEntry];
+        }
       }
 
       // 检查战斗是否结束
@@ -499,60 +690,37 @@ const Battle: React.FC<BattleProps> = ({
 
   /**
    * 获取敌方攻击目标
-   * 实现优先攻击合体幻兽的逻辑
+   * 怪物始终攻击主角，不直接攻击幻兽
    *
-   * 攻击优先级规则：
-   * 1. 首先检查第一出战位幻兽（位置 {x: 0, y: 2}）是否合体且存活
-   * 2. 如果第一出战位幻兽不合体或已死亡，检查第二出战位幻兽（位置 {x: 2, y: 2}）
-   * 3. 如果没有合体幻兽或合体幻兽已死亡，则攻击玩家角色
-   *
-   * 幻兽阵亡处理：
-   * - 当幻兽 currentHp <= 0 时，视为已阵亡，不再作为攻击目标
-   * - 敌人会自动切换攻击目标到玩家角色或其他存活的合体幻兽
-   * - 这确保了幻兽阵亡后战斗逻辑的正确性
+   * 攻击逻辑：
+   * - 怪物攻击主角
+   * - 主角的防御力已经包含了幻兽的防御加成（在 characterToBattleCharacter 中计算）
+   * - 扣除生命值时，优先从幻兽血条扣除（在 handleSingleAttackResult 中处理）
    *
    * @param currentState 当前战斗状态
-   * @returns 攻击目标（玩家角色或合体幻兽）
+   * @returns 攻击目标（玩家角色）
    */
-  const getAttackTarget = (currentState: BattleState): BattleCharacter | BattlePet => {
-    // 获取出战幻兽列表
-    const deployedPets = currentState.deployedPets;
-
-    // 检查第一出战位幻兽（位置 {x: 0, y: 2}）
-    // 优先级最高：如果第一出战位幻兽合体且存活，则返回该幻兽
-    if (deployedPets.length > 0) {
-      const firstPet = deployedPets[0];
-      // 检查幻兽是否合体（isMerged === true）且存活（currentHp > 0）
-      // 幻兽阵亡时 currentHp <= 0，不作为攻击目标
-      if (firstPet.isMerged && firstPet.currentHp > 0) {
-        // 返回第一出战位的合体幻兽作为攻击目标
-        return firstPet;
-      }
-    }
-
-    // 检查第二出战位幻兽（位置 {x: 2, y: 2}）
-    // 优先级次之：如果第二出战位幻兽合体且存活，则返回该幻兽
-    if (deployedPets.length > 1) {
-      const secondPet = deployedPets[1];
-      // 检查幻兽是否合体（isMerged === true）且存活（currentHp > 0）
-      // 幻兽阵亡时 currentHp <= 0，不作为攻击目标
-      if (secondPet.isMerged && secondPet.currentHp > 0) {
-        // 返回第二出战位的合体幻兽作为攻击目标
-        return secondPet;
-      }
-    }
-
-    // 如果没有合体幻兽或合体幻兽已死亡，则攻击玩家角色
-    // 这是默认的攻击目标
+  const getAttackTarget = (currentState: BattleState): BattleCharacter => {
+    // 怪物始终攻击主角，不直接攻击幻兽
+    // 即使有合体幻兽，攻击目标也是主角
+    // 主角的防御力已经包含了幻兽的防御加成（在 characterToBattleCharacter 中计算）
     return currentState.player;
   };
 
   /**
    * 执行技能攻击
    * 根据技能类型调用不同的执行函数
-   * 支持攻击玩家角色或幻兽
+   *
+   * 使用场景：
+   * 1. 玩家攻击敌人：defender 是敌人（isPlayer = false）
+   * 2. 怪物攻击主角：defender 是主角（isPlayer = true）
+   *
+   * 注意：
+   * - 怪物攻击时，主角的防御力已经包含了幻兽的防御加成
+   * - 扣除生命值时，优先从幻兽血条扣除（在 handleSingleAttackResult 中处理）
+   *
    * @param attacker 攻击者
-   * @param defender 防御者（可为null，可以是玩家角色或幻兽）
+   * @param defender 防御者（可以是主角或敌人）
    * @param skill 使用的技能
    */
   const executeSkillAttack = (
@@ -561,14 +729,14 @@ const Battle: React.FC<BattleProps> = ({
     skill: BattleSkill
   ) => {
     // 如果防御者是幻兽（BattlePet），需要转换为 BattleCharacter 格式
-    // 因为 executeSkill 函数需要 BattleCharacter 类型的参数
+    // 这种情况不应该发生，因为怪物始终攻击主角
     let targetDefender: BattleCharacter | null = null;
 
     if (defender) {
       // 检查是否是幻兽（通过判断是否有 isMerged 属性来区分）
       if ('isMerged' in defender) {
-        // 这是幻兽，需要转换为 BattleCharacter 格式
-        // 填充幻兽缺少的属性（MP、体力、战斗力、闪避率、幸运值、技能、增益效果等）
+        // 这是幻兽，理论上不应该发生
+        // 但为了兼容性，还是转换为 BattleCharacter 格式
         const petDefender = defender as BattlePet;
         targetDefender = {
           id: petDefender.id,
@@ -576,23 +744,21 @@ const Battle: React.FC<BattleProps> = ({
           level: petDefender.level,
           maxHp: petDefender.maxHp,
           currentHp: petDefender.currentHp,
-          maxMp: 0, // 幻兽没有MP，设为0
-          currentMp: 0, // 幻兽没有MP，设为0
-          maxStamina: 0, // 幻兽没有体力，设为0
-          currentStamina: 0, // 幻兽没有体力，设为0
+          maxStamina: 0,
+          currentStamina: 0,
           attackMin: petDefender.attackMin,
           attackMax: petDefender.attackMax,
           defense: petDefender.defense,
-          combatPower: 0, // 幻兽战斗力暂时设为0，后续可以计算
-          dodgeRate: 0, // 幻兽没有闪避率，设为0
-          luck: 0, // 幻兽没有幸运值，设为0
-          skills: [], // 幻兽没有技能列表，设为空数组
-          buffs: [], // 幻兽没有增益效果，设为空数组
-          isPlayer: false, // 幻兽不是玩家
+          combatPower: 0,
+          dodgeRate: 0,
+          luck: 0,
+          skills: [],
+          buffs: [],
+          isPlayer: false,
           gridPosition: petDefender.gridPosition
         };
       } else {
-        // 这是玩家角色，直接使用
+        // 这是主角或敌人，直接使用
         targetDefender = defender as BattleCharacter;
       }
     }
@@ -749,7 +915,7 @@ const Battle: React.FC<BattleProps> = ({
 
       if (availableSkills.length > 1) {
         const aoeSkill = availableSkills.find(s => s.attackType === 'aoe');
-        if (aoeSkill && enemy.currentMp >= aoeSkill.mpCost) {
+        if (aoeSkill && enemy.currentStamina >= aoeSkill.staminaCost) {
           selectedSkill = aoeSkill;
         } else {
           const randomIndex = Math.floor(Math.random() * availableSkills.length);
@@ -806,6 +972,73 @@ const Battle: React.FC<BattleProps> = ({
   }, [battleState.isPlayerTurn]);
 
   /**
+   * 显示角色/幻兽/敌人详情弹窗
+   * 根据角色类型显示对应的详情弹窗
+   * @param character 角色或幻兽数据
+   * @param isEnemy 是否是敌人
+   */
+  const showCharacterDetail = useCallback((
+    character: BattleCharacter | BattlePet,
+    isEnemy: boolean
+  ) => {
+    // 判断是否是幻兽类型（通过 isMerged 属性判断）
+    const isPet = 'isMerged' in character;
+
+    if (isPet) {
+      // 幻兽详情：通过 petId 在 deployedPets 中查找原始幻兽数据
+      const pet = deployedPets.find(p => p.id === (character as BattlePet).petId);
+      if (pet) {
+        setSelectedPet(pet);
+        setSelectedCharacter(null);
+        setDetailType('pet');
+        setShowDetailModal(true);
+      }
+    } else if (isEnemy) {
+      // 敌人详情：直接使用 BattleCharacter 数据
+      setSelectedCharacter(character as BattleCharacter);
+      setSelectedPet(null);
+      setDetailType('enemy');
+      setShowDetailModal(true);
+    } else {
+      // 玩家角色详情：直接使用 BattleCharacter 数据
+      setSelectedCharacter(character as BattleCharacter);
+      setSelectedPet(null);
+      setDetailType('character');
+      setShowDetailModal(true);
+    }
+  }, [deployedPets]);
+
+  /**
+   * 处理九宫格中角色/幻兽/敌人的点击事件
+   * 区分"选择攻击目标"和"查看详情"两种情况
+   * @param character 角色或幻兽数据
+   * @param isEnemy 是否是敌人
+   */
+  const handleCharacterClick = useCallback((
+    character: BattleCharacter | BattlePet,
+    isEnemy: boolean
+  ) => {
+    // 如果是玩家回合且已选择技能，且点击的是敌人
+    if (battleState.isPlayerTurn && battleState.selectedAction && isEnemy) {
+      // 执行选择攻击目标的逻辑（现有逻辑）
+      handleTargetSelect(character.id);
+    } else {
+      // 显示详情弹窗
+      showCharacterDetail(character, isEnemy);
+    }
+  }, [battleState.isPlayerTurn, battleState.selectedAction, handleTargetSelect, showCharacterDetail]);
+
+  /**
+   * 关闭详情弹窗
+   */
+  const handleCloseDetailModal = useCallback(() => {
+    setShowDetailModal(false);
+    setSelectedCharacter(null);
+    setSelectedPet(null);
+    setDetailType(null);
+  }, []);
+
+  /**
    * 渲染九宫格占位
    * 根据角色阵营渲染不同的九宫格布局
    * 敌人阵营：渲染敌人列表
@@ -853,8 +1086,13 @@ const Battle: React.FC<BattleProps> = ({
         gridCells.push(
           <div
             key={`${isEnemy ? 'enemy' : 'player'}-${x}-${y}`}
-            className={`grid-cell ${character ? 'occupied' : ''} ${isSelectable ? 'selectable' : ''} ${attackingCharacterId === character?.id ? 'attacking' : ''}`}
-            onClick={() => isSelectable && handleTargetSelect(character!.id)}
+            className={`grid-cell ${character ? 'occupied' : ''} ${isSelectable ? 'selectable' : ''} ${character && character.currentHp > 0 ? 'clickable' : ''} ${attackingCharacterId === character?.id ? 'attacking' : ''}`}
+            onClick={() => {
+              // 如果有角色且存活，处理点击事件
+              if (character && character.currentHp > 0) {
+                handleCharacterClick(character, isEnemy);
+              }
+            }}
           >
             {/* 角色存活时显示角色卡片 */}
             {character && character.currentHp > 0 ? (
@@ -895,7 +1133,7 @@ const Battle: React.FC<BattleProps> = ({
         {battleState.battleResult === 'in_progress' && onLeaveBattle && (
           <button
             className="leave-battle-btn"
-            onClick={onLeaveBattle}
+            onClick={() => onLeaveBattle(battleState.player, battleState.deployedPets)}
           >
             离开战斗
           </button>
@@ -921,7 +1159,6 @@ const Battle: React.FC<BattleProps> = ({
         <div className="action-section">
           <ActionButtons
             skills={battleState.player.skills}
-            currentMp={battleState.player.currentMp}
             currentStamina={battleState.player.currentStamina}
             onActionSelect={handleActionSelect}
             disabled={!battleState.isPlayerTurn || battleState.battleResult !== 'in_progress'}
@@ -945,6 +1182,29 @@ const Battle: React.FC<BattleProps> = ({
           <BattleLog logs={battleState.battleLogs} />
         )}
       </div>
+
+      {/* ========== 详情弹窗区域 ========== */}
+      {/* 角色详情弹窗 */}
+      <CharacterDetailModal
+        isVisible={showDetailModal && detailType === 'character'}
+        onClose={handleCloseDetailModal}
+        character={selectedCharacter}
+      />
+
+      {/* 幻兽详情弹窗 */}
+      <PetDetailModal
+        isVisible={showDetailModal && detailType === 'pet'}
+        onClose={handleCloseDetailModal}
+        pet={selectedPet}
+        canDeploy={false}
+      />
+
+      {/* 敌人详情弹窗 */}
+      <EnemyDetailModal
+        isVisible={showDetailModal && detailType === 'enemy'}
+        onClose={handleCloseDetailModal}
+        enemy={selectedCharacter}
+      />
     </div>
   );
 };

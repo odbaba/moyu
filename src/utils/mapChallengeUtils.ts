@@ -1,11 +1,11 @@
 /**
  * 地图挑战系统工具函数
  * 提供地图挑战相关的核心功能函数
- * 参考文档：reference/docs/scripts_analysis/14_NPC系统.md（地图赛报名官）
+ * 参考文档：reference/docs/地图占领赛报名官交互逻辑文档.md
  */
 
 import type {
-  ChallengerRequirement,
+  ChallengerConfig,
   MapChallengeConfig,
   ProtectorReward,
 } from '../data/mapChallengeData';
@@ -37,146 +37,162 @@ export function getMapChallengeConfig(locationId: string): MapChallengeConfig | 
  */
 export function checkChallengeRequirement(nobleRank: number, locationId: string): boolean {
   const config = getMapChallengeConfig(locationId);
-
-  // 如果地图配置不存在，默认不满足要求
   if (!config) {
     return false;
   }
 
-  // 判断爵位是否满足要求
   return nobleRank >= config.requiredNobleRank;
-}
-
-/**
- * 检查挑战者属性要求
- * 判断玩家等级和战斗力是否满足挑战要求
- * @param playerLevel 玩家等级
- * @param playerCombatPower 玩家战斗力
- * @param locationId 地图ID
- * @returns 是否满足挑战者属性要求
- */
-export function checkChallengerAttributes(
-  playerLevel: number,
-  playerCombatPower: number,
-  locationId: string
-): boolean {
-  const config = getMapChallengeConfig(locationId);
-
-  // 如果地图配置不存在，默认不满足要求
-  if (!config) {
-    return false;
-  }
-
-  const requirement = config.challengerRequirement;
-
-  // 判断等级和战斗力是否满足要求
-  return playerLevel >= requirement.level && playerCombatPower >= requirement.combatPower;
 }
 
 /**
  * 获取挑战要求不满足的原因
  * @param nobleRank 玩家爵位等级
- * @param playerLevel 玩家等级
- * @param playerCombatPower 玩家战斗力
  * @param locationId 地图ID
  * @returns 不满足的原因描述，如果满足要求则返回 null
  */
 export function getChallengeRequirementReason(
   nobleRank: number,
-  playerLevel: number,
-  playerCombatPower: number,
   locationId: string
 ): string | null {
   const config = getMapChallengeConfig(locationId);
-
-  // 如果地图配置不存在
   if (!config) {
     return '该地图暂未开放挑战';
   }
-
-  // 检查爵位要求
   if (nobleRank < config.requiredNobleRank) {
     return `需要【${config.requiredNobleRankName}】以上爵位才能挑战${config.locationName}`;
   }
 
-  // 检查等级要求
-  if (playerLevel < config.challengerRequirement.level) {
-    return `挑战${config.locationName}需要达到 ${config.challengerRequirement.level} 级`;
-  }
-
-  // 检查战斗力要求
-  if (playerCombatPower < config.challengerRequirement.combatPower) {
-    return `挑战${config.locationName}需要战斗力达到 ${config.challengerRequirement.combatPower}`;
-  }
-
-  // 满足所有要求
   return null;
 }
 
-// ========== 保护者奖励领取功能 ==========
+// ========== 挑战者相关函数 ==========
 
 /**
- * 奖励领取结果接口
+ * 获取挑战者配置
+ * @param locationId 地图ID
+ * @returns 挑战者配置，如果不存在则返回 null
  */
-export interface RewardResult {
-  /** 是否成功 */
-  success: boolean;
-  /** 结果消息 */
-  message: string;
-  /** 奖励详情（成功时） */
-  reward?: ProtectorReward;
+export function getChallengerConfig(locationId: string): ChallengerConfig | null {
+  const config = getMapChallengeConfig(locationId);
+
+  return config ? config.challenger : null;
+}
+
+// ========== 地图占领状态管理 ==========
+
+/**
+ * 地图挑战状态接口
+ */
+export interface MapChallengeState {
+  /** 当前拥有的地图ID */
+  ownerMap: string | null;
+  /** 今日奖励是否可领取 */
+  mapReward: boolean;
+  /** 今日是否可挑战（所有地图共享一次机会） */
+  mapRace: boolean;
 }
 
 /**
- * 领取保护者奖励
- * 地图保护者每日可领取一次奖励
- * @param locationId 地图ID
- * @param nobleRank 玩家爵位等级
- * @returns 奖励领取结果
+ * 创建初始地图挑战状态
  */
-export function claimProtectorReward(locationId: string, nobleRank: number): RewardResult {
-  const config = getMapChallengeConfig(locationId);
-
-  // 如果地图配置不存在
-  if (!config) {
-    return {
-      success: false,
-      message: '该地图暂无保护者奖励',
-    };
-  }
-
-  // 检查爵位要求
-  if (!checkChallengeRequirement(nobleRank, locationId)) {
-    return {
-      success: false,
-      message: `需要【${config.requiredNobleRankName}】以上爵位才能领取${config.locationName}的保护者奖励`,
-    };
-  }
-
-  // 返回领取成功结果
+export function createInitialMapChallengeState(): MapChallengeState {
   return {
-    success: true,
-    message: `成功领取${config.locationName}的保护者奖励！`,
-    reward: config.protectorReward,
+    ownerMap: null,
+    mapReward: false,
+    mapRace: true, // 初始可以挑战
   };
 }
 
 /**
- * 检查是否可以领取保护者奖励
- * @param lastClaimTime 上次领取时间（时间戳）
- * @returns 是否可以领取
+ * 每日重置地图挑战状态
+ * @param state 当前状态
+ * @returns 重置后的状态
  */
-export function canClaimProtectorReward(lastClaimTime: number | null): boolean {
-  // 如果从未领取过，可以领取
-  if (lastClaimTime === null) {
-    return true;
-  }
+export function resetMapChallengeDaily(state: MapChallengeState): MapChallengeState {
+  return {
+    ...state,
+    mapReward: state.ownerMap !== null,
+    mapRace: true, // 每日重置，开启挑战机会
+  };
+}
 
-  // 检查是否已经过了1天（每日领取一次）
-  const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-  const now = Date.now();
+/**
+ * 检查今日是否可挑战
+ * @param state 地图挑战状态
+ * @returns 是否可挑战
+ */
+export function canChallengeToday(state: MapChallengeState): boolean {
+  return state.mapRace;
+}
 
-  return (now - lastClaimTime) >= ONE_DAY_MS;
+/**
+ * 标记今日已挑战
+ * @param state 地图挑战状态
+ * @returns 更新后的状态
+ */
+export function markChallengedToday(state: MapChallengeState): MapChallengeState {
+  return {
+    ...state,
+    mapRace: false,
+  };
+}
+
+/**
+ * 设置为地图保护者
+ * @param state 地图挑战状态
+ * @param locationId 地图ID
+ * @returns 更新后的状态
+ */
+export function setAsMapProtector(state: MapChallengeState, locationId: string): MapChallengeState {
+  return {
+    ...state,
+    ownerMap: locationId,
+    mapReward: true,
+  };
+}
+
+/**
+ * 检查是否为当前地图保护者
+ * @param state 地图挑战状态
+ * @param locationId 地图ID
+ * @returns 是否为保护者
+ */
+export function isMapProtector(state: MapChallengeState, locationId: string): boolean {
+  return state.ownerMap === locationId;
+}
+
+/**
+ * 检查是否有可领取的奖励
+ * @param state 地图挑战状态
+ * @returns 是否可领取
+ */
+export function canClaimReward(state: MapChallengeState): boolean {
+  return state.mapReward && state.ownerMap !== null;
+}
+
+/**
+ * 领取保护者奖励
+ * @param state 地图挑战状态
+ * @returns 更新后的状态
+ */
+export function claimReward(state: MapChallengeState): MapChallengeState {
+  return {
+    ...state,
+    mapReward: false,
+  };
+}
+
+// ========== 保护者奖励相关函数 ==========
+
+/**
+ * 获取保护者奖励配置
+ * @param locationId 地图ID
+ * @returns 奖励配置，如果不存在则返回 null
+ */
+export function getProtectorReward(locationId: string): ProtectorReward | null {
+  const config = getMapChallengeConfig(locationId);
+
+  return config ? config.protectorReward : null;
 }
 
 /**
@@ -187,36 +203,22 @@ export function canClaimProtectorReward(lastClaimTime: number | null): boolean {
  */
 export function getProtectorRewardPreview(locationId: string): string {
   const config = getMapChallengeConfig(locationId);
-
   if (!config) {
-    return '该地图暂无保护者奖励';
+    return '该地图暂未开放保护者奖励';
   }
-
   const reward = config.protectorReward;
   let preview = `【${config.locationName}保护者每日奖励】\n\n`;
-
-  // 满经验球
   preview += `• 满经验球 × ${reward.expBalls}\n`;
-
-  // 灵魂石
   preview += `• ${reward.soulStoneType} × ${reward.soulStones}\n`;
-
-  // 白玫瑰
   if (reward.whiteRoses && reward.roseType) {
     preview += `• ${reward.roseType}白玫瑰 × ${reward.whiteRoses}\n`;
   }
-
-  // 技能奖励
   if (reward.skillReward) {
-    preview += `• 技能：${reward.skillReward}\n`;
+    preview += `• 技能书：${reward.skillReward}\n`;
   }
-
-  // 装备奖励
   if (reward.equipmentReward) {
     preview += `• ${reward.equipmentReward.quality}+${reward.equipmentReward.bonusLevel}装备\n`;
   }
-
-  // 幻兽奖励
   if (reward.petReward) {
     preview += `• ${reward.petReward.star}星${reward.petReward.petType}\n`;
   }
@@ -224,48 +226,106 @@ export function getProtectorRewardPreview(locationId: string): string {
   return preview;
 }
 
+// ========== NPC对话相关函数 ==========
+
+/**
+ * 获取NPC对话文本
+ * @param state 地图挑战状态
+ * @param locationId 当前地图ID
+ * @param nobleRank 玩家爵位等级
+ * @returns 对话文本
+ */
+export function getNPCDialog(
+  state: MapChallengeState,
+  locationId: string,
+  _nobleRank: number
+): string {
+  const config = getMapChallengeConfig(locationId);
+  if (!config) {
+    return '该地图暂未开放挑战';
+  }
+  let dialog = '    在魔族大军的威胁下，各个地方都在招募勇士来保护当地人民和财产安全。';
+  dialog += '只要你达到一定的爵位就有资格参加挑战，挑战胜利后该地方就属于你的保护地。';
+  dialog += '每天该地方都会赠与你一定的财物以助你发展。\n\n';
+  dialog += `挑战要求：${config.requiredNobleRankName}以上。\n`;
+  if (state.ownerMap === null) {
+    dialog += `\n${config.locationName}还没有保护者。`;
+  } else if (state.ownerMap === locationId) {
+    dialog += `\n${config.locationName}已经属于你的保护地了。`;
+  } else {
+    const ownerConfig = getMapChallengeConfig(state.ownerMap);
+    const ownerMapName = ownerConfig ? ownerConfig.locationName : state.ownerMap;
+    dialog += `你是${ownerMapName}的保护者。`;
+    dialog += `如果要挑战${config.locationName}你将会放弃${ownerMapName}保护者的资格。`;
+  }
+
+  return dialog;
+}
+
+/**
+ * 获取NPC对话选项
+ * @param state 地图挑战状态
+ * @param locationId 当前地图ID
+ * @returns 选项数组
+ */
+export function getNPCDialogOptions(
+  state: MapChallengeState,
+  locationId: string
+): Array<{ text: string; actionType: string }> {
+  const options: Array<{ text: string; actionType: string }> = [
+    {
+      text: '查看保护者每天的奖励',
+      actionType: 'viewMapProtectorReward',
+    },
+  ];
+  if (isMapProtector(state, locationId)) {
+    options.push({
+      text: '我来领取今天的奖励',
+      actionType: 'claimMapReward',
+    });
+  } else {
+    options.push({
+      text: '我来挑战',
+      actionType: 'challengeMap',
+    });
+  }
+  options.push({
+    text: '随便看看',
+    actionType: 'closeNPC',
+  });
+
+  return options;
+}
+
 // ========== 地图挑战说明生成函数 ==========
 
 /**
  * 获取地图挑战说明
- * 生成地图挑战的完整说明文本
  * @param config 地图挑战配置
  * @returns 地图挑战说明文本
  */
 export function getMapChallengeDescription(config: MapChallengeConfig): string {
   let description = `【${config.locationName}地图挑战】\n\n`;
-
-  // 地图描述
   description += `${config.description}\n\n`;
-
-  // 爵位要求
   description += '【爵位要求】\n';
   description += `需要爵位：${config.requiredNobleRankName}\n\n`;
-
-  // 挑战者属性要求
-  description += '【挑战者属性要求】\n';
-  description += `等级要求：${config.challengerRequirement.level} 级\n`;
-  description += `战斗力要求：${config.challengerRequirement.combatPower}\n\n`;
-
-  // 保护者奖励
+  description += '【挑战者信息】\n';
+  description += `挑战者：${config.challenger.name}\n`;
+  description += `等级：${config.challenger.level}\n`;
+  description += `战斗力：${config.challenger.combatPower}\n\n`;
   description += '【保护者每日奖励】\n';
   const reward = config.protectorReward;
-
   description += `• 满经验球 × ${reward.expBalls}\n`;
   description += `• ${reward.soulStoneType} × ${reward.soulStones}\n`;
-
   if (reward.whiteRoses && reward.roseType) {
     description += `• ${reward.roseType}白玫瑰\n`;
   }
-
   if (reward.skillReward) {
     description += `• 技能：${reward.skillReward}\n`;
   }
-
   if (reward.equipmentReward) {
     description += `• ${reward.equipmentReward.quality}+${reward.equipmentReward.bonusLevel}装备\n`;
   }
-
   if (reward.petReward) {
     description += `• ${reward.petReward.star}星${reward.petReward.petType}\n`;
   }
@@ -280,106 +340,19 @@ export function getMapChallengeDescription(config: MapChallengeConfig): string {
  */
 export function getAllMapChallengesDescription(nobleRank: number): string {
   const availableChallenges = getAvailableMapChallenges(nobleRank);
-
   let description = '【地图挑战系统】\n\n';
   description += '各地图的挑战要求和奖励如下：\n\n';
-
   MAP_CHALLENGE_CONFIGS.forEach((config, index) => {
     const isAvailable = nobleRank >= config.requiredNobleRank;
     const status = isAvailable ? '✓ 可挑战' : `✗ 需要${config.requiredNobleRankName}`;
-
     description += `${index + 1}. ${config.locationName}\n`;
     description += `   爵位要求：${config.requiredNobleRankName}\n`;
-    description += `   等级要求：${config.challengerRequirement.level} 级\n`;
-    description += `   战斗力要求：${config.challengerRequirement.combatPower}\n`;
+    description += `   挑战者：${config.challenger.name} (Lv.${config.challenger.level})\n`;
     description += `   状态：${status}\n\n`;
   });
-
-  description += `当前爵位：${nobleRank === 0 ? '平民' : `爵位等级 ${nobleRank}`}\n`;
   description += `可挑战地图数量：${availableChallenges.length}/${MAP_CHALLENGE_CONFIGS.length}`;
 
   return description;
-}
-
-// ========== 地图挑战状态查询函数 ==========
-
-/**
- * 地图挑战状态接口
- */
-export interface MapChallengeStatus {
-  /** 地图ID */
-  locationId: string;
-  /** 地图名称 */
-  locationName: string;
-  /** 是否满足爵位要求 */
-  meetsNobleRankRequirement: boolean;
-  /** 是否满足等级要求 */
-  meetsLevelRequirement: boolean;
-  /** 是否满足战斗力要求 */
-  meetsCombatPowerRequirement: boolean;
-  /** 是否可以挑战 */
-  canChallenge: boolean;
-  /** 不满足要求的原因 */
-  reason?: string;
-}
-
-/**
- * 获取地图挑战状态
- * @param nobleRank 玩家爵位等级
- * @param playerLevel 玩家等级
- * @param playerCombatPower 玩家战斗力
- * @param locationId 地图ID
- * @returns 地图挑战状态
- */
-export function getMapChallengeStatus(
-  nobleRank: number,
-  playerLevel: number,
-  playerCombatPower: number,
-  locationId: string
-): MapChallengeStatus | null {
-  const config = getMapChallengeConfig(locationId);
-
-  if (!config) {
-    return null;
-  }
-
-  const meetsNobleRankRequirement = nobleRank >= config.requiredNobleRank;
-  const meetsLevelRequirement = playerLevel >= config.challengerRequirement.level;
-  const meetsCombatPowerRequirement = playerCombatPower >= config.challengerRequirement.combatPower;
-
-  const canChallenge = meetsNobleRankRequirement && meetsLevelRequirement && meetsCombatPowerRequirement;
-
-  let reason: string | undefined;
-  if (!canChallenge) {
-    reason = getChallengeRequirementReason(nobleRank, playerLevel, playerCombatPower, locationId) || undefined;
-  }
-
-  return {
-    locationId: config.locationId,
-    locationName: config.locationName,
-    meetsNobleRankRequirement,
-    meetsLevelRequirement,
-    meetsCombatPowerRequirement,
-    canChallenge,
-    reason,
-  };
-}
-
-/**
- * 获取所有地图挑战状态列表
- * @param nobleRank 玩家爵位等级
- * @param playerLevel 玩家等级
- * @param playerCombatPower 玩家战斗力
- * @returns 所有地图挑战状态列表
- */
-export function getAllMapChallengeStatus(
-  nobleRank: number,
-  playerLevel: number,
-  playerCombatPower: number
-): MapChallengeStatus[] {
-  return MAP_CHALLENGE_CONFIGS
-    .map(config => getMapChallengeStatus(nobleRank, playerLevel, playerCombatPower, config.locationId))
-    .filter((status): status is MapChallengeStatus => status !== null);
 }
 
 // ========== 导出所有功能 ==========
@@ -389,5 +362,3 @@ export {
   getMapChallengeConfigById,
   MAP_CHALLENGE_CONFIGS,
 };
-
-export type { ChallengerRequirement, MapChallengeConfig, ProtectorReward };

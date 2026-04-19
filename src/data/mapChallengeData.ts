@@ -1,12 +1,46 @@
 /**
  * 地图挑战系统数据配置
  * 定义各地图的挑战要求、挑战者属性和保护者奖励
- * 参考文档：reference/docs/scripts_analysis/14_NPC系统.md（地图赛报名官）
+ * 参考文档：reference/docs/地图占领赛报名官交互逻辑文档.md
  */
 
 import type { PetType } from '../types';
 
 // ========== 地图挑战类型定义 ==========
+
+/**
+ * 挑战者配置接口
+ * 定义地图挑战者的属性
+ * 参考文档：reference/docs/project_docs/04_怪物系统.md
+ */
+export interface ChallengerConfig {
+  /** 挑战者名称 */
+  name: string;
+  /** 挑战者等级 */
+  level: number;
+  /** 挑战者战斗力 */
+  combatPower: number;
+  /** 基础生命值 */
+  baseHp: number;
+  /** 生命成长（最小值） */
+  hpGrowthMin: number;
+  /** 生命成长（最大值） */
+  hpGrowthMax: number;
+  /** 基础最小攻击 */
+  baseMinAttack: number;
+  /** 最小攻击成长 */
+  minAttackGrowth: number;
+  /** 基础最大攻击 */
+  baseMaxAttack: number;
+  /** 最大攻击成长 */
+  maxAttackGrowth: number;
+  /** 基础防御 */
+  baseDefense: number;
+  /** 防御成长 */
+  defenseGrowth: number;
+  /** 是否为BOSS类型 */
+  isBoss: boolean;
+}
 
 /**
  * 挑战者属性要求接口
@@ -78,8 +112,8 @@ export interface MapChallengeConfig {
   requiredNobleRank: number;
   /** 爵位要求名称 */
   requiredNobleRankName: string;
-  /** 挑战者属性要求 */
-  challengerRequirement: ChallengerRequirement;
+  /** 挑战者配置 */
+  challenger: ChallengerConfig;
   /** 保护者每日奖励 */
   protectorReward: ProtectorReward;
   /** 地图描述 */
@@ -91,17 +125,28 @@ export interface MapChallengeConfig {
 /**
  * 地图挑战配置表
  * 定义所有地图的挑战配置
- * 参考文档：reference/docs/scripts_analysis/14_NPC系统.md
+ * 参考文档：reference/docs/地图占领赛报名官交互逻辑文档.md
  */
 export const MAP_CHALLENGE_CONFIGS: MapChallengeConfig[] = [
   {
     locationId: 'leiming-dalu',
     locationName: '雷鸣大陆',
-    requiredNobleRank: 0,
-    requiredNobleRankName: '平民',
-    challengerRequirement: {
+    requiredNobleRank: 1,
+    requiredNobleRankName: '勋爵',
+    challenger: {
+      name: '雷鸣大陆挑战者',
       level: 50,
       combatPower: 120,
+      baseHp: 0,
+      hpGrowthMin: 2000,
+      hpGrowthMax: 6400,
+      baseMinAttack: 0,
+      minAttackGrowth: 112.5,
+      baseMaxAttack: 0,
+      maxAttackGrowth: 168,
+      baseDefense: 0,
+      defenseGrowth: 96,
+      isBoss: false,
     },
     protectorReward: {
       expBalls: 2,
@@ -121,11 +166,22 @@ export const MAP_CHALLENGE_CONFIGS: MapChallengeConfig[] = [
   {
     locationId: 'gebi',
     locationName: '戈壁',
-    requiredNobleRank: 1,
-    requiredNobleRankName: '勋爵',
-    challengerRequirement: {
+    requiredNobleRank: 2,
+    requiredNobleRankName: '子爵',
+    challenger: {
+      name: '戈壁挑战者',
       level: 80,
       combatPower: 140,
+      baseHp: 0,
+      hpGrowthMin: 2000,
+      hpGrowthMax: 6400,
+      baseMinAttack: 0,
+      minAttackGrowth: 112.5,
+      baseMaxAttack: 0,
+      maxAttackGrowth: 168,
+      baseDefense: 0,
+      defenseGrowth: 96,
+      isBoss: false,
     },
     protectorReward: {
       expBalls: 4,
@@ -142,16 +198,27 @@ export const MAP_CHALLENGE_CONFIGS: MapChallengeConfig[] = [
         star: 8,
       },
     },
-    description: '戈壁是一片荒凉的沙漠地带，需要勋爵以上爵位才能挑战。',
+    description: '戈壁是一片荒凉的沙漠地带，需要子爵以上爵位才能挑战。',
   },
   {
     locationId: 'mimeng-zhaozhe',
     locationName: '迷梦沼泽',
     requiredNobleRank: 2,
     requiredNobleRankName: '子爵',
-    challengerRequirement: {
+    challenger: {
+      name: '迷梦沼泽挑战者',
       level: 100,
       combatPower: 160,
+      baseHp: 0,
+      hpGrowthMin: 2000,
+      hpGrowthMax: 6400,
+      baseMinAttack: 0,
+      minAttackGrowth: 112.5,
+      baseMaxAttack: 0,
+      maxAttackGrowth: 168,
+      baseDefense: 0,
+      defenseGrowth: 96,
+      isBoss: false,
     },
     protectorReward: {
       expBalls: 6,
@@ -172,9 +239,20 @@ export const MAP_CHALLENGE_CONFIGS: MapChallengeConfig[] = [
     locationName: '冰宫',
     requiredNobleRank: 3,
     requiredNobleRankName: '伯爵',
-    challengerRequirement: {
+    challenger: {
+      name: '冰宫挑战者',
       level: 120,
       combatPower: 200,
+      baseHp: 0,
+      hpGrowthMin: 2000,
+      hpGrowthMax: 6400,
+      baseMinAttack: 0,
+      minAttackGrowth: 112.5,
+      baseMaxAttack: 0,
+      maxAttackGrowth: 168,
+      baseDefense: 0,
+      defenseGrowth: 96,
+      isBoss: false,
     },
     protectorReward: {
       expBalls: 8,
@@ -198,9 +276,20 @@ export const MAP_CHALLENGE_CONFIGS: MapChallengeConfig[] = [
     locationName: '亚维特岛',
     requiredNobleRank: 4,
     requiredNobleRankName: '公爵',
-    challengerRequirement: {
+    challenger: {
+      name: '亚维特岛挑战者',
       level: 120,
       combatPower: 240,
+      baseHp: 0,
+      hpGrowthMin: 2000,
+      hpGrowthMax: 6400,
+      baseMinAttack: 0,
+      minAttackGrowth: 112.5,
+      baseMaxAttack: 0,
+      maxAttackGrowth: 168,
+      baseDefense: 0,
+      defenseGrowth: 96,
+      isBoss: false,
     },
     protectorReward: {
       expBalls: 10,
@@ -224,9 +313,20 @@ export const MAP_CHALLENGE_CONFIGS: MapChallengeConfig[] = [
     locationName: '卡萨诺城',
     requiredNobleRank: 5,
     requiredNobleRankName: '侯爵',
-    challengerRequirement: {
+    challenger: {
+      name: '卡萨诺城挑战者',
       level: 150,
       combatPower: 500,
+      baseHp: 0,
+      hpGrowthMin: 2000,
+      hpGrowthMax: 6400,
+      baseMinAttack: 0,
+      minAttackGrowth: 112.5,
+      baseMaxAttack: 0,
+      maxAttackGrowth: 168,
+      baseDefense: 0,
+      defenseGrowth: 96,
+      isBoss: true,
     },
     protectorReward: {
       expBalls: 15,

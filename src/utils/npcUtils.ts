@@ -14,6 +14,7 @@ export interface NPCGameState {
   relationshipLevel: number; // 公主关系等级（0-6）
   militaryRank: number; // 军衔等级（0-11）
   nobleRank: number; // 爵位等级（0-6）
+  warSoulSystemEnabled?: boolean; // 战魂系统是否已开启（可选）
   [key: string]: any; // 其他自定义状态
 }
 
@@ -92,6 +93,17 @@ export const checkNPCOptionCondition = (
     case 'nobleRank':
       // 判断爵位等级是否满足条件（0-6）
       return compare(gameState.nobleRank, condition.value as number, operator);
+
+    case 'warSoulEnabled':
+      // 判断战魂系统是否已开启
+      // condition.value 为 true 时表示需要战魂系统开启才显示
+      // gameState.warSoulSystemEnabled 为 true 表示战魂系统已开启
+      if (condition.value === true) {
+        return gameState.warSoulSystemEnabled === true;
+      }
+
+      // condition.value 为 false 时表示需要战魂系统未开启才显示
+      return gameState.warSoulSystemEnabled !== true;
 
     case 'custom':
       // 自定义条件判断

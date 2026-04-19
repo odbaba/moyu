@@ -2,8 +2,8 @@ import './EquipmentRefineModal.css';
 
 import React, { useMemo, useState } from 'react';
 
-import type { EquipmentItem, GemItem, InventoryItem, RefineResult } from '../../types';
-import { getEquipmentDisplayName } from '../../utils/equipmentConverter';
+import type { EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, InventoryItem, RefineResult } from '../../types';
+import { equipmentDetailToItem, getEquipmentDisplayName } from '../../utils/equipmentConverter';
 import {
   activateSoul,
   embedGem,
@@ -39,6 +39,8 @@ interface EquipmentRefineModalProps {
   inventoryEquipments: EquipmentItem[];
   /** 背包中的所有宝石物品列表 */
   inventoryGems: GemItem[];
+  /** 角色身上已装备的装备列表 */
+  equippedItems: Record<EquipmentSlotType, EquipmentDetail | null>;
 }
 
 /**
@@ -56,7 +58,8 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
   onRefine,
   playerLevel,
   inventoryEquipments,
-  inventoryGems
+  inventoryGems,
+  equippedItems
 }) => {
   // 当前选择的标签页：'equipment' 或 'gem'
   const [activeTab, setActiveTab] = useState<'equipment' | 'gem'>('equipment');
@@ -68,12 +71,26 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
   const [showSelection, setShowSelection] = useState(false);
 
   /**
+   * 合并背包装备和角色装备
+   * 将角色装备转换为 EquipmentItem 类型后与背包装备合并
+   */
+  const allEquipments = useMemo(() => {
+    // 从角色装备中提取非空装备，转换为 EquipmentItem 类型
+    const equippedList: EquipmentItem[] = Object.values(equippedItems)
+      .filter((item): item is EquipmentDetail => item !== null)
+      .map(detail => equipmentDetailToItem(detail));
+
+    // 合并背包装备和角色装备
+    return [...inventoryEquipments, ...equippedList];
+  }, [inventoryEquipments, equippedItems]);
+
+  /**
    * 过滤出可精炼的装备
    * 只显示玩家等级可使用的装备
    */
   const availableEquipments = useMemo(() => {
-    return inventoryEquipments.filter(item => item.useLevel <= playerLevel);
-  }, [inventoryEquipments, playerLevel]);
+    return allEquipments.filter(item => item.useLevel <= playerLevel);
+  }, [allEquipments, playerLevel]);
 
   /**
    * 过滤出可用的宝石

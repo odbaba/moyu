@@ -3,9 +3,9 @@
  * 保留项目最基本的全局样式，所有页面特定样式已迁移到对应模块
  */
 
-/* 全局样式 */
+/* 全局样式 - 手机优先使用 LXGW WenKai */
 :root {
-  font-family: 'Microsoft YaHei', 'SimSun', serif;
+  font-family: 'LXGW WenKai', cursive, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -23,6 +23,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* 手机端优先使用 LXGW WenKai */
+  font-family: 'LXGW WenKai', cursive, sans-serif;
 }
 
 body {
@@ -31,19 +33,53 @@ body {
   min-height: 100vh;
   background-color: #252935;
   color: #FFFFFF;
+  /* 手机端优先使用 LXGW WenKai */
+  font-family: 'LXGW WenKai', cursive, sans-serif;
 }
 
-/* 游戏容器 - 移除padding，使用100%宽度 */
-.game-container {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+/* 全局按钮公共样式 - 纯黑背景，毛笔笔触边框效果 */
+.game-btn {
+  background-color: #000000;
+  color: #FFFFFF;
+  border: none;
+  padding: 3px 12px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-family: 'LXGW WenKai', cursive, sans-serif;
+  width: auto;
+  position: relative;
+  /* 使用不规则边框模拟毛笔笔触效果 */
+  clip-path: polygon(
+    2% 8%, 8% 3%, 15% 5%, 25% 2%, 35% 6%, 45% 3%, 55% 7%, 65% 2%, 75% 5%, 85% 3%, 92% 7%, 98% 4%,
+    97% 15%, 99% 25%, 96% 35%, 98% 45%, 95% 55%, 97% 65%, 94% 75%, 96% 85%, 93% 92%, 97% 96%,
+    90% 98%, 80% 95%, 70% 97%, 60% 94%, 50% 96%, 40% 93%, 30% 95%, 20% 92%, 10% 94%, 5% 91%,
+    3% 80%, 1% 70%, 4% 60%, 2% 50%, 5% 40%, 3% 30%, 6% 20%, 4% 10%
+  );
 }
 
-/* 滚动条样式 */
+.game-btn:hover {
+  background-color: #1a1a1a;
+  transform: scale(1.05);
+}
+
+/* 敌人类按钮样式 - 红色文字 */
+.game-btn--enemy {
+  color: #ff4444;
+}
+
+/* 动作类按钮样式 */
+.game-btn--action {
+  color: #FFFFFF;
+}
+
+/* NPC类按钮样式 */
+.game-btn--npc {
+  color: #FFFFFF;
+}
+
+/* 全局滚动条样式 */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -65,5 +101,21 @@ body {
 @media (max-width: 768px) {
   .game-container {
     padding: 0;
+  }
+}
+
+/* 桌面端（平板及以上）优先尝试系统楷体 */
+@media (min-width: 768px) {
+  :root {
+    font-family: 'KaiTi', '楷体', 'STKaiti', 'LXGW WenKai', cursive, sans-serif;
+  }
+  * {
+    font-family: 'KaiTi', '楷体', 'STKaiti', 'LXGW WenKai', cursive, sans-serif;
+  }
+  body {
+    font-family: 'KaiTi', '楷体', 'STKaiti', 'LXGW WenKai', cursive, sans-serif;
+  }
+  .game-btn {
+    font-family: 'KaiTi', '楷体', 'STKaiti', 'LXGW WenKai', cursive, sans-serif;
   }
 }

@@ -3,7 +3,7 @@ import './pet.css';
 import React from 'react';
 
 import type { Pet } from '../../types';
-import { getPetEmoji, getPetQualityColor } from '../common/utils';
+import { formatGrowthRate, getPetEmoji, getPetQualityColor } from '../common/utils';
 
 /**
  * 幻兽详情弹窗组件属性接口
@@ -156,7 +156,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </div>
           </div>
 
-          {/* 第五行：防御和评分 */}
+          {/* 第五行：防御成长率 */}
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">防御</span>
@@ -164,7 +164,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </div>
             <div className="pet-detail-cell">
               <span className="cell-label">防御成长率</span>
-              <span className="cell-value">{pet.cz_fy}</span>
+              <span className="cell-value">{formatGrowthRate(pet.cz_fy)}</span>
               <span className="cell-score">评分:{pet.rating.pz_cz_fy}</span>
             </div>
           </div>
@@ -173,7 +173,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">生命成长率</span>
-              <span className="cell-value">{pet.cz_hp}</span>
+              <span className="cell-value">{formatGrowthRate(pet.cz_hp)}</span>
             </div>
             <div className="pet-detail-cell">
               <span className="cell-label">评分</span>
@@ -185,7 +185,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">攻击成长率</span>
-              <span className="cell-value">{pet.cz_xgj}-{pet.cz_dgj}</span>
+              <span className="cell-value">{formatGrowthRate(pet.cz_xgj)}-{formatGrowthRate(pet.cz_dgj)}</span>
             </div>
             <div className="pet-detail-cell">
               <span className="cell-label">评分</span>

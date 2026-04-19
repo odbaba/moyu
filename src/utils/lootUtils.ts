@@ -50,17 +50,28 @@ function cloneItemTemplate<T extends InventoryItem>(template: T): T {
  * 计算战利品
  * 根据怪物等级和最大生命值计算战利品
  *
+ * 经验值计算公式（参考文档：04.1_怪物经验值.md）：
+ * 1. 基础经验值 = 怪物最大生命值 ÷ 100
+ * 2. 经验加成 = (玩家战斗力 - 玩家等级) × 0.05 + 宝石加成
+ * 3. 实际经验 = 基础经验值 × (1 + 经验加成)
+ *
  * @param monsterLevel 怪物等级
  * @param monsterMaxHp 怪物最大生命值
  * @param isBoss 是否为BOSS
  * @param luckValue 幸运值（影响掉落概率）
+ * @param playerCombatPower 玩家战斗力（用于经验加成计算）
+ * @param playerLevel 玩家等级（用于经验加成计算）
+ * @param gemExpBonus 宝石经验加成（默认为0）
  * @returns 战利品结果
  */
 export function calculateLoot(
   monsterLevel: number,
   monsterMaxHp: number,
   isBoss: boolean = false,
-  luckValue: number = 0
+  luckValue: number = 0,
+  playerCombatPower: number = 0,
+  playerLevel: number = 1,
+  gemExpBonus: number = 0
 ): LootResult {
   const messages: string[] = [];
   const items: InventoryItem[] = [];
@@ -68,9 +79,29 @@ export function calculateLoot(
   // 暴率 = 1 + (幸运值 + 1) / 100
   const dropRate = 1 + (luckValue + 1) / 100;
 
-  // 经验值 = 怪物最大生命值
-  const experience = monsterMaxHp;
-  messages.push(`获得经验: ${experience}`);
+  // ========== 经验值计算（参考文档：04.1_怪物经验值.md） ==========
+  // 1. 基础经验值 = 怪物最大生命值 ÷ 100
+  const baseExperience = monsterMaxHp / 100;
+
+  // 2. 经验加成计算
+  // 战斗力加成：(玩家战斗力 - 玩家等级) × 0.05
+  // 注意：如果战斗力 < 等级，加成为0（不减少经验）
+  const combatPowerBonus = Math.max(0, (playerCombatPower - playerLevel) * 0.05);
+
+  // 总经验加成 = 战斗力加成 + 宝石加成
+  const totalExpBonus = combatPowerBonus + gemExpBonus;
+
+  // 3. 实际经验 = 基础经验值 × (1 + 总经验加成)
+  // 最低经验为1
+  const experience = Math.max(1, Math.floor(baseExperience * (1 + totalExpBonus)));
+
+  // 生成经验获得消息
+  const expBonusPercent = Math.floor(totalExpBonus * 100);
+  if (expBonusPercent > 0) {
+    messages.push(`获得经验: ${experience} (加成+${expBonusPercent}%)`);
+  } else {
+    messages.push(`获得经验: ${experience}`);
+  }
 
   // 金币 = 6 × (20 + 等级) × 10 × 暴率
   const gold = Math.floor(6 * (20 + monsterLevel) * 10 * dropRate);

@@ -41,7 +41,6 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
   /** 渲染技能消耗信息 */
   const renderCost = () => {
     const costs: string[] = [];
-    if (skill.cost.mp) costs.push(`魔法: ${skill.cost.mp}`);
     if (skill.cost.stamina) costs.push(`体力: ${skill.cost.stamina}`);
     if (skill.cost.hp) costs.push(`生命: ${skill.cost.hp}`);
     if (skill.cost.gold) costs.push(`金币: ${skill.cost.gold}`);
