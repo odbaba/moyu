@@ -3068,6 +3068,7 @@ function App() {
             resources={playerResources}
             onClose={() => setShowInventoryPage(false)}
             onUseItem={handleUseItem}
+            onEquipItem={handleEquipItem}
           />
 
           {/* 技能页面 */}

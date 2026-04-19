@@ -112,8 +112,22 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
   // 判断是否为已装备状态（有卸下和替换回调）
   const isEquipped = !!(onUnequip || onReplace);
 
-  // 获取装备名称（品质+名称）
-  const displayName = `${equipment.quality}${equipment.name}`;
+  // 获取装备名称（品质+名称+魔魂等级，普通品不显示品质前缀）
+  const getDisplayName = () => {
+    // 基础名称：普通品不显示品质前缀
+    const baseName = equipment.quality === '普通品' 
+      ? equipment.name 
+      : `${equipment.quality}${equipment.name}`;
+    
+    // 魔魂等级大于0时显示+等级
+    if (equipment.magicSoulLevel > 0) {
+      return `${baseName}+${equipment.magicSoulLevel}`;
+    }
+    
+    return baseName;
+  };
+  
+  const displayName = getDisplayName();
 
   return (
     <div
