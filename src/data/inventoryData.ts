@@ -235,7 +235,7 @@ export const createEquipment = (
     defense: defense + addDefense,
     goldValue: 100 * useLevel * (equipmentQuality + 1) + 100 * magicSoulLevel + 10000 * holeCount * holeCount * holeCount,
     magicStoneValue: equipmentQuality === 4 ? Math.floor(28 * (useLevel * 2.5 + 50) + magicSoulLevel * 128 + 1500 * holeCount * holeCount * holeCount) : 0,
-    imagePath: `/images/equipment/${equipmentType}/lv${useLevel}.png`,
+    imagePath: `./images/equipment/${equipmentType}/lv${useLevel}.png`,
   };
 };
 
@@ -370,7 +370,7 @@ const tiLiYao: InventoryItem = {
   equippable: false,
   goldValue: 1000,
   magicStoneValue: 0,
-  imagePath: '/images/items/consumable/tiliyao.png',
+  imagePath: './images/items/consumable/tiliyao.png',
 };
 
 /**
@@ -390,7 +390,7 @@ const guoZi: InventoryItem = {
   equippable: false,
   goldValue: 1000,
   magicStoneValue: 0,
-  imagePath: '/images/items/consumable/guozi.png',
+  imagePath: './images/items/consumable/guozi.png',
 };
 
 /**
@@ -410,7 +410,7 @@ export const manJingYanQiu: InventoryItem = {
   equippable: false,
   goldValue: 1000,
   magicStoneValue: 100,
-  imagePath: '/images/items/consumable/manjingyanqiu.png',
+  imagePath: './images/items/consumable/manjingyanqiu.png',
 };
 
 /**
@@ -430,7 +430,7 @@ export const kongJingYanQiu: InventoryItem = {
   equippable: false,
   goldValue: 1000,
   magicStoneValue: 0,
-  imagePath: '/images/items/consumable/kongjingyanqiu.png',
+  imagePath: './images/items/consumable/kongjingyanqiu.png',
 };
 
 /**
@@ -450,7 +450,7 @@ export const dianJiangYaoShui: InventoryItem = {
   equippable: false,
   goldValue: 82800000,
   magicStoneValue: 8280,
-  imagePath: '/images/items/consumable/dianjiangyaoshui.png',
+  imagePath: './images/items/consumable/dianjiangyaoshui.png',
 };
 
 /**
@@ -471,7 +471,7 @@ const shengMingYaoJi: InventoryItem = {
   equippable: false,
   goldValue: 100,
   magicStoneValue: 0,
-  imagePath: '/images/items/consumable/tiliyao.png',
+  imagePath: './images/items/consumable/tiliyao.png',
 };
 
 /**
@@ -492,7 +492,7 @@ const gaoJiShengMingYaoJi: InventoryItem = {
   equippable: false,
   goldValue: 500,
   magicStoneValue: 0,
-  imagePath: '/images/items/consumable/guozi.png',
+  imagePath: './images/items/consumable/guozi.png',
 };
 
 /**
@@ -513,7 +513,7 @@ const moLiYaoJi: InventoryItem = {
   equippable: false,
   goldValue: 300,
   magicStoneValue: 0,
-  imagePath: '/images/items/consumable/tiliyao.png',
+  imagePath: './images/items/consumable/tiliyao.png',
 };
 
 /**
@@ -534,7 +534,7 @@ const jingLingZhiLei: InventoryItem = {
   equippable: false,
   goldValue: 5000,
   magicStoneValue: 50,
-  imagePath: '/images/items/consumable/guozi.png',
+  imagePath: './images/items/consumable/guozi.png',
 };
 
 // ==================== 技能书类物品 ====================
@@ -562,7 +562,7 @@ const xingMoJian: SkillBookItem = {
   targetCount: 3,
   goldValue: 10000000,
   magicStoneValue: 0,
-  imagePath: '/images/items/skillbook/xingmojian.png',
+  imagePath: './images/items/skillbook/xingmojian.png',
 };
 
 /**
@@ -588,7 +588,7 @@ const gaoJiXingMoJian: SkillBookItem = {
   targetCount: 3,
   goldValue: 28000000,
   magicStoneValue: 2800,
-  imagePath: '/images/items/skillbook/gaojixingmojian.png',
+  imagePath: './images/items/skillbook/gaojixingmojian.png',
 };
 
 /**
@@ -614,7 +614,7 @@ const gaoJiFengZhan: SkillBookItem = {
   targetCount: 1,
   goldValue: 1000,
   magicStoneValue: 0,
-  imagePath: '/images/items/skillbook/gaojifengzhan.png',
+  imagePath: './images/items/skillbook/gaojifengzhan.png',
 };
 
 /**
@@ -640,7 +640,7 @@ const feiTianLianZhan: SkillBookItem = {
   targetCount: 1,
   goldValue: 10000000,
   magicStoneValue: 1000,
-  imagePath: '/images/items/skillbook/feitianlianzhan.png',
+  imagePath: './images/items/skillbook/feitianlianzhan.png',
 };
 
 /**
@@ -666,7 +666,7 @@ const gaoJiFeiTianLianZhan: SkillBookItem = {
   targetCount: 1,
   goldValue: 82800000,
   magicStoneValue: 8280,
-  imagePath: '/images/items/skillbook/gaojifeitianlianzhan.png',
+  imagePath: './images/items/skillbook/gaojifeitianlianzhan.png',
 };
 
 /**
@@ -690,7 +690,7 @@ const douZhiYiYang: SkillBookItem = {
   skillEffect: '提升战斗力',
   goldValue: 28000000,
   magicStoneValue: 0,
-  imagePath: '/images/items/skillbook/douzhiyiyang.png',
+  imagePath: './images/items/skillbook/douzhiyiyang.png',
 };
 
 /**
@@ -714,7 +714,7 @@ const gaoJiDouZhiYiYang: SkillBookItem = {
   skillEffect: '大幅提升战斗力',
   goldValue: 82800000,
   magicStoneValue: 25000,
-  imagePath: '/images/items/skillbook/gaojidouzhiyiyang.png',
+  imagePath: './images/items/skillbook/gaojidouzhiyiyang.png',
 };
 
 /**
@@ -740,7 +740,7 @@ const gaoJiDiLieBaoZhan: SkillBookItem = {
   targetCount: 3,
   goldValue: 10000,
   magicStoneValue: 0,
-  imagePath: '/images/items/skillbook/gaojidiliebaozhan.png',
+  imagePath: './images/items/skillbook/gaojidiliebaozhan.png',
 };
 
 // ==================== 宝石类物品 ====================
@@ -769,7 +769,7 @@ const moHunJingShi: GemItem = {
   refineType: 'magicSoul',
   goldValue: 50000,
   magicStoneValue: 0,
-  imagePath: '/images/items/gem/mohunjingshi.png',
+  imagePath: './images/items/gem/mohunjingshi.png',
 };
 
 /**
@@ -794,7 +794,7 @@ const moHunZhiXin: GemItem = {
   refineType: 'magicSoul',
   goldValue: 280000,
   magicStoneValue: 0,
-  imagePath: '/images/items/gem/mohunzhixin.png',
+  imagePath: './images/items/gem/mohunzhixin.png',
 };
 
 /**
@@ -819,7 +819,7 @@ export const lingHunJingShi: GemItem = {
   refineType: 'quality',
   goldValue: 1000000,
   magicStoneValue: 0,
-  imagePath: '/images/items/gem/linghunjingshi.png',
+  imagePath: './images/items/gem/linghunjingshi.png',
 };
 
 /**
@@ -844,7 +844,7 @@ export const lingHunWang: GemItem = {
   refineType: 'quality',
   goldValue: 20000000,
   magicStoneValue: 2000,
-  imagePath: '/images/items/gem/linghunwang.png',
+  imagePath: './images/items/gem/linghunwang.png',
 };
 
 /**
@@ -869,7 +869,7 @@ const huanMoJingShi: GemItem = {
   refineType: 'useLevel',
   goldValue: 500000,
   magicStoneValue: 0,
-  imagePath: '/images/items/gem/huanmojingshi.png',
+  imagePath: './images/items/gem/huanmojingshi.png',
 };
 
 /**
@@ -894,7 +894,7 @@ const huanMoZhiXin: GemItem = {
   refineType: 'useLevel',
   goldValue: 2800000,
   magicStoneValue: 0,
-  imagePath: '/images/items/gem/huanmozhixin.png',
+  imagePath: './images/items/gem/huanmozhixin.png',
 };
 
 /**
@@ -919,7 +919,7 @@ const zhanHunJingShi: GemItem = {
   refineType: 'soul',
   goldValue: 28000000,
   magicStoneValue: 2800,
-  imagePath: '/images/items/gem/zhanhunjingshi.png',
+  imagePath: './images/items/gem/zhanhunjingshi.png',
 };
 
 /**
@@ -944,7 +944,7 @@ export const zhanHunZhiXin: GemItem = {
   refineType: 'soul',
   goldValue: 82800000,
   magicStoneValue: 12500,
-  imagePath: '/images/items/gem/zhanhunzhixin.png',
+  imagePath: './images/items/gem/zhanhunzhixin.png',
 };
 
 // ---------- 镶嵌宝石 ----------
@@ -970,7 +970,7 @@ const zhongJiZhanDouLiShi: GemItem = {
   combatPower: 3,
   goldValue: 500000,
   magicStoneValue: 0,
-  imagePath: '/images/items/gem/zhongjizhandoulishi.png',
+  imagePath: './images/items/gem/zhongjizhandoulishi.png',
 };
 
 /**
@@ -994,7 +994,7 @@ const gaoJiZhanDouLiShi: GemItem = {
   combatPower: 5,
   goldValue: 28000000,
   magicStoneValue: 2500,
-  imagePath: '/images/items/gem/gaojizhandoulishi.png',
+  imagePath: './images/items/gem/gaojizhandoulishi.png',
 };
 
 /**
@@ -1018,7 +1018,7 @@ const zhongJiJingYanShi: GemItem = {
   expBonus: 25,
   goldValue: 500000,
   magicStoneValue: 0,
-  imagePath: '/images/items/gem/zhongjijingyanshi.png',
+  imagePath: './images/items/gem/zhongjijingyanshi.png',
 };
 
 /**
@@ -1042,7 +1042,7 @@ const gaoJiJingYanShi: GemItem = {
   expBonus: 50,
   goldValue: 5000000,
   magicStoneValue: 0,
-  imagePath: '/images/items/gem/gaojijingyanshi.png',
+  imagePath: './images/items/gem/gaojijingyanshi.png',
 };
 
 // ==================== 特殊道具类物品 ====================
@@ -1069,7 +1069,7 @@ export const yueGuangBaoHe: GemItem = {
   refineType: 'openHole',
   goldValue: 27000000,
   magicStoneValue: 2700,
-  imagePath: '/images/items/special/yueguangbaohe.png',
+  imagePath: './images/items/special/yueguangbaohe.png',
 };
 
 /**
@@ -1094,7 +1094,7 @@ export const yueGuangBaoHeZengQiangBan: GemItem = {
   refineType: 'openHole',
   goldValue: 82800000,
   magicStoneValue: 8280,
-  imagePath: '/images/items/special/yueguangbaohezengqiangban.png',
+  imagePath: './images/items/special/yueguangbaohezengqiangban.png',
 };
 
 /**
@@ -1116,7 +1116,7 @@ const yinKuang: SpecialItem = {
   effect: '出售换金币',
   effectValue: 10000,
   quality: 1,
-  imagePath: '/images/items/special/yinkuang.png',
+  imagePath: './images/items/special/yinkuang.png',
 };
 
 /**
@@ -1141,7 +1141,7 @@ const jinKuang: SpecialItem = {
   quality: 1,
   goldValue: 0,
   magicStoneValue: 10, // 品质1 × 10 = 10
-  imagePath: '/images/items/special/jinkuang.png',
+  imagePath: './images/items/special/jinkuang.png',
 };
 
 /**
@@ -1164,7 +1164,7 @@ const baiMeiGui99: SpecialItem = {
   effectValue: 50,
   goldValue: 500000,
   magicStoneValue: 50,
-  imagePath: '/images/items/special/baineigui99.png',
+  imagePath: './images/items/special/baineigui99.png',
 };
 
 /**
@@ -1187,7 +1187,7 @@ const baiMeiGui999: SpecialItem = {
   effectValue: 4000,
   goldValue: 40000000,
   magicStoneValue: 4000,
-  imagePath: '/images/items/special/baineigui999.png',
+  imagePath: './images/items/special/baineigui999.png',
 };
 
 // ==================== 材料类物品 ====================
@@ -1209,7 +1209,7 @@ const huanShouZhiHun: InventoryItem = {
   equippable: false,
   goldValue: 1000000,
   magicStoneValue: 1000,
-  imagePath: '/images/items/special/jinkuang.png',
+  imagePath: './images/items/special/jinkuang.png',
 };
 
 /**
@@ -1229,7 +1229,7 @@ const moLingCao: InventoryItem = {
   equippable: false,
   goldValue: 5000,
   magicStoneValue: 0,
-  imagePath: '/images/items/consumable/guozi.png',
+  imagePath: './images/items/consumable/guozi.png',
 };
 
 // ==================== 任务物品类 ====================
@@ -1249,7 +1249,7 @@ const shenMiJuanZhou: InventoryItem = {
   maxStack: 1,
   usable: false,
   equippable: false,
-  imagePath: '/images/items/skillbook/xingmojian.png',
+  imagePath: './images/items/skillbook/xingmojian.png',
 };
 
 /**
@@ -1267,7 +1267,7 @@ const junTuanLingPai: InventoryItem = {
   maxStack: 1,
   usable: false,
   equippable: false,
-  imagePath: '/images/items/gem/mohunjingshi.png',
+  imagePath: './images/items/gem/mohunjingshi.png',
 };
 
 // ==================== 其他类物品 ====================
@@ -1289,7 +1289,7 @@ const yanHua: InventoryItem = {
   equippable: false,
   goldValue: 100,
   magicStoneValue: 0,
-  imagePath: '/images/items/special/yueguangbaohe.png',
+  imagePath: './images/items/special/yueguangbaohe.png',
 };
 
 /**
@@ -1309,7 +1309,7 @@ const chuanSongJuanZhou: InventoryItem = {
   equippable: false,
   goldValue: 500,
   magicStoneValue: 10,
-  imagePath: '/images/items/skillbook/xingmojian.png',
+  imagePath: './images/items/skillbook/xingmojian.png',
 };
 
 // ==================== 生成银矿物品（品质1-10）====================
@@ -1333,7 +1333,7 @@ const createSilverOre = (quality: number): SpecialItem => {
     quality: quality,
     goldValue: quality * 10000,
     magicStoneValue: 0,
-    imagePath: '/images/items/special/yinkuang.png',
+    imagePath: './images/items/special/yinkuang.png',
   };
 };
 
@@ -1358,7 +1358,7 @@ const createGoldOre = (quality: number): SpecialItem => {
     quality: quality,
     goldValue: 0,
     magicStoneValue: quality * 10,
-    imagePath: '/images/items/special/jinkuang.png',
+    imagePath: './images/items/special/jinkuang.png',
   };
 };
 

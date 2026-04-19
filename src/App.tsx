@@ -875,7 +875,7 @@ function App() {
               skillEffect: '大幅提升战斗力',
               goldValue: 82800000,
               magicStoneValue: 25000,
-              imagePath: '/images/items/skillbook/gaojidouzhiyiyang.png',
+              imagePath: './images/items/skillbook/gaojidouzhiyiyang.png',
             };
             setInventory(prev => [...prev, skillBook]);
             setInteractionLog(prev => [...prev, `额外获得：${payResult.specialReward}`]);
