@@ -213,6 +213,9 @@ export const createEquipment = (
   // 物品基础名称（不包含品质和魔魂等级）
   const name = baseName;
 
+  // 获取装备图片目录名（clothes 对应 armor 目录）
+  const imageDir = equipmentType === 'clothes' ? 'armor' : equipmentType;
+
   return {
     id: `equipment_${equipmentType}_${useLevel}_${equipmentQuality}_${magicSoulLevel}_${holeCount}`,
     name,
@@ -235,7 +238,7 @@ export const createEquipment = (
     defense: defense + addDefense,
     goldValue: 100 * useLevel * (equipmentQuality + 1) + 100 * magicSoulLevel + 10000 * holeCount * holeCount * holeCount,
     magicStoneValue: equipmentQuality === 4 ? Math.floor(28 * (useLevel * 2.5 + 50) + magicSoulLevel * 128 + 1500 * holeCount * holeCount * holeCount) : 0,
-    imagePath: `./images/equipment/${equipmentType}/lv${useLevel}.png`,
+    imagePath: `./images/equipment/${imageDir}/lv${useLevel}.png`,
   };
 };
 

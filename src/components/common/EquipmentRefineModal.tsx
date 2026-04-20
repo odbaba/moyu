@@ -10,7 +10,8 @@ import {
   refineMagicSoul,
   refineOpenHole,
   refineQuality,
-  refineUseLevel} from '../../utils/equipmentRefine';
+  refineUseLevel,
+  removeGem} from '../../utils/equipmentRefine';
 import ItemGrid from '../inventory/ItemGrid';
 import { getEquipmentQualityColor } from './utils';
 
@@ -41,6 +42,8 @@ interface EquipmentRefineModalProps {
   inventoryGems: GemItem[];
   /** 角色身上已装备的装备列表 */
   equippedItems: Record<EquipmentSlotType, EquipmentDetail | null>;
+  /** 战魂系统是否已开启，用于精炼函数判断是否激活战魂 */
+  warSoulSystemEnabled: boolean;
 }
 
 /**
@@ -59,7 +62,8 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
   playerLevel,
   inventoryEquipments,
   inventoryGems,
-  equippedItems
+  equippedItems,
+  warSoulSystemEnabled
 }) => {
   // 当前选择的标签页：'equipment' 或 'gem'
   const [activeTab, setActiveTab] = useState<'equipment' | 'gem'>('equipment');
@@ -163,6 +167,33 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
   };
 
   /**
+   * 处理摘除已镶嵌宝石事件
+   * 调用 removeGem 函数摘除装备上指定位置的宝石
+   * @param gemIndex 要摘除的宝石索引
+   */
+  const handleRemoveEmbeddedGem = (gemIndex: number) => {
+    if (!equipment) return;
+
+    const result = removeGem(equipment, gemIndex);
+
+    // 更新装备状态
+    if (result.success) {
+      onEquipmentChange({ ...equipment });
+    }
+
+    // 调用回调
+    onRefine(result);
+
+    // 显示结果
+    setRefineResult(result);
+
+    // 3秒后自动清除结果
+    setTimeout(() => {
+      setRefineResult(null);
+    }, 3000);
+  };
+
+  /**
    * 处理开始精炼事件
    * 检查装备和宝石是否都已选择，执行精炼逻辑
    */
@@ -179,24 +210,25 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
     let result: RefineResult;
 
     // 根据宝石的 refineType 调用对应的精炼函数
+    // 传递 warSoulSystemEnabled 参数，用于精炼时判断是否激活战魂
     switch (gem.refineType) {
       case 'quality':
-        result = refineQuality(equipment, gem);
+        result = refineQuality(equipment, gem, warSoulSystemEnabled);
         break;
       case 'magicSoul':
-        result = refineMagicSoul(equipment, gem);
+        result = refineMagicSoul(equipment, gem, warSoulSystemEnabled);
         break;
       case 'useLevel':
         result = refineUseLevel(equipment, gem, playerLevel);
         break;
       case 'openHole':
-        result = refineOpenHole(equipment, gem);
+        result = refineOpenHole(equipment, gem, warSoulSystemEnabled);
         break;
       case 'embed':
         result = embedGem(equipment, gem);
         break;
       case 'soul':
-        result = activateSoul(equipment, gem);
+        result = activateSoul(equipment, gem, warSoulSystemEnabled);
         break;
       default:
         result = {
@@ -269,6 +301,24 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
                     <div>品质: {equipment.equipmentQuality}</div>
                     {equipment.magicSoulLevel > 0 && <div>魔魂: +{equipment.magicSoulLevel}</div>}
                   </div>
+                  {/* 已镶嵌宝石列表，支持点击摘除 */}
+                  {equipment.gems && equipment.gems.length > 0 && (
+                    <div className="embedded-gems-list">
+                      {equipment.gems.map((gemName, index) => (
+                        <button
+                          key={index}
+                          className="embedded-gem-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveEmbeddedGem(index);
+                          }}
+                          title="点击摘除宝石"
+                        >
+                          {gemName} ✕
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="slot-placeholder">

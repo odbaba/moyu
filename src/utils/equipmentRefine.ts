@@ -5,6 +5,7 @@
  */
 
 import { calculateEquipmentBaseAttributes, getEquipmentName } from '../data/equipmentNames';
+import { WarSoulType } from '../types';
 import type { EquipmentItem, EquipmentQuality, GemItem, RefineResult } from '../types';
 
 /**
@@ -134,7 +135,7 @@ function updateEquipmentNameAndAttributes(equipment: EquipmentItem, newLevel: nu
  * @param gem - 使用的宝石（灵魂晶石或灵魂王）
  * @returns 精炼结果
  */
-export function refineQuality(equipment: EquipmentItem, gem: GemItem): RefineResult {
+export function refineQuality(equipment: EquipmentItem, gem: GemItem, warSoulSystemEnabled?: boolean): RefineResult {
   // 验证装备是否有效
   if (!equipment || equipment.type !== 'equipment') {
     return {
@@ -199,6 +200,28 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem): RefineRes
     const newQualityLevel = currentQualityLevel + 1;
     equipment.equipmentQuality = QUALITY_NAMES[newQualityLevel];
 
+    // 升极品时战魂逻辑
+    let soulLevelChange = 0;
+    let soulActivated = false;
+
+    if (newQualityLevel >= 4 && warSoulSystemEnabled) {
+      if (equipment.soulType && equipment.soulType > WarSoulType.NONE) {
+        // 已有战魂且等级<5，战魂等级+1
+        const currentSoulLevel = equipment.soulLevel || 1;
+        if (currentSoulLevel < 5) {
+          equipment.soulLevel = currentSoulLevel + 1;
+          soulLevelChange = 1;
+          message += ' 装备品质提升到了极品使得装备能量提升，战魂等级提高一级。';
+        }
+      } else if (Math.random() < 0.025) {
+        // 无战魂，2.5%概率激活战魂
+        equipment.soulType = Math.random() < 0.5 ? WarSoulType.TIAN_HUN : WarSoulType.DI_HUN;
+        equipment.soulLevel = 1;
+        soulActivated = true;
+        message += ' 装备在精练中爆发出强大的能量激活了装备战魂！';
+      }
+    }
+
     // 计算战斗力变化
     const oldCombatPower = QUALITY_COMBAT_POWER[QUALITY_NAMES[currentQualityLevel]];
     const newCombatPower = QUALITY_COMBAT_POWER[equipment.equipmentQuality];
@@ -208,7 +231,9 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem): RefineRes
       message,
       attributeChanges: {
         qualityLevel: newQualityLevel,
-        combatPowerChange: newCombatPower - oldCombatPower
+        combatPowerChange: newCombatPower - oldCombatPower,
+        soulLevelChange,
+        soulActivated: soulActivated ? 1 : 0
       }
     };
   }
@@ -226,7 +251,7 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem): RefineRes
  * @param gem - 使用的宝石（魔魂晶石或魔魂之心）
  * @returns 精炼结果
  */
-export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem): RefineResult {
+export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulSystemEnabled?: boolean): RefineResult {
   // 验证装备是否有效
   if (!equipment || equipment.type !== 'equipment') {
     return {
@@ -265,12 +290,32 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem): RefineR
 
     equipment.magicSoulLevel = currentLevel + 1;
 
+    // 魔魂升至12级时战魂等级提升
+    let soulLevelChange = 0;
+    if (warSoulSystemEnabled && currentLevel + 1 >= 12 && equipment.soulType && equipment.soulType > WarSoulType.NONE) {
+      const currentSoulLevel = equipment.soulLevel || 1;
+      if (currentSoulLevel < 5) {
+        equipment.soulLevel = currentSoulLevel + 1;
+        soulLevelChange = 1;
+        return {
+          success: true,
+          message: `使用魔魂之心精炼成功！魔魂等级提升为+${currentLevel + 1}。魔魂等级提升到了12级使得装备能量提升，战魂等级提高一级。`,
+          attributeChanges: {
+            magicSoulLevel: currentLevel + 1,
+            magicSoulChange: 1,
+            soulLevelChange
+          }
+        };
+      }
+    }
+
     return {
       success: true,
       message: `使用魔魂之心精炼成功！魔魂等级提升为+${currentLevel + 1}`,
       attributeChanges: {
         magicSoulLevel: currentLevel + 1,
-        magicSoulChange: 1
+        magicSoulChange: 1,
+        soulLevelChange: 0
       }
     };
   }
@@ -298,12 +343,32 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem): RefineR
   if (success) {
     equipment.magicSoulLevel = currentLevel + 1;
 
+    // 魔魂升至12级时战魂等级提升
+    let soulLevelChange = 0;
+    if (warSoulSystemEnabled && currentLevel + 1 >= 12 && equipment.soulType && equipment.soulType > WarSoulType.NONE) {
+      const currentSoulLevel = equipment.soulLevel || 1;
+      if (currentSoulLevel < 5) {
+        equipment.soulLevel = currentSoulLevel + 1;
+        soulLevelChange = 1;
+        return {
+          success: true,
+          message: `精炼成功！魔魂等级提升为+${currentLevel + 1}。魔魂等级提升到了12级使得装备能量提升，战魂等级提高一级。`,
+          attributeChanges: {
+            magicSoulLevel: currentLevel + 1,
+            magicSoulChange: 1,
+            soulLevelChange
+          }
+        };
+      }
+    }
+
     return {
       success: true,
       message: `精炼成功！魔魂等级提升为+${currentLevel + 1}`,
       attributeChanges: {
         magicSoulLevel: currentLevel + 1,
-        magicSoulChange: 1
+        magicSoulChange: 1,
+        soulLevelChange: 0
       }
     };
   } else {
@@ -445,7 +510,7 @@ export function refineUseLevel(
  * @param gem - 使用的道具（月光宝盒或月光宝盒增强版）
  * @returns 精炼结果
  */
-export function refineOpenHole(equipment: EquipmentItem, gem: GemItem): RefineResult {
+export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSystemEnabled?: boolean): RefineResult {
   // 验证装备是否有效
   if (!equipment || equipment.type !== 'equipment') {
     return {
@@ -477,7 +542,7 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem): RefineRe
     equipment.holeCount = 1;
 
     // 3%概率激活战魂
-    const soulActivated = activateSoulInternal(equipment, 0.03);
+    const soulActivated = activateSoulInternal(equipment, 0.03, warSoulSystemEnabled);
 
     let message = '开洞成功！装备获得1个宝石洞';
     if (soulActivated) {
@@ -513,7 +578,7 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem): RefineRe
     equipment.holeCount = 2;
 
     // 10%概率激活战魂
-    const soulActivated = activateSoulInternal(equipment, 0.1);
+    const soulActivated = activateSoulInternal(equipment, 0.1, warSoulSystemEnabled);
 
     let message = '开洞成功！装备获得第2个宝石洞';
     if (soulActivated) {
@@ -595,7 +660,7 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
   } else if (gem.name === '高级战斗力石') {
     combatPowerBonus = 5;
     // 高级宝石：如果装备有战魂且战魂等级<5，战魂等级+1
-    if (equipment.soulType && equipment.soulType > 0) {
+    if (equipment.soulType && equipment.soulType > WarSoulType.NONE) {
       const currentSoulLevel = equipment.soulLevel || 1;
       if (currentSoulLevel < 5) {
         equipment.soulLevel = currentSoulLevel + 1;
@@ -609,7 +674,7 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
   } else if (gem.name === '高级经验石') {
     expBonus = 50;
     // 高级宝石：如果装备有战魂且战魂等级<5，战魂等级+1
-    if (equipment.soulType && equipment.soulType > 0) {
+    if (equipment.soulType && equipment.soulType > WarSoulType.NONE) {
       const currentSoulLevel = equipment.soulLevel || 1;
       if (currentSoulLevel < 5) {
         equipment.soulLevel = currentSoulLevel + 1;
@@ -642,7 +707,7 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
  * @param gem - 使用的宝石（战魂晶石或战魂之心）
  * @returns 精炼结果
  */
-export function activateSoul(equipment: EquipmentItem, gem: GemItem): RefineResult {
+export function activateSoul(equipment: EquipmentItem, gem: GemItem, warSoulSystemEnabled?: boolean): RefineResult {
   // 验证装备是否有效
   if (!equipment || equipment.type !== 'equipment') {
     return {
@@ -659,15 +724,23 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem): RefineResu
     };
   }
 
+  // 检查战魂系统是否已开启
+  if (!warSoulSystemEnabled) {
+    return {
+      success: false,
+      message: '战魂系统尚未开启，请先击败无名氏开启战魂系统'
+    };
+  }
+
   // 战魂之心：100%激活或改变战魂类型
   if (gem.name === '战魂之心') {
-    const hadSoul = equipment.soulType && equipment.soulType > 0;
+    const hadSoul = equipment.soulType && equipment.soulType > WarSoulType.NONE;
 
-    // 随机战魂类型：天魂(1)或地魂(2)
-    equipment.soulType = Math.random() < 0.5 ? 1 : 2;
+    // 随机战魂类型：天魂或地魂
+    equipment.soulType = Math.random() < 0.5 ? WarSoulType.TIAN_HUN : WarSoulType.DI_HUN;
     equipment.soulLevel = 1;
 
-    const soulTypeName = equipment.soulType === 1 ? '天魂' : '地魂';
+    const soulTypeName = equipment.soulType === WarSoulType.TIAN_HUN ? '天魂' : '地魂';
     const message = hadSoul
       ? `战魂之心激活成功！装备战魂类型改变为${soulTypeName}`
       : `战魂之心激活成功！装备激活了${soulTypeName}`;
@@ -687,13 +760,13 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem): RefineResu
     const success = Math.random() < 0.2;
 
     if (success) {
-      const hadSoul = equipment.soulType && equipment.soulType > 0;
+      const hadSoul = equipment.soulType && equipment.soulType > WarSoulType.NONE;
 
-      // 随机战魂类型：天魂(1)或地魂(2)
-      equipment.soulType = Math.random() < 0.5 ? 1 : 2;
+      // 随机战魂类型：天魂或地魂
+      equipment.soulType = Math.random() < 0.5 ? WarSoulType.TIAN_HUN : WarSoulType.DI_HUN;
       equipment.soulLevel = 1;
 
-      const soulTypeName = equipment.soulType === 1 ? '天魂' : '地魂';
+      const soulTypeName = equipment.soulType === WarSoulType.TIAN_HUN ? '天魂' : '地魂';
       const message = hadSoul
         ? `战魂晶石激活成功！装备战魂类型改变为${soulTypeName}`
         : `战魂晶石激活成功！装备激活了${soulTypeName}`;
@@ -727,17 +800,97 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem): RefineResu
  * @param probability - 激活概率（0-1）
  * @returns 是否成功激活战魂
  */
-function activateSoulInternal(equipment: EquipmentItem, probability: number): boolean {
+function activateSoulInternal(equipment: EquipmentItem, probability: number, warSoulSystemEnabled?: boolean): boolean {
+  // 战魂系统未开启时不触发战魂激活
+  if (!warSoulSystemEnabled) {
+    return false;
+  }
+
   // 随机判断是否激活战魂
   if (Math.random() >= probability) {
     return false;
   }
 
-  // 随机战魂类型：天魂(1)或地魂(2)
-  equipment.soulType = Math.random() < 0.5 ? 1 : 2;
+  // 随机战魂类型：天魂或地魂
+  equipment.soulType = Math.random() < 0.5 ? WarSoulType.TIAN_HUN : WarSoulType.DI_HUN;
   equipment.soulLevel = 1;
 
   return true;
+}
+
+/**
+ * 摘除宝石函数
+ * 从装备上摘除指定位置的宝石
+ * 根据参考文档：摘除宝石时，如果装备有战魂且战魂等级>1，战魂等级降为1
+ * @param equipment - 装备对象
+ * @param gemIndex - 要摘除的宝石索引（0或1）
+ * @returns 精炼结果
+ */
+export function removeGem(equipment: EquipmentItem, gemIndex: number): RefineResult {
+  // 验证装备是否有效
+  if (!equipment || equipment.type !== 'equipment') {
+    return {
+      success: false,
+      message: '请放入正确的装备'
+    };
+  }
+
+  // 检查装备是否有宝石洞
+  const holeCount = equipment.holeCount || 0;
+  if (holeCount === 0) {
+    return {
+      success: false,
+      message: '装备没有宝石洞，无法摘除宝石'
+    };
+  }
+
+  // 检查是否有已镶嵌的宝石
+  const embeddedGems = equipment.gems || [];
+  if (embeddedGems.length === 0) {
+    return {
+      success: false,
+      message: '装备没有镶嵌宝石，无法摘除'
+    };
+  }
+
+  // 检查宝石索引是否有效
+  if (gemIndex < 0 || gemIndex >= embeddedGems.length) {
+    return {
+      success: false,
+      message: '无效的宝石索引'
+    };
+  }
+
+  // 记录摘除的宝石名称
+  const removedGemName = embeddedGems[gemIndex];
+
+  // 从装备上移除宝石
+  equipment.gems = embeddedGems.filter((_, index) => index !== gemIndex);
+
+  // 检查是否需要降低战魂等级
+  let soulLevelChanged = false;
+  if (equipment.soulType && equipment.soulType > WarSoulType.NONE) {
+    const currentSoulLevel = equipment.soulLevel || 1;
+    if (currentSoulLevel > 1) {
+      equipment.soulLevel = 1;
+      soulLevelChanged = true;
+    }
+  }
+
+  // 构建结果消息
+  let message = `成功摘除${removedGemName}！`;
+  if (soulLevelChanged) {
+    message += ' 摘除宝石操作使战魂的等级下降为1级';
+  }
+
+  return {
+    success: true,
+    message,
+    attributeChanges: {
+      removedGem: removedGemName,
+      soulLevelChange: soulLevelChanged ? -(equipment.soulLevel || 1) + 1 : 0
+    }
+  };
 }
 
 /**
@@ -783,12 +936,12 @@ export function getQualityCombatPower(quality: EquipmentQuality): number {
 
 /**
  * 获取战魂类型名称
- * @param soulType - 战魂类型（1=天魂，2=地魂）
+ * @param soulType - 战魂类型（WarSoulType枚举）
  * @returns 战魂类型名称
  */
-export function getSoulTypeName(soulType: number): string {
-  if (soulType === 1) return '天魂';
-  if (soulType === 2) return '地魂';
+export function getSoulTypeName(soulType: WarSoulType | undefined): string {
+  if (soulType === WarSoulType.TIAN_HUN) return '天魂';
+  if (soulType === WarSoulType.DI_HUN) return '地魂';
 
   return '无';
 }
@@ -899,6 +1052,11 @@ export function canRefine(
         reason: '装备的所有宝石洞都已镶嵌'
       };
     }
+  }
+
+  // 战魂激活
+  if (gemName === '战魂晶石' || gemName === '战魂之心') {
+    // 战魂物品的精炼条件由 activateSoul 函数内部检查
   }
 
   return {

@@ -13,6 +13,7 @@ import {
   refineOpenHole,
   embedGem,
   activateSoul,
+  removeGem,
   canRefine,
   getQualityCombatPower,
   getSoulTypeName,
@@ -316,6 +317,102 @@ console.log('最终装备：', sword);
 // }
 ```
 
+## 9. 升极品时战魂逻辑
+
+当装备品质提升到极品时，会触发战魂相关逻辑（需要战魂系统已开启）：
+
+- **已有战魂且等级<5**：战魂等级+1，提示"装备品质提升到了极品使得装备能量提升，战魂等级提高一级。"
+- **无战魂**：2.5%概率激活战魂，激活时随机获得天魂或地魂，等级为1
+- **战魂等级=5**：不再提升
+
+```typescript
+// 使用灵魂王升极品，触发战魂逻辑
+const result = refineQuality(equipment, soulKingGem, true); // warSoulSystemEnabled=true
+console.log(result);
+// 如果已有战魂且等级<5：
+// { success: true, message: '...战魂等级提高一级。', attributeChanges: { soulLevelChange: 1, ... } }
+// 如果无战魂且2.5%概率触发：
+// { success: true, message: '...激活了装备战魂！', attributeChanges: { soulActivated: 1, ... } }
+```
+
+## 10. 魔魂升至12级时战魂等级提升
+
+当装备魔魂等级升至12级时，如果装备已有战魂且战魂等级<5，战魂等级+1：
+
+```typescript
+// 使用魔魂晶石提升到+12，触发战魂等级提升
+const result = refineMagicSoul(equipment, magicGem, true); // warSoulSystemEnabled=true
+console.log(result);
+// { success: true, message: '...魔魂等级提升到了12级使得装备能量提升，战魂等级提高一级。', ... }
+```
+
+## 11. 摘除宝石
+
+从装备上摘除指定位置的宝石。摘除宝石时，如果装备有战魂且战魂等级>1，战魂等级降为1：
+
+```typescript
+// 摘除第一个宝石（索引0）
+const result = removeGem(equipment, 0);
+console.log(result);
+// { success: true, message: '成功摘除高级战斗力石！ 摘除宝石操作使战魂的等级下降为1级', ... }
+
+// 摘除第二个宝石（索引1）
+const result2 = removeGem(equipment, 1);
+```
+
+## 12. 战魂系统开关参数
+
+以下精炼函数新增了 `warSoulSystemEnabled?: boolean` 可选参数，用于控制战魂相关逻辑：
+
+| 函数 | 参数 | 说明 |
+|------|------|------|
+| `refineQuality` | `warSoulSystemEnabled?` | 升极品时是否触发战魂逻辑 |
+| `refineMagicSoul` | `warSoulSystemEnabled?` | 魔魂升至12级时是否触发战魂等级提升 |
+| `refineOpenHole` | `warSoulSystemEnabled?` | 开洞时是否触发战魂激活 |
+| `activateSoul` | `warSoulSystemEnabled?` | 战魂系统未开启时返回失败 |
+
+```typescript
+// 战魂系统未开启时激活战魂会失败
+const result = activateSoul(equipment, soulGem, false);
+console.log(result);
+// { success: false, message: '战魂系统尚未开启，请先击败无名氏开启战魂系统' }
+```
+
+## 13. 战魂套装效果
+
+战魂套装需要所有6件装备都拥有战魂属性且类型一致：
+
+| 套装类型 | 条件 | 效果 | 最大加成 |
+|----------|------|------|----------|
+| 天魂套装 | 6件装备soulType=1 | 攻击力+每件战魂等级×5% | 150% |
+| 地魂套装 | 6件装备soulType=2 | 闪避率+每件战魂等级×2% | 60% |
+| 混合套装 | 不同类型战魂 | 无套装效果 | - |
+
+套装等级 = 所有装备战魂等级中的最小值
+
+PK赛战斗力加成 = 套装等级 × 5%（最高25%）
+
+```typescript
+import { checkWarSoulSet, calculateTianHunSetBonus, calculateDiHunSetBonus, calculateWarSoulPKCombatPower } from '@/utils/combatPower';
+
+// 检查战魂套装
+const setInfo = checkWarSoulSet(character.equipment);
+console.log(setInfo);
+// { isActivated: true, setType: WarSoulType.TIAN_HUN, setLevel: 3 }
+
+// 计算天魂套装攻击加成
+const attackBonus = calculateTianHunSetBonus(character.equipment);
+console.log(attackBonus); // 0.15 (15%)
+
+// 计算地魂套装闪避加成
+const dodgeBonus = calculateDiHunSetBonus(character.equipment);
+console.log(dodgeBonus); // 0 (无地魂装备)
+
+// 计算PK赛战斗力加成
+const pkBonus = calculateWarSoulPKCombatPower(character.equipment);
+console.log(pkBonus); // 0.15 (15%)
+```
+
 ## 注意事项
 
 1. **品质提升**：灵魂晶石成功率随品质提升而降低，建议使用灵魂王确保成功
@@ -324,6 +421,11 @@ console.log('最终装备：', sword);
 4. **开洞**：月光宝盒只能开第一个洞，增强版只能开第二个洞
 5. **镶嵌**：高级宝石会提升战魂等级（最高5级）
 6. **战魂**：战魂之心100%成功，战魂晶石仅20%成功率
+7. **升极品战魂**：升极品时已有战魂则等级+1，无战魂则2.5%概率激活（需战魂系统已开启）
+8. **魔魂12级战魂**：魔魂升至12级时战魂等级+1（需战魂系统已开启）
+9. **摘除宝石**：摘除宝石会使战魂等级降为1（如果等级>1）
+10. **战魂系统开关**：使用战魂相关功能前需先击败无名氏开启战魂系统
+11. **战魂套装**：6件装备战魂类型一致时激活套装效果
 
 ## 错误处理
 

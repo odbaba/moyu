@@ -1,3 +1,4 @@
+import { WarSoulType } from '../types';
 import type { CharacterData, EquipmentDetail, EquipmentSlotType } from '../types';
 
 /**
@@ -134,7 +135,7 @@ export function calculateAllEquipmentBonus(equipment: CharacterData['equipment']
       result.defense += attrs.defense;
 
       // 计算地魂战魂的闪避加成
-      if (item.soulType === 2 && item.soulLevel) {
+      if (item.soulType === WarSoulType.DI_HUN && item.soulLevel) {
         result.dodgeRate += item.soulLevel * 2; // 每级地魂提供2%闪避
       }
     }
@@ -157,7 +158,7 @@ export function calculateSoulAttackBonus(equipment: CharacterData['equipment']):
   slots.forEach(slot => {
     const item = equipment[slot];
     // 天魂战魂提供攻击力百分比加成
-    if (item && item.soulType === 1 && item.soulLevel) {
+    if (item && item.soulType === WarSoulType.TIAN_HUN && item.soulLevel) {
       bonus += item.soulLevel * 0.05; // 每级天魂提供5%攻击加成
     }
   });

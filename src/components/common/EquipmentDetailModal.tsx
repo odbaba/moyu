@@ -2,6 +2,7 @@ import './EquipmentDetailModal.css';
 
 import React, { useState } from 'react';
 
+import { WarSoulType } from '../../types';
 import type { EquipmentDetail } from '../../types';
 import { EQUIPMENT_SLOT_TYPE_NAMES } from '../common/constants';
 import { getEquipmentQualityColor } from '../common/utils';
@@ -270,14 +271,28 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
           </div>
         )}
 
-        {/* 战魂属性 */}
-        {equipment.soulType && equipment.soulType > 0 && (
-          <div className="equipment-detail-info-row">
-            <span className="info-label">战魂</span>
-            <span className="info-value soul-value">
-              {equipment.soulType === 1 ? `天魂 Lv.${equipment.soulLevel}` : `地魂 Lv.${equipment.soulLevel}`}
-            </span>
-          </div>
+        {/* 战魂属性：显示战魂类型、等级及效果 */}
+        {equipment.soulType && equipment.soulType > WarSoulType.NONE && (
+          <>
+            {/* 战魂类型与等级，5级显示MAX，1-4级显示X级 */}
+            <div className="equipment-detail-info-row">
+              <span className="info-label">战魂</span>
+              <span className="info-value soul-value">
+                {equipment.soulType === WarSoulType.TIAN_HUN
+                  ? (equipment.soulLevel && equipment.soulLevel >= 5 ? '天魂MAX' : `天魂${equipment.soulLevel}级`)
+                  : (equipment.soulLevel && equipment.soulLevel >= 5 ? '地魂MAX' : `地魂${equipment.soulLevel}级`)}
+              </span>
+            </div>
+            {/* 战魂效果：天魂加攻击百分比，地魂加闪避百分比 */}
+            <div className="equipment-detail-info-row">
+              <span className="info-label">战魂效果</span>
+              <span className="info-value soul-value">
+                {equipment.soulType === WarSoulType.TIAN_HUN
+                  ? `攻击+${(equipment.soulLevel || 1) * 5}%`
+                  : `闪避+${(equipment.soulLevel || 1) * 2}%`}
+              </span>
+            </div>
+          </>
         )}
 
         {/* 操作按钮区域 */}

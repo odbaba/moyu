@@ -1,3 +1,4 @@
+import { WarSoulType } from '../types';
 import type { CharacterData, EquipmentDetail, PrincessRelationship } from '../types';
 import { CHARACTER_BASE_STATS, CHARACTER_GROWTH_RATES } from '../utils/attributeCalculator';
 import { calculateTotalCombatPower } from '../utils/combatPower';
@@ -23,7 +24,7 @@ const weapon: EquipmentDetail = {
   useLevel: 100,
   combatPower: 12, // 极品品质: 4 × 3 = 12
   // 战魂属性
-  soulType: 1, // 天魂
+  soulType: WarSoulType.TIAN_HUN, // 天魂
   soulLevel: 5 // 5级天魂
 };
 
@@ -46,7 +47,7 @@ const clothes: EquipmentDetail = {
   useLevel: 80,
   combatPower: 9, // 精品品质: 3 × 3 = 9
   // 战魂属性
-  soulType: 1, // 天魂
+  soulType: WarSoulType.TIAN_HUN, // 天魂
   soulLevel: 4 // 4级天魂
 };
 
@@ -69,7 +70,7 @@ const shoes: EquipmentDetail = {
   useLevel: 60,
   combatPower: 6, // 上品品质: 2 × 3 = 6
   // 战魂属性
-  soulType: 2, // 地魂
+  soulType: WarSoulType.DI_HUN, // 地魂
   soulLevel: 3 // 3级地魂
 };
 
@@ -91,7 +92,7 @@ const bracelet: EquipmentDetail = {
   useLevel: 40,
   combatPower: 3, // 良品品质: 1 × 3 = 3
   // 战魂属性
-  soulType: 0, // 无战魂
+  soulType: WarSoulType.NONE, // 无战魂
   soulLevel: 0
 };
 
@@ -115,7 +116,7 @@ const necklace: EquipmentDetail = {
   useLevel: 100,
   combatPower: 12, // 极品品质: 4 × 3 = 12
   // 战魂属性
-  soulType: 1, // 天魂
+  soulType: WarSoulType.TIAN_HUN, // 天魂
   soulLevel: 5 // 5级天魂
 };
 
@@ -134,7 +135,7 @@ const helmet: EquipmentDetail = {
   useLevel: 1,
   combatPower: 0, // 普通品品质: 0 × 3 = 0
   // 战魂属性
-  soulType: 0, // 无战魂
+  soulType: WarSoulType.NONE, // 无战魂
   soulLevel: 0
 };
 

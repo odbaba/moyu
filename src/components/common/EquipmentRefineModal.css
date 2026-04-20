@@ -184,6 +184,33 @@
   transform: translateY(-1px);
 }
 
+/* 已镶嵌宝石列表 */
+.embedded-gems-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  justify-content: center;
+}
+
+/* 已镶嵌宝石项（可点击摘除） */
+.embedded-gem-item {
+  background-color: #4a1a6a;
+  color: #e0b0ff;
+  border: 1px solid #9c27b0;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.embedded-gem-item:hover {
+  background-color: #6a2a8a;
+  border-color: #e040fb;
+  transform: translateY(-1px);
+}
+
 /* 精炼按钮容器 */
 .refine-button-container {
   display: flex;

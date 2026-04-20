@@ -3125,6 +3125,7 @@ function App() {
             inventoryEquipments={inventoryEquipments}
             inventoryGems={inventoryGems}
             equippedItems={equippedItems}
+            warSoulSystemEnabled={warSoulSystemEnabled}
           />
 
           {/* 收藏架界面 */}

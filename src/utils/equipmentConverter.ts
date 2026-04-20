@@ -1,3 +1,4 @@
+import { WarSoulType } from '../types';
 import type { EquipmentDetail, EquipmentItem, EquipmentQuality, EquipmentSlotType, GemAttribute } from '../types';
 
 /**
@@ -130,7 +131,7 @@ export function calculateGemExpBonus(gems: string[] | undefined): number {
  * @returns 战魂属性加成对象
  */
 export function calculateSoulBonus(
-  soulType: number | undefined,
+  soulType: WarSoulType | undefined,
   soulLevel: number | undefined,
   baseAttackMin: number,
   baseAttackMax: number
@@ -141,18 +142,18 @@ export function calculateSoulBonus(
     dodgeBonus: 0
   };
 
-  if (!soulType || soulType <= 0 || !soulLevel) {
+  if (!soulType || soulType <= WarSoulType.NONE || !soulLevel) {
     return result;
   }
 
   // 天魂：攻击力 + 战魂等级 × 5%
-  if (soulType === 1) {
+  if (soulType === WarSoulType.TIAN_HUN) {
     const bonusPercent = soulLevel * 0.05;
     result.attackMinBonus = Math.floor(baseAttackMin * bonusPercent);
     result.attackMaxBonus = Math.floor(baseAttackMax * bonusPercent);
   }
   // 地魂：闪避率 + 战魂等级 × 2%
-  else if (soulType === 2) {
+  else if (soulType === WarSoulType.DI_HUN) {
     result.dodgeBonus = soulLevel * 2;
   }
 
@@ -166,8 +167,8 @@ export function calculateSoulBonus(
  * @param soulLevel 战魂等级
  * @returns 战斗力加成值
  */
-export function calculateSoulCombatPower(soulType: number | undefined, soulLevel: number | undefined): number {
-  if (!soulType || soulType <= 0 || !soulLevel) {
+export function calculateSoulCombatPower(soulType: WarSoulType | undefined, soulLevel: number | undefined): number {
+  if (!soulType || soulType <= WarSoulType.NONE || !soulLevel) {
     return 0;
   }
 
