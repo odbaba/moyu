@@ -56,7 +56,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
   const renderEquipmentDetails = (equip: EquipmentItem) => {
     // 判断装备类型：攻击型还是防御型
     const isAttackType = ['weapon', 'bracelet', 'necklace'].includes(equip.equipmentType);
-    const isDefenseType = ['helmet', 'armor', 'shoes'].includes(equip.equipmentType);
+    const isDefenseType = ['helmet', 'clothes', 'shoes'].includes(equip.equipmentType);
 
     // 计算追加属性（基于魔魂等级）
     const calculateAddAttack = (base: number) => Math.floor(base / 10) * equip.magicSoulLevel;

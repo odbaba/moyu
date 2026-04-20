@@ -15,8 +15,6 @@ export default defineConfig([
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
     ],
     languageOptions: {
       ecmaVersion: 2020,
@@ -106,17 +104,8 @@ export default defineConfig([
       '@typescript-eslint/consistent-type-imports': ['warn', { prefer: 'type-imports' }],
 
       // ==================== React 规则 ====================
-      // React Hooks 规则已由 reactHooks.configs.flat.recommended 处理
-      // 禁止在 JSX 中使用 bind 或箭头函数
-      'react/jsx-no-bind': 'off',
-      
-      // 要求 JSX 使用 PascalCase 组件名
-      'react/jsx-pascal-case': 'off',
-
+    
       // ==================== 最佳实践 ====================
-      // 要求使用 const 声明不会被重新赋值的变量
-      'prefer-const': 'error',
-      
       // 禁止 var
       'no-var': 'error',
       

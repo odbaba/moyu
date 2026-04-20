@@ -18,36 +18,44 @@ character/
 ## 数据类型
 
 ```typescript
-// 装备类型
-interface Equipment {
+// 装备槽位类型（使用 clothes 而非 armor）
+type EquipmentSlotType = 'weapon' | 'helmet' | 'clothes' | 'shoes' | 'bracelet' | 'necklace';
+
+// 装备品质
+type EquipmentQuality = '普通品' | '良品' | '上品' | '精品' | '极品';
+
+// 装备详情
+interface EquipmentDetail {
   id: string;
   name: string;
-  type: 'weapon' | 'armor' | 'accessory';
-  attack: number;
-  defense: number;
-  maxHp: number;
-  maxMp: number;
+  type: EquipmentSlotType;
+  quality: EquipmentQuality;
+  magicSoulLevel: number;
+  attributes: EquipmentAttribute;
+  holeCount: number;
+  gems?: string[];
+  gemAttributes?: GemAttribute[];
+  soulType?: number;
+  soulLevel?: number;
+  combatPower: number;
+  icon?: string;
+  imagePath?: string;
 }
 
-// 详细角色信息
-interface CharacterDetail {
+// 角色数据
+interface CharacterData {
   id: string;
-  name: string;
+  playerName: string;
   level: number;
-  exp: number;
-  maxExp: number;
-  maxHp: number;
-  currentHp: number;
-  maxMp: number;
-  currentMp: number;
-  attack: number;
-  defense: number;
   equipment: {
-    weapon: Equipment | null;
-    armor: Equipment | null;
-    accessory: Equipment | null;
+    weapon: EquipmentDetail | null;
+    clothes: EquipmentDetail | null;
+    shoes: EquipmentDetail | null;
+    bracelet: EquipmentDetail | null;
+    necklace: EquipmentDetail | null;
+    helmet: EquipmentDetail | null;
   };
-  skills: Skill[];
+  // ... 其他属性
 }
 ```
 

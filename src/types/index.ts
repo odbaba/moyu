@@ -58,45 +58,6 @@ export interface Character {
   gridPosition: GridPosition;
 }
 
-// 装备类型枚举
-export type EquipmentType = 'weapon' | 'armor' | 'accessory';
-
-// 装备接口定义
-export interface Equipment {
-  id: string;
-  name: string;
-  type: EquipmentType;
-  description: string;
-  attack: number;
-  defense: number;
-  maxHp: number;
-  maxMp: number;
-}
-
-// 角色装备槽接口定义
-export interface CharacterEquipment {
-  weapon: Equipment | null;
-  armor: Equipment | null;
-  accessory: Equipment | null;
-}
-
-// 详细角色信息接口定义
-export interface CharacterDetail {
-  id: string;
-  name: string;
-  level: number;
-  exp: number;
-  maxExp: number;
-  maxHp: number;
-  currentHp: number;
-  maxMp: number;
-  currentMp: number;
-  attack: number;
-  defense: number;
-  equipment: CharacterEquipment;
-  skills: Skill[];
-}
-
 // 角色属性总览接口定义
 export interface CharacterStats {
   baseAttack: number;
