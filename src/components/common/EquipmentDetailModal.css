@@ -260,6 +260,51 @@
   color: #9c27b0;
 }
 
+/* ========== 战魂区域样式 ========== */
+
+.war-soul-section {
+  margin-bottom: 8px;
+  padding: 12px;
+  background-color: rgba(156, 39, 176, 0.1);
+  border: 1px solid #9c27b0;
+  border-radius: 6px;
+}
+
+.war-soul-effect {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background-color: rgba(40, 40, 40, 0.5);
+  border-radius: 4px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.war-soul-effect .effect-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.war-soul-effect .effect-value {
+  color: #ffd700;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.war-soul-description {
+  padding: 6px 12px;
+  background-color: rgba(40, 40, 40, 0.3);
+  border-radius: 4px;
+  border-left: 3px solid #9c27b0;
+}
+
+.war-soul-description .description-text {
+  color: #aaa;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
 /* ========== 宝石属性区域样式 ========== */
 
 .gem-attributes-section {

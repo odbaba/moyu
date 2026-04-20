@@ -58,6 +58,45 @@ export interface Character {
   gridPosition: GridPosition;
 }
 
+// 装备类型枚举
+export type EquipmentType = 'weapon' | 'armor' | 'accessory';
+
+// 装备接口定义
+export interface Equipment {
+  id: string;
+  name: string;
+  type: EquipmentType;
+  description: string;
+  attack: number;
+  defense: number;
+  maxHp: number;
+  maxMp: number;
+}
+
+// 角色装备槽接口定义
+export interface CharacterEquipment {
+  weapon: Equipment | null;
+  armor: Equipment | null;
+  accessory: Equipment | null;
+}
+
+// 详细角色信息接口定义
+export interface CharacterDetail {
+  id: string;
+  name: string;
+  level: number;
+  exp: number;
+  maxExp: number;
+  maxHp: number;
+  currentHp: number;
+  maxMp: number;
+  currentMp: number;
+  attack: number;
+  defense: number;
+  equipment: CharacterEquipment;
+  skills: Skill[];
+}
+
 // 角色属性总览接口定义
 export interface CharacterStats {
   baseAttack: number;
@@ -115,7 +154,7 @@ export interface EquipmentDetail {
   useLevel: number;
   combatPower: number;
   // 战魂属性
-  soulType?: WarSoulType; // 战魂类型 (WarSoulType枚举: 0=无, 1=天魂, 2=地魂)
+  soulType?: WarSoulType | number; // 战魂类型 (0=无, 1=天魂, 2=地魂)
   soulLevel?: number; // 战魂等级 (1-5)
   // 基础属性（根据等级动态计算）
   baseAttackMin?: number; // 基础最小攻击
@@ -266,7 +305,7 @@ export interface EquipmentItem extends InventoryItem {
   magicSoulLevel: number; // 魔魂等级 (0-12)
   holeCount: number; // 宝石洞数量 (0-2)
   gems?: string[]; // 镶嵌的宝石名称
-  soulType?: WarSoulType; // 战魂类型 (WarSoulType枚举: 0=无, 1=天魂, 2=地魂)
+  soulType?: WarSoulType | number; // 战魂类型 (0=无, 1=天魂, 2=地魂)
   soulLevel?: number; // 战魂等级 (1-5)
   attackMin?: number; // 最小攻击力
   attackMax?: number; // 最大攻击力
@@ -1220,23 +1259,17 @@ export interface SellResult {
 // ========== 战魂系统类型定义 ==========
 
 /**
- * 战魂类型常量对象
+ * 战魂类型枚举
  * 定义装备战魂的类型
- * - NONE: 无战魂
- * - TIAN_HUN: 天魂（攻击力加成）
- * - DI_HUN: 地魂（闪避率加成）
  */
-export const WarSoulType = {
-  NONE: 0,      // 无战魂
-  TIAN_HUN: 1,  // 天魂
-  DI_HUN: 2     // 地魂
-} as const;
-
-/**
- * 战魂类型联合类型
- * 由 WarSoulType 常量对象的值推导而来
- */
-export type WarSoulType = typeof WarSoulType[keyof typeof WarSoulType];
+export enum WarSoulType {
+  /** 无战魂 */
+  NONE = 0,
+  /** 天魂 */
+  TIAN_HUN = 1,
+  /** 地魂 */
+  DI_HUN = 2
+}
 
 /**
  * 战魂物品类型

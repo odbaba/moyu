@@ -2257,7 +2257,7 @@ function App() {
         // 探险家NPC从戈壁消失（任务完成）
         setExplorerUnlocked(false);
         // 显示提示（更新提示信息，告知战魂系统已开启）
-        const victoryMessage = '战魂系统已开启！快去找装备打造师吧，他知道如何激发装备的战魂。';
+        const victoryMessage = '获得了战魂之心。\n终于找到关于战魂的秘密了，快去找装备打造师吧，他知道如何激发装备的战魂。';
         setInteractionLog(prev => [...prev, victoryMessage]);
         // 显示弹窗
         setInfoModalTitle('战魂系统开启');

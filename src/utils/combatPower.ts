@@ -1,5 +1,4 @@
 import { getMilitaryRankByLevel, getNobleRankByLevel, MILITARY_RANKS, NOBLE_RANKS } from '../data/rankData';
-import { WarSoulType } from '../types';
 import type { CharacterData, EquipmentDetail, EquipmentQuality, Pet } from '../types';
 import { getQualityValue } from './attributeCalculator';
 import { calculateGemCombatPower } from './equipmentConverter';
@@ -203,6 +202,124 @@ export function calculateAllGemCombatPower(equipment: CharacterData['equipment']
 }
 
 /**
+ * 战魂套装信息接口
+ */
+interface WarSoulSetInfo {
+  isActive: boolean;
+  setType: number;
+  setLevel: number;
+}
+
+/**
+ * 检查战魂套装状态
+ * 检查所有6件装备是否都有战魂且战魂类型是否一致
+ * @param equipment 角色装备对象
+ * @returns 套装信息对象（是否激活、套装类型、套装等级）
+ */
+export function checkWarSoulSet(equipment: CharacterData['equipment']): WarSoulSetInfo {
+  const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
+  
+  // 获取所有装备
+  const equippedItems: EquipmentDetail[] = [];
+  slots.forEach(slot => {
+    const item = equipment[slot];
+    if (item) {
+      equippedItems.push(item);
+    }
+  });
+
+  // 检查是否有6件装备
+  if (equippedItems.length < 6) {
+    return { isActive: false, setType: 0, setLevel: 0 };
+  }
+
+  // 检查所有装备是否都有战魂
+  const allHaveSoul = equippedItems.every(item => item.soulType && item.soulType > 0 && item.soulLevel);
+  if (!allHaveSoul) {
+    return { isActive: false, setType: 0, setLevel: 0 };
+  }
+
+  // 检查战魂类型是否一致
+  const soulTypes = equippedItems.map(item => item.soulType);
+  const firstSoulType = soulTypes[0];
+  const allSameType = soulTypes.every(type => type === firstSoulType);
+  if (!allSameType) {
+    return { isActive: false, setType: 0, setLevel: 0 };
+  }
+
+  // 计算套装等级（取最低战魂等级）
+  const soulLevels = equippedItems.map(item => item.soulLevel || 0);
+  const setLevel = Math.min(...soulLevels);
+
+  return { 
+    isActive: true, 
+    setType: firstSoulType || 0, 
+    setLevel 
+  };
+}
+
+/**
+ * 计算天魂套装攻击加成
+ * 天魂套装：每件装备战魂等级 × 5%
+ * 最大加成：150%
+ * @param equipment 角色装备对象
+ * @returns 攻击加成百分比
+ */
+export function calculateTianHunSetBonus(equipment: CharacterData['equipment']): number {
+  let total = 0;
+  const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
+
+  slots.forEach(slot => {
+    const item = equipment[slot];
+    if (item && item.soulType === 1 && item.soulLevel) {
+      // 每件天魂装备提供 战魂等级 × 5% 攻击加成
+      total += item.soulLevel * 5;
+    }
+  });
+
+  // 最大加成 150%
+  return Math.min(total, 150);
+}
+
+/**
+ * 计算地魂套装闪避加成
+ * 地魂套装：每件装备战魂等级 × 2%
+ * 最大加成：60%
+ * @param equipment 角色装备对象
+ * @returns 闪避加成百分比
+ */
+export function calculateDiHunSetBonus(equipment: CharacterData['equipment']): number {
+  let total = 0;
+  const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
+
+  slots.forEach(slot => {
+    const item = equipment[slot];
+    if (item && item.soulType === 2 && item.soulLevel) {
+      // 每件地魂装备提供 战魂等级 × 2% 闪避加成
+      total += item.soulLevel * 2;
+    }
+  });
+
+  // 最大加成 60%
+  return Math.min(total, 60);
+}
+
+/**
+ * 计算战魂PK赛战斗力加成
+ * PK赛加成：套装等级 × 5%
+ * @param equipment 角色装备对象
+ * @returns PK赛战斗力加成百分比
+ */
+export function calculateWarSoulPKCombatPower(equipment: CharacterData['equipment']): number {
+  const setInfo = checkWarSoulSet(equipment);
+  if (!setInfo.isActive) {
+    return 0;
+  }
+  // PK赛战斗力加成 = 套装等级 × 5%
+  return setInfo.setLevel * 5;
+}
+
+/**
  * 计算战魂战斗力加成
  * 根据参考文档：战魂等级提供额外战斗力加成
  * @param equipment 角色装备对象
@@ -214,7 +331,7 @@ export function calculateSoulCombatPower(equipment: CharacterData['equipment']):
 
   slots.forEach(slot => {
     const item = equipment[slot];
-    if (item && item.soulType && item.soulType > WarSoulType.NONE && item.soulLevel) {
+    if (item && item.soulType && item.soulType > 0 && item.soulLevel) {
       // 每级战魂提供1点战斗力
       total += item.soulLevel;
     }
@@ -256,129 +373,4 @@ export function calculateTotalCombatPower(character: CharacterData, pets?: Pet[]
   const petsPower = pets ? calculateAllPetsCombatPower(pets) : 0;
 
   return levelPower + equipmentBasePower + equipmentQualityPower + holeCountPower + gemPower + militaryRankPower + titlePower + fullSetMagicSoulBonus + soulPower + petsPower;
-}
-
-/**
- * 战魂套装信息接口
- * 定义战魂套装的激活状态和属性
- */
-export interface WarSoulSetInfo {
-  isActivated: boolean; // 是否激活套装效果
-  setType: WarSoulType; // 套装类型（TIAN_HUN或DI_HUN）
-  setLevel: number; // 套装等级（所有装备战魂等级最小值）
-}
-
-/**
- * 检查战魂套装是否激活
- * 根据参考文档：所有6件装备都拥有战魂属性且类型一致时激活套装效果
- * - 天魂套装：所有装备soulType=1，攻击力加成
- * - 地魂套装：所有装备soulType=2，闪避率加成
- * - 混合套装：无套装效果
- * @param equipment 角色装备对象
- * @returns 战魂套装信息
- */
-export function checkWarSoulSet(equipment: CharacterData['equipment']): WarSoulSetInfo {
-  // 默认返回：未激活
-  const defaultResult: WarSoulSetInfo = {
-    isActivated: false,
-    setType: WarSoulType.NONE,
-    setLevel: 0
-  };
-
-  // 获取所有6个装备槽位的装备
-  const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-  const equippedItems: EquipmentDetail[] = [];
-
-  for (const slot of slots) {
-    const item = equipment[slot];
-    if (!item) {
-      // 有槽位没有装备，无法激活套装
-      return defaultResult;
-    }
-    equippedItems.push(item);
-  }
-
-  // 检查是否所有装备都有战魂
-  const allHaveSoul = equippedItems.every(item => item.soulType && item.soulType > WarSoulType.NONE);
-  if (!allHaveSoul) {
-    return defaultResult;
-  }
-
-  // 检查是否所有装备战魂类型一致
-  const firstSoulType = equippedItems[0].soulType;
-  const allSameType = equippedItems.every(item => item.soulType === firstSoulType);
-  if (!allSameType) {
-    // 混合战魂，无套装效果
-    return defaultResult;
-  }
-
-  // 计算套装等级（所有装备战魂等级最小值）
-  const setLevel = Math.min(...equippedItems.map(item => item.soulLevel || 1));
-
-  return {
-    isActivated: true,
-    setType: firstSoulType as WarSoulType,
-    setLevel
-  };
-}
-
-/**
- * 计算天魂套装攻击加成
- * 根据参考文档：每件天魂装备提供 zhdj × 5% 的攻击力加成
- * 最大加成：6件 × 5级 × 5% = 150%
- * @param equipment 角色装备对象
- * @returns 攻击力百分比加成（如0.25表示25%）
- */
-export function calculateTianHunSetBonus(equipment: CharacterData['equipment']): number {
-  let bonus = 0;
-  const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-
-  slots.forEach(slot => {
-    const item = equipment[slot];
-    // 天魂战魂提供攻击力百分比加成
-    if (item && item.soulType === WarSoulType.TIAN_HUN && item.soulLevel) {
-      bonus += item.soulLevel * 0.05; // 每级天魂提供5%攻击加成
-    }
-  });
-
-  return bonus;
-}
-
-/**
- * 计算地魂套装闪避加成
- * 根据参考文档：每件地魂装备提供 zhdj × 2% 的闪避率加成
- * 最大加成：6件 × 5级 × 2% = 60%
- * @param equipment 角色装备对象
- * @returns 闪避率百分比加成
- */
-export function calculateDiHunSetBonus(equipment: CharacterData['equipment']): number {
-  let bonus = 0;
-  const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-
-  slots.forEach(slot => {
-    const item = equipment[slot];
-    // 地魂战魂提供闪避率加成
-    if (item && item.soulType === WarSoulType.DI_HUN && item.soulLevel) {
-      bonus += item.soulLevel * 2; // 每级地魂提供2%闪避加成
-    }
-  });
-
-  return bonus;
-}
-
-/**
- * 计算PK赛战魂套装战斗力加成
- * 根据参考文档：套装等级 × 5%
- * @param equipment 角色装备对象
- * @returns PK赛战斗力百分比加成（如0.25表示25%）
- */
-export function calculateWarSoulPKCombatPower(equipment: CharacterData['equipment']): number {
-  const setInfo = checkWarSoulSet(equipment);
-
-  if (!setInfo.isActivated) {
-    return 0;
-  }
-
-  // 套装等级 × 5%
-  return setInfo.setLevel * 0.05;
 }
