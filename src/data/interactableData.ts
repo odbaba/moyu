@@ -9,6 +9,7 @@ import type {
   EnemyData,
   EnemyInteractable,
   InteractableConfig,
+  MonsterTemplate,
   NPCInteractable,
 } from '../types';
 import { generateBossEnemyData } from '../utils/bossUtils';
@@ -267,4 +268,48 @@ export function generateBossInteractables(
  */
 export function getAllBossInteractableIds(): string[] {
   return bossSpawnConfigs.map(config => config.interactableId);
+}
+
+// ==================== 无名氏动态生成 ====================
+
+/**
+ * 生成无名氏敌人数据
+ * 无名氏等级 = max(玩家等级, 50)
+ * 属性根据等级动态计算：生命值=4000×等级，攻击=112.5~168×等级，防御=96×等级
+ * @param playerLevel 玩家等级
+ * @returns 无名氏敌人交互对象
+ */
+export function generateWumingshiInteractable(playerLevel: number): EnemyInteractable {
+  // 无名氏等级 = max(玩家等级, 50)
+  const wumingshiLevel = Math.max(playerLevel, 50);
+
+  // 获取无名氏模板
+  const template = monsterTemplates['wumingshi'];
+  if (!template) {
+    console.error('无名氏模板不存在');
+    throw new Error('无名氏模板不存在');
+  }
+
+  // 创建临时模板，使用计算后的等级
+  const dynamicTemplate: MonsterTemplate = {
+    ...template,
+    level: wumingshiLevel,
+    combatPower: 100 + wumingshiLevel, // 战斗力 = 100 + 等级
+  };
+
+  // 计算怪物属性
+  const monsterStats = calculateMonsterStats(dynamicTemplate);
+
+  // 生成战斗用的敌人列表
+  const enemies: EnemyData[] = generateEnemiesForBattle(monsterStats, 'spawn-zhanhun-wumingshi');
+
+  // 返回交互对象
+  return {
+    id: 'enemy_wumingshi',
+    type: 'enemy',
+    name: template.name,
+    icon: template.icon,
+    description: `${template.description}\n等级: ${wumingshiLevel} | 战斗力: ${dynamicTemplate.combatPower}`,
+    enemies,
+  };
 }

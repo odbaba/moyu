@@ -42,7 +42,7 @@ import { bossSpawnConfigs, bossTemplates } from './data/bossData';
 import { exampleCharacter } from './data/characterData';
 // 导入数据
 import { locations } from './data/gameData';
-import { generateBossInteractables, interactableConfig } from './data/interactableData';
+import { generateBossInteractables, generateWumingshiInteractable, interactableConfig } from './data/interactableData';
 import { exampleItems } from './data/inventoryData';
 import { examplePets } from './data/petData';
 import { getMeritReward } from './data/rankData';
@@ -452,8 +452,8 @@ function App() {
       setInteractionLog(prev => [...prev, `你移动到了${location.name}`]);
 
       // 检测到达卡萨诺城时是否触发探险家解锁
-      // 条件：未解锁 + 全身6件装备都是极品品质
-      if (locationId === 'kasanuocheng' && !explorerUnlocked) {
+      // 条件：未解锁 + 全身6件装备都是极品品质 + 战魂系统未开启
+      if (locationId === 'kasanuocheng' && !explorerUnlocked && !warSoulSystemEnabled) {
         if (checkAllEquipmentLegendary(equippedItems)) {
           // 在日志区打印提示
           setInteractionLog(prev => [...prev, '飞翔：噢，你的全身装备都是极品啊，看来这位你是位不同寻常的人。听装备打造师说从戈壁可以找到有关战魂的秘密...你应该去看一看。']);
@@ -2436,7 +2436,7 @@ function App() {
 
     setPets(prev => prev.map(pet =>
       pet.id === petId
-        ? { ...pet, isDeployed: true }
+        ? { ...pet, isDeployed: true, isMerged: true } // 出征时自动进入合体状态
         : pet
     ));
   };
@@ -2889,11 +2889,10 @@ function App() {
     // 根据状态显示神秘人或无名氏
     if (currentLocation === 'zhanhun-fengyin-migong' && !wumingshiDefeated) {
       if (mysteriousPersonTriggered) {
-        // 神秘人已触发，显示无名氏敌人
-        const wumingshi = interactableConfig['enemy_wumingshi'];
-        if (wumingshi) {
-          dynamicInteractables.push(wumingshi as EnemyInteractable);
-        }
+        // 神秘人已触发，动态生成无名氏敌人（等级根据玩家等级计算）
+        // 无名氏等级 = max(玩家等级, 50)
+        const wumingshi = generateWumingshiInteractable(character.level);
+        dynamicInteractables.push(wumingshi);
       } else {
         // 神秘人未触发，显示神秘人NPC
         const mysteriousPerson = interactableConfig['npc_mysterious_person'];
@@ -2904,7 +2903,7 @@ function App() {
     }
 
     return [...staticInteractables, ...locationBossInteractables.filter(Boolean), ...dynamicInteractables] as (ActionInteractable | EnemyInteractable | NPCInteractable)[];
-  }, [currentLoc, killedMonsters, bossInteractables, spawnedBosses, currentLocation, explorerUnlocked, mysteriousPersonTriggered, wumingshiDefeated]);
+  }, [currentLoc, killedMonsters, bossInteractables, spawnedBosses, currentLocation, explorerUnlocked, mysteriousPersonTriggered, wumingshiDefeated, character.level]);
 
   // 计算带幻兽合体加成的角色数据
   // 同时使用最新的装备槽位数据作为 equipment 字段
