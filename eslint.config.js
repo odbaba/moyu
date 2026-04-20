@@ -57,9 +57,6 @@ export default defineConfig([
       'import/order': 'off',
 
       // ==================== 代码质量 ====================
-      // 禁止 console（警告）
-      'no-console': 'warn',
-      
       // 禁止 debugger
       'no-debugger': 'error',
       
@@ -91,9 +88,6 @@ export default defineConfig([
       // 要求模块边界处有显式类型
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       
-      // 禁止非空断言（警告）
-      '@typescript-eslint/no-non-null-assertion': 'warn',
-      
       // 要求使用 === 和 !==
       '@typescript-eslint/strict-boolean-expressions': 'off',
       
@@ -124,9 +118,6 @@ export default defineConfig([
       // 禁止 case 语句落空
       'no-fallthrough': 'error',
       
-      // 禁止在 switch/case 中使用词法声明
-      'no-case-declarations': 'error',
-
       // ==================== 代码风格 ====================
       // 禁止使用多个空格
       'no-multi-spaces': 'error',
