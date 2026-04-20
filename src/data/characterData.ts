@@ -1,5 +1,5 @@
-import { WarSoulType } from '../types';
 import type { CharacterData, EquipmentDetail, PrincessRelationship } from '../types';
+import { WarSoulType } from '../types';
 import { CHARACTER_BASE_STATS, CHARACTER_GROWTH_RATES } from '../utils/attributeCalculator';
 import { calculateTotalCombatPower } from '../utils/combatPower';
 import { examplePets } from './petData';

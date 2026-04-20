@@ -1,5 +1,5 @@
-import { WarSoulType } from '../types';
 import type { EquipmentDetail, EquipmentItem, EquipmentQuality, EquipmentSlotType, GemAttribute } from '../types';
+import { WarSoulType } from '../types';
 
 /**
  * 装备品质映射（EquipmentItem 的 equipmentQuality 到 EquipmentDetail 的 quality）

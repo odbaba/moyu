@@ -5,8 +5,8 @@
  */
 
 import { calculateEquipmentBaseAttributes, getEquipmentName } from '../data/equipmentNames';
-import { WarSoulType } from '../types';
 import type { EquipmentItem, EquipmentQuality, GemItem, RefineResult } from '../types';
+import { WarSoulType } from '../types';
 
 /**
  * 装备类型名称列表
@@ -297,6 +297,7 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
       if (currentSoulLevel < 5) {
         equipment.soulLevel = currentSoulLevel + 1;
         soulLevelChange = 1;
+
         return {
           success: true,
           message: `使用魔魂之心精炼成功！魔魂等级提升为+${currentLevel + 1}。魔魂等级提升到了12级使得装备能量提升，战魂等级提高一级。`,
@@ -350,6 +351,7 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
       if (currentSoulLevel < 5) {
         equipment.soulLevel = currentSoulLevel + 1;
         soulLevelChange = 1;
+
         return {
           success: true,
           message: `精炼成功！魔魂等级提升为+${currentLevel + 1}。魔魂等级提升到了12级使得装备能量提升，战魂等级提高一级。`,

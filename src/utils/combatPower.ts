@@ -218,7 +218,7 @@ interface WarSoulSetInfo {
  */
 export function checkWarSoulSet(equipment: CharacterData['equipment']): WarSoulSetInfo {
   const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-  
+
   // 获取所有装备
   const equippedItems: EquipmentDetail[] = [];
   slots.forEach(slot => {
@@ -251,10 +251,10 @@ export function checkWarSoulSet(equipment: CharacterData['equipment']): WarSoulS
   const soulLevels = equippedItems.map(item => item.soulLevel || 0);
   const setLevel = Math.min(...soulLevels);
 
-  return { 
-    isActive: true, 
-    setType: firstSoulType || 0, 
-    setLevel 
+  return {
+    isActive: true,
+    setType: firstSoulType || 0,
+    setLevel
   };
 }
 
@@ -315,6 +315,7 @@ export function calculateWarSoulPKCombatPower(equipment: CharacterData['equipmen
   if (!setInfo.isActive) {
     return 0;
   }
+
   // PK赛战斗力加成 = 套装等级 × 5%
   return setInfo.setLevel * 5;
 }

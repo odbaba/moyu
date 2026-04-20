@@ -1,5 +1,5 @@
-import { WarSoulType } from '../types';
 import type { CharacterData, EquipmentDetail, EquipmentSlotType } from '../types';
+import { WarSoulType } from '../types';
 
 /**
  * 装备基础属性系数配置
