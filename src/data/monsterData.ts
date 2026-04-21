@@ -425,6 +425,69 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     baseDefense: 300,
     growthDefense: 45,
   },
+
+  // ========== 雪域边境怪物 ==========
+  // 冰雪巨人士兵：雪域边境的基础怪物，击杀获得500战功
+  // 属性来源：reference/scripts/DefineSprite_118_选择怪物/frame_25/DoAction.as
+  'bingxue-juren-shibing': {
+    id: 'bingxue-juren-shibing',
+    name: '冰雪巨人士兵',
+    type: 'normal',
+    level: 200,
+    combatPower: 100,
+    location: 'xueyu-bianjing',
+    icon: '🧊',
+    description: '雪域边境的魔族士兵，击杀后获得500点战功。',
+    baseHp: 10000,
+    growthHp: 200,
+    baseAttackMin: 500,
+    growthAttackMin: 55,
+    baseAttackMax: 500,
+    growthAttackMax: 88,
+    baseDefense: 500,
+    growthDefense: 40,
+  },
+  // 冰雪巨人士官：雪域边境的中级怪物，击杀获得2000战功
+  // 属性来源：reference/scripts/DefineSprite_118_选择怪物/frame_26/DoAction.as
+  'bingxue-juren-shiguan': {
+    id: 'bingxue-juren-shiguan',
+    name: '冰雪巨人士官',
+    type: 'normal',
+    level: 400,
+    combatPower: 200,
+    location: 'xueyu-bianjing',
+    icon: '❄️',
+    description: '雪域边境的魔族士官，击杀后获得2000点战功，有概率掉落战魂之心。',
+    baseHp: 10000,
+    growthHp: 200,
+    baseAttackMin: 500,
+    growthAttackMin: 55,
+    baseAttackMax: 500,
+    growthAttackMax: 88,
+    baseDefense: 500,
+    growthDefense: 40,
+  },
+  // 冰雪巨人军官：雪域边境的高级怪物，击杀获得5000战功
+  // 属性来源：reference/scripts/DefineSprite_118_选择怪物/frame_27/DoAction.as
+  'bingxue-juren-junguan': {
+    id: 'bingxue-juren-junguan',
+    name: '冰雪巨人军官',
+    type: 'special',
+    level: 500,
+    combatPower: 500,
+    location: 'xueyu-bianjing',
+    icon: '👑',
+    description: '雪域边境的魔族军官，击杀后获得5000点战功，必定掉落战魂之心。',
+    baseHp: 10000,
+    growthHp: 200,
+    baseAttackMin: 500,
+    growthAttackMin: 55,
+    baseAttackMax: 500,
+    growthAttackMax: 88,
+    baseDefense: 500,
+    growthDefense: 40,
+  },
+
   // 无名氏：战魂封印迷宫的特殊怪物，击败后获得战魂之心
   // 属性根据玩家等级动态计算：等级=max(玩家等级,50)，生命值=4000×等级，攻击=112.5~168×等级，防御=96×等级
   'wumingshi': {
@@ -444,6 +507,68 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     growthAttackMax: 168, // 最大攻击 = 168 × 等级
     baseDefense: 0,
     growthDefense: 96, // 防御 = 96 × 等级
+  },
+
+  // ========== 地下城怪物 ==========
+  // 地下城蝎怪：地下城1层怪物，等级动态等于玩家等级，战斗力也等于玩家等级
+  // 属性来源：reference/docs/project_docs/04_怪物系统.md
+  'dixiacheng-xieguai': {
+    id: 'dixiacheng-xieguai',
+    name: '地下城蝎怪',
+    type: 'dungeon',
+    level: 1, // 基础等级，实际等级在战斗时动态计算为玩家等级
+    combatPower: 1, // 基础战斗力，实际战斗力在战斗时动态计算为玩家等级
+    location: 'dixiacheng-1',
+    icon: '🦂',
+    description: '地下城1层的守卫蝎怪，等级和战斗力会根据你的等级动态调整。',
+    baseHp: 1000,
+    growthHp: 300,
+    baseAttackMin: 300,
+    growthAttackMin: 50,
+    baseAttackMax: 300,
+    growthAttackMax: 88,
+    baseDefense: 300,
+    growthDefense: 45,
+  },
+  // 地下城骑士亡魂：地下城2层怪物，150级，战斗力200
+  // 属性来源：reference/docs/project_docs/04_怪物系统.md
+  'dixiacheng-qishiwanghun': {
+    id: 'dixiacheng-qishiwanghun',
+    name: '骑士亡魂',
+    type: 'dungeon',
+    level: 150,
+    combatPower: 200,
+    location: 'dixiacheng-2',
+    icon: '👻',
+    description: '地下城2层的亡魂骑士，曾经是英勇的骑士，死后被魔族操控。特殊掉落：战魂晶石。',
+    baseHp: 10000,
+    growthHp: 400,
+    baseAttackMin: 500,
+    growthAttackMin: 75,
+    baseAttackMax: 500,
+    growthAttackMax: 112,
+    baseDefense: 500,
+    growthDefense: 64,
+  },
+  // 呖风火龙兽：地下城3层怪物，800级，游戏中最强怪物之一
+  // 属性来源：reference/scripts/frame_30/PlaceObject2_1074_6/CLIPACTIONRECORD onClipEvent(load).as
+  'lifeng-huolongshou': {
+    id: 'lifeng-huolongshou',
+    name: '呖风火龙兽',
+    type: 'dungeon',
+    level: 800,
+    combatPower: 800,
+    location: 'dixiacheng-3',
+    icon: '🐉',
+    description: '地下城3层的终极BOSS，游戏中最强大的怪物之一，击败它可救出国王。',
+    baseHp: 10000,
+    growthHp: 400,
+    baseAttackMin: 500,
+    growthAttackMin: 20,
+    baseAttackMax: 500,
+    growthAttackMax: 30,
+    baseDefense: 500,
+    growthDefense: 25,
   },
 };
 
@@ -747,6 +872,53 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     interactableId: 'interact-shenyuan-random2',
   },
 
+  // ========== 雪域边境怪物刷新配置（5个怪物按钮）==========
+  // 冰雪巨人士兵1（gw_xybj_1，国王救出后隐藏）
+  {
+    id: 'spawn-xueyu-shibing-1',
+    templateId: 'bingxue-juren-shibing',
+    location: 'xueyu-bianjing',
+    spawnVariable: 'gw_xybj_1',
+    isSpawned: true,
+    interactableId: 'interact-xueyu-shibing-1',
+  },
+  // 冰雪巨人士兵2（gw_xybj_2，国王救出后隐藏）
+  {
+    id: 'spawn-xueyu-shibing-2',
+    templateId: 'bingxue-juren-shibing',
+    location: 'xueyu-bianjing',
+    spawnVariable: 'gw_xybj_2',
+    isSpawned: true,
+    interactableId: 'interact-xueyu-shibing-2',
+  },
+  // 冰雪巨人士官1（gw_xybj_3，国王救出后隐藏）
+  {
+    id: 'spawn-xueyu-shiguan-1',
+    templateId: 'bingxue-juren-shiguan',
+    location: 'xueyu-bianjing',
+    spawnVariable: 'gw_xybj_3',
+    isSpawned: true,
+    interactableId: 'interact-xueyu-shiguan-1',
+  },
+  // 冰雪巨人军官（gw_xybj_4，始终可见）
+  {
+    id: 'spawn-xueyu-junguan',
+    templateId: 'bingxue-juren-junguan',
+    location: 'xueyu-bianjing',
+    spawnVariable: 'gw_xybj_4',
+    isSpawned: true,
+    interactableId: 'interact-xueyu-junguan',
+  },
+  // 冰雪巨人士官2（gw_xybj_5，国王救出后隐藏）
+  {
+    id: 'spawn-xueyu-shiguan-2',
+    templateId: 'bingxue-juren-shiguan',
+    location: 'xueyu-bianjing',
+    spawnVariable: 'gw_xybj_5',
+    isSpawned: true,
+    interactableId: 'interact-xueyu-shiguan-2',
+  },
+
   // ========== 战魂封印迷宫怪物刷新配置 ==========
   // 无名氏（特殊怪物，击败后获得战魂之心）
   // 注意：此怪物不通过静态配置显示，而是在神秘人NPC交互后动态显示
@@ -757,6 +929,59 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     spawnVariable: 'zhanhun_wumingshi',
     isSpawned: false, // 初始不刷新，通过神秘人NPC触发
     interactableId: 'enemy_wumingshi',
+  },
+
+  // ========== 地下城怪物刷新配置 ==========
+  // 地下城1层：3个地下城蝎怪
+  {
+    id: 'spawn-dxc1-xieguai-1',
+    templateId: 'dixiacheng-xieguai',
+    location: 'dixiacheng-1',
+    spawnVariable: 'rw_gw1_1',
+    isSpawned: true,
+    interactableId: 'interact-dxc1-xieguai-1',
+  },
+  {
+    id: 'spawn-dxc1-xieguai-2',
+    templateId: 'dixiacheng-xieguai',
+    location: 'dixiacheng-1',
+    spawnVariable: 'rw_gw1_2',
+    isSpawned: true,
+    interactableId: 'interact-dxc1-xieguai-2',
+  },
+  {
+    id: 'spawn-dxc1-xieguai-3',
+    templateId: 'dixiacheng-xieguai',
+    location: 'dixiacheng-1',
+    spawnVariable: 'rw_gw1_3',
+    isSpawned: true,
+    interactableId: 'interact-dxc1-xieguai-3',
+  },
+  // 地下城2层：2个骑士亡魂
+  {
+    id: 'spawn-dxc2-qishiwanghun-1',
+    templateId: 'dixiacheng-qishiwanghun',
+    location: 'dixiacheng-2',
+    spawnVariable: 'rw_gw2_1',
+    isSpawned: true,
+    interactableId: 'interact-dxc2-qishiwanghun-1',
+  },
+  {
+    id: 'spawn-dxc2-qishiwanghun-2',
+    templateId: 'dixiacheng-qishiwanghun',
+    location: 'dixiacheng-2',
+    spawnVariable: 'rw_gw2_2',
+    isSpawned: true,
+    interactableId: 'interact-dxc2-qishiwanghun-2',
+  },
+  // 地下城3层：1个呖风火龙兽
+  {
+    id: 'spawn-dxc3-huolongshou-1',
+    templateId: 'lifeng-huolongshou',
+    location: 'dixiacheng-3',
+    spawnVariable: 'rw_gw3_1',
+    isSpawned: true,
+    interactableId: 'interact-dxc3-huolongshou-1',
   },
 ];
 

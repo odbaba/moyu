@@ -161,17 +161,6 @@ export function getMeritReward(enemyId: string): number {
   return MERIT_REWARDS[enemyId] || 0;
 }
 
-/**
- * 计算战功奖励
- * 普通怪物根据等级计算战功
- * @param enemyLevel 敌人等级
- * @returns 战功值
- */
-export function calculateBattleExpReward(enemyLevel: number): number {
-  // 基础战功 = 敌人等级 × 10
-  return Math.floor(enemyLevel * 10);
-}
-
 // ========== 爵位奖励配置 ==========
 
 /**

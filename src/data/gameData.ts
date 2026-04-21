@@ -254,8 +254,14 @@ export const locations: LocationData = [
     name: '雪域边境',
     description: '雪域边境是亚特大陆的最北端，终年积雪。',
     adjacentLocations: ['binggong'],
-    // 雪域边境：无特殊交互
-    interactables: [],
+    // 雪域边境：5个怪物按钮（冰雪巨人士兵x2、冰雪巨人士官x2、冰雪巨人军官x1）
+    interactables: [
+      'interact-xueyu-shibing-1',
+      'interact-xueyu-shibing-2',
+      'interact-xueyu-shiguan-1',
+      'interact-xueyu-junguan',
+      'interact-xueyu-shiguan-2',
+    ],
     x: 4,
     y: 3
   },
@@ -268,6 +274,39 @@ export const locations: LocationData = [
     interactables: [], // 初始为空，根据状态动态显示神秘人或无名氏
     x: 10, // 独立坐标
     y: 5,
+  },
+  // 地下城1层：独立地点，只能通过日常任务官传送进入
+  {
+    id: 'dixiacheng-1',
+    name: '地下城1层',
+    description: '地下城的第一层，守卫着三只凶猛的蝎怪。消灭它们才能进入下一层。',
+    adjacentLocations: ['dixiacheng-2'], // 仅与地下城2层连通，与主地图不连通
+    // 地下城1层：3个地下城蝎怪交互按钮
+    interactables: ['interact-dxc1-xieguai-1', 'interact-dxc1-xieguai-2', 'interact-dxc1-xieguai-3'],
+    x: 7,
+    y: 2,
+  },
+  // 地下城2层：独立地点，与地下城1层和3层连通
+  {
+    id: 'dixiacheng-2',
+    name: '地下城2层',
+    description: '地下城的第二层，徘徊着两个骑士亡魂。消灭它们才能进入最终层。',
+    adjacentLocations: ['dixiacheng-1', 'dixiacheng-3'], // 与1层和3层连通，与主地图不连通
+    // 地下城2层：2个骑士亡魂交互按钮
+    interactables: ['interact-dxc2-qishiwanghun-1', 'interact-dxc2-qishiwanghun-2'],
+    x: 8,
+    y: 2,
+  },
+  // 地下城3层：独立地点，与地下城2层连通
+  {
+    id: 'dixiacheng-3',
+    name: '地下城3层',
+    description: '地下城的最终层，传说中的呖风火龙兽在此守护着被囚禁的国王。',
+    adjacentLocations: ['dixiacheng-2'], // 仅与地下城2层连通，与主地图不连通
+    // 地下城3层：1个呖风火龙兽交互按钮
+    interactables: ['interact-dxc3-huolongshou-1'],
+    x: 9,
+    y: 2,
   }
 ];
 
@@ -298,7 +337,11 @@ export const connections = [
 
   // y=3 横向
   ['mimeng-zhaozhe', 'binggong'],
-  ['binggong', 'xueyu-bianjing']
+  ['binggong', 'xueyu-bianjing'],
+
+  // 地下城之间横向连接
+  ['dixiacheng-1', 'dixiacheng-2'],
+  ['dixiacheng-2', 'dixiacheng-3']
 ];
 
 /**

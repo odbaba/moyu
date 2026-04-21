@@ -94,8 +94,8 @@ export function getEnemyCount(monsterLevel: number, monsterType: MonsterType): n
  * @returns 是否为特殊怪物
  */
 export function isSpecialMonster(monsterType: MonsterType): boolean {
-  // boss 或 special 类型为特殊怪物
-  return monsterType === 'boss' || monsterType === 'special';
+  // boss、special 或 dungeon 类型为特殊怪物
+  return monsterType === 'boss' || monsterType === 'special' || monsterType === 'dungeon';
 }
 
 /**

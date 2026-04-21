@@ -16,11 +16,13 @@ import type {
   EnemyTemplate,
   GridPosition,
   Pet,
-  SkillDetail} from '../types';
+  SkillDetail,
+} from '../types';
+import { WarSoulType } from '../types';
 // 导入角色属性计算函数
 import { calculateTotalCharacterAttributes } from './attributeCalculator';
 // 导入战斗力计算函数
-import { calculateTotalCombatPower } from './combatPower';
+import { calculateTotalCombatPower, type WarSoulSetInfo } from './combatPower';
 
 /**
  * 技能数据转换为战斗技能数据
@@ -130,7 +132,8 @@ export function createEnemyFromTemplate(
   template: EnemyTemplate,
   level: number,
   index: number,
-  gridPosition: GridPosition
+  gridPosition: GridPosition,
+  warSoulSetInfo?: WarSoulSetInfo
 ): BattleCharacter {
   // 生成唯一ID
   const id = `${template.id}_${index}`;
@@ -174,6 +177,31 @@ export function createEnemyFromTemplate(
     gridPosition: gridPosition
   };
 
+  // 应用战魂套装压制效果
+  if (warSoulSetInfo && warSoulSetInfo.isActive) {
+    if (warSoulSetInfo.setType === WarSoulType.TIAN_HUN) {
+      // 天魂套装：降低怪物战斗力（套装等级×2%，最大10%）
+      const suppressionRate = Math.min(warSoulSetInfo.setLevel * 0.02, 0.10);
+      enemy.originalCombatPower = enemy.combatPower; // 保存原始值
+      enemy.combatPower = Math.round(enemy.combatPower * (1 - suppressionRate));
+      enemy.warSoulSuppression = {
+        type: 'combatPower',
+        percentage: suppressionRate
+      };
+    } else if (warSoulSetInfo.setType === WarSoulType.DI_HUN) {
+      // 地魂套装：降低怪物生命值（套装等级×5%，最大25%）
+      const suppressionRate = Math.min(warSoulSetInfo.setLevel * 0.05, 0.25);
+      enemy.originalMaxHp = enemy.maxHp; // 保存原始值
+      enemy.maxHp = Math.round(enemy.maxHp * (1 - suppressionRate));
+      enemy.currentHp = enemy.maxHp; // 当前生命值也同步调整
+      // 设置战魂套装压制信息，用于UI展示
+      enemy.warSoulSuppression = {
+        type: 'hp',
+        percentage: suppressionRate
+      };
+    }
+  }
+
   return enemy;
 }
 
@@ -182,7 +210,7 @@ export function createEnemyFromTemplate(
  * @param params 战斗初始化参数
  * @returns 战斗状态数据
  */
-export function createBattleState(params: BattleInitParams): BattleState {
+export function createBattleState(params: BattleInitParams, warSoulSetInfo?: WarSoulSetInfo): BattleState {
   const { playerData, playerSkills, enemyTemplate, enemyLevel, enemyCount, pets } = params;
 
   // 创建玩家战斗角色（玩家位置固定在九宫格中心）
@@ -216,7 +244,8 @@ export function createBattleState(params: BattleInitParams): BattleState {
       enemyTemplate,
       enemyLevel,
       i,
-      enemyPositions[i]
+      enemyPositions[i],
+      warSoulSetInfo
     );
     enemies.push(enemy);
   }
@@ -301,7 +330,8 @@ export function petToBattlePet(
 export function createEnemyFromEnemyData(
   enemyData: EnemyData,
   index: number,
-  gridPosition: GridPosition
+  gridPosition: GridPosition,
+  warSoulSetInfo?: WarSoulSetInfo
 ): BattleCharacter {
   // 使用 enemyData.id 作为唯一ID（已经由 generateEnemiesForBattle 生成唯一ID）
   const id = enemyData.id || `enemy_${Date.now()}_${index}`;
@@ -352,6 +382,31 @@ export function createEnemyFromEnemyData(
     gridPosition: gridPosition
   };
 
+  // 应用战魂套装压制效果
+  if (warSoulSetInfo && warSoulSetInfo.isActive) {
+    if (warSoulSetInfo.setType === WarSoulType.TIAN_HUN) {
+      // 天魂套装：降低怪物战斗力（套装等级×2%，最大10%）
+      const suppressionRate = Math.min(warSoulSetInfo.setLevel * 0.02, 0.10);
+      enemy.originalCombatPower = enemy.combatPower; // 保存原始值
+      enemy.combatPower = Math.round(enemy.combatPower * (1 - suppressionRate));
+      enemy.warSoulSuppression = {
+        type: 'combatPower',
+        percentage: suppressionRate
+      };
+    } else if (warSoulSetInfo.setType === WarSoulType.DI_HUN) {
+      // 地魂套装：降低怪物生命值（套装等级×5%，最大25%）
+      const suppressionRate = Math.min(warSoulSetInfo.setLevel * 0.05, 0.25);
+      enemy.originalMaxHp = enemy.maxHp; // 保存原始值
+      enemy.maxHp = Math.round(enemy.maxHp * (1 - suppressionRate));
+      enemy.currentHp = enemy.maxHp; // 当前生命值也同步调整
+      // 设置战魂套装压制信息，用于UI展示
+      enemy.warSoulSuppression = {
+        type: 'hp',
+        percentage: suppressionRate
+      };
+    }
+  }
+
   return enemy;
 }
 
@@ -395,7 +450,8 @@ export function createBattleStateFromEnemies(
   playerData: CharacterData,
   playerSkills: SkillDetail[],
   enemiesData: EnemyData[],
-  pets?: Pet[]
+  pets?: Pet[],
+  warSoulSetInfo?: WarSoulSetInfo
 ): BattleState {
   // 创建玩家战斗角色（玩家位置固定在九宫格中心）
   const player = characterToBattleCharacter(
@@ -427,7 +483,8 @@ export function createBattleStateFromEnemies(
     const enemy = createEnemyFromEnemyData(
       enemiesData[i],
       i,
-      enemyPositions[i]
+      enemyPositions[i],
+      warSoulSetInfo
     );
     enemies.push(enemy);
   }

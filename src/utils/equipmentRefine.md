@@ -382,35 +382,56 @@ console.log(result);
 
 战魂套装需要所有6件装备都拥有战魂属性且类型一致：
 
-| 套装类型 | 条件 | 效果 | 最大加成 |
+| 套装类型 | 条件 | 效果 | 最大压制 |
 |----------|------|------|----------|
-| 天魂套装 | 6件装备soulType=1 | 攻击力+每件战魂等级×5% | 150% |
-| 地魂套装 | 6件装备soulType=2 | 闪避率+每件战魂等级×2% | 60% |
+| 天魂套装 | 6件装备soulType=1 | 降低怪物战斗力（套装等级×2%） | 10% |
+| 地魂套装 | 6件装备soulType=2 | 降低怪物生命值（套装等级×5%） | 25% |
 | 混合套装 | 不同类型战魂 | 无套装效果 | - |
 
 套装等级 = 所有装备战魂等级中的最小值
 
-PK赛战斗力加成 = 套装等级 × 5%（最高25%）
+天魂套装压制 = 套装等级 × 2%（最高10%），对怪物战斗力压制
+地魂套装压制 = 套装等级 × 5%（最高25%），对怪物生命值压制
 
 ```typescript
-import { checkWarSoulSet, calculateTianHunSetBonus, calculateDiHunSetBonus, calculateWarSoulPKCombatPower } from '@/utils/combatPower';
+import { checkWarSoulSet, calculateTianHunSetSuppression, calculateDiHunSetSuppression, WarSoulSetInfo } from '@/utils/combatPower';
 
 // 检查战魂套装
 const setInfo = checkWarSoulSet(character.equipment);
 console.log(setInfo);
 // { isActivated: true, setType: WarSoulType.TIAN_HUN, setLevel: 3 }
 
-// 计算天魂套装攻击加成
-const attackBonus = calculateTianHunSetBonus(character.equipment);
-console.log(attackBonus); // 0.15 (15%)
+// 计算天魂套装对怪物的战斗力压制
+const combatSuppression = calculateTianHunSetSuppression(character.equipment);
+console.log(combatSuppression); // 0.06 (6%)
 
-// 计算地魂套装闪避加成
-const dodgeBonus = calculateDiHunSetBonus(character.equipment);
-console.log(dodgeBonus); // 0 (无地魂装备)
+// 计算地魂套装对怪物的生命值压制
+const hpSuppression = calculateDiHunSetSuppression(character.equipment);
+console.log(hpSuppression); // 0 (无地魂装备)
+```
 
-// 计算PK赛战斗力加成
-const pkBonus = calculateWarSoulPKCombatPower(character.equipment);
-console.log(pkBonus); // 0.15 (15%)
+### 战斗中怪物详情弹窗显示压制信息
+
+在战斗中查看怪物详情弹窗时，如果玩家拥有战魂套装，弹窗中会显示压制信息：
+
+- **天魂套装激活时**：显示"怪物战斗力压制：X%"，怪物实际战斗力 = 原始战斗力 × (1 - 压制比例)
+- **地魂套装激活时**：显示"怪物生命值压制：X%"，怪物实际生命值 = 原始生命值 × (1 - 压制比例)
+- **无套装时**：不显示压制信息
+
+```typescript
+// 在怪物详情弹窗中计算并显示压制效果
+const setInfo = checkWarSoulSet(character.equipment);
+if (setInfo.isActivated) {
+  if (setInfo.setType === WarSoulType.TIAN_HUN) {
+    const suppression = calculateTianHunSetSuppression(character.equipment);
+    // 显示：怪物战斗力压制：6%
+    // 怪物实际战斗力 = 怪物原始战斗力 × (1 - 0.06)
+  } else if (setInfo.setType === WarSoulType.DI_HUN) {
+    const suppression = calculateDiHunSetSuppression(character.equipment);
+    // 显示：怪物生命值压制：15%
+    // 怪物实际生命值 = 怪物原始生命值 × (1 - 0.15)
+  }
+}
 ```
 
 ## 注意事项
@@ -425,7 +446,7 @@ console.log(pkBonus); // 0.15 (15%)
 8. **魔魂12级战魂**：魔魂升至12级时战魂等级+1（需战魂系统已开启）
 9. **摘除宝石**：摘除宝石会使战魂等级降为1（如果等级>1）
 10. **战魂系统开关**：使用战魂相关功能前需先击败无名氏开启战魂系统
-11. **战魂套装**：6件装备战魂类型一致时激活套装效果
+11. **战魂套装**：6件装备战魂类型一致时激活套装效果，天魂套装降低怪物战斗力，地魂套装降低怪物生命值
 
 ## 错误处理
 

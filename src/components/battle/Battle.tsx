@@ -7,6 +7,7 @@ import type {
   BattleCharacter, BattleLogEntry, BattlePet,
   BattleResult, BattleSkill,
   BattleState, Buff, CharacterData, DamageResult, EnemyData, GridPosition, Pet, SkillDetail} from '../../types';
+import { WarSoulType } from '../../types';
 // 导入角色属性计算函数
 import { calculateTotalCharacterAttributes } from '../../utils/attributeCalculator';
 // 导入战斗适配器工具
@@ -21,7 +22,7 @@ import {
   generateLogId,
   removeExpiredBuffs} from '../../utils/battleCalculator';
 // 导入战斗力计算函数
-import { calculateTotalCombatPower } from '../../utils/combatPower';
+import { calculateTotalCombatPower, checkWarSoulSet, type WarSoulSetInfo } from '../../utils/combatPower';
 import PetDetailModal from '../pet/PetDetailModal';
 import ActionButtons from './ActionButtons';
 import BattleLog from './BattleLog';
@@ -110,6 +111,15 @@ const Battle: React.FC<BattleProps> = ({
   // 详情类型：'character' | 'pet' | 'enemy'
   const [detailType, setDetailType] = useState<'character' | 'pet' | 'enemy' | null>(null);
 
+  // 战魂套装信息状态，用于对怪物属性压制和传递给敌人详情弹窗
+  const [warSoulSetInfo, setWarSoulSetInfo] = useState<WarSoulSetInfo | null>(null);
+
+  // 监听装备变化，更新战魂套装信息
+  useEffect(() => {
+    const setInfo = checkWarSoulSet(playerData.equipment);
+    setWarSoulSetInfo(setInfo);
+  }, [playerData.equipment]);
+
   /**
    * 获取九宫格上方位置坐标数组
    * @param count - 需要的位置数量（1-9）
@@ -148,17 +158,43 @@ const Battle: React.FC<BattleProps> = ({
       deployedPets
     );
 
+    // 检查战魂套装状态，用于对怪物属性压制
+    const currentWarSoulSetInfo = checkWarSoulSet(playerData.equipment);
+
     let enemies: BattleCharacter[] = [];
 
     // 优先使用 enemiesData 创建敌人（怪物系统）
     if (enemiesData && enemiesData.length > 0) {
       const positions = getGridPositions(enemiesData.length);
       enemies = enemiesData.map((enemyData, index) => {
-        return createEnemyFromEnemyData(enemyData, index, positions[index] || { x: 0, y: 0 });
+        return createEnemyFromEnemyData(enemyData, index, positions[index] || { x: 0, y: 0 }, currentWarSoulSetInfo);
       });
     } else {
       // 使用模板创建敌人（原有逻辑）
       enemies = createEnemiesForBattle(enemyTemplateId, enemyLevel, enemyCount);
+      // createEnemiesForBattle 不经过 battleAdapter，需要手动应用战魂套装压制效果
+      if (currentWarSoulSetInfo.isActive) {
+        enemies = enemies.map(enemy => {
+          const suppressedEnemy = { ...enemy };
+          if (currentWarSoulSetInfo.setType === WarSoulType.TIAN_HUN) {
+            // 天魂套装：降低怪物战斗力（套装等级×2%，最大10%）
+            const suppressionRate = Math.min(currentWarSoulSetInfo.setLevel * 0.02, 0.10);
+            suppressedEnemy.originalCombatPower = enemy.combatPower;
+            suppressedEnemy.combatPower = Math.round(enemy.combatPower * (1 - suppressionRate));
+            suppressedEnemy.warSoulSuppression = { type: 'combatPower', percentage: suppressionRate };
+          } else if (currentWarSoulSetInfo.setType === WarSoulType.DI_HUN) {
+            // 地魂套装：降低怪物生命值（套装等级×5%，最大25%）
+            const suppressionRate = Math.min(currentWarSoulSetInfo.setLevel * 0.05, 0.25);
+            suppressedEnemy.originalMaxHp = enemy.maxHp;
+            suppressedEnemy.maxHp = Math.round(enemy.maxHp * (1 - suppressionRate));
+            suppressedEnemy.currentHp = suppressedEnemy.maxHp;
+            // 设置战魂套装压制信息，用于UI展示
+            suppressedEnemy.warSoulSuppression = { type: 'hp', percentage: suppressionRate };
+          }
+
+          return suppressedEnemy;
+        });
+      }
     }
 
     // ========== 幻兽初始化逻辑 ==========
@@ -189,6 +225,40 @@ const Battle: React.FC<BattleProps> = ({
       });
     }
 
+    // 添加战魂套装压制提示日志
+    const initialLogs: BattleLogEntry[] = [];
+    if (currentWarSoulSetInfo.isActive) {
+      if (currentWarSoulSetInfo.setType === WarSoulType.TIAN_HUN) {
+        // 天魂套装压制提示
+        const suppressionPercent = Math.min(currentWarSoulSetInfo.setLevel * 2, 10);
+        initialLogs.push({
+          id: generateLogId(),
+          round: 0,
+          actor: '战魂套装',
+          actorId: 'war_soul_set',
+          action: `在天魂战魂的神圣力量下，所有敌人的战斗力下降${suppressionPercent}%。`,
+          actionType: 'buff',
+          damage: 0,
+          target: '所有敌人',
+          targetId: 'all_enemies'
+        });
+      } else if (currentWarSoulSetInfo.setType === WarSoulType.DI_HUN) {
+        // 地魂套装压制提示
+        const suppressionPercent = Math.min(currentWarSoulSetInfo.setLevel * 5, 25);
+        initialLogs.push({
+          id: generateLogId(),
+          round: 0,
+          actor: '战魂套装',
+          actorId: 'war_soul_set',
+          action: `在地魂战魂的神圣力量下，所有敌人的生命值减少${suppressionPercent}%。`,
+          actionType: 'buff',
+          damage: 0,
+          target: '所有敌人',
+          targetId: 'all_enemies'
+        });
+      }
+    }
+
     // 返回初始战斗状态
     return {
       player,
@@ -196,12 +266,12 @@ const Battle: React.FC<BattleProps> = ({
       deployedPets: battlePets, // 将转换后的幻兽数据添加到战斗状态
       currentTurn: 'player',
       isPlayerTurn: true,
-      battleLogs: [],
+      battleLogs: initialLogs, // 使用包含战魂套装提示的日志
       round: 1,
       selectedAction: null,
       targetEnemy: null,
       battleResult: 'in_progress',
-      logIdCounter: 0,
+      logIdCounter: initialLogs.length, // 从初始日志数量开始计数
       currentEnemyActionIndex: 0 // 初始化敌人行动索引
     };
   }, [playerData, playerSkills, enemyTemplateId, enemyLevel, enemyCount, enemiesData, deployedPets]);
@@ -1204,6 +1274,7 @@ const Battle: React.FC<BattleProps> = ({
         isVisible={showDetailModal && detailType === 'enemy'}
         onClose={handleCloseDetailModal}
         enemy={selectedCharacter}
+        warSoulSetInfo={warSoulSetInfo || undefined}
       />
     </div>
   );

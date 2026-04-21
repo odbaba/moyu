@@ -227,8 +227,9 @@ export function createSpecialItem(config: {
 
 /**
  * 从模板创建物品
- * 根据物品名称查找模板并创建实例，保留原始ID以支持堆叠
- * 适用于抽奖、战利品等场景
+ * 根据物品名称查找模板并创建实例
+ * 不可堆叠物品（maxStack <= 1）生成唯一ID，避免背包中出现重复key
+ * 可堆叠物品保留原始ID以支持堆叠合并
  *
  * @param name 物品名称
  * @param quantity 数量（默认1）
@@ -239,11 +240,23 @@ export function createItemFromTemplate(name: string, quantity: number = 1): Inve
   const template = findItemByName(name);
 
   if (template) {
-    // 找到模板，复制并保留原始ID（支持堆叠）
-    return {
-      ...template,
-      quantity,
-    };
+    // 判断是否为可堆叠物品
+    const isStackable = template.stackable === true || (template.maxStack && template.maxStack > 1);
+
+    if (isStackable) {
+      // 可堆叠物品保留原始ID，支持堆叠合并
+      return {
+        ...template,
+        quantity,
+      };
+    } else {
+      // 不可堆叠物品（如技能书）生成唯一ID，避免背包中重复key
+      return {
+        ...template,
+        id: generateItemId(template.type, template.id),
+        quantity,
+      };
+    }
   }
 
   // 如果找不到模板，返回null
@@ -256,16 +269,30 @@ export function createItemFromTemplate(name: string, quantity: number = 1): Inve
 
 /**
  * 复制单个物品模板
- * 用于战利品等场景，生成新的唯一ID
+ * 用于战利品等场景
+ * 不可堆叠物品生成唯一ID，可堆叠物品保留原始ID以支持堆叠合并
  *
  * @param item 原始物品
  * @returns 复制后的单个物品
  */
 export function cloneItem(item: InventoryItem): InventoryItem {
-  return {
-    ...item,
-    quantity: 1,
-  };
+  // 判断是否为可堆叠物品
+  const isStackable = item.stackable === true || (item.maxStack && item.maxStack > 1);
+
+  if (isStackable) {
+    // 可堆叠物品保留原始ID，支持堆叠合并
+    return {
+      ...item,
+      quantity: 1,
+    };
+  } else {
+    // 不可堆叠物品生成唯一ID，避免背包中重复key
+    return {
+      ...item,
+      id: generateItemId(item.type, item.id),
+      quantity: 1,
+    };
+  }
 }
 
 // ==================== 常用物品模板导出 ====================

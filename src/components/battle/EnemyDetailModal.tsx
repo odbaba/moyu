@@ -3,6 +3,7 @@ import './battle.css';
 import React from 'react';
 
 import type { BattleCharacter } from '../../types';
+import type { WarSoulSetInfo } from '../../utils/combatPower';
 
 /**
  * 敌人详情弹窗组件属性接口
@@ -21,6 +22,10 @@ interface EnemyDetailModalProps {
    * 要显示的敌人对象
    */
   enemy: BattleCharacter | null;
+  /**
+   * 战魂套装信息（可选），用于显示压制效果
+   */
+  warSoulSetInfo?: WarSoulSetInfo;
 }
 
 /**
@@ -31,7 +36,8 @@ interface EnemyDetailModalProps {
 const EnemyDetailModal: React.FC<EnemyDetailModalProps> = ({
   isVisible,
   onClose,
-  enemy
+  enemy,
+  warSoulSetInfo
 }) => {
   /**
    * 处理点击遮罩层关闭弹窗
@@ -107,6 +113,10 @@ const EnemyDetailModal: React.FC<EnemyDetailModalProps> = ({
             <div className="enemy-detail-cell full-width">
               <span className="cell-label">生命值</span>
               <span className="cell-value hp-value">{enemy.currentHp}/{enemy.maxHp}</span>
+              {/* 地魂套装压制时显示生命值降低百分比 */}
+              {enemy.warSoulSuppression && enemy.warSoulSuppression.type === 'hp' && (
+                <span className="suppression-value">（-{Math.round(enemy.warSoulSuppression.percentage * 100)}%）</span>
+              )}
               <span className="cell-percent">({getHpPercent()})</span>
             </div>
           </div>
@@ -136,7 +146,13 @@ const EnemyDetailModal: React.FC<EnemyDetailModalProps> = ({
             </div>
             <div className="enemy-detail-cell">
               <span className="cell-label">战斗力</span>
-              <span className="cell-value combat-power-value">{enemy.combatPower}</span>
+              <span className="cell-value combat-power-value">
+                {enemy.combatPower}
+                {/* 天魂套装压制时显示战斗力降低百分比 */}
+                {enemy.warSoulSuppression && enemy.warSoulSuppression.type === 'combatPower' && (
+                  <span className="suppression-value">（-{Math.round(enemy.warSoulSuppression.percentage * 100)}%）</span>
+                )}
+              </span>
             </div>
           </div>
 
@@ -151,6 +167,25 @@ const EnemyDetailModal: React.FC<EnemyDetailModalProps> = ({
               <span className="cell-value">{enemy.luck}</span>
             </div>
           </div>
+
+          {/* 战魂套装压制提示 */}
+          {warSoulSetInfo && warSoulSetInfo.isActive && (
+            <div className="enemy-detail-war-soul-suppression">
+              <div className="suppression-label">战魂套装压制</div>
+              {/* 天魂套装：降低敌人战斗力 */}
+              {warSoulSetInfo.setType === 1 && (
+                <div className="suppression-info">
+                  天魂套装：敌人战斗力降低{warSoulSetInfo.setLevel * 2}%
+                </div>
+              )}
+              {/* 地魂套装：降低敌人生命值 */}
+              {warSoulSetInfo.setType === 2 && (
+                <div className="suppression-info">
+                  地魂套装：敌人生命值降低{warSoulSetInfo.setLevel * 5}%
+                </div>
+              )}
+            </div>
+          )}
 
           {/* 技能列表 */}
           {enemy.skills && enemy.skills.length > 0 && (

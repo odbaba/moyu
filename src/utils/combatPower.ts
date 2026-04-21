@@ -204,7 +204,7 @@ export function calculateAllGemCombatPower(equipment: CharacterData['equipment']
 /**
  * 战魂套装信息接口
  */
-interface WarSoulSetInfo {
+export interface WarSoulSetInfo {
   isActive: boolean;
   setType: number;
   setLevel: number;
@@ -259,65 +259,43 @@ export function checkWarSoulSet(equipment: CharacterData['equipment']): WarSoulS
 }
 
 /**
- * 计算天魂套装攻击加成
- * 天魂套装：每件装备战魂等级 × 5%
- * 最大加成：150%
+ * 计算天魂套装对怪物的战斗力压制百分比
+ * 天魂套装激活时：套装等级 × 2% 战斗力压制
+ * 最大压制：10%
  * @param equipment 角色装备对象
- * @returns 攻击加成百分比
+ * @returns 怪物战斗力压制百分比（0~0.10）
  */
-export function calculateTianHunSetBonus(equipment: CharacterData['equipment']): number {
-  let total = 0;
-  const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-
-  slots.forEach(slot => {
-    const item = equipment[slot];
-    if (item && item.soulType === 1 && item.soulLevel) {
-      // 每件天魂装备提供 战魂等级 × 5% 攻击加成
-      total += item.soulLevel * 5;
-    }
-  });
-
-  // 最大加成 150%
-  return Math.min(total, 150);
-}
-
-/**
- * 计算地魂套装闪避加成
- * 地魂套装：每件装备战魂等级 × 2%
- * 最大加成：60%
- * @param equipment 角色装备对象
- * @returns 闪避加成百分比
- */
-export function calculateDiHunSetBonus(equipment: CharacterData['equipment']): number {
-  let total = 0;
-  const slots: (keyof typeof equipment)[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-
-  slots.forEach(slot => {
-    const item = equipment[slot];
-    if (item && item.soulType === 2 && item.soulLevel) {
-      // 每件地魂装备提供 战魂等级 × 2% 闪避加成
-      total += item.soulLevel * 2;
-    }
-  });
-
-  // 最大加成 60%
-  return Math.min(total, 60);
-}
-
-/**
- * 计算战魂PK赛战斗力加成
- * PK赛加成：套装等级 × 5%
- * @param equipment 角色装备对象
- * @returns PK赛战斗力加成百分比
- */
-export function calculateWarSoulPKCombatPower(equipment: CharacterData['equipment']): number {
+export function calculateTianHunSetSuppression(equipment: CharacterData['equipment']): number {
+  // 获取战魂套装信息
   const setInfo = checkWarSoulSet(equipment);
-  if (!setInfo.isActive) {
+
+  // 天魂套装未激活时，无压制效果
+  if (!setInfo.isActive || setInfo.setType !== 1) {
     return 0;
   }
 
-  // PK赛战斗力加成 = 套装等级 × 5%
-  return setInfo.setLevel * 5;
+  // 天魂套装压制 = 套装等级 × 2%，最大10%
+  return Math.min(setInfo.setLevel * 0.02, 0.10);
+}
+
+/**
+ * 计算地魂套装对怪物的生命值压制百分比
+ * 地魂套装激活时：套装等级 × 5% 生命值压制
+ * 最大压制：25%
+ * @param equipment 角色装备对象
+ * @returns 怪物生命值压制百分比（0~0.25）
+ */
+export function calculateDiHunSetSuppression(equipment: CharacterData['equipment']): number {
+  // 获取战魂套装信息
+  const setInfo = checkWarSoulSet(equipment);
+
+  // 地魂套装未激活时，无压制效果
+  if (!setInfo.isActive || setInfo.setType !== 2) {
+    return 0;
+  }
+
+  // 地魂套装压制 = 套装等级 × 5%，最大25%
+  return Math.min(setInfo.setLevel * 0.05, 0.25);
 }
 
 /**

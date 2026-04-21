@@ -1,135 +1,110 @@
-# 战魂系统装备属性优化 Spec
+# 战魂系统装备属性优化 Spec（更新版）
 
 ## Why
-当前战魂系统已有基础实现，但缺少一些重要功能：战魂套装效果（天魂套装攻击加成、地魂套装闪避加成）、战魂等级降低逻辑（使用战魂物品、摘除宝石）、魔魂升至12级时战魂等级提升逻辑、战魂等级达到5级时显示MAX等。需要根据战魂系统完整文档进行优化补充。
+根据参考文档 `reference/docs/战魂系统完整文档.md` 的最新内容，当前实现存在以下关键问题：
+1. **战魂套装效果理解错误**：当前 `calculateTianHunSetBonus` 和 `calculateDiHunSetBonus` 计算的是角色属性加成（与单件装备加成重复），但参考文档明确套装效果是**对怪物属性的压制削弱**，不是角色加成
+2. **战魂套装压制效果未在战斗中体现**：天魂套装应降低怪物战斗力（最高10%），地魂套装应降低怪物生命值（最高25%），当前未实现
+3. **怪物详情未显示战魂套装压制信息**：战斗页面中点击怪物详情时，应显示战魂套装压制效果和减少的属性值
 
 ## What Changes
-- 优化战魂类型定义（添加枚举类型）
-- 实现战魂套装效果计算
-- 完善战魂等级提升逻辑（魔魂升至12级）
-- 实现战魂等级降低逻辑（使用战魂物品、摘除宝石）
-- 优化战魂显示（5级显示MAX）
-- 实现战魂属性加成到角色属性计算
+- 修改 `calculateTianHunSetBonus` 为 `calculateTianHunSetSuppression`：天魂套装降低怪物战斗力（套装等级×2%，最高10%）
+- 修改 `calculateDiHunSetBonus` 为 `calculateDiHunSetSuppression`：地魂套装降低怪物生命值（套装等级×5%，最高25%）
+- 修改 `createEnemyFromEnemyData` 和 `createEnemyFromTemplate`：创建敌人时应用战魂套装压制效果
+- 修改 `EnemyDetailModal`：显示战魂套装压制信息和被削弱的属性值（括号内显示减少值）
+- 修改 `Battle` 组件：传递战魂套装信息到敌人创建流程
+- 删除 `calculateWarSoulPKCombatPower`（PK赛功能暂未实现，避免误导）
 
 ## Impact
-- Affected specs:
-  - add-equipment-refiner（装备打造师系统）
-  - optimize-character-equipment-system（装备系统）
 - Affected code:
-  - src/types/index.ts（优化战魂类型定义）
-  - src/utils/equipmentConverter.ts（优化战魂属性计算）
-  - src/utils/combatPower.ts（实现战魂套装效果）
-  - src/utils/attributeCalculator.ts（战魂属性加成到角色）
-  - src/utils/equipmentRefine.ts（完善战魂等级升降逻辑）
-  - src/components/common/EquipmentDetailModal.tsx（优化战魂显示）
+  - `src/utils/combatPower.ts`（修改套装效果函数为怪物压制函数）
+  - `src/utils/battleAdapter.ts`（创建敌人时应用战魂套装压制）
+  - `src/components/battle/EnemyDetailModal.tsx`（显示战魂套装压制信息）
+  - `src/components/battle/Battle.tsx`（传递战魂套装信息）
 
 ## ADDED Requirements
 
-### Requirement: 战魂类型枚举定义
-系统 SHALL 提供战魂类型的枚举定义。
+### Requirement: 天魂套装怪物战斗力压制
+系统 SHALL 实现天魂套装对怪物战斗力的压制效果。
 
-#### Scenario: 战魂类型枚举
-- **WHEN** 定义战魂类型时
-- **THEN** 使用枚举类型 `WarSoulType`：
-  - NONE: 0（无战魂）
-  - TIAN_HUN: 1（天魂）
-  - DI_HUN: 2（地魂）
+#### Scenario: 天魂套装激活时降低怪物战斗力
+- **WHEN** 所有6件装备都是天魂（soulType = WarSoulType.TIAN_HUN）
+- **AND** 战魂系统已开启
+- **THEN** 怪物战斗力 = Math.round(怪物原始战斗力 × (1 - 套装等级 × 0.02))
+- **AND** 最大压制：5级套装 × 2% = 10%
 
-### Requirement: 战魂套装效果计算
-系统 SHALL 实现战魂套装效果的计算。
+#### Scenario: 天魂套装战斗提示
+- **WHEN** 天魂套装激活时进入战斗
+- **THEN** 在战斗日志中显示提示："在天魂战魂的神圣力量下，所有敌人的战斗力下降X%。"
 
-#### Scenario: 天魂套装激活
-- **WHEN** 所有6件装备都有战魂
-- **AND** 所有装备战魂类型 = 1（天魂）
-- **THEN** 激活天魂套装，攻击力加成 = 每件装备战魂等级 × 5%
-- **AND** 最大加成：6件 × 5级 × 5% = 150%
+### Requirement: 地魂套装怪物生命值压制
+系统 SHALL 实现地魂套装对怪物生命值的压制效果。
 
-#### Scenario: 地魂套装激活
-- **WHEN** 所有6件装备都有战魂
-- **AND** 所有装备战魂类型 = 2（地魂）
-- **THEN** 激活地魂套装，闪避率加成 = 每件装备战魂等级 × 2%
-- **AND** 最大加成：6件 × 5级 × 2% = 60%
+#### Scenario: 地魂套装激活时降低怪物生命值
+- **WHEN** 所有6件装备都是地魂（soulType = WarSoulType.DI_HUN）
+- **AND** 战魂系统已开启
+- **THEN** 怪物当前生命值 = Math.round(怪物原始生命值 × (1 - 套装等级 × 0.05))
+- **AND** 怪物最大生命值 = Math.round(怪物原始最大生命值 × (1 - 套装等级 × 0.05))
+- **AND** 最大压制：5级套装 × 5% = 25%
 
-#### Scenario: 套装等级计算
-- **WHEN** 计算战魂套装等级时
-- **THEN** 套装等级 = 所有装备战魂等级中的最小值
+#### Scenario: 地魂套装战斗提示
+- **WHEN** 地魂套装激活时进入战斗
+- **THEN** 在战斗日志中显示提示："在地魂战魂的神圣力量下，所有敌人的生命值减少X%。"
 
-#### Scenario: PK赛战斗力加成
-- **WHEN** 在PK赛中
-- **AND** 战魂套装已激活
-- **THEN** 战斗力加成 = 套装等级 × 5%
+### Requirement: 怪物详情显示战魂套装压制信息
+系统 SHALL 在怪物详情弹窗中显示战魂套装压制效果。
 
-### Requirement: 战魂等级提升逻辑
-系统 SHALL 完善战魂等级提升逻辑。
+#### Scenario: 天魂套装压制显示
+- **WHEN** 天魂套装已激活
+- **AND** 玩家在战斗中点击查看怪物详情
+- **THEN** 在怪物详情中显示战魂套装压制信息
+- **AND** 战斗力行显示格式："战斗力：被压制后值（-X%）"
+- **AND** 显示提示："天魂套装压制：敌人战斗力降低X%"
 
-#### Scenario: 魔魂升至12级时战魂等级提升
-- **WHEN** 装备魔魂等级升至12级
-- **AND** 装备已有战魂（soulType > 0）
-- **AND** 战魂等级 < 5
-- **THEN** 战魂等级 + 1
-- **AND** 显示提示："魔魂等级提升到了12级使得装备能量提升，战魂等级提高一级。"
+#### Scenario: 地魂套装压制显示
+- **WHEN** 地魂套装已激活
+- **AND** 玩家在战斗中点击查看怪物详情
+- **THEN** 在怪物详情中显示战魂套装压制信息
+- **AND** 生命值行显示格式："生命值：被压制后值/被压制后最大值（-X%）"
+- **AND** 显示提示："地魂套装压制：敌人生命值降低X%"
 
-#### Scenario: 战魂等级上限
-- **WHEN** 战魂等级已达到5级
-- **THEN** 无法继续提升
-
-### Requirement: 战魂等级降低逻辑
-系统 SHALL 实现战魂等级降低逻辑。
-
-#### Scenario: 使用战魂晶石/战魂之心时等级重置
-- **WHEN** 使用战魂晶石或战魂之心
-- **AND** 装备已有战魂
-- **THEN** 战魂等级重置为1
-
-#### Scenario: 摘除宝石时战魂等级降低
-- **WHEN** 摘除装备上的宝石
-- **AND** 装备已有战魂
-- **AND** 战魂等级 > 1
-- **THEN** 战魂等级降为1
-- **AND** 显示提示："摘除宝石操作使战魂的等级下降为1级"
-
-### Requirement: 战魂显示优化
-系统 SHALL 优化战魂信息显示。
-
-#### Scenario: 战魂等级5级显示MAX
-- **WHEN** 战魂等级 = 5
-- **THEN** 显示格式："天魂MAX" 或 "地魂MAX"
-
-#### Scenario: 战魂效果显示
-- **WHEN** 显示战魂属性时
-- **THEN** 显示战魂效果：
-  - 天魂："效果：攻击+X%"
-  - 地魂："效果：闪避+X%"
-
-### Requirement: 战魂属性加成到角色属性
-系统 SHALL 实现战魂属性加成到角色属性的计算。
-
-#### Scenario: 天魂攻击加成
-- **WHEN** 计算角色攻击力时
-- **THEN** 攻击力 += 每件天魂装备的（战魂等级 × 5% × 基础攻击力）
-
-#### Scenario: 地魂闪避加成
-- **WHEN** 计算角色闪避率时
-- **THEN** 闪避率 += 每件地魂装备的（战魂等级 × 2%）
+#### Scenario: 无套装压制显示
+- **WHEN** 没有激活任何战魂套装
+- **THEN** 怪物详情正常显示，无压制信息
 
 ## MODIFIED Requirements
 
-### Requirement: 战魂属性接口优化
-战魂属性接口 SHALL 使用枚举类型。
+### Requirement: 战魂套装效果函数修改
+战魂套装效果函数 SHALL 计算怪物属性压制而非角色属性加成。
 
-#### Scenario: 使用枚举类型
-- **WHEN** 定义装备战魂属性时
-- **THEN** 使用 `WarSoulType` 枚举替代数字
-- **AND** soulType 类型为 `WarSoulType`
-- **AND** soulLevel 范围为 1-5
+#### Scenario: calculateTianHunSetBonus 改为 calculateTianHunSetSuppression
+- **WHEN** 调用天魂套装效果函数时
+- **THEN** 函数名改为 `calculateTianHunSetSuppression`
+- **AND** 返回怪物战斗力压制百分比（如0.06表示6%）
+- **AND** 计算公式：套装等级 × 2%
 
-### Requirement: 战魂属性计算函数优化
-战魂属性计算函数 SHALL 支持套装效果。
+#### Scenario: calculateDiHunSetBonus 改为 calculateDiHunSetSuppression
+- **WHEN** 调用地魂套装效果函数时
+- **THEN** 函数名改为 `calculateDiHunSetSuppression`
+- **AND** 返回怪物生命值压制百分比（如0.15表示15%）
+- **AND** 计算公式：套装等级 × 5%
 
-#### Scenario: 函数签名更新
-- **WHEN** 调用战魂属性计算函数时
-- **THEN** 函数参数包含所有装备信息
-- **AND** 函数返回单件装备战魂加成和套装战魂加成
+### Requirement: 敌人创建时应用战魂套装压制
+创建敌人时 SHALL 应用战魂套装压制效果。
+
+#### Scenario: createEnemyFromEnemyData 增加战魂套装压制参数
+- **WHEN** 调用 createEnemyFromEnemyData 时
+- **THEN** 增加 `warSoulSetInfo` 可选参数
+- **AND** 如果天魂套装激活，应用战斗力压制
+- **AND** 如果地魂套装激活，应用生命值压制
+
+#### Scenario: createEnemyFromTemplate 增加战魂套装压制参数
+- **WHEN** 调用 createEnemyFromTemplate 时
+- **THEN** 增加 `warSoulSetInfo` 可选参数
+- **AND** 如果天魂套装激活，应用战斗力压制
+- **AND** 如果地魂套装激活，应用生命值压制
 
 ## REMOVED Requirements
-无移除的需求。
+
+### Requirement: calculateWarSoulPKCombatPower
+**Reason**: PK赛功能暂未实现，此函数计算逻辑与当前套装压制概念不一致，避免误导
+**Migration**: 当PK赛功能实现时，重新根据参考文档实现PK赛战斗力加成

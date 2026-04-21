@@ -140,7 +140,9 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem, warSoulSys
   if (!equipment || equipment.type !== 'equipment') {
     return {
       success: false,
-      message: '请放入正确的装备'
+      message: '请放入正确的装备',
+      updatedEquipment: equipment ? { ...equipment } : undefined,
+      usedGem: gem ? { ...gem } : undefined
     };
   }
 
@@ -148,7 +150,9 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem, warSoulSys
   if (!gem || (gem.name !== '灵魂晶石' && gem.name !== '灵魂王')) {
     return {
       success: false,
-      message: '请使用灵魂晶石或灵魂王'
+      message: '请使用灵魂晶石或灵魂王',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -159,7 +163,9 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem, warSoulSys
   if (currentQualityLevel >= 4) {
     return {
       success: false,
-      message: '装备已达到最高品质（极品），无法继续提升'
+      message: '装备已达到最高品质（极品），无法继续提升',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -234,13 +240,17 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem, warSoulSys
         combatPowerChange: newCombatPower - oldCombatPower,
         soulLevelChange,
         soulActivated: soulActivated ? 1 : 0
-      }
+      },
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
   return {
     success: false,
-    message
+    message,
+    updatedEquipment: { ...equipment },
+    usedGem: { ...gem }
   };
 }
 
@@ -256,7 +266,9 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
   if (!equipment || equipment.type !== 'equipment') {
     return {
       success: false,
-      message: '请放入正确的装备'
+      message: '请放入正确的装备',
+      updatedEquipment: equipment ? { ...equipment } : undefined,
+      usedGem: gem ? { ...gem } : undefined
     };
   }
 
@@ -264,7 +276,9 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
   if (!gem || (gem.name !== '魔魂晶石' && gem.name !== '魔魂之心')) {
     return {
       success: false,
-      message: '请使用魔魂晶石或魔魂之心'
+      message: '请使用魔魂晶石或魔魂之心',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -275,7 +289,9 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
   if (currentLevel >= 12) {
     return {
       success: false,
-      message: '装备魔魂等级已达到最高等级（+12），无法继续提升'
+      message: '装备魔魂等级已达到最高等级（+12），无法继续提升',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -284,7 +300,9 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
     if (currentLevel >= 9) {
       return {
         success: false,
-        message: '魔魂之心只能用于+9之前的装备'
+        message: '魔魂之心只能用于+9之前的装备',
+        updatedEquipment: { ...equipment },
+        usedGem: { ...gem }
       };
     }
 
@@ -305,7 +323,9 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
             magicSoulLevel: currentLevel + 1,
             magicSoulChange: 1,
             soulLevelChange
-          }
+          },
+          updatedEquipment: { ...equipment },
+          usedGem: { ...gem }
         };
       }
     }
@@ -317,7 +337,9 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
         magicSoulLevel: currentLevel + 1,
         magicSoulChange: 1,
         soulLevelChange: 0
-      }
+      },
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -359,7 +381,9 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
             magicSoulLevel: currentLevel + 1,
             magicSoulChange: 1,
             soulLevelChange
-          }
+          },
+          updatedEquipment: { ...equipment },
+          usedGem: { ...gem }
         };
       }
     }
@@ -371,14 +395,18 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
         magicSoulLevel: currentLevel + 1,
         magicSoulChange: 1,
         soulLevelChange: 0
-      }
+      },
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   } else {
     // 失败处理：+9后失败不降级
     if (currentLevel >= 9) {
       return {
         success: false,
-        message: `精炼失败，但魔魂等级保持在+${currentLevel}（+9后失败不降级）`
+        message: `精炼失败，但魔魂等级保持在+${currentLevel}（+9后失败不降级）`,
+        updatedEquipment: { ...equipment },
+        usedGem: { ...gem }
       };
     } else {
       // +9前失败降1级
@@ -391,7 +419,9 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
         attributeChanges: {
           magicSoulLevel: newLevel,
           magicSoulChange: newLevel - currentLevel
-        }
+        },
+        updatedEquipment: { ...equipment },
+        usedGem: { ...gem }
       };
     }
   }
@@ -414,7 +444,9 @@ export function refineUseLevel(
   if (!equipment || equipment.type !== 'equipment') {
     return {
       success: false,
-      message: '请放入正确的装备'
+      message: '请放入正确的装备',
+      updatedEquipment: equipment ? { ...equipment } : undefined,
+      usedGem: gem ? { ...gem } : undefined
     };
   }
 
@@ -422,7 +454,9 @@ export function refineUseLevel(
   if (!gem || (gem.name !== '幻魔晶石' && gem.name !== '幻魔之心')) {
     return {
       success: false,
-      message: '请使用幻魔晶石或幻魔之心'
+      message: '请使用幻魔晶石或幻魔之心',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -433,7 +467,9 @@ export function refineUseLevel(
   if (currentLevel >= 125) {
     return {
       success: false,
-      message: '装备使用等级已达到最高等级（125级），无法继续提升'
+      message: '装备使用等级已达到最高等级（125级），无法继续提升',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -444,7 +480,9 @@ export function refineUseLevel(
   if (newLevel > playerLevel) {
     return {
       success: false,
-      message: `升级后等级（${newLevel}级）将超过您的当前等级（${playerLevel}级），无法升级`
+      message: `升级后等级（${newLevel}级）将超过您的当前等级（${playerLevel}级），无法升级`,
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -461,7 +499,9 @@ export function refineUseLevel(
       attributeChanges: {
         useLevel: newLevel,
         useLevelChange: newLevel - currentLevel
-      }
+      },
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -495,12 +535,16 @@ export function refineUseLevel(
       attributeChanges: {
         useLevel: newLevel,
         useLevelChange: newLevel - currentLevel
-      }
+      },
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   } else {
     return {
       success: false,
-      message: '精炼失败，幻魔晶石已消耗'
+      message: '精炼失败，幻魔晶石已消耗',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 }
@@ -517,7 +561,9 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
   if (!equipment || equipment.type !== 'equipment') {
     return {
       success: false,
-      message: '请放入正确的装备'
+      message: '请放入正确的装备',
+      updatedEquipment: equipment ? { ...equipment } : undefined,
+      usedGem: gem ? { ...gem } : undefined
     };
   }
 
@@ -525,7 +571,9 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
   if (!gem || (gem.name !== '月光宝盒' && gem.name !== '月光宝盒增强版')) {
     return {
       success: false,
-      message: '请使用月光宝盒或月光宝盒增强版'
+      message: '请使用月光宝盒或月光宝盒增强版',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -537,7 +585,9 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
     if (currentHoles >= 1) {
       return {
         success: false,
-        message: '该装备已有洞，请使用月光宝盒增强版开第二个洞'
+        message: '该装备已有洞，请使用月光宝盒增强版开第二个洞',
+        updatedEquipment: { ...equipment },
+        usedGem: { ...gem }
       };
     }
 
@@ -557,7 +607,9 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
       attributeChanges: {
         holeCount: 1,
         soulActivated: soulActivated ? 1 : 0
-      }
+      },
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -566,14 +618,18 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
     if (currentHoles === 0) {
       return {
         success: false,
-        message: '该装备还没有洞，请先使用月光宝盒开第一个洞'
+        message: '该装备还没有洞，请先使用月光宝盒开第一个洞',
+        updatedEquipment: { ...equipment },
+        usedGem: { ...gem }
       };
     }
 
     if (currentHoles >= 2) {
       return {
         success: false,
-        message: '装备已达到最大洞数（2个），无法继续开洞'
+        message: '装备已达到最大洞数（2个），无法继续开洞',
+        updatedEquipment: { ...equipment },
+        usedGem: { ...gem }
       };
     }
 
@@ -593,13 +649,17 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
       attributeChanges: {
         holeCount: 2,
         soulActivated: soulActivated ? 1 : 0
-      }
+      },
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
   return {
     success: false,
-    message: '开洞失败'
+    message: '开洞失败',
+    updatedEquipment: { ...equipment },
+    usedGem: { ...gem }
   };
 }
 
@@ -615,7 +675,9 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
   if (!equipment || equipment.type !== 'equipment') {
     return {
       success: false,
-      message: '请放入正确的装备'
+      message: '请放入正确的装备',
+      updatedEquipment: equipment ? { ...equipment } : undefined,
+      usedGem: gem ? { ...gem } : undefined
     };
   }
 
@@ -623,7 +685,9 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
   if (!gem || !['中级战斗力石', '高级战斗力石', '中级经验石', '高级经验石'].includes(gem.name)) {
     return {
       success: false,
-      message: '请使用战斗力石或经验石进行镶嵌'
+      message: '请使用战斗力石或经验石进行镶嵌',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -632,7 +696,9 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
   if (holeCount === 0) {
     return {
       success: false,
-      message: '装备没有宝石洞，无法镶嵌宝石'
+      message: '装备没有宝石洞，无法镶嵌宝石',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -641,7 +707,9 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
   if (embeddedGems.length >= holeCount) {
     return {
       success: false,
-      message: '装备的所有宝石洞都已镶嵌，无法继续镶嵌'
+      message: '装备的所有宝石洞都已镶嵌，无法继续镶嵌',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -698,7 +766,9 @@ export function embedGem(equipment: EquipmentItem, gem: GemItem): RefineResult {
       combatPowerBonus,
       expBonus,
       soulLevelChange: soulLevelUp ? 1 : 0
-    }
+    },
+    updatedEquipment: { ...equipment },
+    usedGem: { ...gem }
   };
 }
 
@@ -714,7 +784,9 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem, warSoulSyst
   if (!equipment || equipment.type !== 'equipment') {
     return {
       success: false,
-      message: '请放入正确的装备'
+      message: '请放入正确的装备',
+      updatedEquipment: equipment ? { ...equipment } : undefined,
+      usedGem: gem ? { ...gem } : undefined
     };
   }
 
@@ -722,7 +794,9 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem, warSoulSyst
   if (!gem || (gem.name !== '战魂晶石' && gem.name !== '战魂之心')) {
     return {
       success: false,
-      message: '请使用战魂晶石或战魂之心'
+      message: '请使用战魂晶石或战魂之心',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -730,7 +804,9 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem, warSoulSyst
   if (!warSoulSystemEnabled) {
     return {
       success: false,
-      message: '战魂系统尚未开启，请先击败无名氏开启战魂系统'
+      message: '战魂系统尚未开启，请先击败无名氏开启战魂系统',
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -753,7 +829,9 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem, warSoulSyst
       attributeChanges: {
         soulType: equipment.soulType,
         soulLevel: 1
-      }
+      },
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
     };
   }
 
@@ -779,19 +857,25 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem, warSoulSyst
         attributeChanges: {
           soulType: equipment.soulType,
           soulLevel: 1
-        }
+        },
+        updatedEquipment: { ...equipment },
+        usedGem: { ...gem }
       };
     } else {
       return {
         success: false,
-        message: '战魂晶石激活失败，请再接再厉'
+        message: '战魂晶石激活失败，请再接再厉',
+        updatedEquipment: { ...equipment },
+        usedGem: { ...gem }
       };
     }
   }
 
   return {
     success: false,
-    message: '战魂激活失败'
+    message: '战魂激活失败',
+    updatedEquipment: { ...equipment },
+    usedGem: { ...gem }
   };
 }
 

@@ -222,7 +222,7 @@ export function equipmentItemToDetail(item: EquipmentItem): EquipmentDetail {
   const bonusAttackMax = calculateMagicSoulBonus(baseAttackMax, magicSoulLevel);
   const bonusDefense = calculateMagicSoulBonus(baseDefense, magicSoulLevel);
 
-  // 计算战魂属性加成
+  // 计算战魂属性加成（仅用于角色面板属性计算，不加入装备详情面板的攻击值）
   const soulBonus = calculateSoulBonus(item.soulType, item.soulLevel, baseAttackMin, baseAttackMax);
 
   // 计算宝石属性
@@ -232,6 +232,7 @@ export function equipmentItemToDetail(item: EquipmentItem): EquipmentDetail {
   const gemCombatPower = calculateGemCombatPower(item.gems);
 
   // 创建装备详情对象
+  // 注意：attributes 中的攻击值不包含天魂加成，天魂加成在角色属性计算时单独处理
   const detail: EquipmentDetail = {
     id: item.id,
     name: item.name,
@@ -239,8 +240,8 @@ export function equipmentItemToDetail(item: EquipmentItem): EquipmentDetail {
     quality: qualityMap[item.equipmentQuality] || '普通品',
     magicSoulLevel: magicSoulLevel,
     attributes: {
-      attackMin: baseAttackMin + bonusAttackMin + soulBonus.attackMinBonus,
-      attackMax: baseAttackMax + bonusAttackMax + soulBonus.attackMaxBonus,
+      attackMin: baseAttackMin + bonusAttackMin,
+      attackMax: baseAttackMax + bonusAttackMax,
       defense: baseDefense + bonusDefense,
       hp: item.attributes?.hp,
       mp: item.attributes?.mp,
@@ -276,6 +277,12 @@ export function equipmentItemToDetail(item: EquipmentItem): EquipmentDetail {
  * @returns 背包中的装备物品
  */
 export function equipmentDetailToItem(detail: EquipmentDetail): EquipmentItem {
+  // 使用基础属性值，而不是 attributes 中的值（attributes 包含了追加属性）
+  // 避免装备穿脱时属性累积
+  const baseAttackMin = detail.baseAttackMin ?? detail.attributes.attackMin ?? 0;
+  const baseAttackMax = detail.baseAttackMax ?? detail.attributes.attackMax ?? 0;
+  const baseDefense = detail.baseDefense ?? detail.attributes.defense ?? 0;
+
   return {
     id: detail.id,
     name: detail.name,
@@ -286,8 +293,8 @@ export function equipmentDetailToItem(detail: EquipmentDetail): EquipmentItem {
     attributes: {
       hp: detail.attributes.hp,
       mp: detail.attributes.mp,
-      attack: detail.attributes.attackMin || detail.attributes.attackMax,
-      defense: detail.attributes.defense,
+      attack: baseAttackMin || baseAttackMax,
+      defense: baseDefense,
       luck: detail.attributes.luck
     },
     source: '装备卸下',
@@ -303,9 +310,9 @@ export function equipmentDetailToItem(detail: EquipmentDetail): EquipmentItem {
     gems: detail.gems, // 保留宝石名称数组
     soulType: detail.soulType,
     soulLevel: detail.soulLevel,
-    attackMin: detail.attributes.attackMin,
-    attackMax: detail.attributes.attackMax,
-    defense: detail.attributes.defense,
+    attackMin: baseAttackMin,
+    attackMax: baseAttackMax,
+    defense: baseDefense,
     imagePath: detail.imagePath // 恢复原始图片路径
   };
 }

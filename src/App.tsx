@@ -4,6 +4,7 @@ import './components/battle/battle.css';
 import './components/common/common.css';
 import './components/character/character.css';
 import './components/inventory/inventory.css';
+import './components/cover/cover.css';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -17,6 +18,8 @@ import CollectorModal from './components/common/CollectorModal';
 import EquipmentRefineModal from './components/common/EquipmentRefineModal';
 import ExperienceExchangeModal from './components/common/ExperienceExchangeModal';
 import InfoModal from './components/common/InfoModal';
+// 导入组件 - 封面页模块
+import { CoverPage } from './components/cover';
 // 导入组件 - 首页模块
 import {
   InteractionButtons,
@@ -45,7 +48,6 @@ import { locations } from './data/gameData';
 import { generateBossInteractables, generateWumingshiInteractable, interactableConfig } from './data/interactableData';
 import { exampleItems } from './data/inventoryData';
 import { examplePets } from './data/petData';
-import { getMeritReward } from './data/rankData';
 import { getShopItemById } from './data/shopData';
 import { createInitialSkills, getSkillUpgradeCost } from './data/skillData';
 import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, DailyTaskState, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, NPCInteractable, Pet, PetInstituteState, PlayerResources, PrincessRelationship, RefineResult, SkillDetail, TimeSystem } from './types';
@@ -109,7 +111,7 @@ import {
 // 导入 NPC 相关工具函数
 import { getDemonArmyDialogue, performChat, performGift, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
 // 导入存档系统工具函数
-import { loadGame, saveGame } from './utils/saveUtils';
+import { deleteSave, hasSaveData, loadGame, saveGame } from './utils/saveUtils';
 // 导入战魂物品掉落工具函数
 import { checkWarSoulDrop } from './utils/warSoulDropUtils';
 
@@ -227,19 +229,48 @@ function App() {
   // 当玩家与神秘人NPC交互后，神秘人消失，无名氏敌人出现
   const [mysteriousPersonTriggered, setMysteriousPersonTriggered] = useState(false);
 
-  // 尝试从存档加载数据
-  // 在组件初始化时加载存档中的战魂系统状态
-  const savedData = loadGame();
+  // 封面页显示状态
+  // 默认为 true，进入游戏时先显示封面页
+  const [showCover, setShowCover] = useState(true);
 
   // 无名氏击败状态（战魂封印迷宫）
   // 当玩家击败无名氏后，获得战魂之心
-  // 优先使用存档中的数据，如果没有存档则使用默认值 false
-  const [wumingshiDefeated, setWumingshiDefeated] = useState(savedData?.wumingshiDefeated ?? false);
+  // 默认为 false，通过"继续游戏"从存档恢复
+  const [wumingshiDefeated, setWumingshiDefeated] = useState(false);
 
   // 战魂系统开启状态
   // 当玩家击败无名氏后，战魂系统开启，可以与装备打造师讨论战魂
-  // 优先使用存档中的数据，如果没有存档则使用默认值 false
-  const [warSoulSystemEnabled, setWarSoulSystemEnabled] = useState(savedData?.warSoulSystemEnabled ?? false);
+  // 默认为 false，通过"继续游戏"从存档恢复
+  const [warSoulSystemEnabled, setWarSoulSystemEnabled] = useState(false);
+
+  // ========== 封面页操作处理 ==========
+
+  /**
+   * 处理"开始游戏"
+   * 清除存档数据，以全新初始状态进入游戏
+   */
+  const handleStartGame = useCallback(() => {
+    // 清除存档数据，确保全新开始
+    deleteSave();
+    // 关闭封面页，进入游戏主界面
+    setShowCover(false);
+  }, []);
+
+  /**
+   * 处理"继续游戏"
+   * 从存档读取数据，恢复游戏状态
+   */
+  const handleContinueGame = useCallback(() => {
+    // 从存档读取数据
+    const savedData = loadGame();
+    if (savedData) {
+      // 使用存档数据恢复战魂系统状态
+      setWumingshiDefeated(savedData.wumingshiDefeated ?? false);
+      setWarSoulSystemEnabled(savedData.warSoulSystemEnabled ?? false);
+    }
+    // 关闭封面页，进入游戏主界面
+    setShowCover(false);
+  }, []);
 
   // 日常任务状态
   const [_dailyTaskState, setDailyTaskState] = useState<DailyTaskState>(
@@ -446,6 +477,31 @@ function App() {
 
   // 处理移动
   const handleMove = (locationId: string) => {
+    // 地下城层间移动条件检查：从低层前往高层时，需清除当前层所有怪物
+    const dungeonFloorOrder = ['dixiacheng-1', 'dixiacheng-2', 'dixiacheng-3'];
+    const currentFloorIndex = dungeonFloorOrder.indexOf(currentLocation);
+    const targetFloorIndex = dungeonFloorOrder.indexOf(locationId);
+
+    // 从低层前往高层时检查怪物清除条件
+    if (currentFloorIndex >= 0 && targetFloorIndex > currentFloorIndex) {
+      const taskState = _dailyTaskState;
+      let canMove = true;
+
+      if (currentLocation === 'dixiacheng-1') {
+        // 地下城1层前往2层：检查1层怪物是否全部清除
+        canMove = !taskState.rw_gw1_1 && !taskState.rw_gw1_2 && !taskState.rw_gw1_3;
+      } else if (currentLocation === 'dixiacheng-2') {
+        // 地下城2层前往3层：检查2层怪物是否全部清除
+        canMove = !taskState.rw_gw2_1 && !taskState.rw_gw2_2;
+      }
+
+      if (!canMove) {
+        setInteractionLog(prev => [...prev, '只有消灭完怪物后才能进入下一层']);
+
+        return;
+      }
+    }
+
     const location = locations.find(loc => loc.id === locationId);
     if (location) {
       setCurrentLocation(locationId);
@@ -560,8 +616,8 @@ function App() {
    * @param miningName 挖矿类型名称
    */
   const handleMining = (miningName: string) => {
-    // 消耗1个时间单位
-    consumeTime(1);
+    // TODO：暂时调试消耗15个时间单位，后续改回1个时间单位
+    consumeTime(15);
 
     // 决定矿石类型：30%金矿，70%银矿
     const isGold = Math.random() < 0.3;
@@ -618,7 +674,50 @@ function App() {
    * @param interactable 敌人交互数据
    */
   const handleEnemyInteract = (interactable: EnemyInteractable) => {
-    setCurrentEnemyData(interactable);
+    // 地下城蝎怪特殊处理：等级和战斗力动态等于玩家等级
+    if (interactable.id.startsWith('interact-dxc1-xieguai-')) {
+      // 获取地下城蝎怪的属性模板参数
+      const playerLevel = character.level;
+      const baseHp = 1000;
+      const growthHp = 300;
+      const baseAttackMin = 300;
+      const growthAttackMin = 50;
+      const baseAttackMax = 300;
+      const growthAttackMax = 88;
+      const baseDefense = 300;
+      const growthDefense = 45;
+
+      // 根据玩家等级计算属性
+      const maxHp = baseHp + growthHp * playerLevel;
+      const attackMin = baseAttackMin + growthAttackMin * playerLevel;
+      const attackMax = baseAttackMax + growthAttackMax * playerLevel;
+      const defense = baseDefense + growthDefense * playerLevel;
+
+      // 重新生成敌人数据
+      const dynamicEnemies: EnemyData[] = interactable.enemies.map((enemy) => {
+        // 计算随机变化系数（±10%）
+        const variationFactor = 0.9 + Math.random() * 0.2;
+        return {
+          ...enemy,
+          level: playerLevel,
+          combatPower: playerLevel,
+          maxHp: Math.round(maxHp * variationFactor),
+          attack: Math.round(((attackMin + attackMax) / 2) * variationFactor),
+          defense: Math.round(defense * variationFactor),
+        };
+      });
+
+      // 创建更新后的交互对象
+      const dynamicInteractable: EnemyInteractable = {
+        ...interactable,
+        description: `${interactable.name}\n等级: ${playerLevel}（动态） | 战斗力: ${playerLevel}`,
+        enemies: dynamicEnemies,
+      };
+
+      setCurrentEnemyData(dynamicInteractable);
+    } else {
+      setCurrentEnemyData(interactable);
+    }
     setShowEnemyModal(true);
   };
 
@@ -888,10 +987,10 @@ function App() {
       case 'queryBattleExp':
         // 查询战功
         const expResult = queryBattleExp(battleExp);
-        const expMessage = `当前军衔：${expResult.currentRankName}\n当前战功：${expResult.currentExp}\n${
+        const expMessage = `当前军衔：${expResult.currentRankName}\n${
           expResult.nextRankName
-            ? `下一级军衔：${expResult.nextRankName}\n所需战功：${expResult.nextRequirement}\n晋升进度：${expResult.progress}%`
-            : '已达到最高军衔！'
+            ? `当前战功/下一级所需战功：${expResult.currentExp}/${expResult.nextRequirement}\n下一级军衔：${expResult.nextRankName}`
+            : `当前战功：${expResult.currentExp}\n已达到最高军衔！`
         }`;
         setInteractionLog(prev => [...prev, expMessage]);
         // 添加弹窗显示
@@ -1009,10 +1108,10 @@ function App() {
 
       case 'queryMerit':
         // 查询功勋
-        const meritMessage = `当前爵位：${getNobleRankName(nobleRank)}\n当前功勋：${playerResources.merit.toLocaleString()}\n${
+        const meritMessage = `当前爵位：${getNobleRankName(nobleRank)}\n${
           nobleRank < 6
-            ? `下一级爵位：${getNobleRankName(nobleRank + 1)}\n所需功勋：${getNextNobleRankMerit(nobleRank)?.toLocaleString()}`
-            : '已达到最高爵位！'
+            ? `当前功勋/下一级所需功勋：${playerResources.merit.toLocaleString()}/${getNextNobleRankMerit(nobleRank)?.toLocaleString()}\n下一级爵位：${getNobleRankName(nobleRank + 1)}`
+            : `当前功勋：${playerResources.merit.toLocaleString()}\n已达到最高爵位！`
         }`;
         setInteractionLog(prev => [...prev, meritMessage]);
         // 添加弹窗显示
@@ -1207,8 +1306,17 @@ function App() {
           }
 
           case 'dungeon': {
-            // 地下城任务：暂时不做
-            setInteractionLog(prev => [...prev, '地下城任务暂未开放，敬请期待！']);
+            // 地下城任务：根据国王是否已救出，传送到对应地下城层
+            setShowNPCModal(false); // 关闭NPC对话框
+            if (isKingRescued) {
+              // 已救出国王：直接传送到地下城3层
+              setCurrentLocation('dixiacheng-3');
+              setInteractionLog(prev => [...prev, '你被传送到了地下城3层！消灭呖风火龙兽，破坏魔族会议！']);
+            } else {
+              // 未救出国王：从地下城1层开始
+              setCurrentLocation('dixiacheng-1');
+              setInteractionLog(prev => [...prev, '你被传送到了地下城1层！消灭所有怪物才能进入下一层！']);
+            }
             break;
           }
 
@@ -2092,6 +2200,155 @@ function App() {
       // 将怪物添加到击杀列表
       setKilledMonsters(prev => new Set(prev).add(currentBattleInteractableId));
 
+      // ========== 地下城怪物击杀处理 ==========
+      // 地下城怪物被击杀后，更新 _dailyTaskState 中对应的 rw_gw 变量为 false
+      const dungeonMonsterMap: Record<string, keyof typeof _dailyTaskState> = {
+        'interact-dxc1-xieguai-1': 'rw_gw1_1',
+        'interact-dxc1-xieguai-2': 'rw_gw1_2',
+        'interact-dxc1-xieguai-3': 'rw_gw1_3',
+        'interact-dxc2-qishiwanghun-1': 'rw_gw2_1',
+        'interact-dxc2-qishiwanghun-2': 'rw_gw2_2',
+        'interact-dxc3-huolongshou-1': 'rw_gw3_1',
+      };
+      const dungeonMonsterKey = dungeonMonsterMap[currentBattleInteractableId];
+      if (dungeonMonsterKey) {
+        // 更新怪物状态为已击杀
+        const newTaskState = { ..._dailyTaskState, [dungeonMonsterKey]: false };
+        setDailyTaskState(newTaskState);
+
+        // ========== 地下城层级奖励发放 ==========
+        // 检查当前层是否所有怪物都已清除，如果是则发放奖励
+        // 地下城1层奖励：灵魂王 × 1 + 3,000功勋
+        if (!newTaskState.rw_gw1_1 && !newTaskState.rw_gw1_2 && !newTaskState.rw_gw1_3 && currentLocation === 'dixiacheng-1') {
+          // 发放灵魂王
+          const soulKingItem = createItemFromTemplate('灵魂王', 1);
+          if (soulKingItem) {
+            setInventory(prev => {
+              const newInventory = [...prev];
+              const existingIndex = newInventory.findIndex(item => item.id === soulKingItem.id || item.name === '灵魂王');
+              if (existingIndex !== -1) {
+                newInventory[existingIndex] = {
+                  ...newInventory[existingIndex],
+                  quantity: newInventory[existingIndex].quantity + 1,
+                };
+              } else {
+                newInventory.push(soulKingItem);
+              }
+              return newInventory;
+            });
+          }
+          // 发放功勋
+          handleGainMerit(3000, '完成地下城1层任务');
+          // 弹窗提示
+          setInfoModalTitle('地下城1层完成');
+          setInfoModalContent('你完成了第一层任务：获得了灵魂王和3,000功勋。\n现在可以进入第二层了。');
+          setShowInfoModal(true);
+        }
+        // 地下城2层奖励：极品一洞+9装备 × 1 + 6,000功勋
+        else if (!newTaskState.rw_gw2_1 && !newTaskState.rw_gw2_2 && currentLocation === 'dixiacheng-2') {
+          // 随机生成装备类型
+          const equipmentTypes: EquipmentSlotType[] = ['weapon', 'helmet', 'necklace', 'clothes', 'bracelet', 'shoes'];
+          const randomType = equipmentTypes[Math.floor(Math.random() * equipmentTypes.length)];
+          // 计算装备等级（玩家等级向下取整到10的倍数，范围10-100）
+          let equipLevel = Math.floor(character.level / 10) * 10;
+          if (equipLevel < 10) equipLevel = 10;
+          if (equipLevel > 100) equipLevel = 100;
+          // 创建极品一洞+9装备
+          const equipmentItem = createEquipmentItem({
+            equipmentType: randomType,
+            level: equipLevel,
+            quality: 4, // 极品
+            magicSoulLevel: 9,
+            gemSlots: 1,
+          });
+          setInventory(prev => [...prev, equipmentItem]);
+          // 发放功勋
+          handleGainMerit(6000, '完成地下城2层任务');
+          // 弹窗提示
+          const equipmentNames: Record<EquipmentSlotType, string> = {
+            weapon: '武器', helmet: '头盔', necklace: '项链', clothes: '衣服', bracelet: '手镯', shoes: '战鞋'
+          };
+          setInfoModalTitle('地下城2层完成');
+          setInfoModalContent(`你完成了第二层任务：获得了6,000功勋和极品一洞+9${equipmentNames[randomType]}一件。\n现在可以进入最后一层了。`);
+          setShowInfoModal(true);
+        }
+        // 地下城3层奖励：极品一洞+12装备 × 1 + 12,000功勋 + 特殊道具 + 救出国王
+        else if (!newTaskState.rw_gw3_1 && currentLocation === 'dixiacheng-3') {
+          // 随机生成装备类型
+          const equipmentTypes: EquipmentSlotType[] = ['weapon', 'helmet', 'necklace', 'clothes', 'bracelet', 'shoes'];
+          const randomType = equipmentTypes[Math.floor(Math.random() * equipmentTypes.length)];
+          // 计算装备等级
+          let equipLevel = Math.floor(character.level / 10) * 10;
+          if (equipLevel < 10) equipLevel = 10;
+          if (equipLevel > 100) equipLevel = 100;
+          // 创建极品一洞+12装备
+          const equipmentItem = createEquipmentItem({
+            equipmentType: randomType,
+            level: equipLevel,
+            quality: 4, // 极品
+            magicSoulLevel: 12,
+            gemSlots: 1,
+          });
+          setInventory(prev => [...prev, equipmentItem]);
+          // 发放特殊道具（根据战魂系统状态）
+          const specialItemName = warSoulSystemEnabled ? '战魂之心' : '月光宝盒增强版';
+          const specialItem = createItemFromTemplate(specialItemName, 1);
+          if (specialItem) {
+            setInventory(prev => {
+              const newInventory = [...prev];
+              const existingIndex = newInventory.findIndex(item => item.id === specialItem.id || item.name === specialItemName);
+              if (existingIndex !== -1) {
+                newInventory[existingIndex] = {
+                  ...newInventory[existingIndex],
+                  quantity: newInventory[existingIndex].quantity + 1,
+                };
+              } else {
+                newInventory.push(specialItem);
+              }
+              return newInventory;
+            });
+          }
+          // 发放功勋
+          handleGainMerit(12000, '完成地下城3层任务');
+          // 救出国王剧情
+          const equipmentNames: Record<EquipmentSlotType, string> = {
+            weapon: '武器', helmet: '头盔', necklace: '项链', clothes: '衣服', bracelet: '手镯', shoes: '战鞋'
+          };
+          // 检查国王是否已被救出
+          if (!isKingRescued) {
+            // 标记国王已救出
+            _setIsKingRescued(true);
+            // 根据爵位给予不同奖励
+            if (nobleRank >= 5) {
+              // 爵位 >= 5级：授予王爵位
+              setNobleRank(6);
+              setInfoModalTitle('🎉 救出国王！');
+              setInfoModalContent(
+                `${character.playerName}击败魔族的高级军官了，并救出国王...\n` +
+                `随着国王的回来，人类军队的士气被激起到了最高点，他们已经准备好与魔族大军决战到底。\n` +
+                `因为英勇地救出了国王，你被授与王爵位。\n\n` +
+                `奖励：12,000功勋、极品一洞+12${equipmentNames[randomType]}、${specialItemName}`
+              );
+            } else {
+              // 爵位 < 5级：200,000魔石
+              setPlayerResources(prev => ({ ...prev, magicStone: prev.magicStone + 200000 }));
+              setInfoModalTitle('🎉 救出国王！');
+              setInfoModalContent(
+                `${character.playerName}击败魔族的高级军官了，并救出国王...\n` +
+                `随着国王的回来，人类军队的士气被激起到了最高点，他们已经准备好与魔族大军决战到底。\n` +
+                `由于你的英勇作战，你获得了200,000魔石奖励。\n\n` +
+                `奖励：12,000功勋、极品一洞+12${equipmentNames[randomType]}、${specialItemName}、200,000魔石`
+              );
+            }
+          } else {
+            // 国王已被救出，只发放奖励
+            setInfoModalTitle('地下城3层完成');
+            setInfoModalContent(`你完成了地下城任务：获得了12,000功勋、极品一洞+12${equipmentNames[randomType]}和${specialItemName}。`);
+          }
+          setShowInfoModal(true);
+        }
+      }
+
       // 计算战利品
       if (battleParams?.enemiesData && battleParams.enemiesData.length > 0) {
         // 计算所有敌人的战利品
@@ -2163,31 +2420,24 @@ function App() {
 
         // ========== 战功和功勋获取 ==========
         // 遍历所有敌人，根据敌人类型给予战功和功勋
+        // 参考文档：reference/docs/project_docs/04_怪物系统.md
+        // 冰雪巨人士兵：500战功，冰雪巨人士官：2000战功，冰雪巨人军官：5000战功
         battleParams.enemiesData.forEach(enemy => {
           const isBoss = enemy.name.includes('BOSS') || enemy.name.includes('boss');
-          const isIceGiant = enemy.name.includes('冰雪巨人') || enemy.name.includes('冰巨人');
 
           // 战功获取
           if (isBoss) {
             // 击败BOSS获得1000战功
             handleGainBattleExp(1000, '击败BOSS');
-          } else if (isIceGiant) {
-            // 击败冰雪巨人获得10000战功
-            handleGainBattleExp(10000, '击败冰雪巨人');
-          }
-
-          // 功勋获取（击败BOSS根据等级获得功勋）
-          if (isBoss) {
-            // 从敌人名称中提取BOSS等级（例如：'10级BOSS' -> 'boss-10'）
-            const levelMatch = enemy.name.match(/(\d+)级/);
-            if (levelMatch) {
-              const bossLevel = levelMatch[1];
-              const enemyId = `boss-${bossLevel}`;
-              const meritReward = getMeritReward(enemyId);
-              if (meritReward > 0) {
-                handleGainMerit(meritReward, '击败BOSS');
-              }
-            }
+          } else if (enemy.name === '冰雪巨人军官') {
+            // 击败冰雪巨人军官获得5000战功
+            handleGainBattleExp(5000, '击败冰雪巨人军官');
+          } else if (enemy.name === '冰雪巨人士官') {
+            // 击败冰雪巨人士官获得2000战功
+            handleGainBattleExp(2000, '击败冰雪巨人士官');
+          } else if (enemy.name === '冰雪巨人士兵') {
+            // 击败冰雪巨人士兵获得500战功
+            handleGainBattleExp(500, '击败冰雪巨人士兵');
           }
         });
 
@@ -2576,42 +2826,84 @@ function App() {
     // 记录到交互日志
     setInteractionLog(prev => [...prev, result.message]);
 
-    // 如果精炼成功，更新装备属性
-    if (result.success && refineEquipment) {
+    // 先处理背包装备的更新和宝石消耗
+    setInventory(prev => {
+      let updated = [...prev];
+
+      // 消耗使用的宝石（无论精炼成功与否，只要使用了宝石就消耗）
+      if (result.usedGem && refineGem) {
+        updated = updated.map(item => {
+          if (item.name === result.usedGem!.name && item.quantity > 0) {
+            return {
+              ...item,
+              quantity: item.quantity - 1,
+            };
+          }
+
+          return item;
+        }).filter(item => item.quantity > 0); // 移除数量为0的物品
+      }
+
+      // 如果精炼成功，更新背包装备
+      if (result.success && result.updatedEquipment) {
+        // 检查是否是角色装备
+        const isEquipped = Object.values(equippedItems).some(
+          item => item?.id === result.updatedEquipment!.id
+        );
+
+        if (!isEquipped) {
+          // 更新背包装备
+          updated = updated.map(item => {
+            if (item.id === result.updatedEquipment!.id && item.type === 'equipment') {
+              return result.updatedEquipment!;
+            }
+
+            return item;
+          });
+        }
+      }
+
+      return updated;
+    });
+
+    // 如果精炼成功，更新角色装备（如果是角色装备的话）
+    if (result.success && result.updatedEquipment) {
       // 检查是否是角色装备
       const isEquipped = Object.values(equippedItems).some(
-        item => item?.id === refineEquipment.id
+        item => item?.id === result.updatedEquipment!.id
       );
 
       if (isEquipped) {
         // 更新角色装备
         setEquippedItems(prev => {
           const updated = { ...prev };
-          const slotType = refineEquipment.equipmentType;
+          const slotType = result.updatedEquipment!.equipmentType;
           if (updated[slotType]) {
             // 将精炼后的装备转换为 EquipmentDetail 并更新
-            updated[slotType] = equipmentItemToDetail(refineEquipment);
+            updated[slotType] = equipmentItemToDetail(result.updatedEquipment!);
           }
 
           return updated;
         });
-      } else {
-        // 更新背包装备
-        setInventory(prev => {
-          return prev.map(item => {
-            if (item.id === refineEquipment.id && item.type === 'equipment') {
-              return refineEquipment;
-            }
-
-            return item;
-          });
-        });
       }
+
+      // 更新精炼界面选择的装备为最新状态
+      setRefineEquipment({ ...result.updatedEquipment! });
     }
 
-    // 清空选择的装备和宝石
-    setRefineEquipment(null);
-    setRefineGem(null);
+    // 检查背包中是否还有相同的宝石，如果有则保留，否则清空
+    if (refineGem && result.usedGem) {
+      // 使用 setTimeout 确保我们拿到最新的 inventory 状态
+      setTimeout(() => {
+        const hasRemainingGem = inventory.some(
+          item => item.name === result.usedGem!.name && item.quantity > 0
+        );
+
+        if (!hasRemainingGem) {
+          setRefineGem(null);
+        }
+      }, 0);
+    }
   };
 
   /**
@@ -2944,7 +3236,14 @@ function App() {
 
   return (
     <div className="game-container">
-      {inBattle ? (
+      {showCover ? (
+        /* 封面页面 */
+        <CoverPage
+          onStartGame={handleStartGame}
+          onContinueGame={handleContinueGame}
+          hasSaveData={hasSaveData()}
+        />
+      ) : inBattle ? (
         /* 战斗界面 */
         <Battle
           playerData={characterWithPetBonus}

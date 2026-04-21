@@ -357,6 +357,8 @@ export interface RefineResult {
   success: boolean; // 是否成功
   message: string; // 结果消息
   attributeChanges?: Record<string, string | number | boolean>; // 属性变化（可选）
+  updatedEquipment?: EquipmentItem; // 精炼后的装备（可选）
+  usedGem?: GemItem; // 使用的宝石（可选）
 }
 
 // ========== 特殊道具类物品扩展接口 ==========
@@ -735,6 +737,17 @@ export interface BattleCharacter {
   buffs: Buff[]; // 增益效果列表
   isPlayer: boolean; // 是否是玩家
   gridPosition: GridPosition; // 九宫格位置
+  /** 压制前原始战斗力（战魂套装压制前） */
+  originalCombatPower?: number;
+  /** 压制前原始最大生命值（战魂套装压制前） */
+  originalMaxHp?: number;
+  /** 战魂套装压制信息 */
+  warSoulSuppression?: {
+    /** 压制类型：'combatPower' 表示天魂套装降低战斗力，'hp' 表示地魂套装降低生命值 */
+    type: 'combatPower' | 'hp';
+    /** 压制百分比（如0.06表示6%） */
+    percentage: number;
+  };
 }
 
 /**
@@ -855,7 +868,7 @@ export interface BattleInitParams {
  * 怪物类型枚举
  * 定义怪物的类型，不同类型有不同的战斗数量规则
  */
-export type MonsterType = 'normal' | 'boss' | 'special';
+export type MonsterType = 'normal' | 'boss' | 'special' | 'dungeon';
 
 /**
  * 怪物模板接口

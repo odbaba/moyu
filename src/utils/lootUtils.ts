@@ -33,17 +33,29 @@ const EQUIPMENT_TYPES: EquipmentItem['equipmentType'][] = ['weapon', 'helmet', '
 
 /**
  * 复制物品模板用于战利品
- * 保留原始ID以支持堆叠，设置quantity为1
+ * 不可堆叠物品生成唯一ID，可堆叠物品保留原始ID以支持堆叠合并
  *
  * @param template 物品模板
  * @returns 战利品物品实例
  */
 function cloneItemTemplate<T extends InventoryItem>(template: T): T {
-  return {
-    ...template,
-    quantity: 1, // 战利品每次掉落1个
-    // 保留原始ID，这样可以与背包中的物品堆叠
-  };
+  // 判断是否为可堆叠物品
+  const isStackable = template.stackable === true || (template.maxStack && template.maxStack > 1);
+
+  if (isStackable) {
+    // 可堆叠物品保留原始ID，支持堆叠合并
+    return {
+      ...template,
+      quantity: 1,
+    };
+  } else {
+    // 不可堆叠物品生成唯一ID，避免背包中重复key
+    return {
+      ...template,
+      id: generateItemId(template.type, template.id),
+      quantity: 1,
+    } as T;
+  }
 }
 
 /**

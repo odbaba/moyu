@@ -1,0 +1,95 @@
+/**
+ * 封面页样式
+ * 全屏深色背景，居中布局，手机端一屏展示
+ */
+
+/* 封面页容器 - 全屏居中 */
+.cover-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #252935;
+  padding: 20px;
+  gap: 40px;
+}
+
+/* 游戏标题 - 金色发光效果 */
+.cover-title {
+  color: #ffd700;
+  font-size: 2.8rem;
+  font-weight: bold;
+  text-shadow:
+    0 0 10px rgba(255, 215, 0, 0.6),
+    0 0 20px rgba(255, 215, 0, 0.4),
+    0 0 40px rgba(255, 215, 0, 0.2);
+  letter-spacing: 0.3em;
+  margin: 0;
+  text-align: center;
+}
+
+/* 按钮区域 - 垂直排列 */
+.cover-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 280px;
+}
+
+/* 封面页按钮 - 基于全局 game-btn 扩展 */
+.cover-btn {
+  width: 100%;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* 禁用状态按钮样式 */
+.cover-btn--disabled:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cover-btn--disabled:disabled:hover {
+  background-color: #000000;
+  transform: none;
+}
+
+/* 手机端响应式 - 确保一屏展示 */
+@media (max-width: 768px) {
+  .cover-title {
+    font-size: 2.2rem;
+    letter-spacing: 0.2em;
+  }
+
+  .cover-page {
+    gap: 30px;
+    padding: 16px;
+  }
+
+  .cover-buttons {
+    gap: 14px;
+    max-width: 240px;
+  }
+
+  .cover-btn {
+    padding: 8px 16px;
+    font-size: 1rem;
+  }
+}
+
+/* 小屏手机适配 */
+@media (max-width: 375px) {
+  .cover-title {
+    font-size: 1.8rem;
+  }
+
+  .cover-page {
+    gap: 24px;
+  }
+}

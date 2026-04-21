@@ -86,7 +86,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
   onShowPet,
 }) => {
   // 抽奖消耗的魔石数量
-  const MAGIC_STONE_COST = 100;
+  const MAGIC_STONE_COST = 28;
   // 抽奖消耗的时间数量
   const TIME_COST = 2;
 
@@ -101,9 +101,6 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
     }))
   );
 
-  // 当前选中的宝箱
-  const [selectedChest, setSelectedChest] = useState<string | null>(null);
-
   // 抽奖结果弹窗
   const [showResultModal, setShowResultModal] = useState(false);
 
@@ -115,7 +112,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
 
   /**
    * 处理宝箱点击事件
-   * 选中宝箱并准备抽奖
+   * 点击宝箱直接进行抽奖
    * @param chestId 宝箱ID
    */
   const handleChestClick = (chestId: string) => {
@@ -131,22 +128,6 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
       return;
     }
 
-    // 选中宝箱
-    setSelectedChest(chestId);
-    setMessage(null);
-  };
-
-  /**
-   * 处理抽奖操作
-   * 消耗魔石并执行抽奖
-   */
-  const handleDraw = () => {
-    if (!selectedChest) {
-      setMessage('请先选择一个宝箱！');
-
-      return;
-    }
-
     // 检查魔石是否足够
     if (playerResources.magicStone < MAGIC_STONE_COST) {
       setMessage(`魔石不足！需要 ${MAGIC_STONE_COST} 魔石，当前只有 ${playerResources.magicStone} 魔石`);
@@ -154,7 +135,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
       return;
     }
 
-    // 执行抽奖
+    // 直接执行抽奖
     const result = executeLottery(playerResources, playerLevel, MAGIC_STONE_COST);
 
     if (!result.success) {
@@ -184,7 +165,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
     // 更新宝箱状态
     setChests((prev) =>
       prev.map((chest) =>
-        chest.id === selectedChest
+        chest.id === chestId
           ? { ...chest, isOpened: true, result }
           : chest
       )
@@ -193,7 +174,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
     // 显示抽奖结果
     setCurrentResult(result);
     setShowResultModal(true);
-    setSelectedChest(null);
+    setMessage(null);
   };
 
   /**
@@ -208,7 +189,6 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
         isOpened: false,
       }))
     );
-    setSelectedChest(null);
     setMessage(null);
     setShowResultModal(false);
     setCurrentResult(null);
@@ -235,7 +215,6 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
         isOpened: false,
       }))
     );
-    setSelectedChest(null);
     setMessage(null);
   };
 
@@ -314,9 +293,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
         {chests.map((chest) => (
           <div
             key={chest.id}
-            className={`lottery-chest ${chest.isOpened ? 'opened' : ''} ${
-              selectedChest === chest.id ? 'selected' : ''
-            }`}
+            className={`lottery-chest ${chest.isOpened ? 'opened' : ''}`}
             onClick={() => handleChestClick(chest.id)}
           >
             <div className="chest-icon">
@@ -337,15 +314,6 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
 
       {/* 操作按钮区域 */}
       <div className="lottery-actions">
-        {/* 抽奖按钮 */}
-        <button
-          className="lottery-draw-button"
-          onClick={handleDraw}
-          disabled={!selectedChest || playerResources.magicStone < MAGIC_STONE_COST}
-        >
-          🎲 抽奖 ({MAGIC_STONE_COST} 魔石)
-        </button>
-
         {/* 重置按钮 */}
         <button
           className="lottery-reset-button"

@@ -139,6 +139,9 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
       const x2 = (location2.x - minX) * (cellWidth + cellSpacingX) + cellWidth / 2;
       const y2 = (location2.y - minY) * (cellHeight + cellSpacingY) + cellHeight / 2;
 
+      // 地下城连接线使用不同颜色
+      const isDungeonConnection = loc1Id.startsWith('dixiacheng-') && loc2Id.startsWith('dixiacheng-');
+
       return (
         <line
           key={index}
@@ -146,8 +149,9 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
           y1={y1}
           x2={x2}
           y2={y2}
-          stroke="#555"
+          stroke={isDungeonConnection ? '#8B4513' : '#555'}
           strokeWidth="2"
+          strokeDasharray={isDungeonConnection ? '4,2' : undefined}
         />
       );
     });
@@ -185,6 +189,8 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
                   const x = (loc.x - minX) * (cellWidth + cellSpacingX);
                   const y = (loc.y - minY) * (cellHeight + cellSpacingY);
                   const isCurrent = currentLocation === loc.id;
+                  // 地下城地点使用不同的视觉样式
+                  const isDungeon = loc.id.startsWith('dixiacheng-');
 
                   return (
                     <g key={index}>
@@ -193,9 +199,10 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
                         y={y}
                         width={cellWidth}
                         height={cellHeight}
-                        fill="#252935"
-                        stroke={isCurrent ? '#2492D1' : '#6F7072'}
+                        fill={isDungeon ? '#1a1025' : '#252935'}
+                        stroke={isCurrent ? '#2492D1' : isDungeon ? '#8B4513' : '#6F7072'}
                         strokeWidth={isCurrent ? '2' : '1'}
+                        strokeDasharray={isDungeon ? '4,2' : undefined}
                         rx="3"
                         ry="3"
                         className={`map-area ${isCurrent ? 'current' : ''}`}
@@ -209,7 +216,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ isVisible, onClose, currentLocation
                         y={y + cellHeight / 2}
                         textAnchor="middle"
                         dominantBaseline="middle"
-                        fill="#FFFFFF"
+                        fill={isDungeon ? '#DAA520' : '#FFFFFF'}
                         fontSize="10"
                         fontWeight={isCurrent ? 'bold' : 'normal'}
                         className="map-area-text"
