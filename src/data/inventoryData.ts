@@ -554,7 +554,7 @@ const xingMoJian: SkillBookItem = {
   maxStack: 1,
   usable: true,
   equippable: false,
-  skillId: 'skill_xingmojian',
+  skillId: 'skill_star_sword',
   skillName: '星魔剑',
   skillType: 'attack',
   skillEffect: '群体攻击，造成120%伤害',
@@ -580,7 +580,7 @@ const gaoJiXingMoJian: SkillBookItem = {
   maxStack: 1,
   usable: true,
   equippable: false,
-  skillId: 'skill_gaojixingmojian',
+  skillId: 'skill_star_sword',
   skillName: '高级星魔剑',
   skillType: 'attack',
   skillEffect: '群体攻击，造成150%伤害',
@@ -589,6 +589,8 @@ const gaoJiXingMoJian: SkillBookItem = {
   goldValue: 28000000,
   magicStoneValue: 2800,
   imagePath: './images/items/skillbook/gaojixingmojian.png',
+  isUpgrade: true,
+  targetLevel: 2,
 };
 
 /**
@@ -615,6 +617,8 @@ const gaoJiFengZhan: SkillBookItem = {
   goldValue: 1000,
   magicStoneValue: 0,
   imagePath: './images/items/skillbook/gaojifengzhan.png',
+  isUpgrade: true,
+  targetLevel: 2,
 };
 
 /**
@@ -632,7 +636,7 @@ const feiTianLianZhan: SkillBookItem = {
   maxStack: 1,
   usable: true,
   equippable: false,
-  skillId: 'skill_feitianlianzhan',
+  skillId: 'skill_flying_slash',
   skillName: '飞天连斩',
   skillType: 'attack',
   skillEffect: '单体四连击攻击',
@@ -658,7 +662,7 @@ const gaoJiFeiTianLianZhan: SkillBookItem = {
   maxStack: 1,
   usable: true,
   equippable: false,
-  skillId: 'skill_gaojifeitianlianzhan',
+  skillId: 'skill_flying_slash',
   skillName: '高级飞天连斩',
   skillType: 'attack',
   skillEffect: '四连击攻击，2击破防',
@@ -667,6 +671,8 @@ const gaoJiFeiTianLianZhan: SkillBookItem = {
   goldValue: 82800000,
   magicStoneValue: 8280,
   imagePath: './images/items/skillbook/gaojifeitianlianzhan.png',
+  isUpgrade: true,
+  targetLevel: 2,
 };
 
 /**
@@ -684,13 +690,14 @@ const douZhiYiYang: SkillBookItem = {
   maxStack: 1,
   usable: true,
   equippable: false,
-  skillId: 'skill_douzhiyiyang',
+  skillId: 'skill_fighting_spirit',
   skillName: '斗志抑扬',
   skillType: 'buff',
   skillEffect: '提升战斗力',
   goldValue: 28000000,
   magicStoneValue: 0,
   imagePath: './images/items/skillbook/douzhiyiyang.png',
+  targetLevel: 1,
 };
 
 /**
@@ -708,7 +715,7 @@ const gaoJiDouZhiYiYang: SkillBookItem = {
   maxStack: 1,
   usable: true,
   equippable: false,
-  skillId: 'skill_gaojidouzhiyiyang',
+  skillId: 'skill_fighting_spirit',
   skillName: '高级斗志抑扬',
   skillType: 'buff',
   skillEffect: '大幅提升战斗力',
@@ -741,6 +748,8 @@ const gaoJiDiLieBaoZhan: SkillBookItem = {
   goldValue: 10000,
   magicStoneValue: 0,
   imagePath: './images/items/skillbook/gaojidiliebaozhan.png',
+  isUpgrade: true,
+  targetLevel: 2,
 };
 
 // ==================== 宝石类物品 ====================

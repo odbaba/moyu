@@ -139,10 +139,6 @@ const npc_marshal: NPCInteractable = {
       result: '领取本周军饷（魔石奖励）。\n少将以上额外获得"高级斗志抑扬"。',
       actionType: 'receiveSalary',
       actionParams: { weeklyLimit: true },
-      condition: {
-        type: 'weekday',
-        value: '星期日',
-      },
     },
     {
       text: '战功查询',
@@ -209,12 +205,6 @@ const npc_prime_minister: NPCInteractable = {
       result: '查看爵位系统说明。\n\n爵位等级：平民、勋爵、子爵、伯爵、公爵、侯爵、王\n\n爵位可以通过积累功勋来提升。',
       actionType: 'showHelp',
       actionParams: { topic: 'nobleRank' },
-    },
-    {
-      text: '领取奖励',
-      result: '领取爵位奖励。',
-      actionType: 'receiveNobleReward',
-      actionParams: {},
     },
     {
       text: '没事',
@@ -713,10 +703,6 @@ const npc_gem_synthesizer: NPCInteractable = {
   npcType: 'function',
   options: [
     {
-      text: '查看合成配方',
-      result: '我可以帮你合成魔魂之心、幻魔之心、灵魂王、高级经验石、高级战斗力石。\n\n魔魂之心：需要5个魔魂晶石。\n幻魔之心：需要5个幻魔晶石。\n灵魂王：需要20个灵魂晶石。\n高级经验石：需要10个中级经验石。\n高级战斗力石：需要10个中级战斗力石。\n\n合成成功率均为100%！',
-    },
-    {
       text: '合成魔魂之心（需5个魔魂晶石）',
       result: '使用5个魔魂晶石合成魔魂之心，提升装备魔魂等级（+9前100%成功）。',
       actionType: 'synthesize',
@@ -739,12 +725,6 @@ const npc_gem_synthesizer: NPCInteractable = {
       result: '使用10个中级经验石合成高级经验石，镶嵌后经验值+50%。',
       actionType: 'synthesize',
       actionParams: { recipeId: 'gaojijingyanshi' },
-    },
-    {
-      text: '合成高级战斗力石（需10个中级战斗力石）',
-      result: '使用10个中级战斗力石合成高级战斗力石，镶嵌后战斗力+5。',
-      actionType: 'synthesize',
-      actionParams: { recipeId: 'gaojizhandoulishi' },
     },
   ],
 };

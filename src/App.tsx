@@ -98,7 +98,7 @@ import {
   setAsMapProtector,
 } from './utils/mapChallengeUtils';
 import { claimMilitaryPay, formatMilitaryIntel, gainBattleExpAndPromote, getMilitaryRankDescription, getMilitaryRankName, queryBattleExp, queryMilitaryIntel } from './utils/militaryRankUtils';
-import { claimNobleReward, gainMeritAndPromote, getNextNobleRankMerit, getNobleRankName, getNobleRankSystemDescription } from './utils/nobleRankUtils';
+import { gainMeritAndPromote, getNextNobleRankMerit, getNobleRankName, getNobleRankSystemDescription } from './utils/nobleRankUtils';
 import { findPath } from './utils/pathfinding';
 // 导入幻兽生成工具函数
 import { gainExperience, generatePetByType, generateStarStrangePet } from './utils/petGenerator';
@@ -112,6 +112,8 @@ import {
 import { getDemonArmyDialogue, performChat, performGift, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
 // 导入存档系统工具函数
 import { deleteSave, hasSaveData, loadGame, saveGame } from './utils/saveUtils';
+// 导入技能学习工具函数
+import { learnSkillFromBook } from './utils/skillLearnUtils';
 // 导入战魂物品掉落工具函数
 import { checkWarSoulDrop } from './utils/warSoulDropUtils';
 
@@ -215,7 +217,6 @@ function App() {
 
   // 爵位和功勋状态
   const [nobleRank, setNobleRank] = useState(0); // 爵位等级（0-6）
-  const [lastNobleRewardClaimTime, setLastNobleRewardClaimTime] = useState<number | null>(null); // 上次领取爵位奖励的时间
 
   // 国王消息系统状态
   // 注意：setIsKingRescued将在救出国王的任务中使用
@@ -697,6 +698,7 @@ function App() {
       const dynamicEnemies: EnemyData[] = interactable.enemies.map((enemy) => {
         // 计算随机变化系数（±10%）
         const variationFactor = 0.9 + Math.random() * 0.2;
+
         return {
           ...enemy,
           level: playerLevel,
@@ -941,7 +943,7 @@ function App() {
       case 'receiveSalary':
         // 领取军饷
         // 使用游戏时间系统获取星期几
-        const weekday = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][timeSystem.nowday % 7] as any;
+        const weekday = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][timeSystem.nowday % 7] as any;
         const payResult = claimMilitaryPay(militaryRank, weekday, hasClaimedMilitaryPay);
 
         if (payResult.success) {
@@ -1126,19 +1128,6 @@ function App() {
         setInteractionLog(prev => [...prev, kingMessage]);
         // 添加弹窗显示
         showInfoModalWithContent('关于国王的消息', kingMessage);
-        break;
-
-      case 'receiveNobleReward':
-        // 领取爵位奖励
-        const nobleRewardResult = claimNobleReward(nobleRank, lastNobleRewardClaimTime);
-
-        if (nobleRewardResult.success && nobleRewardResult.reward) {
-          // 更新领取时间
-          setLastNobleRewardClaimTime(Date.now());
-          setInteractionLog(prev => [...prev, nobleRewardResult.message]);
-        } else {
-          setInteractionLog(prev => [...prev, nobleRewardResult.message]);
-        }
         break;
 
       // ========== 日常任务官 NPC 功能 ==========
@@ -2234,6 +2223,7 @@ function App() {
               } else {
                 newInventory.push(soulKingItem);
               }
+
               return newInventory;
             });
           }
@@ -2305,6 +2295,7 @@ function App() {
               } else {
                 newInventory.push(specialItem);
               }
+
               return newInventory;
             });
           }
@@ -2325,8 +2316,8 @@ function App() {
               setInfoModalTitle('🎉 救出国王！');
               setInfoModalContent(
                 `${character.playerName}击败魔族的高级军官了，并救出国王...\n` +
-                `随着国王的回来，人类军队的士气被激起到了最高点，他们已经准备好与魔族大军决战到底。\n` +
-                `因为英勇地救出了国王，你被授与王爵位。\n\n` +
+                '随着国王的回来，人类军队的士气被激起到了最高点，他们已经准备好与魔族大军决战到底。\n' +
+                '因为英勇地救出了国王，你被授与王爵位。\n\n' +
                 `奖励：12,000功勋、极品一洞+12${equipmentNames[randomType]}、${specialItemName}`
               );
             } else {
@@ -2335,8 +2326,8 @@ function App() {
               setInfoModalTitle('🎉 救出国王！');
               setInfoModalContent(
                 `${character.playerName}击败魔族的高级军官了，并救出国王...\n` +
-                `随着国王的回来，人类军队的士气被激起到了最高点，他们已经准备好与魔族大军决战到底。\n` +
-                `由于你的英勇作战，你获得了200,000魔石奖励。\n\n` +
+                '随着国王的回来，人类军队的士气被激起到了最高点，他们已经准备好与魔族大军决战到底。\n' +
+                '由于你的英勇作战，你获得了200,000魔石奖励。\n\n' +
                 `奖励：12,000功勋、极品一洞+12${equipmentNames[randomType]}、${specialItemName}、200,000魔石`
               );
             }
@@ -2965,6 +2956,41 @@ function App() {
    * @param item 要使用的物品
    */
   const handleUseItem = useCallback((item: InventoryItem) => {
+    // 检查是否是技能书
+    if (item.type === 'skillBook') {
+      const result = learnSkillFromBook(item, skills);
+
+      // 显示结果消息
+      setInteractionLog(prev => [...prev, result.message]);
+
+      if (result.success) {
+        // 更新技能列表
+        setSkills(result.updatedSkills);
+
+        // 消耗技能书
+        setInventory(prev => {
+          const index = prev.findIndex(i => i.id === item.id);
+          if (index !== -1) {
+            const newInventory = [...prev];
+            if (newInventory[index].quantity > 1) {
+              newInventory[index] = {
+                ...newInventory[index],
+                quantity: newInventory[index].quantity - 1,
+              };
+            } else {
+              newInventory.splice(index, 1);
+            }
+
+            return newInventory;
+          }
+
+          return prev;
+        });
+      }
+
+      return;
+    }
+
     // 检查是否是满经验球
     if (item.name === '满经验球') {
       setCurrentUseItem(item);
@@ -2993,7 +3019,7 @@ function App() {
         return prev;
       });
     }
-  }, []);
+  }, [skills]);
 
   /**
    * 对玩家使用满经验球

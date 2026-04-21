@@ -946,15 +946,6 @@ export interface MonsterSpawnConfig {
   interactableId: string; // 对应的交互对象ID
 }
 
-/**
- * 怪物交互接口
- * 扩展 EnemyInteractable，支持怪物模板引用
- */
-export interface MonsterInteractable extends EnemyInteractable {
-  monsterTemplateId: string; // 怪物模板ID
-  spawnConfigId: string; // 刷新配置ID
-}
-
 // ========== BOSS 系统类型定义 ==========
 
 /**
@@ -990,15 +981,6 @@ export interface BossSpawnConfig {
   bossTemplateId: string; // BOSS 模板ID
   location: string; // 所在地图ID
   interactableId: string; // 交互对象ID
-}
-
-/**
- * BOSS 交互接口
- * 扩展 EnemyInteractable，支持 BOSS 模板引用
- */
-export interface BossInteractable extends EnemyInteractable {
-  bossTemplateId: string; // BOSS 模板ID
-  spawnConfigId: string; // 刷新配置ID
 }
 
 // ========== 公主关系系统类型定义 ==========

@@ -4,7 +4,7 @@
  */
 
 import { bossSpawnConfigs, bossTemplates } from '../data/bossData';
-import type { BossSpawnConfig, BossTemplate, EnemyData } from '../types';
+import type { BossTemplate, EnemyData } from '../types';
 
 /**
  * 刷新结果接口
@@ -95,32 +95,3 @@ export function generateBossEnemyData(bossTemplate: BossTemplate, spawnId: strin
   return enemyData;
 }
 
-/**
- * 根据交互 ID 获取 BOSS 模板
- * @param interactableId 交互 ID
- * @returns BOSS 模板或 undefined
- */
-export function getBossTemplateByInteractableId(interactableId: string): BossTemplate | undefined {
-  const spawnConfig = bossSpawnConfigs.find(config => config.interactableId === interactableId);
-  if (!spawnConfig) {
-    return undefined;
-  }
-
-  return bossTemplates[spawnConfig.bossTemplateId];
-}
-
-/**
- * 获取所有 BOSS 模板
- * @returns BOSS 模板数组
- */
-export function getAllBossTemplates(): BossTemplate[] {
-  return Object.values(bossTemplates);
-}
-
-/**
- * 获取所有 BOSS 刷新配置
- * @returns BOSS 刷新配置数组
- */
-export function getAllBossSpawnConfigs(): BossSpawnConfig[] {
-  return bossSpawnConfigs;
-}

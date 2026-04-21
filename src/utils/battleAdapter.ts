@@ -4,7 +4,7 @@
  */
 
 // 导入技能伤害计算函数
-import { getBreakDefenseHits, getSkillDamagePercent } from '../data/skillData';
+import { getBreakDefenseHits, getSkillDamagePercent, getSkillDisplayName } from '../data/skillData';
 import type {
   BattleCharacter,
   BattleInitParams,
@@ -48,10 +48,13 @@ export function skillToBattleSkill(
   // 获取破防击数（仅对飞天连斩系列有效）
   const breakDefenseHits = getBreakDefenseHits(skill);
 
+  // 获取根据等级显示的技能名称（如"高级风斩"）
+  const displayName = getSkillDisplayName(skill);
+
   return {
     id: skill.id,
     skillIndex: skill.skillIndex,
-    name: skill.name,
+    name: displayName,
     icon: skill.icon,
     attackType: skill.attackType,
     level: skill.level,

@@ -20,6 +20,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 3,
     price: 1000,
     stackable: false,
+    usable: true,
     skillId: 'skill_wind_slash',
     isUpgrade: true,
     targetLevel: 2
@@ -36,6 +37,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 3,
     price: 10000,
     stackable: false,
+    usable: true,
     skillId: 'skill_earth_slash',
     isUpgrade: true,
     targetLevel: 2
@@ -52,6 +54,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 3,
     price: 5000,
     stackable: false,
+    usable: true,
     skillId: 'skill_star_sword'
   },
   // 高级星魔剑技能书
@@ -65,6 +68,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 4,
     price: 10000,
     stackable: false,
+    usable: true,
     skillId: 'skill_star_sword',
     isUpgrade: true
   },
@@ -80,6 +84,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 4,
     price: 8000,
     stackable: false,
+    usable: true,
     skillId: 'skill_flying_slash'
   },
   // 高级飞天连斩技能书
@@ -93,6 +98,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 5,
     price: 15000,
     stackable: false,
+    usable: true,
     skillId: 'skill_flying_slash',
     isUpgrade: true
   },
@@ -108,6 +114,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 3,
     price: 3000,
     stackable: false,
+    usable: true,
     skillId: 'skill_fighting_spirit',
     targetLevel: 1
   },
@@ -121,6 +128,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 3,
     price: 5000,
     stackable: false,
+    usable: true,
     skillId: 'skill_fighting_spirit',
     isUpgrade: true,
     targetLevel: 2
@@ -135,6 +143,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 4,
     price: 10000,
     stackable: false,
+    usable: true,
     skillId: 'skill_fighting_spirit',
     isUpgrade: true,
     targetLevel: 3
@@ -149,6 +158,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 4,
     price: 20000,
     stackable: false,
+    usable: true,
     skillId: 'skill_fighting_spirit',
     isUpgrade: true,
     targetLevel: 4
@@ -163,6 +173,7 @@ export const skillBookItems: InventoryItem[] = [
     quality: 5,
     price: 50000,
     stackable: false,
+    usable: true,
     skillId: 'skill_fighting_spirit',
     isUpgrade: true,
     targetLevel: 5

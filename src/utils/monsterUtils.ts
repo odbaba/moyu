@@ -98,44 +98,6 @@ export function isSpecialMonster(monsterType: MonsterType): boolean {
   return monsterType === 'boss' || monsterType === 'special' || monsterType === 'dungeon';
 }
 
-/**
- * 从模板生成怪物实例
- * 调用 calculateMonsterStats 计算属性
- * 生成唯一实例ID
- *
- * @param template - 怪物模板数据
- * @param instanceId - 可选的实例ID，如果不提供则自动生成
- * @returns 怪物实例
- */
-export function generateMonsterInstance(template: MonsterTemplate, instanceId?: string): Monster {
-  // 调用 calculateMonsterStats 计算属性
-  const monster = calculateMonsterStats(template);
-
-  // 生成唯一实例ID
-  // 如果提供了 instanceId 则使用，否则基于模板ID和时间戳生成
-  const uniqueId = instanceId || `${template.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-  // 更新实例ID
-  monster.id = uniqueId;
-
-  return monster;
-}
-
-/**
- * 获取指定地图的所有怪物模板
- * 接受怪物模板映射表作为参数，避免循环依赖
- *
- * @param templates - 怪物模板映射表
- * @param locationId - 地图ID
- * @returns 该地图的怪物模板数组
- */
-export function getMonstersByLocation(templates: Record<string, MonsterTemplate>, locationId: string): MonsterTemplate[] {
-  // templates 是一个 Record 对象，需要转换为数组后过滤
-  const templatesArray = Object.values(templates);
-
-  // 过滤出指定地图的怪物模板
-  return templatesArray.filter(template => template.location === locationId);
-}
 
 /**
  * 根据怪物生成战斗用的敌人列表
@@ -194,14 +156,3 @@ export function generateEnemiesForBattle(monster: Monster, spawnId?: string): En
   return enemies;
 }
 
-/**
- * 生成随机整数（包含最小值和最大值）
- * 辅助函数，用于生成随机范围内的整数
- *
- * @param min - 最小值
- * @param max - 最大值
- * @returns 随机整数
- */
-export function getRandomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
