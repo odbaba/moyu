@@ -19,12 +19,14 @@ interface MenuProps {
   onShowSkill: () => void;
   /** 显示幻兽页面的回调 */
   onShowPet: () => void;
+  /** 保存游戏的回调 */
+  onSaveGame: () => void;
 }
 
 /**
  * 菜单组件
  * 显示在右下角的菜单按钮和弹出菜单
- * 包含角色信息、幻兽、背包、技能、大地图、设置、帮助等功能入口
+ * 包含角色信息、幻兽、背包、技能、大地图、保存游戏、设置、帮助等功能入口
  */
 const Menu: React.FC<MenuProps> = ({
   isOpen,
@@ -33,8 +35,18 @@ const Menu: React.FC<MenuProps> = ({
   onShowCharacter,
   onShowInventory,
   onShowSkill,
-  onShowPet
+  onShowPet,
+  onSaveGame
 }) => {
+  /**
+   * 处理保存游戏点击
+   * 保存后关闭菜单
+   */
+  const handleSaveGame = () => {
+    onSaveGame();
+    onToggle();
+  };
+
   return (
     <div className="menu-container">
       {/* 菜单按钮 */}
@@ -49,6 +61,7 @@ const Menu: React.FC<MenuProps> = ({
           <button onClick={onShowInventory}>背包</button>
           <button onClick={onShowSkill}>技能</button>
           <button onClick={onShowMap}>大地图</button>
+          <button onClick={handleSaveGame}>保存游戏</button>
           <button>设置</button>
           <button>帮助</button>
         </div>

@@ -149,8 +149,9 @@ const PetPage: React.FC<PetPageProps> = ({
           <button
             className="pet-page-close-button"
             onClick={onClose}
+            aria-label="关闭"
           >
-            ✕ 关闭
+            ✕
           </button>
         </div>
 
@@ -207,6 +208,7 @@ const PetPage: React.FC<PetPageProps> = ({
                       pet={pet}
                       onClick={handlePetClick}
                       onDeploy={onDeploy}
+                      onRecall={onRecall}
                       canDeploy={canDeployMore}
                     />
                   ))}
@@ -223,6 +225,7 @@ const PetPage: React.FC<PetPageProps> = ({
                       pet={pet}
                       onClick={handlePetClick}
                       onDeploy={onDeploy}
+                      onRecall={onRecall}
                       canDeploy={canDeployMore}
                     />
                   ))}

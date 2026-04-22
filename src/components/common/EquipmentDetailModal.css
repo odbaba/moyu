@@ -142,12 +142,12 @@
   transform: scale(1.05);
 }
 
-/* 装备图片样式 */
+/* 装备图片样式 - 使用高清渲染 */
 .equipment-detail-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 /* 装备emoji图标样式 */

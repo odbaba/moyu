@@ -56,15 +56,6 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
   };
 
   /**
-   * 计算经验值百分比
-   */
-  const getExpPercent = (): string => {
-    if (!pet) return '0%';
-
-    return `${Math.round((pet.jy / pet.mjy) * 100)}%`;
-  };
-
-  /**
    * 计算罕见度加分
    * 基于幻兽类型的基础评分
    */
@@ -89,7 +80,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
           onClick={onClose}
           aria-label="关闭"
         >
-          ×
+          ✕
         </button>
 
         {/* 幻兽头部信息：图标和名称 */}
@@ -107,20 +98,12 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
 
         {/* 详细信息表格 */}
         <div className="pet-detail-table">
-          {/* 第一行：名字和幻兽类型 */}
+          {/* 第一行：名字和品质称号 */}
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">名字</span>
               <span className="cell-value">{pet.othername}</span>
             </div>
-            <div className="pet-detail-cell">
-              <span className="cell-label">幻兽类型</span>
-              <span className="cell-value">{pet.hs_name}</span>
-            </div>
-          </div>
-
-          {/* 第二行：品质称号和等级 */}
-          <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">品质称号</span>
               <span
@@ -130,9 +113,17 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
                 {pet.qualityTitle}
               </span>
             </div>
+          </div>
+
+          {/* 第二行：等级和转世 */}
+          <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">等级</span>
               <span className="cell-value">{pet.dj}</span>
+            </div>
+            <div className="pet-detail-cell">
+              <span className="cell-label">转世</span>
+              <span className="cell-value">{pet.zs}次</span>
             </div>
           </div>
 
@@ -144,32 +135,35 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </div>
             <div className="pet-detail-cell">
               <span className="cell-label">经验</span>
-              <span className="cell-value exp-value">{getExpPercent()}</span>
+              <span className="cell-value exp-value">{pet.jy}/{pet.mjy}</span>
             </div>
           </div>
 
-          {/* 第四行：攻击 */}
+          {/* 第四行：攻击和防御 */}
           <div className="pet-detail-row">
-            <div className="pet-detail-cell full-width">
+            <div className="pet-detail-cell">
               <span className="cell-label">攻击</span>
               <span className="cell-value attack-value">{pet.xgj}-{pet.dgj}</span>
             </div>
-          </div>
-
-          {/* 第五行：防御成长率 */}
-          <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">防御</span>
               <span className="cell-value defense-value">{pet.fy}</span>
             </div>
+          </div>
+
+          {/* 第五行：防御成长率和评分 */}
+          <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">防御成长率</span>
               <span className="cell-value">{formatGrowthRate(pet.cz_fy)}</span>
-              <span className="cell-score">评分:{pet.rating.pz_cz_fy}</span>
+            </div>
+            <div className="pet-detail-cell">
+              <span className="cell-label">防御评分</span>
+              <span className="cell-value">{pet.rating.pz_cz_fy}</span>
             </div>
           </div>
 
-          {/* 第六行：生命成长率 */}
+          {/* 第六行：生命成长率和评分 */}
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">生命成长率</span>
@@ -181,7 +175,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </div>
           </div>
 
-          {/* 第七行：攻击成长率 */}
+          {/* 第七行：攻击成长率和评分 */}
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">攻击成长率</span>
@@ -193,7 +187,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </div>
           </div>
 
-          {/* 第八行：初始生命 */}
+          {/* 第八行：初始生命和评分 */}
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">初始生命</span>
@@ -205,7 +199,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </div>
           </div>
 
-          {/* 第九行：初始攻击 */}
+          {/* 第九行：初始攻击和评分 */}
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">初始攻击</span>
@@ -217,7 +211,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </div>
           </div>
 
-          {/* 第十行：初始防御 */}
+          {/* 第十行：初始防御和评分 */}
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">初始防御</span>
@@ -229,15 +223,11 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             </div>
           </div>
 
-          {/* 第十一行：罕见度和转世 */}
+          {/* 第十一行：罕见度 */}
           <div className="pet-detail-row">
-            <div className="pet-detail-cell">
+            <div className="pet-detail-cell full-width">
               <span className="cell-label">罕见度</span>
               <span className="cell-value rarity-value">+{getRarityBonus()}</span>
-            </div>
-            <div className="pet-detail-cell">
-              <span className="cell-label">转世</span>
-              <span className="cell-value">{pet.zs}次</span>
             </div>
           </div>
 
@@ -269,14 +259,12 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
             {/* 已出战提示 */}
             {pet.isDeployed && (
               <div className="pet-detail-deployed-info">
-                <span className="deployed-icon">⚔️</span>
                 <span className="deployed-text">已出战</span>
               </div>
             )}
             {/* 无法出战提示 */}
             {!pet.isDeployed && onDeploy && !canDeploy && (
               <div className="pet-detail-cannot-deploy">
-                <span className="cannot-icon">⚠️</span>
                 <span className="cannot-text">出战位置已满</span>
               </div>
             )}

@@ -49,18 +49,6 @@ const DeployedPetSlot: React.FC<DeployedPetSlotProps> = ({
   onUnmerge
 }) => {
   /**
-   * 计算生命值百分比
-   * 用于显示生命值进度条
-   */
-  const hpPercent = pet ? Math.round((pet.hp / pet.mhp) * 100) : 0;
-
-  /**
-   * 计算经验值百分比
-   * 用于显示经验值进度条
-   */
-  const expPercent = pet ? Math.round((pet.jy / pet.mjy) * 100) : 0;
-
-  /**
    * 处理召回按钮点击
    */
   const handleRecall = () => {
@@ -98,7 +86,6 @@ const DeployedPetSlot: React.FC<DeployedPetSlotProps> = ({
           <span className="slot-index">位置 {slotIndex + 1}</span>
         </div>
         <div className="empty-slot-content">
-          <span className="empty-icon">💨</span>
           <span className="empty-text">空</span>
         </div>
       </div>
@@ -134,11 +121,11 @@ const DeployedPetSlot: React.FC<DeployedPetSlotProps> = ({
 
           {/* 生命值进度条 */}
           <div className="pet-stat-bar">
-            <div className="stat-label">❤️ 生命</div>
+            <div className="stat-label">生命</div>
             <div className="stat-bar-container">
               <div
                 className="stat-bar-fill hp-fill"
-                style={{ width: `${hpPercent}%` }}
+                style={{ width: `${Math.round((pet.hp / pet.mhp) * 100)}%` }}
               />
               <span className="stat-bar-text">
                 {pet.hp}/{pet.mhp}
@@ -148,14 +135,14 @@ const DeployedPetSlot: React.FC<DeployedPetSlotProps> = ({
 
           {/* 经验值进度条 */}
           <div className="pet-stat-bar">
-            <div className="stat-label">⭐ 经验</div>
+            <div className="stat-label">经验</div>
             <div className="stat-bar-container">
               <div
                 className="stat-bar-fill exp-fill"
-                style={{ width: `${expPercent}%` }}
+                style={{ width: `${Math.round((pet.jy / pet.mjy) * 100)}%` }}
               />
               <span className="stat-bar-text">
-                {expPercent}%
+                {pet.jy}/{pet.mjy}
               </span>
             </div>
           </div>

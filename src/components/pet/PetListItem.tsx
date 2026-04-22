@@ -25,6 +25,11 @@ interface PetListItemProps {
    */
   onDeploy?: (petId: string) => void;
   /**
+   * 召回幻兽的回调函数（可选）
+   * @param petId 要召回的幻兽ID
+   */
+  onRecall?: (petId: string) => void;
+  /**
    * 是否可以出战（可选，默认为true）
    * 当已有两只幻兽出战时，应该为false
    */
@@ -41,6 +46,7 @@ const PetListItem: React.FC<PetListItemProps> = ({
   pet,
   onClick,
   onDeploy,
+  onRecall,
   canDeploy = true
 }) => {
   /**
@@ -62,6 +68,17 @@ const PetListItem: React.FC<PetListItemProps> = ({
   };
 
   /**
+   * 处理召回按钮点击事件
+   * 阻止事件冒泡，避免触发列表项点击
+   */
+  const handleRecallClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onRecall && pet.isDeployed) {
+      onRecall(pet.id);
+    }
+  };
+
+  /**
    * 获取幻兽状态标签
    * 显示出战或合体状态
    */
@@ -75,12 +92,6 @@ const PetListItem: React.FC<PetListItemProps> = ({
 
     return null;
   };
-
-  /**
-   * 判断是否显示出战按钮
-   * 未出战且提供了onDeploy回调时显示
-   */
-  const showDeployButton = !pet.isDeployed && onDeploy && canDeploy;
 
   return (
     <div
@@ -105,28 +116,36 @@ const PetListItem: React.FC<PetListItemProps> = ({
           {getStatusBadge()}
         </div>
 
-        {/* 幻兽类型和等级 */}
+        {/* 幻兽品质称号和等级 */}
         <div className="pet-list-meta">
-          <span className="pet-list-type">{pet.hs_name}</span>
+          <span
+            className="pet-list-type"
+            style={{ color: getPetQualityColor(pet.qualityTitle) }}
+          >
+            {pet.qualityTitle}
+          </span>
           <span className="pet-list-level">Lv.{pet.dj}</span>
         </div>
       </div>
 
-      {/* 出战按钮或品质称号标签 */}
-      {showDeployButton ? (
+      {/* 出战/召回按钮 */}
+      {pet.isDeployed ? (
+        /* 已出战 - 显示召回按钮 */
         <button
-          className="pet-deploy-button"
+          className="pet-recall-button"
+          onClick={handleRecallClick}
+        >
+          召回
+        </button>
+      ) : (
+        /* 未出战 - 显示出战按钮 */
+        <button
+          className={`pet-deploy-button ${!canDeploy ? 'disabled' : ''}`}
           onClick={handleDeployClick}
+          disabled={!canDeploy}
         >
           出战
         </button>
-      ) : (
-        <div
-          className="pet-list-quality"
-          style={{ backgroundColor: getPetQualityColor(pet.qualityTitle) }}
-        >
-          {pet.qualityTitle}
-        </div>
       )}
     </div>
   );

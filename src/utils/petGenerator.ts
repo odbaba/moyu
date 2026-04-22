@@ -46,7 +46,7 @@ export interface PetGenerateOptions {
  */
 export function getQualityTitle(score: number): string {
   if (score >= 100) {
-    const stars = Math.floor(score / 100);
+    const stars = (score / 100).toFixed(2);
 
     return `极品${stars}星`;
   } else if (score >= 75) {

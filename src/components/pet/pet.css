@@ -57,31 +57,27 @@
 
 /* 幻兽页面标题 */
 .pet-page-title {
-  color: #ffd700;
+  color: #FFFFFF;
   font-size: 1.2rem;
   margin: 0;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 /* 关闭按钮样式 */
 .pet-page-close-button {
-  padding: 6px 15px;
-  background-color: rgba(255, 107, 107, 0.2);
-  border: 1px solid #ff6b6b;
+  padding: 5px 12px;
+  background-color: transparent;
+  border: none;
   border-radius: 4px;
-  color: #ff6b6b;
+  color: #FFFFFF;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 1.5rem;
+  font-weight: bold;
   transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
 
 /* 关闭按钮悬停效果 */
 .pet-page-close-button:hover {
-  background-color: rgba(255, 107, 107, 0.4);
-  box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
-  transform: translateY(-1px);
+  color: #ff6b6b;
 }
 
 /* 主要内容区域 - 移动端上下布局 */
@@ -552,17 +548,6 @@
   font-size: 0.75rem;
 }
 
-/* 品质标签 */
-.pet-list-quality {
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  flex-shrink: 0;
-}
-
 /* 幻兽列表项出战按钮 */
 .pet-deploy-button {
   padding: 6px 12px;
@@ -587,6 +572,42 @@
   transform: scale(0.95);
 }
 
+/* 出战按钮置灰状态 */
+.pet-deploy-button.disabled {
+  background: linear-gradient(180deg, #666 0%, #444 100%);
+  border-color: #333;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pet-deploy-button.disabled:hover {
+  transform: none;
+}
+
+/* 幻兽列表项召回按钮 */
+.pet-recall-button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #ff9800 0%, #f57c00 100%);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 1px solid #e65100;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.pet-recall-button:hover {
+  background: linear-gradient(180deg, #ffb74d 0%, #ff9800 100%);
+  transform: scale(1.05);
+}
+
+.pet-recall-button:active {
+  transform: scale(0.95);
+}
+
 /* ========== 幻兽详情弹窗样式 ========== */
 
 .pet-detail-modal-overlay {
@@ -606,12 +627,12 @@
 .pet-detail-modal-content {
   background-color: #252935;
   border-radius: 8px;
-  padding: 20px;
+  padding: 15px;
   width: 90%;
   max-width: 450px;
   max-height: 85vh;
   overflow-y: auto;
-  border: 2px solid #ffd700;
+  border: 1px solid #000000;
   animation: slideIn 0.3s ease;
   position: relative;
 }
@@ -640,12 +661,13 @@
   top: 10px;
   right: 10px;
   background-color: transparent;
-  color: #f0f0f0;
+  color: #FFFFFF;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
   line-height: 1;
+  font-weight: bold;
   transition: color 0.3s ease;
 }
 
@@ -657,27 +679,23 @@
 .pet-detail-header {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #444;
 }
 
 .pet-detail-icon-wrapper {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #252935;
-  border-radius: 10px;
-  border: 2px solid #555;
+  border-radius: 8px;
+  border: 1px solid #555;
   flex-shrink: 0;
   overflow: hidden;
-}
-
-.pet-detail-emoji {
-  font-size: 2.5rem;
 }
 
 /* 幻兽详情头像图片样式 */
@@ -689,29 +707,28 @@
 }
 
 .pet-detail-name {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   margin: 0;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
 /* 详细信息表格 */
 .pet-detail-table {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .pet-detail-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  gap: 4px;
 }
 
 .pet-detail-cell {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 8px;
+  gap: 1px;
+  padding: 5px 8px;
   background-color: #252935;
   border-radius: 4px;
 }
@@ -725,27 +742,21 @@
 
 .cell-label {
   color: #888;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
 .cell-value {
-  color: #f0f0f0;
-  font-size: 0.9rem;
-  font-weight: bold;
-}
-
-.cell-score {
-  color: #ffd700;
-  font-size: 0.7rem;
-  margin-left: 5px;
-}
-
-.quality-value {
+  color: #FFFFFF;
+  font-size: 0.85rem;
   font-weight: bold;
 }
 
 .hp-value {
   color: #ff6b6b;
+}
+
+.quality-value {
+  font-weight: bold;
 }
 
 .exp-value {
@@ -769,11 +780,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  background-color: rgba(255, 215, 0, 0.1);
-  border: 2px solid #ffd700;
-  border-radius: 8px;
-  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #252935;
+  border: 1px solid #000000;
+  border-radius: 6px;
+  margin-top: 6px;
 }
 
 /* 详情弹窗操作按钮区域 */
@@ -781,16 +792,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 15px;
-  margin-top: 10px;
+  padding: 10px;
+  margin-top: 6px;
   gap: 10px;
 }
 
 /* 详情弹窗出战按钮 */
 .pet-detail-button {
-  padding: 10px 30px;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: 8px 25px;
+  border-radius: 4px;
+  font-size: 0.85rem;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -817,51 +828,44 @@
 .pet-detail-deployed-info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
+  gap: 5px;
+  padding: 6px 15px;
   background: rgba(76, 175, 80, 0.2);
-  border-radius: 6px;
+  border-radius: 4px;
   border: 1px solid #4caf50;
-}
-
-.pet-detail-deployed-info .deployed-icon {
-  font-size: 1.2rem;
 }
 
 .pet-detail-deployed-info .deployed-text {
   color: #4caf50;
   font-weight: bold;
+  font-size: 0.85rem;
 }
 
 /* 无法出战提示 */
 .pet-detail-cannot-deploy {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
+  gap: 5px;
+  padding: 6px 15px;
   background: rgba(255, 152, 0, 0.2);
-  border-radius: 6px;
+  border-radius: 4px;
   border: 1px solid #ff9800;
-}
-
-.pet-detail-cannot-deploy .cannot-icon {
-  font-size: 1.2rem;
 }
 
 .pet-detail-cannot-deploy .cannot-text {
   color: #ff9800;
   font-weight: bold;
+  font-size: 0.85rem;
 }
 
 .total-label {
-  color: #888;
-  font-size: 0.95rem;
+  color: #FFFFFF;
+  font-size: 0.85rem;
 }
 
 .total-value {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 /* ========== 动画效果 ========== */
@@ -960,12 +964,8 @@
     height: 50px;
   }
 
-  .pet-detail-emoji {
-    font-size: 2rem;
-  }
-
   .pet-detail-name {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 }
 

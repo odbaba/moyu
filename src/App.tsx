@@ -117,7 +117,8 @@ import {
 // 导入 NPC 相关工具函数
 import { getChatDialogue, getDemonArmyDialogue, getNextRelationshipRequirement, getRelationshipName, performChat, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
 // 导入存档系统工具函数
-import { deleteSave, hasSaveData, loadGame, saveGame } from './utils/saveUtils';
+import type { SaveData } from './utils/saveUtils';
+import { deleteSave, getSaveVersion, hasSaveData, loadGame, saveGame } from './utils/saveUtils';
 // 导入技能学习工具函数
 import { learnSkillFromBook } from './utils/skillLearnUtils';
 // 导入战魂物品掉落工具函数
@@ -292,19 +293,62 @@ function App() {
 
   /**
    * 处理"继续游戏"
-   * 从存档读取数据，恢复游戏状态
+   * 从存档读取所有数据，完整恢复游戏状态
    */
   const handleContinueGame = useCallback(() => {
     // 从存档读取数据
     const savedData = loadGame();
     if (savedData) {
-      // 使用存档数据恢复战魂系统状态
-      setWumingshiDefeated(savedData.wumingshiDefeated ?? false);
-      setWarSoulSystemEnabled(savedData.warSoulSystemEnabled ?? false);
-      // 恢复PK赛参与状态
-      setHasParticipatedPKToday(savedData.hasParticipatedPKToday ?? false);
+      // 恢复位置
+      setCurrentLocation(savedData.currentLocation ?? 'kasanuocheng');
+      // 恢复时间系统
+      setTimeSystem(savedData.timeSystem ?? createInitialTimeSystem());
+      // 恢复角色数据
+      setCharacter(savedData.character);
+      // 恢复玩家资源
+      setPlayerResources(savedData.playerResources);
+      // 恢复装备槽位
+      setEquippedItems(savedData.equippedItems);
+      // 恢复背包
+      setInventory(savedData.inventory);
+      // 恢复幻兽
+      setPets(savedData.pets);
+      // 恢复技能
+      setSkills(savedData.skills);
+      // 恢复军衔和战功
+      _setMilitaryRank(savedData.militaryRank ?? 0);
+      _setBattleExp(savedData.battleExp ?? 0);
+      setHasClaimedMilitaryPay(savedData.hasClaimedMilitaryPay ?? false);
+      // 恢复爵位
+      setNobleRank(savedData.nobleRank ?? 0);
+      // 恢复公主关系
+      setPrincessRelationship(savedData.princessRelationship);
       // 恢复国王救出状态
       _setIsKingRescued(savedData.isKingRescued ?? false);
+      // 恢复探险家解锁状态
+      setExplorerUnlocked(savedData.explorerUnlocked ?? false);
+      // 恢复神秘人触发状态
+      setMysteriousPersonTriggered(savedData.mysteriousPersonTriggered ?? false);
+      // 恢复无名氏击败状态
+      setWumingshiDefeated(savedData.wumingshiDefeated ?? false);
+      // 恢复战魂系统开启状态
+      setWarSoulSystemEnabled(savedData.warSoulSystemEnabled ?? false);
+      // 恢复已击杀怪物和已刷新BOSS（Array→Set）
+      setKilledMonsters(new Set(savedData.killedMonsters ?? []));
+      setSpawnedBosses(new Set(savedData.spawnedBosses ?? []));
+      // 恢复日常任务状态
+      setDailyTaskState(savedData.dailyTaskState ?? createInitialDailyTaskState());
+      // 恢复地图挑战状态
+      setMapChallengeState(savedData.mapChallengeState ?? createInitialMapChallengeState());
+      // 恢复PK赛参与状态
+      setHasParticipatedPKToday(savedData.hasParticipatedPKToday ?? false);
+      // 恢复丫环交易状态
+      setMaid1DailyPurchaseCount(savedData.maid1DailyPurchaseCount ?? 0);
+      setHasPurchasedYearPig(savedData.hasPurchasedYearPig ?? false);
+      // 恢复电浆药水使用状态
+      setHasUsedDianJiangYaoShuiToday(savedData.hasUsedDianJiangYaoShuiToday ?? false);
+      // 恢复幻兽研究所状态
+      setPetInstituteState(savedData.petInstituteState ?? createInitialPetInstituteState());
     }
     // 关闭封面页，进入游戏主界面
     setShowCover(false);
@@ -453,15 +497,63 @@ function App() {
   // currentLocation 引用，用于解决闭包问题
   const currentLocationRef = useRef(currentLocation);
 
-  // 当战魂系统状态或无名氏击败状态或PK赛参与状态或国王救出状态变化时，自动保存到存档
-  useEffect(() => {
-    saveGame({
-      warSoulSystemEnabled,
-      wumingshiDefeated,
-      hasParticipatedPKToday,
+  // 当战魂系统状态或无名氏击败状态或PK赛参与状态或国王救出状态变化时，不再自动保存
+  // 改为手动保存（菜单中"保存游戏"按钮触发）
+
+  /**
+   * 处理"保存游戏"
+   * 收集所有游戏状态并保存到 localStorage
+   * @returns 是否保存成功
+   */
+  const handleSaveGame = useCallback((): boolean => {
+    // 收集所有游戏状态，Set 类型需转为 Array 以便 JSON 序列化
+    const saveData: SaveData = {
+      version: getSaveVersion(),
+      currentLocation,
+      timeSystem,
+      character,
+      playerResources,
+      equippedItems,
+      inventory,
+      pets,
+      skills,
+      militaryRank,
+      battleExp,
+      hasClaimedMilitaryPay,
+      nobleRank,
+      princessRelationship,
       isKingRescued,
-    });
-  }, [warSoulSystemEnabled, wumingshiDefeated, hasParticipatedPKToday, isKingRescued]);
+      explorerUnlocked,
+      mysteriousPersonTriggered,
+      wumingshiDefeated,
+      warSoulSystemEnabled,
+      killedMonsters: Array.from(killedMonsters),
+      spawnedBosses: Array.from(spawnedBosses),
+      dailyTaskState: _dailyTaskState,
+      mapChallengeState,
+      hasParticipatedPKToday,
+      maid1DailyPurchaseCount,
+      hasPurchasedYearPig,
+      hasUsedDianJiangYaoShuiToday,
+      petInstituteState,
+    };
+    const success = saveGame(saveData);
+    // 在交互日志中显示保存结果
+    if (success) {
+      setInteractionLog(prev => [...prev, '💾 游戏保存成功！']);
+    } else {
+      setInteractionLog(prev => [...prev, '❌ 游戏保存失败！']);
+    }
+    return success;
+  }, [
+    currentLocation, timeSystem, character, playerResources, equippedItems,
+    inventory, pets, skills, militaryRank, battleExp, hasClaimedMilitaryPay,
+    nobleRank, princessRelationship, isKingRescued, explorerUnlocked,
+    mysteriousPersonTriggered, wumingshiDefeated, warSoulSystemEnabled,
+    killedMonsters, spawnedBosses, _dailyTaskState, mapChallengeState,
+    hasParticipatedPKToday, maid1DailyPurchaseCount, hasPurchasedYearPig,
+    hasUsedDianJiangYaoShuiToday, petInstituteState,
+  ]);
 
   // 游戏初始化时的第一天日志和 BOSS 刷新
   useEffect(() => {
@@ -3855,6 +3947,7 @@ function App() {
             onShowInventory={() => setShowInventoryPage(true)}
             onShowSkill={() => setShowSkillPage(true)}
             onShowPet={() => setShowPetPage(true)}
+            onSaveGame={handleSaveGame}
           />
 
           {/* 大地图 */}

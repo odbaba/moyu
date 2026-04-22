@@ -135,7 +135,7 @@ const AttributeDetailTooltip: React.FC<AttributeDetailTooltipProps> = ({
       )}
 
       {/* 天魂百分比加成（仅攻击力显示） */}
-      {data.soulPercent && data.soulPercent > 0 && (
+      {data.soulPercent !== undefined && data.soulPercent > 0 && (
         <div className="attribute-tooltip-row">
           <span className="attribute-tooltip-label">天魂加成</span>
           <span className="attribute-tooltip-value soul">
