@@ -56,7 +56,7 @@ export const EQUIPMENT_SLOT_TYPE_NAMES: Record<string, string> = {
 
 /**
  * 幻兽类型对应的emoji图标映射
- * 用于在UI中显示幻兽头像
+ * 用于在UI中显示幻兽头像（备用方案）
  */
 export const PET_TYPE_EMOJI: Record<string, string> = {
   '攻防型': '🦁',
@@ -66,6 +66,20 @@ export const PET_TYPE_EMOJI: Record<string, string> = {
   '圣天使': '👼',
   '守护': '🛡️',
   '年猪': '🐗'
+};
+
+/**
+ * 幻兽类型对应的拼音文件名映射
+ * 用于获取幻兽头像图片路径
+ */
+export const PET_TYPE_PINYIN: Record<string, string> = {
+  '攻防型': 'gongfangxing',
+  '调皮鬼': 'tiaopigui',
+  '吉鲁猪': 'jiluzhu',
+  '奇异兽': 'qiyishou',
+  '圣天使': 'shengtianshi',
+  '守护': 'shouhu',
+  '年猪': 'nianzhu'
 };
 
 /**

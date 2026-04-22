@@ -309,7 +309,7 @@ const Battle: React.FC<BattleProps> = ({
         attackMin: totalAttributes.attackMin, // 使用总最小攻击力
         attackMax: totalAttributes.attackMax, // 使用总最大攻击力
         defense: totalAttributes.defense, // 使用总防御力
-        combatPower: calculateTotalCombatPower(playerData, deployedPets), // 使用完整的战斗力计算
+        combatPower: calculateTotalCombatPower(playerData, deployedPets, playerSkills), // 使用完整的战斗力计算（包含斗志抑扬加成）
         dodgeRate: totalAttributes.dodgeRate, // 使用总闪避率
         // 如果升级了，恢复满血；否则保持当前HP
         currentHp: playerLeveledUp ? totalAttributes.maxHp : prev.player.currentHp,
@@ -656,27 +656,24 @@ const Battle: React.FC<BattleProps> = ({
 
   /**
    * 处理多段攻击结果
+   * 优化为连续攻击动画效果，每次攻击独立播放动画和显示伤害数字
+   * 当目标阵亡后，自动切换到血量最低的敌人继续攻击
    * @param result 攻击结果
    * @param attacker 攻击者
    * @param skill 使用的技能
+   * @param onComplete 所有攻击完成后的回调函数
    */
   const handleMultiAttackResult = (
     result: { defender: BattleCharacter; damageResults: DamageResult[]; logEntries: BattleLogEntry[] },
     attacker: BattleCharacter,
-    skill: BattleSkill
+    skill: BattleSkill,
+    onComplete?: () => void
   ) => {
-    // 播放攻击动画
-    setAttackingCharacterId(attacker.id);
+    // 逐次播放每次攻击的动画和伤害
+    const attackCount = result.damageResults.length;
+    const attackDelay = 400; // 每次攻击之间的延迟（毫秒）
 
-    // 添加所有伤害数字和日志
-    result.damageResults.forEach((damageResult, index) => {
-      if (damageResult.damage > 0) {
-        addDamageNumber(damageResult.damage, result.defender.id);
-      }
-      addBattleLog(result.logEntries[index]);
-    });
-
-    // 更新状态
+    // 更新攻击者资源（只更新一次）
     setBattleState(prev => {
       const newState = { ...prev };
 
@@ -689,42 +686,138 @@ const Battle: React.FC<BattleProps> = ({
         );
       }
 
-      // 更新防御者生命值
-      if (result.defender.isPlayer) {
-        newState.player = result.defender;
-      } else {
-        // 更新敌人列表
-        newState.enemies = newState.enemies.map(enemy =>
-          enemy.id === result.defender.id ? result.defender : enemy
-        );
-
-        // 检查敌人是否阵亡，添加阵亡日志
-        if (result.defender.currentHp <= 0) {
-          const deathLogEntry: BattleLogEntry = {
-            id: generateLogId(),
-            round: newState.round,
-            actor: result.defender.name,
-            actorId: result.defender.id,
-            action: `${result.defender.name} 阵亡了！`,
-            actionType: 'death',
-            damage: 0,
-            target: result.defender.name,
-            targetId: result.defender.id
-          };
-          newState.battleLogs = [...newState.battleLogs, deathLogEntry];
-        }
-      }
-
-      // 检查战斗是否结束
-      newState.battleResult = checkBattleEnd(newState);
-
       return newState;
     });
 
-    // 攻击动画结束
-    setTimeout(() => {
-      setAttackingCharacterId(null);
-    }, 500);
+    // 逐次播放每次攻击
+    result.damageResults.forEach((damageResult, index) => {
+      setTimeout(() => {
+        // 播放攻击动画
+        setAttackingCharacterId(attacker.id);
+
+        // 查找当前目标（检查是否存活）
+        let currentTargetId = result.defender.id;
+        let isNewTarget = false;
+        let switchLogEntry: BattleLogEntry | null = null;
+        let attackLogEntry: BattleLogEntry | null = null;
+        let deathLogEntry: BattleLogEntry | null = null;
+
+        setBattleState(prev => {
+          const newState = { ...prev };
+
+          // 获取当前目标
+          let currentDefender = newState.enemies.find(e => e.id === currentTargetId) ||
+                                 (newState.player.id === currentTargetId ? newState.player : null);
+
+          // 检查目标是否存活
+          if (!currentDefender || currentDefender.currentHp <= 0) {
+            // 目标已阵亡，寻找血量最低的存活敌人
+            const aliveEnemies = newState.enemies.filter(e => e.currentHp > 0);
+
+            if (aliveEnemies.length > 0) {
+              // 找到血量最低的敌人
+              const lowestHpEnemy = aliveEnemies.reduce((lowest, enemy) =>
+                enemy.currentHp < lowest.currentHp ? enemy : lowest
+              );
+
+              currentDefender = lowestHpEnemy;
+              currentTargetId = lowestHpEnemy.id;
+              isNewTarget = true;
+
+              // 创建目标切换日志
+              switchLogEntry = {
+                id: generateLogId(),
+                round: newState.round,
+                actor: attacker.name,
+                actorId: attacker.id,
+                action: `目标已阵亡，自动切换攻击 ${lowestHpEnemy.name}`,
+                actionType: 'skill',
+                damage: 0,
+                target: lowestHpEnemy.name,
+                targetId: lowestHpEnemy.id,
+                skillName: skill.name
+              };
+            }
+          }
+
+          // 如果找到了有效目标，执行攻击
+          if (currentDefender && currentDefender.currentHp > 0) {
+            // 添加伤害数字
+            if (damageResult.damage > 0) {
+              addDamageNumber(damageResult.damage, currentDefender.id);
+            }
+
+            // 创建战斗日志（如果是新目标，需要修改日志内容）
+            attackLogEntry = isNewTarget ? {
+              ...result.logEntries[index],
+              id: generateLogId(),
+              target: currentDefender.name,
+              targetId: currentDefender.id,
+              action: `使用 ${skill.name} 第 ${index + 1} 击攻击 ${currentDefender.name}`
+            } : result.logEntries[index];
+
+            // 直接从当前HP扣除本次伤害
+            const updatedDefender = {
+              ...currentDefender,
+              currentHp: Math.max(0, currentDefender.currentHp - damageResult.damage)
+            };
+
+            // 更新防御者
+            if (updatedDefender.isPlayer) {
+              newState.player = updatedDefender;
+            } else {
+              newState.enemies = newState.enemies.map(enemy =>
+                enemy.id === updatedDefender.id ? updatedDefender : enemy
+              );
+
+              // 检查敌人是否阵亡
+              if (updatedDefender.currentHp <= 0) {
+                deathLogEntry = {
+                  id: generateLogId(),
+                  round: newState.round,
+                  actor: updatedDefender.name,
+                  actorId: updatedDefender.id,
+                  action: `${updatedDefender.name} 阵亡了！`,
+                  actionType: 'death',
+                  damage: 0,
+                  target: updatedDefender.name,
+                  targetId: updatedDefender.id
+                };
+              }
+            }
+          }
+
+          // 添加所有日志到状态
+          const newLogs: BattleLogEntry[] = [];
+          if (switchLogEntry) newLogs.push(switchLogEntry);
+          if (attackLogEntry) newLogs.push(attackLogEntry);
+          if (deathLogEntry) newLogs.push(deathLogEntry);
+
+          if (newLogs.length > 0) {
+            newState.battleLogs = [...newState.battleLogs, ...newLogs];
+          }
+
+          // 检查战斗是否结束（只在最后一次攻击后检查）
+          if (index === attackCount - 1) {
+            newState.battleResult = checkBattleEnd(newState);
+          }
+
+          return newState;
+        });
+
+        // 攻击动画结束
+        setTimeout(() => {
+          setAttackingCharacterId(null);
+        }, 300);
+
+        // 如果是最后一次攻击，调用回调函数
+        if (index === attackCount - 1 && onComplete) {
+          setTimeout(() => {
+            onComplete();
+          }, 350);
+        }
+      }, index * attackDelay);
+    });
   };
 
   /**
@@ -792,11 +885,13 @@ const Battle: React.FC<BattleProps> = ({
    * @param attacker 攻击者
    * @param defender 防御者（可以是主角或敌人）
    * @param skill 使用的技能
+   * @param onComplete 攻击完成后的回调函数（用于多段攻击）
    */
   const executeSkillAttack = (
     attacker: BattleCharacter,
     defender: BattleCharacter | BattlePet | null,
-    skill: BattleSkill
+    skill: BattleSkill,
+    onComplete?: () => void
   ) => {
     // 如果防御者是幻兽（BattlePet），需要转换为 BattleCharacter 格式
     // 这种情况不应该发生，因为怪物始终攻击主角
@@ -840,18 +935,22 @@ const Battle: React.FC<BattleProps> = ({
     switch (result.type) {
       case 'single':
         handleSingleAttackResult(result, attacker, skill);
+        if (onComplete) onComplete();
         break;
       case 'aoe':
         handleAoeAttackResult(result, attacker, skill);
+        if (onComplete) onComplete();
         break;
       case 'multi':
-        handleMultiAttackResult(result, attacker, skill);
+        handleMultiAttackResult(result, attacker, skill, onComplete);
         break;
       case 'buff':
         handleBuffResult(result, attacker, skill);
+        if (onComplete) onComplete();
         break;
       case 'special':
         handleSingleAttackResult(result, attacker, skill);
+        if (onComplete) onComplete();
         break;
     }
   };
@@ -880,16 +979,16 @@ const Battle: React.FC<BattleProps> = ({
 
     // 增益技能不需要选择目标
     if (skill.attackType === 'buff') {
-      executeSkillAttack(battleState.player, null, skill);
-
-      // 清除选择并切换到敌人回合，重置敌人行动索引
-      setBattleState(prev => ({
-        ...prev,
-        selectedAction: null,
-        targetEnemy: null,
-        isPlayerTurn: false,
-        currentEnemyActionIndex: 0 // 重置敌人行动索引
-      }));
+      executeSkillAttack(battleState.player, null, skill, () => {
+        // 清除选择并切换到敌人回合，重置敌人行动索引
+        setBattleState(prev => ({
+          ...prev,
+          selectedAction: null,
+          targetEnemy: null,
+          isPlayerTurn: false,
+          currentEnemyActionIndex: 0 // 重置敌人行动索引
+        }));
+      });
 
       return;
     }
@@ -898,17 +997,17 @@ const Battle: React.FC<BattleProps> = ({
     const targetEnemy = battleState.enemies.find(e => e.id === enemyId && e.currentHp > 0);
     if (!targetEnemy) return;
 
-    // 执行攻击
-    executeSkillAttack(battleState.player, targetEnemy, skill);
-
-    // 清除选择并切换到敌人回合，重置敌人行动索引
-    setBattleState(prev => ({
-      ...prev,
-      selectedAction: null,
-      targetEnemy: null,
-      isPlayerTurn: false,
-      currentEnemyActionIndex: 0 // 重置敌人行动索引
-    }));
+    // 执行攻击，传入回调函数在攻击完成后切换回合
+    executeSkillAttack(battleState.player, targetEnemy, skill, () => {
+      // 清除选择并切换到敌人回合，重置敌人行动索引
+      setBattleState(prev => ({
+        ...prev,
+        selectedAction: null,
+        targetEnemy: null,
+        isPlayerTurn: false,
+        currentEnemyActionIndex: 0 // 重置敌人行动索引
+      }));
+    });
   };
 
   /**
@@ -1197,6 +1296,9 @@ const Battle: React.FC<BattleProps> = ({
 
   return (
     <div className="battle-container">
+      {/* 顶部占位框 */}
+      <div className="page-top-placeholder"></div>
+
       <div className="battle-header">
         <h2>战斗界面 - 第 {battleState.round} 回合</h2>
         {/* 离开战斗按钮 - 战斗进行中时显示 */}

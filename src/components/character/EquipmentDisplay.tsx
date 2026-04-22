@@ -90,7 +90,7 @@ const EquipmentDisplay: React.FC<EquipmentDisplayProps> = ({
       return (
         <div
           key={slotType}
-          className="equipment-card-compact"
+          className="equipment-card-compact equipment-slot-filled"
           onClick={() => onEquipmentClick && onEquipmentClick(equipment)}
         >
           {/* 装备图标/图片 */}
@@ -100,11 +100,6 @@ const EquipmentDisplay: React.FC<EquipmentDisplayProps> = ({
 
           {/* 装备信息 */}
           <div className="equipment-info-compact">
-            {/* 装备类型 */}
-            <div className="equipment-type-compact">
-              {getEquipmentSlotName(slotType)}
-            </div>
-
             {/* 装备名称 */}
             <div
               className="equipment-name-compact"
@@ -129,13 +124,8 @@ const EquipmentDisplay: React.FC<EquipmentDisplayProps> = ({
         className="equipment-card-compact equipment-slot-empty"
         onClick={() => onEmptySlotClick && onEmptySlotClick(slotType)}
       >
-        {/* 装备图标 */}
-        <div className="equipment-icon-compact empty-icon">
-          {getEquipmentIcon(slotType)}
-        </div>
-
         {/* 空槽位信息 */}
-        <div className="equipment-info-compact">
+        <div className="equipment-info-compact empty-info">
           {/* 装备类型 */}
           <div className="equipment-type-compact">
             {getEquipmentSlotName(slotType)}

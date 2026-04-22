@@ -9,6 +9,7 @@ import {
   EQUIPMENT_QUALITY_COLORS,
   PET_QUALITY_COLORS,
   PET_TYPE_EMOJI,
+  PET_TYPE_PINYIN,
   RARITY_CLASS_NAMES,
   RARITY_CONFIG} from './constants';
 
@@ -48,6 +49,21 @@ export const getEquipmentQualityColor = (quality: string): string => {
  */
 export const getPetEmoji = (petType: string): string => {
   return PET_TYPE_EMOJI[petType] || '🐾';
+};
+
+/**
+ * 根据幻兽类型获取对应的头像图片路径
+ * @param petType 幻兽类型名称
+ * @returns 对应的头像图片路径
+ */
+export const getPetAvatar = (petType: string): string => {
+  const pinyin = PET_TYPE_PINYIN[petType];
+
+  if (pinyin) {
+    return `/images/pet/${pinyin}.jpg`;
+  }
+
+  return '/images/pet/default.jpg';
 };
 
 /**

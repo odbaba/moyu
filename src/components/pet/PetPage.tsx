@@ -140,6 +140,9 @@ const PetPage: React.FC<PetPageProps> = ({
   return (
     <div className="pet-page-overlay" onClick={handleOverlayClick}>
       <div className="pet-page-container">
+        {/* 顶部占位框 */}
+        <div className="page-top-placeholder"></div>
+
         {/* 页面顶部关闭按钮 */}
         <div className="pet-page-header">
           <h2 className="pet-page-title">幻兽</h2>

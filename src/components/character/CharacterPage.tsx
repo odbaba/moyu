@@ -2,7 +2,7 @@ import './character.css';
 
 import React, { useMemo, useState } from 'react';
 
-import type { CharacterData, EquipmentDetail, EquipmentItem, EquipmentSlotType, Pet } from '../../types';
+import type { CharacterData, EquipmentDetail, EquipmentItem, EquipmentSlotType, Pet, SkillDetail } from '../../types';
 import { calculateAllEquipmentBonus } from '../../utils/attributeCalculator';
 import { equipmentItemToDetail } from '../../utils/equipmentConverter';
 import EquipmentDetailModal from '../common/EquipmentDetailModal';
@@ -36,6 +36,10 @@ interface CharacterPageProps {
    */
   pets?: Pet[];
   /**
+   * 技能列表，用于计算斗志抑扬加成
+   */
+  skills?: SkillDetail[];
+  /**
    * 关闭按钮点击回调
    */
   onClose: () => void;
@@ -61,6 +65,7 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
   equippedItems,
   inventoryEquipments,
   pets = [],
+  skills = [],
   onClose,
   onEquipItem,
   onUnequipItem
@@ -184,13 +189,17 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
   return (
     <div className="character-page-overlay" onClick={handleOverlayClick}>
       <div className="character-page-container">
+        {/* 顶部占位框 */}
+        <div className="page-top-placeholder"></div>
+
         {/* 页面顶部关闭按钮 */}
         <div className="character-page-header">
           <button
             className="character-page-close-button"
             onClick={onClose}
+            aria-label="关闭"
           >
-            ✕ 关闭
+            ✕
           </button>
         </div>
 
@@ -201,6 +210,7 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
             <CharacterInfo
               character={characterWithEquipment}
               pets={pets}
+              skills={skills}
               onShowDetail={handleShowCombatPowerDetail}
             />
           </div>
@@ -221,6 +231,7 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
           onClose={handleCloseCombatPowerModal}
           character={characterWithEquipment}
           pets={pets}
+          skills={skills}
         />
 
         {/* 统一装备详情弹窗 */}

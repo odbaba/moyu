@@ -3,7 +3,7 @@ import './pet.css';
 import React from 'react';
 
 import type { Pet } from '../../types';
-import { getPetEmoji, getPetQualityColor } from '../common/utils';
+import { getPetAvatar, getPetQualityColor } from '../common/utils';
 
 /**
  * 幻兽列表项组件属性接口
@@ -89,7 +89,7 @@ const PetListItem: React.FC<PetListItemProps> = ({
     >
       {/* 幻兽头像 */}
       <div className="pet-list-avatar">
-        <span className="pet-list-emoji">{getPetEmoji(pet.hs_name)}</span>
+        <img className="pet-list-avatar-img" src={getPetAvatar(pet.hs_name)} alt={pet.hs_name} />
       </div>
 
       {/* 幻兽信息 */}

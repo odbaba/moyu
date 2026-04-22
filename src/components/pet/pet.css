@@ -2,7 +2,18 @@
  * 幻兽模块样式 (Pet Module Styles)
  * 包含幻兽系统的所有样式
  * 移动端优化：确保一屏展示所有信息
+ * 
+ * 高度分配：顶部占位10% + 页面头部5% + 内容区85% = 100%
  */
+
+/* 顶部占位框 - 高度10% */
+.page-top-placeholder {
+  width: 100%;
+  height: 10vh;
+  background-color: #252935;
+  border-bottom: 1px solid #000000;
+  flex-shrink: 0;
+}
 
 /* ========== 幻兽主页面样式 ========== */
 
@@ -25,7 +36,7 @@
 
 /* 幻兽主页面容器 */
 .pet-page-container {
-  background-color: rgba(20, 20, 20, 0.98);
+  background-color: #252935;
   width: 100%;
   height: 100%;
   display: flex;
@@ -39,8 +50,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 15px;
-  background-color: rgba(30, 30, 30, 0.8);
-  border-bottom: 1px solid #333;
+  background-color: #252935;
+  border-bottom: 1px solid #000000;
   flex-shrink: 0;
 }
 
@@ -106,7 +117,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background-color: rgba(40, 40, 40, 0.5);
+  background-color: #252935;
   border-radius: 6px;
   border: 1px solid #444;
 }
@@ -178,7 +189,7 @@
   color: #888;
   font-size: 0.85rem;
   padding: 5px 10px;
-  background-color: rgba(40, 40, 40, 0.5);
+  background-color: #252935;
   border-radius: 4px;
   border-left: 3px solid #ffd700;
 }
@@ -207,7 +218,7 @@
 /* ========== 出战幻兽栏样式 ========== */
 
 .deployed-pet-slot {
-  background-color: rgba(40, 40, 40, 0.8);
+  background-color: #252935;
   border: 2px solid #555;
   border-radius: 8px;
   padding: 10px;
@@ -232,7 +243,7 @@
 .deployed-pet-slot.empty {
   border-style: dashed;
   border-color: #444;
-  background-color: rgba(30, 30, 30, 0.5);
+  background-color: #252935;
 }
 
 .deployed-pet-slot.empty:hover {
@@ -294,14 +305,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(50, 50, 50, 0.8);
+  background-color: #252935;
   border-radius: 8px;
   border: 1px solid #555;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .pet-emoji {
   font-size: 1.8rem;
+}
+
+/* 幻兽头像图片样式 */
+.pet-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 /* 幻兽详细信息 */
@@ -429,7 +449,7 @@
   display: flex;
   align-items: center;
   padding: 10px 12px;
-  background-color: rgba(50, 50, 50, 0.8);
+  background-color: #252935;
   border: 1px solid #444;
   border-radius: 6px;
   cursor: pointer;
@@ -454,14 +474,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(40, 40, 40, 0.8);
+  background-color: #252935;
   border-radius: 6px;
   border: 1px solid #555;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .pet-list-emoji {
   font-size: 1.5rem;
+}
+
+/* 幻兽列表头像图片样式 */
+.pet-list-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
 }
 
 /* 幻兽信息 */
@@ -575,7 +604,7 @@
 }
 
 .pet-detail-modal-content {
-  background-color: #222;
+  background-color: #252935;
   border-radius: 8px;
   padding: 20px;
   width: 90%;
@@ -640,14 +669,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(40, 40, 40, 0.8);
+  background-color: #252935;
   border-radius: 10px;
   border: 2px solid #555;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .pet-detail-emoji {
   font-size: 2.5rem;
+}
+
+/* 幻兽详情头像图片样式 */
+.pet-detail-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
 .pet-detail-name {
@@ -674,7 +712,7 @@
   flex-direction: column;
   gap: 2px;
   padding: 8px;
-  background-color: rgba(40, 40, 40, 0.5);
+  background-color: #252935;
   border-radius: 4px;
 }
 
@@ -1136,7 +1174,7 @@
 
 /* 幻兽选择弹窗内容容器 */
 .pet-select-modal-content {
-  background-color: #222;
+  background-color: #252935;
   border-radius: 8px;
   padding: 15px;
   width: 90%;
@@ -1282,7 +1320,7 @@
   display: flex;
   align-items: center;
   padding: 10px;
-  background-color: rgba(50, 50, 50, 0.8);
+  background-color: #252935;
   border: 1px solid #444;
   border-radius: 6px;
   cursor: pointer;
@@ -1307,14 +1345,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(40, 40, 40, 0.8);
+  background-color: #252935;
   border-radius: 6px;
   border: 1px solid #555;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .pet-select-item-emoji {
   font-size: 1.3rem;
+}
+
+/* 幻兽选择项头像图片样式 */
+.pet-select-item-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
 }
 
 /* 幻兽选择项信息 */
@@ -1394,7 +1441,7 @@
 
 /* 幻化帮助弹窗内容容器 */
 .fusion-help-modal-content {
-  background-color: #222;
+  background-color: #252935;
   border-radius: 8px;
   padding: 15px;
   width: 90%;
@@ -1461,7 +1508,7 @@
 .fusion-help-section {
   margin-bottom: 15px;
   padding: 10px;
-  background-color: rgba(40, 40, 40, 0.5);
+  background-color: #252935;
   border-radius: 6px;
   border-left: 3px solid #ffd700;
 }
@@ -1531,7 +1578,7 @@
 
 /* 幻化设置面板容器 */
 .fusion-settings-panel {
-  background-color: rgba(40, 40, 40, 0.8);
+  background-color: #252935;
   border: 1px solid #444;
   border-radius: 8px;
   padding: 12px;
@@ -1626,7 +1673,7 @@
 
 /* 幻化结果弹窗内容容器 */
 .fusion-result-modal-content {
-  background-color: #222;
+  background-color: #252935;
   border-radius: 8px;
   padding: 15px;
   width: 90%;
@@ -1745,7 +1792,7 @@
 
 /* 幻化页面容器 */
 .pet-fusion-page-container {
-  background-color: rgba(20, 20, 20, 0.98);
+  background-color: #252935;
   width: 100%;
   height: 100%;
   display: flex;
@@ -1759,8 +1806,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 15px;
-  background-color: rgba(30, 30, 30, 0.8);
-  border-bottom: 1px solid #333;
+  background-color: #252935;
+  border-bottom: 1px solid #000000;
   flex-shrink: 0;
 }
 
@@ -1851,7 +1898,7 @@
 
 /* 幻兽框 */
 .fusion-pet-slot {
-  background-color: rgba(40, 40, 40, 0.8);
+  background-color: #252935;
   border: 2px solid #555;
   border-radius: 8px;
   padding: 10px;
@@ -1878,7 +1925,7 @@
 
 .fusion-pet-slot.empty {
   border-style: dashed;
-  background-color: rgba(30, 30, 30, 0.5);
+  background-color: #252935;
 }
 
 /* 幻兽框空状态 */
@@ -1915,14 +1962,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(50, 50, 50, 0.8);
+  background-color: #252935;
   border-radius: 6px;
   border: 1px solid #555;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .fusion-pet-emoji {
   font-size: 1.4rem;
+}
+
+/* 幻兽框头像图片样式 */
+.fusion-pet-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
 }
 
 /* 幻兽框详细信息 */
@@ -2021,7 +2077,7 @@
   align-items: center;
   gap: 3px;
   padding: 8px;
-  background-color: rgba(40, 40, 40, 0.5);
+  background-color: #252935;
   border-radius: 6px;
   border: 1px solid #444;
 }

@@ -1,14 +1,16 @@
 import './character.css';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import { exampleCharacter } from '../../data/characterData';
-import type { CharacterData, Pet } from '../../types';
+import type { CharacterData, Pet, SkillDetail } from '../../types';
 import {
   calculateAllEquipmentBonus,
+  calculateCharacterBaseAttributes,
   calculateSoulAttackBonus,
   calculateTotalCharacterAttributes} from '../../utils/attributeCalculator';
 import { calculateTotalCombatPower } from '../../utils/combatPower';
+import AttributeDetailTooltip, { type AttributeDetailData } from './AttributeDetailTooltip';
 
 /**
  * 角色信息组件属性接口
@@ -24,6 +26,10 @@ interface CharacterInfoProps {
    */
   pets?: Pet[];
   /**
+   * 技能列表，用于计算斗志抑扬加成
+   */
+  skills?: SkillDetail[];
+  /**
    * 点击详细按钮时触发的回调函数
    */
   onShowDetail?: () => void;
@@ -37,12 +43,20 @@ interface CharacterInfoProps {
 const CharacterInfo: React.FC<CharacterInfoProps> = ({
   character = exampleCharacter,
   pets = [],
+  skills = [],
   onShowDetail
 }) => {
   /**
+   * 属性详情悬浮框状态
+   */
+  const [tooltipData, setTooltipData] = useState<AttributeDetailData | null>(null);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+
+  /**
    * 计算综合战斗力（包含幻兽加成）
    */
-  const totalCombatPower = calculateTotalCombatPower(character, pets);
+  const totalCombatPower = calculateTotalCombatPower(character, pets, skills);
 
   /**
    * 计算经验值百分比
@@ -80,22 +94,80 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
   const petBonus = character.petBonus || { attackMin: 0, attackMax: 0, defense: 0 };
 
   /**
-   * 判断是否有装备加成
+   * 获取基础属性
    */
-  const hasEquipmentBonus = equipmentBonus.attackMin > 0 || equipmentBonus.attackMax > 0 || equipmentBonus.defense > 0;
-
-  /**
-   * 判断是否有幻兽合体加成
-   */
-  const hasPetBonus = petBonus.attackMin > 0 || petBonus.attackMax > 0 || petBonus.defense > 0;
+  const baseAttributes = calculateCharacterBaseAttributes(character.level);
 
   /**
    * 判断是否有战魂加成
    */
   const hasSoulBonus = soulAttackBonus > 0 || equipmentBonus.dodgeRate > 0;
 
+  /**
+   * 处理属性点击事件，显示详细来源
+   */
+  const handleAttributeClick = (
+    event: React.MouseEvent,
+    attributeType: 'attack' | 'defense' | 'dodge'
+  ) => {
+    event.stopPropagation();
+
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    setTooltipPosition({ x: rect.left, y: rect.bottom });
+
+    let data: AttributeDetailData;
+
+    switch (attributeType) {
+      case 'attack':
+        data = {
+          name: '攻击力',
+          base: baseAttributes.attackMin,
+          baseMax: baseAttributes.attackMax,
+          equipment: equipmentBonus.attackMin,
+          equipmentMax: equipmentBonus.attackMax,
+          pet: petBonus.attackMin,
+          petMax: petBonus.attackMax,
+          soulPercent: soulAttackBonus,
+          total: totalAttributes.attackMin,
+          max: totalAttributes.attackMax,
+          isRange: true
+        };
+        break;
+      case 'defense':
+        data = {
+          name: '防御力',
+          base: baseAttributes.defense,
+          equipment: equipmentBonus.defense,
+          pet: petBonus.defense,
+          total: totalAttributes.defense
+        };
+        break;
+      case 'dodge':
+        data = {
+          name: '闪避率',
+          base: 0,
+          equipment: equipmentBonus.dodgeRate,
+          pet: 0,
+          total: totalAttributes.dodgeRate,
+          unit: '%'
+        };
+        break;
+    }
+
+    setTooltipData(data);
+    setTooltipVisible(true);
+  };
+
+  /**
+   * 关闭属性详情悬浮框
+   */
+  const handleCloseTooltip = () => {
+    setTooltipVisible(false);
+    setTooltipData(null);
+  };
+
   return (
-    <div className="character-info-compact">
+    <div className="character-info-compact" onClick={handleCloseTooltip}>
       {/* 第一行：角色名称、等级 */}
       <div className="character-row-1">
         <span className="character-name-compact">{character.playerName}</span>
@@ -118,7 +190,7 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
       <div className="character-row-2">
         {/* 生命值 */}
         <div className="hp-container-compact">
-          <span className="hp-icon">❤️</span>
+          <span className="hp-icon">生命值</span>
           <div className="hp-bar-compact">
             <div
               className="hp-fill-compact"
@@ -130,7 +202,7 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
 
         {/* 体力值 */}
         <div className="stamina-container-compact">
-          <span className="stamina-icon">⚡</span>
+          <span className="stamina-icon">体力值</span>
           <div className="stamina-bar-compact">
             <div
               className="stamina-fill-compact"
@@ -144,7 +216,7 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
       {/* 第四行：经验值进度条 */}
       <div className="character-row-3">
         <div className="exp-container-compact">
-          <span className="exp-icon">📊</span>
+          <span className="exp-icon">经验值</span>
           <div className="exp-bar-compact">
             <div
               className="exp-fill-compact"
@@ -157,41 +229,44 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
 
       {/* 第五行：属性网格 - 攻击、防御、闪避、幸运 */}
       <div className="character-row-4">
-        <div className="stat-compact attack-compact">
-          <span className="stat-icon">⚔️</span>
+        {/* 攻击力：显示总和 + 天魂百分比加成，点击显示详细来源 */}
+        <div
+          className="stat-compact attack-compact clickable"
+          onClick={(e) => handleAttributeClick(e, 'attack')}
+        >
           <span className="stat-label-compact">攻击</span>
           <span className="stat-value-compact">
             {totalAttributes.attackMin}-{totalAttributes.attackMax}
-            {(hasEquipmentBonus || hasPetBonus || hasSoulBonus) && (
-              <span className="bonus-text">
-                {hasEquipmentBonus && ` (+${equipmentBonus.attackMin}-+${equipmentBonus.attackMax})`}
-                {hasSoulBonus && soulAttackBonus > 0 && ` (${Math.round(soulAttackBonus * 100)}%魂)`}
-              </span>
+            {hasSoulBonus && soulAttackBonus > 0 && (
+              <span className="bonus-text"> ({Math.round(soulAttackBonus * 100)}%魂)</span>
             )}
           </span>
         </div>
-        <div className="stat-compact defense-compact">
-          <span className="stat-icon">🛡️</span>
+
+        {/* 防御力：显示总和，点击显示详细来源 */}
+        <div
+          className="stat-compact defense-compact clickable"
+          onClick={(e) => handleAttributeClick(e, 'defense')}
+        >
           <span className="stat-label-compact">防御</span>
           <span className="stat-value-compact">
             {totalAttributes.defense}
-            {(hasEquipmentBonus || hasPetBonus) && equipmentBonus.defense > 0 && (
-              <span className="bonus-text"> (+{equipmentBonus.defense})</span>
-            )}
           </span>
         </div>
-        <div className="stat-compact dodge-compact">
-          <span className="stat-icon">💨</span>
+
+        {/* 闪避率：显示总和，点击显示详细来源 */}
+        <div
+          className="stat-compact dodge-compact clickable"
+          onClick={(e) => handleAttributeClick(e, 'dodge')}
+        >
           <span className="stat-label-compact">闪避</span>
           <span className="stat-value-compact">
             {totalAttributes.dodgeRate}%
-            {hasSoulBonus && equipmentBonus.dodgeRate > 0 && (
-              <span className="bonus-text"> (+{equipmentBonus.dodgeRate}%)</span>
-            )}
           </span>
         </div>
+
+        {/* 幸运：无加成，不可点击 */}
         <div className="stat-compact luck-compact">
-          <span className="stat-icon">🍀</span>
           <span className="stat-label-compact">幸运</span>
           <span className="stat-value-compact">{character.luck}</span>
         </div>
@@ -199,19 +274,21 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
 
       {/* 第六行：综合战斗力 */}
       <div className="character-row-5">
-        <div className="combat-power-compact">
-          <span className="combat-power-label">战斗力</span>
-          <span className="combat-power-value">{totalCombatPower}</span>
-          {onShowDetail && (
-            <button
-              className="detail-button-compact"
-              onClick={onShowDetail}
-            >
-              详细
-            </button>
-          )}
-        </div>
+        <button
+          className="game-btn combat-power-btn"
+          onClick={onShowDetail}
+        >
+          战斗力：{totalCombatPower}
+        </button>
       </div>
+
+      {/* 属性详情悬浮框 */}
+      <AttributeDetailTooltip
+        isVisible={tooltipVisible}
+        data={tooltipData}
+        positionX={tooltipPosition.x}
+        positionY={tooltipPosition.y}
+      />
     </div>
   );
 };

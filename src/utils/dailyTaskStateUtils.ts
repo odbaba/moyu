@@ -36,6 +36,14 @@ export function createInitialDailyTaskState(): DailyTaskState {
     gw_xybj_4: true, // 雪域边境怪物4存在
     gw_xybj_5: true, // 雪域边境怪物5存在
 
+    // 魔族大军状态 - 初始时所有魔族大军都存在
+    mj_gj: true, // 魔军突击队存在
+    mj_fy: true, // 魔军守卫军存在
+    mj_tt: true, // 魔军图腾兽存在
+    mj_sm: true, // 魔军神秘部队存在
+    mj_zs: true, // 魔军主帅存在
+    mj_nl: true, // 魔的能量存在
+
     // 任务进度追踪
     taskProgress: 0, // 初始进度为0
   };
@@ -89,6 +97,14 @@ export function resetDailyTaskState(
     newState.gw_xybj_4 = true;
     newState.gw_xybj_5 = true;
   }
+
+  // 魔族大军每日复活：所有魔族大军每天都会复活
+  newState.mj_gj = true;
+  newState.mj_fy = true;
+  newState.mj_tt = true;
+  newState.mj_sm = true;
+  newState.mj_zs = true;
+  newState.mj_nl = true;
 
   return newState;
 }

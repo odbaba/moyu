@@ -570,6 +570,188 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     baseDefense: 500,
     growthDefense: 25,
   },
+
+  // ========== 魔中军阵地怪物（魔族大军）==========
+  // 魔军突击队：700级，使所有魔族军队攻击力提高50%
+  // 属性来源：reference/docs/project_docs/12_国王系统.md
+  'mojun-tujidui': {
+    id: 'mojun-tujidui',
+    name: '魔军突击队',
+    type: 'special',
+    level: 700,
+    combatPower: 700,
+    location: 'mozhongjun-zhendi',
+    icon: '⚔️',
+    description: '魔族大军的先锋部队，700级。特殊效果：存在时所有魔族军队攻击力提高50%。',
+    baseHp: 10000,
+    growthHp: 400,
+    baseAttackMin: 500,
+    growthAttackMin: 75,
+    baseAttackMax: 500,
+    growthAttackMax: 112,
+    baseDefense: 500,
+    growthDefense: 64,
+  },
+  // 魔军守卫军：800级，使所有魔族军队防御提高50%
+  'mojun-shouweijun': {
+    id: 'mojun-shouweijun',
+    name: '魔军守卫军',
+    type: 'special',
+    level: 800,
+    combatPower: 800,
+    location: 'mozhongjun-zhendi',
+    icon: '🛡️',
+    description: '魔族大军的防御主力，800级。特殊效果：存在时所有魔族军队防御提高50%。',
+    baseHp: 10000,
+    growthHp: 400,
+    baseAttackMin: 500,
+    growthAttackMin: 75,
+    baseAttackMax: 500,
+    growthAttackMax: 112,
+    baseDefense: 500,
+    growthDefense: 64,
+  },
+  // 魔军神秘部队：900级，使所有魔族军队生命值提高50%
+  'mojun-shenmibudui': {
+    id: 'mojun-shenmibudui',
+    name: '魔军神秘部队',
+    type: 'special',
+    level: 900,
+    combatPower: 900,
+    location: 'mozhongjun-zhendi',
+    icon: '🔮',
+    description: '魔族大军的精锐部队，900级，估计大多数由祭师组成。特殊效果：存在时所有魔族军队生命值提高50%。',
+    baseHp: 10000,
+    growthHp: 400,
+    baseAttackMin: 500,
+    growthAttackMin: 75,
+    baseAttackMax: 500,
+    growthAttackMax: 112,
+    baseDefense: 500,
+    growthDefense: 64,
+  },
+  // 魔军图腾兽：1000级，使所有魔族军队战斗力提高50%
+  'mojun-tutengshou': {
+    id: 'mojun-tutengshou',
+    name: '魔军图腾兽',
+    type: 'special',
+    level: 1000,
+    combatPower: 1000,
+    location: 'mozhongjun-zhendi',
+    icon: '🗿',
+    description: '魔族大军的图腾象征，1000级。特殊效果：存在时所有魔族军队战斗力提高50%。',
+    baseHp: 10000,
+    growthHp: 400,
+    baseAttackMin: 500,
+    growthAttackMin: 75,
+    baseAttackMax: 500,
+    growthAttackMax: 112,
+    baseDefense: 500,
+    growthDefense: 64,
+  },
+  // 魔的能量：魔族大军的力量源泉，每天复活所有魔族大军
+  'mojun-nengliang': {
+    id: 'mojun-nengliang',
+    name: '魔的能量',
+    type: 'special',
+    level: 1, // 无等级，设置为1
+    combatPower: 500,
+    location: 'mozhongjun-zhendi',
+    icon: '💫',
+    description: '魔族大军的力量源泉，是魔族的生命支柱。特殊效果：每天复活所有被消灭的魔族军队。',
+    baseHp: 50000,
+    growthHp: 0,
+    baseAttackMin: 0,
+    growthAttackMin: 0,
+    baseAttackMax: 0,
+    growthAttackMax: 0,
+    baseDefense: 1000,
+    growthDefense: 0,
+  },
+  // 魔军主帅：2000级，魔族大军的最高指挥官
+  'mojun-shuai': {
+    id: 'mojun-shuai',
+    name: '魔军主帅',
+    type: 'special',
+    level: 2000,
+    combatPower: 2000,
+    location: 'mozhongjun-zhendi',
+    icon: '👿',
+    description: '魔族大军的最高指挥官，2000级。负责保护魔的能量不被破坏。只有消灭它才能进一步消灭魔的能量。',
+    baseHp: 100000,
+    growthHp: 500,
+    baseAttackMin: 1000,
+    growthAttackMin: 100,
+    baseAttackMax: 1000,
+    growthAttackMax: 150,
+    baseDefense: 1000,
+    growthDefense: 80,
+  },
+
+  // ========== PK赛BOSS ==========
+  // PK赛BOSS：周六PK赛专用BOSS，根据玩家等级分组挑战
+  // 属性来源：reference/docs/project_docs/11_PK赛系统.md
+  // 属性计算公式：生命值=2000×等级，攻击=112.5~168×等级，防御=96×等级
+
+  // 60级PK赛BOSS：60级组冠军挑战BOSS
+  'pk-boss-60': {
+    id: 'pk-boss-60',
+    name: '60级PK赛BOSS',
+    type: 'special',
+    level: 60,
+    combatPower: 201,
+    location: 'pk-arena-1',
+    icon: '🏆',
+    description: 'PK赛60级组冠军挑战BOSS，击败它获得冠军荣誉！',
+    baseHp: 0,
+    growthHp: 2000, // 生命值 = 2000 × 60 = 120,000
+    baseAttackMin: 0,
+    growthAttackMin: 112.5, // 最小攻击 = 112.5 × 60 = 6,750
+    baseAttackMax: 0,
+    growthAttackMax: 168, // 最大攻击 = 168 × 60 = 10,080
+    baseDefense: 0,
+    growthDefense: 96, // 防御 = 96 × 60 = 5,760
+  },
+
+  // 100级PK赛BOSS：100级组冠军挑战BOSS
+  'pk-boss-100': {
+    id: 'pk-boss-100',
+    name: '100级PK赛BOSS',
+    type: 'special',
+    level: 100,
+    combatPower: 284,
+    location: 'pk-arena-2',
+    icon: '🏆',
+    description: 'PK赛100级组冠军挑战BOSS，击败它获得冠军荣誉！',
+    baseHp: 0,
+    growthHp: 2000, // 生命值 = 2000 × 100 = 200,000
+    baseAttackMin: 0,
+    growthAttackMin: 112.5, // 最小攻击 = 112.5 × 100 = 11,250
+    baseAttackMax: 0,
+    growthAttackMax: 168, // 最大攻击 = 168 × 100 = 16,800
+    baseDefense: 0,
+    growthDefense: 96, // 防御 = 96 × 100 = 9,600
+  },
+
+  // 130级PK赛BOSS：100级以上组冠军挑战BOSS
+  'pk-boss-130': {
+    id: 'pk-boss-130',
+    name: '130级PK赛BOSS',
+    type: 'special',
+    level: 130,
+    combatPower: 374,
+    location: 'pk-arena-3',
+    icon: '🏆',
+    description: 'PK赛100级以上组冠军挑战BOSS，击败它获得冠军荣誉！',
+    baseHp: 0,
+    growthHp: 2000, // 生命值 = 2000 × 130 = 260,000
+    baseAttackMin: 0,
+    growthAttackMin: 112.5, // 最小攻击 = 112.5 × 130 = 14,625
+    baseAttackMax: 0,
+    growthAttackMax: 168, // 最大攻击 = 168 × 130 = 21,840
+    baseDefense: 0,
+    growthDefense: 96, // 防御 = 96 × 130 = 12,480
+  },
 };
 
 // ========== 怪物刷新配置 ==========
@@ -900,15 +1082,6 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     isSpawned: true,
     interactableId: 'interact-xueyu-shiguan-1',
   },
-  // 冰雪巨人军官（gw_xybj_4，始终可见）
-  {
-    id: 'spawn-xueyu-junguan',
-    templateId: 'bingxue-juren-junguan',
-    location: 'xueyu-bianjing',
-    spawnVariable: 'gw_xybj_4',
-    isSpawned: true,
-    interactableId: 'interact-xueyu-junguan',
-  },
   // 冰雪巨人士官2（gw_xybj_5，国王救出后隐藏）
   {
     id: 'spawn-xueyu-shiguan-2',
@@ -917,6 +1090,15 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     spawnVariable: 'gw_xybj_5',
     isSpawned: true,
     interactableId: 'interact-xueyu-shiguan-2',
+  },
+  // 冰雪巨人军官（gw_xybj_4，始终可见）
+  {
+    id: 'spawn-xueyu-junguan',
+    templateId: 'bingxue-juren-junguan',
+    location: 'xueyu-bianjing',
+    spawnVariable: 'gw_xybj_4',
+    isSpawned: true,
+    interactableId: 'interact-xueyu-junguan',
   },
 
   // ========== 战魂封印迷宫怪物刷新配置 ==========
@@ -982,6 +1164,62 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     spawnVariable: 'rw_gw3_1',
     isSpawned: true,
     interactableId: 'interact-dxc3-huolongshou-1',
+  },
+
+  // ========== 魔中军阵地怪物刷新配置（魔族大军）==========
+  // 魔军突击队（700级）
+  {
+    id: 'spawn-mojun-tujidui',
+    templateId: 'mojun-tujidui',
+    location: 'mozhongjun-zhendi',
+    spawnVariable: 'mj_gj', // 魔军攻击
+    isSpawned: true,
+    interactableId: 'interact-mojun-tujidui',
+  },
+  // 魔军守卫军（800级）
+  {
+    id: 'spawn-mojun-shouweijun',
+    templateId: 'mojun-shouweijun',
+    location: 'mozhongjun-zhendi',
+    spawnVariable: 'mj_fy', // 魔军防御
+    isSpawned: true,
+    interactableId: 'interact-mojun-shouweijun',
+  },
+  // 魔军神秘部队（900级）
+  {
+    id: 'spawn-mojun-shenmibudui',
+    templateId: 'mojun-shenmibudui',
+    location: 'mozhongjun-zhendi',
+    spawnVariable: 'mj_sm', // 魔军生命
+    isSpawned: true,
+    interactableId: 'interact-mojun-shenmibudui',
+  },
+  // 魔军图腾兽（1000级）
+  {
+    id: 'spawn-mojun-tutengshou',
+    templateId: 'mojun-tutengshou',
+    location: 'mozhongjun-zhendi',
+    spawnVariable: 'mj_tt', // 魔军图腾
+    isSpawned: true,
+    interactableId: 'interact-mojun-tutengshou',
+  },
+  // 魔的能量
+  {
+    id: 'spawn-mojun-nengliang',
+    templateId: 'mojun-nengliang',
+    location: 'mozhongjun-zhendi',
+    spawnVariable: 'mj_nl', // 魔军能量
+    isSpawned: true,
+    interactableId: 'interact-mojun-nengliang',
+  },
+  // 魔军主帅（2000级）
+  {
+    id: 'spawn-mojun-shuai',
+    templateId: 'mojun-shuai',
+    location: 'mozhongjun-zhendi',
+    spawnVariable: 'mj_zs', // 魔军主帅
+    isSpawned: true,
+    interactableId: 'interact-mojun-shuai',
   },
 ];
 

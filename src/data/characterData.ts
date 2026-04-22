@@ -70,8 +70,8 @@ const shoes: EquipmentDetail = {
   useLevel: 60,
   combatPower: 6, // 上品品质: 2 × 3 = 6
   // 战魂属性
-  soulType: WarSoulType.DI_HUN, // 地魂
-  soulLevel: 3 // 3级地魂
+  soulType: WarSoulType.TIAN_HUN, // 天魂
+  soulLevel: 3 // 3级天魂
 };
 
 // 示例装备数据 - 手镯
@@ -92,8 +92,8 @@ const bracelet: EquipmentDetail = {
   useLevel: 40,
   combatPower: 3, // 良品品质: 1 × 3 = 3
   // 战魂属性
-  soulType: WarSoulType.NONE, // 无战魂
-  soulLevel: 0
+  soulType: WarSoulType.TIAN_HUN, // 天魂
+  soulLevel: 3 // 3级天魂
 };
 
 // 示例装备数据 - 项链
@@ -135,8 +135,8 @@ const helmet: EquipmentDetail = {
   useLevel: 1,
   combatPower: 0, // 普通品品质: 0 × 3 = 0
   // 战魂属性
-  soulType: WarSoulType.NONE, // 无战魂
-  soulLevel: 0
+  soulType: WarSoulType.TIAN_HUN, // 天魂
+  soulLevel: 3 // 3级天魂
 };
 
 // 示例角色数据
@@ -191,8 +191,8 @@ const playerCharacter: CharacterData = {
 // 导出示例角色数据（计算战斗力）
 export const exampleCharacter: CharacterData = {
   ...playerCharacter,
-  // 使用完整的战斗力计算函数，包含幻兽战斗力加成
-  combatPower: calculateTotalCombatPower(playerCharacter, examplePets)
+  // 使用完整的战斗力计算函数，包含幻兽战斗力加成和斗志抑扬加成
+  combatPower: calculateTotalCombatPower(playerCharacter, examplePets, [])
 };
 
 // 导出示例装备数据

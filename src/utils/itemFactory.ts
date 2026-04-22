@@ -295,6 +295,68 @@ export function cloneItem(item: InventoryItem): InventoryItem {
   }
 }
 
+// ==================== 物品添加与堆叠合并函数 ====================
+
+/**
+ * 将物品添加到背包，处理堆叠合并逻辑
+ * 可堆叠物品会自动合并到已有物品上，不可堆叠物品会添加为新物品
+ *
+ * @param inventory 当前背包物品列表
+ * @param newItem 要添加的新物品
+ * @returns 更新后的背包物品列表
+ *
+ * @example
+ * // 添加可堆叠物品（会合并）
+ * const newInventory = addItemToInventory(inventory, combatStone);
+ *
+ * // 添加不可堆叠物品（会创建新物品）
+ * const newInventory = addItemToInventory(inventory, skillBook);
+ */
+export function addItemToInventory(
+  inventory: InventoryItem[],
+  newItem: InventoryItem
+): InventoryItem[] {
+  // 判断是否为可堆叠物品
+  const isStackable = newItem.stackable === true || (newItem.maxStack && newItem.maxStack > 1);
+
+  if (isStackable) {
+    // 可堆叠物品：查找背包中是否有相同ID的物品
+    const existingItemIndex = inventory.findIndex(item => item.id === newItem.id);
+
+    if (existingItemIndex !== -1) {
+      // 找到相同ID的物品，合并数量
+      const existingItem = inventory[existingItemIndex];
+      const newQuantity = existingItem.quantity + newItem.quantity;
+
+      // 检查是否超过最大堆叠数量
+      const maxStack = existingItem.maxStack || 99;
+      const finalQuantity = Math.min(newQuantity, maxStack);
+
+      // 更新物品数量
+      const updatedInventory = [...inventory];
+      updatedInventory[existingItemIndex] = {
+        ...existingItem,
+        quantity: finalQuantity,
+      };
+
+      // 如果数量超过最大堆叠，创建新的物品实例
+      if (newQuantity > maxStack) {
+        const overflowQuantity = newQuantity - maxStack;
+        const overflowItem = {
+          ...newItem,
+          quantity: overflowQuantity,
+        };
+        updatedInventory.push(overflowItem);
+      }
+
+      return updatedInventory;
+    }
+  }
+
+  // 不可堆叠物品或背包中没有相同ID的可堆叠物品：直接添加
+  return [...inventory, newItem];
+}
+
 // ==================== 常用物品模板导出 ====================
 
 /**

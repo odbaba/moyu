@@ -515,6 +515,9 @@ const ShopPage: React.FC<ShopPageProps> = ({
 
   return (
     <div className="shop-page">
+      {/* 顶部占位框 */}
+      <div className="page-top-placeholder"></div>
+
       {/* 商店头部 */}
       <div className="shop-header">
         <h2>{shopConfig.name}</h2>

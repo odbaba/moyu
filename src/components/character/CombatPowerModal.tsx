@@ -1,32 +1,38 @@
 import React from 'react';
 
-import type { CharacterData, Pet } from '../../types';
+import type { CharacterData, Pet, SkillDetail } from '../../types';
 import {
   calculateAllEquipmentQualityCombatPower,
   calculateAllGemCombatPower,
   calculateAllHoleCountCombatPower,
   calculateAllPetsCombatPower,
   calculateEquipmentBaseCombatPower,
+  calculateFightingSpiritCombatPower,
   calculateFullSetMagicSoulBonusCombatPower,
   calculateLevelCombatPower,
   calculateMilitaryRankCombatPower,
   calculatePetCombatPower,
   calculateSoulCombatPower,
   calculateTitleCombatPower,
-  calculateTotalCombatPower} from '../../utils/combatPower';
+  calculateTotalCombatPower,
+  calculateWarSoulSetCombatPowerBonus,
+  calculateWarSoulSetCombatPowerPercent,
+  getFightingSpiritBonus} from '../../utils/combatPower';
 
 interface CombatPowerModalProps {
   isVisible: boolean;
   onClose: () => void;
   character: CharacterData;
   pets?: Pet[];
+  skills?: SkillDetail[];
 }
 
 const CombatPowerModal: React.FC<CombatPowerModalProps> = ({
   isVisible,
   onClose,
   character,
-  pets = []
+  pets = [],
+  skills = []
 }) => {
   if (!isVisible) return null;
 
@@ -45,7 +51,20 @@ const CombatPowerModal: React.FC<CombatPowerModalProps> = ({
   // 获取出战幻兽列表用于显示详情
   const deployedPets = pets.filter(pet => pet.isDeployed);
 
-  const totalPower = calculateTotalCombatPower(character, pets);
+  // 计算基础战斗力（不含斗志抑扬加成和战魂套装加成）
+  const baseCombatPower = levelPower + equipmentBasePower + equipmentQualityPower + holeCountPower + gemPower + militaryRankPower + titlePower + fullSetMagicSoulBonus + soulPower + petsPower;
+
+  // 计算战魂套装战斗力加成
+  const warSoulSetBonus = calculateWarSoulSetCombatPowerBonus(character.equipment, baseCombatPower);
+  const warSoulSetPercent = calculateWarSoulSetCombatPowerPercent(character.equipment);
+
+  // 计算斗志抑扬加成
+  const fightingSpiritSkill = skills.find(s => s.id === 'skill_fighting_spirit');
+  const fightingSpiritLevel = fightingSpiritSkill && fightingSpiritSkill.isLearned ? fightingSpiritSkill.level : 0;
+  const fightingSpiritPower = calculateFightingSpiritCombatPower(baseCombatPower + warSoulSetBonus, fightingSpiritLevel);
+  const fightingSpiritBonus = getFightingSpiritBonus(fightingSpiritLevel);
+
+  const totalPower = calculateTotalCombatPower(character, pets, skills);
 
   const combatPowerItems = [
     {
@@ -94,6 +113,15 @@ const CombatPowerModal: React.FC<CombatPowerModalProps> = ({
     });
   }
 
+  // 添加战魂套装战斗力加成项
+  if (warSoulSetBonus > 0) {
+    combatPowerItems.push({
+      label: '战魂套装加成',
+      value: warSoulSetBonus,
+      description: `6件装备战魂等级最低值 × ${Math.round(warSoulSetPercent * 100)}%`
+    });
+  }
+
   // 添加幻兽战斗力贡献项
   if (petsPower > 0) {
     combatPowerItems.push({
@@ -102,6 +130,15 @@ const CombatPowerModal: React.FC<CombatPowerModalProps> = ({
       description: deployedPets.map(pet =>
         `${pet.othername || pet.hs_name}: ${calculatePetCombatPower(pet)}`
       ).join(' + ')
+    });
+  }
+
+  // 添加斗志抑扬加成项
+  if (fightingSpiritPower > 0) {
+    combatPowerItems.push({
+      label: '斗志抑扬加成',
+      value: fightingSpiritPower,
+      description: `Lv.${fightingSpiritLevel} 斗志抑扬 +${(fightingSpiritBonus * 100).toFixed(0)}% 战斗力`
     });
   }
 

@@ -73,7 +73,7 @@ export interface MagicStoneCheckResult {
  * 概率：2% (0-19)
  */
 const LEGENDARY_PRIZES = [
-  { id: 'lulu_pet', name: '噜噜幻兽', type: 'pet', petType: '噜噜' as PetType },
+  { id: 'nianzhu_pet', name: '年猪幻兽', type: 'pet', petType: '年猪' as PetType },
   { id: 'moon_box_enhanced', name: '月光宝盒增强版', type: 'item' },
   { id: 'plasma_potion', name: '电浆药水', type: 'item' },
   { id: 'high_spirit_scroll', name: '高级斗志抑扬', type: 'item' },
@@ -169,7 +169,7 @@ export function selectLegendaryPrize(playerLevel: number): { name: string; item?
   const prize = LEGENDARY_PRIZES[prizeIndex];
 
   if (prize.type === 'pet') {
-    // 使用 petGenerator 的 generatePetByType 函数生成噜噜幻兽
+    // 使用 petGenerator 的 generatePetByType 函数生成年猪幻兽
     return {
       name: prize.name,
       pet: generatePetByType(prize.petType!),

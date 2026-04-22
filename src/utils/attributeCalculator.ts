@@ -1,5 +1,6 @@
 import type { CharacterData, EquipmentDetail, EquipmentSlotType } from '../types';
 import { WarSoulType } from '../types';
+import { increaseLuck } from './luckUtils';
 
 /**
  * 装备基础属性系数配置
@@ -356,8 +357,12 @@ export function gainCharacterExperience(
     // 重新计算总属性（基础 + 装备 + 幻兽）
     const totalAttrs = calculateTotalCharacterAttributes(tempCharacter);
 
+    // 升级时增加幸运值（每次升级+1，上限100）
+    const newLuck = increaseLuck(character.luck, levelUpCount);
+
     updatedCharacter = {
       ...tempCharacter,
+      luck: newLuck,
       maxHp: totalAttrs.maxHp,
       maxStamina: totalAttrs.maxStamina,
       attackMin: totalAttrs.attackMin,

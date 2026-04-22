@@ -459,6 +459,31 @@ export interface SkillDetail {
   isLearned: boolean; // 是否已学习
 }
 
+/**
+ * 技能学习结果接口
+ * 定义技能学习操作的返回结果
+ * 统一用于技能书学习和公主关系技能学习
+ */
+export interface SkillLearnResult {
+  success: boolean; // 是否成功学习
+  message: string; // 提示消息
+  updatedSkills: SkillDetail[]; // 更新后的技能列表
+  skillId?: string; // 技能ID（可选，用于公主关系技能学习）
+  skillName?: string; // 技能名称（可选，用于公主关系技能学习）
+  skillLevel?: number; // 技能等级（可选，用于公主关系技能学习）
+}
+
+/**
+ * 关系升级结果接口
+ * 包含关系更新和技能学习的结果
+ * 用于公主关系系统
+ */
+export interface RelationshipUpgradeResult {
+  relationship: PrincessRelationship; // 更新后的关系数据
+  skillLearnResult: SkillLearnResult | null; // 技能学习结果（如果有的话）
+  upgradeMessage: string; // 升级提示消息
+}
+
 // ========== 交互系统类型定义 ==========
 
 /**
@@ -476,6 +501,7 @@ export type ActionType = 'mining' | 'fishing' | 'gathering' | 'crafting' | 'cust
 /**
  * 敌人数据接口
  * 定义单个敌人的属性信息
+ * 注意：攻击力有最小值和最大值，发动普通攻击造成伤害时才会在范围内随机取值
  */
 export interface EnemyData {
   id: string; // 敌人唯一ID
@@ -483,7 +509,8 @@ export interface EnemyData {
   level?: number; // 敌人等级（可选）
   combatPower?: number; // 敌人战斗力（可选）
   maxHp: number; // 最大生命值
-  attack: number; // 攻击力
+  attackMin: number; // 最小攻击力
+  attackMax: number; // 最大攻击力
   defense: number; // 防御力
   description?: string; // 敌人描述
 }
@@ -601,7 +628,7 @@ export type Weekday = '星期一' | '星期二' | '星期三' | '星期四' | '�
  * 幻兽类型枚举
  * 定义幻兽的类型，不同类型有不同的基础评分和成长特点
  */
-export type PetType = '攻防型' | '调皮鬼' | '吉鲁猪' | '奇异兽' | '圣天使' | '守护' | '年猪' | '噜噜';
+export type PetType = '攻防型' | '调皮鬼' | '吉鲁猪' | '奇异兽' | '圣天使' | '守护' | '年猪';
 
 /**
  * 幻兽评分接口
@@ -1177,6 +1204,14 @@ export interface DailyTaskState {
   gw_xybj_4: boolean; // 雪域边境怪物4是否存在，true表示存在
   gw_xybj_5: boolean; // 雪域边境怪物5是否存在，true表示存在
 
+  // 魔族大军状态（魔中军阵地）
+  mj_gj: boolean; // 魔军突击队是否存在，true表示存在
+  mj_fy: boolean; // 魔军守卫军是否存在，true表示存在
+  mj_tt: boolean; // 魔军图腾兽是否存在，true表示存在
+  mj_sm: boolean; // 魔军神秘部队是否存在，true表示存在
+  mj_zs: boolean; // 魔军主帅是否存在，true表示存在
+  mj_nl: boolean; // 魔的能量是否存在，true表示存在
+
   // 任务进度追踪
   currentTaskId?: string; // 当前接受的任务ID
   taskAcceptedAt?: number; // 任务接受时间戳
@@ -1283,5 +1318,20 @@ export interface WarSoulDropConfig {
   itemType: WarSoulItemType; // 战魂物品类型（战魂之心/战魂晶石）
   dropRate: number; // 掉落概率（0-1之间）
   requireSystemEnabled: boolean; // 是否需要战魂系统开启才能掉落
+}
+
+// ========== 地图挑战系统类型定义 ==========
+
+/**
+ * 地图挑战状态接口
+ * 从 mapChallengeUtils.ts 重新导出
+ */
+export interface MapChallengeState {
+  /** 当前拥有的地图ID */
+  ownerMap: string | null;
+  /** 今日奖励是否可领取 */
+  mapReward: boolean;
+  /** 今日是否可挑战（所有地图共享一次机会） */
+  mapRace: boolean;
 }
 

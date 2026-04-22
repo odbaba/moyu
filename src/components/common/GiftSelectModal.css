@@ -1,0 +1,284 @@
+/* 送礼选择模态窗口样式 */
+
+.gift-select-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 10px;
+}
+
+.gift-select-modal {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.gift-select-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.gift-select-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: white;
+  font-weight: 600;
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 24px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.gift-select-modal-tip {
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  text-align: center;
+}
+
+.gift-select-flowers {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.flower-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.flower-option:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.flower-option.selected {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.2);
+}
+
+.flower-option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.flower-icon {
+  font-size: 32px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.flower-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.flower-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.flower-count {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2px;
+}
+
+.flower-effect {
+  font-size: 12px;
+  color: #ffd700;
+  font-weight: 500;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.quantity-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quantity-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  min-width: 30px;
+  text-align: center;
+}
+
+.gift-select-total {
+  padding: 16px 20px;
+  background: rgba(255, 215, 0, 0.2);
+  margin: 0 16px 16px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-label {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.total-value {
+  font-size: 24px;
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.gift-select-message {
+  padding: 10px 20px;
+  margin: 0 16px 16px;
+  background: rgba(255, 0, 0, 0.3);
+  color: white;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.gift-select-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cancel-btn,
+.confirm-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #333;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 移动端优化 */
+@media (max-width: 480px) {
+  .gift-select-modal {
+    max-width: 100%;
+    margin: 10px;
+  }
+
+  .flower-icon {
+    font-size: 28px;
+    width: 45px;
+    height: 45px;
+  }
+
+  .flower-name {
+    font-size: 15px;
+  }
+
+  .quantity-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  .quantity-value {
+    font-size: 16px;
+    min-width: 25px;
+  }
+
+  .total-value {
+    font-size: 20px;
+  }
+}

@@ -3,16 +3,7 @@
  * 处理技能书学习逻辑
  */
 
-import type { InventoryItem, SkillDetail } from '../types';
-
-/**
- * 学习技能的结果
- */
-export interface SkillLearnResult {
-  success: boolean; // 是否成功
-  message: string; // 提示消息
-  updatedSkills: SkillDetail[]; // 更新后的技能列表
-}
+import type { InventoryItem, SkillDetail, SkillLearnResult } from '../types';
 
 /**
  * 从技能书学习技能

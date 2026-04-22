@@ -64,13 +64,15 @@ const mining_4: ActionInteractable = {
 /**
  * 巡逻小兵的敌人数据列表
  * 定义三个城卫小兵的属性
+ * 注意：攻击力有最小值和最大值范围
  */
 const patrolSoldiersEnemies: EnemyData[] = [
   {
     id: 'soldier_a',
     name: '小兵甲',
     maxHp: 50,
-    attack: 10,
+    attackMin: 8, // 最小攻击力
+    attackMax: 12, // 最大攻击力
     defense: 2,
     description: '手持长枪，神情警惕',
   },
@@ -78,7 +80,8 @@ const patrolSoldiersEnemies: EnemyData[] = [
     id: 'soldier_b',
     name: '小兵乙',
     maxHp: 60,
-    attack: 12,
+    attackMin: 10, // 最小攻击力
+    attackMax: 14, // 最大攻击力
     defense: 3,
     description: '腰佩短刀，目光锐利',
   },
@@ -86,7 +89,8 @@ const patrolSoldiersEnemies: EnemyData[] = [
     id: 'soldier_c',
     name: '小兵丙',
     maxHp: 45,
-    attack: 15,
+    attackMin: 12, // 最小攻击力
+    attackMax: 18, // 最大攻击力
     defense: 1,
     description: '背负弓箭，身手敏捷',
   },

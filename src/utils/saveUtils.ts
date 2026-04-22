@@ -9,6 +9,10 @@ export interface SaveData {
   warSoulSystemEnabled: boolean;
   // 无名氏击败状态
   wumingshiDefeated: boolean;
+  // PK赛今日参与状态（周六开放，每天只能参加一次）
+  hasParticipatedPKToday: boolean;
+  // 国王是否被救出
+  isKingRescued: boolean;
   // 可以根据需要添加更多状态字段
 }
 

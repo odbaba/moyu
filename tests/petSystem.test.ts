@@ -497,11 +497,11 @@ function testShopPetGeneration() {
 function testLotteryPetGeneration() {
   console.log('\n========== 测试抽奖获得幻兽生成 ==========');
 
-  // 测试用例1: 极品奖品 - 噜噜幻兽
+  // 测试用例1: 极品奖品 - 年猪幻兽
   const prize1 = selectLegendaryPrize(50);
-  const passed1 = prize1.pet !== undefined && prize1.pet.hs_name === '噜噜' && prize1.pet.rating.pzbase === 700;
+  const passed1 = prize1.pet !== undefined && prize1.pet.hs_name === '年猪' && prize1.pet.rating.pzbase === 380;
   logTest(
-    '抽奖 - 极品奖品噜噜幻兽',
+    '抽奖 - 极品奖品年猪幻兽',
     passed1,
     passed1 ? `生成成功，类型: ${prize1.pet?.hs_name}, 基础评分: ${prize1.pet?.rating.pzbase}` : '生成失败',
     prize1.pet ? { type: prize1.pet.hs_name, baseScore: prize1.pet.rating.pzbase, totalScore: prize1.pet.pz } : null

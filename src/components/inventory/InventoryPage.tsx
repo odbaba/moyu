@@ -176,6 +176,9 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
   return (
     <div className="inventory-page-overlay" onClick={handleOverlayClick}>
       <div className="inventory-page-container">
+        {/* 顶部占位框 */}
+        <div className="page-top-placeholder"></div>
+
         {/* 页面顶部关闭按钮 */}
         <div className="inventory-page-header">
           <h2 className="inventory-page-title">背包</h2>

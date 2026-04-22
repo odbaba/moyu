@@ -3,7 +3,7 @@ import './pet.css';
 import React, { useMemo } from 'react';
 
 import type { Pet } from '../../types';
-import { getPetEmoji, getPetQualityColor } from '../common/utils';
+import { getPetAvatar, getPetQualityColor } from '../common/utils';
 
 /**
  * 幻兽选择弹窗组件属性接口
@@ -140,9 +140,7 @@ const PetSelectModal: React.FC<PetSelectModalProps> = ({
               >
                 {/* 幻兽头像 */}
                 <div className="pet-select-item-avatar">
-                  <span className="pet-select-item-emoji">
-                    {getPetEmoji(pet.hs_name)}
-                  </span>
+                  <img className="pet-select-item-avatar-img" src={getPetAvatar(pet.hs_name)} alt={pet.hs_name} />
                 </div>
 
                 {/* 幻兽信息 */}

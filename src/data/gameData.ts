@@ -253,7 +253,8 @@ export const locations: LocationData = [
     id: 'xueyu-bianjing',
     name: '雪域边境',
     description: '雪域边境是亚特大陆的最北端，终年积雪。',
-    adjacentLocations: ['binggong'],
+    // 雪域边境与冰宫和魔中军阵地连通（魔中军阵地需要国王救出后才能进入）
+    adjacentLocations: ['binggong', 'mozhongjun-zhendi'],
     // 雪域边境：5个怪物按钮（冰雪巨人士兵x2、冰雪巨人士官x2、冰雪巨人军官x1）
     interactables: [
       'interact-xueyu-shibing-1',
@@ -264,6 +265,24 @@ export const locations: LocationData = [
     ],
     x: 4,
     y: 3
+  },
+  // 魔中军阵地：国王救出后解锁，从雪域边境进入
+  {
+    id: 'mozhongjun-zhendi',
+    name: '魔中军阵地',
+    description: '魔族大军的营地，驻扎着强大的魔族军队。只有救出国王后才能进入。',
+    adjacentLocations: ['xueyu-bianjing'], // 仅与雪域边境连通
+    // 魔中军阵地：6个魔族大军怪物按钮
+    interactables: [
+      'interact-mojun-tujidui',
+      'interact-mojun-shouweijun',
+      'interact-mojun-shenmibudui',
+      'interact-mojun-tutengshou',
+      'interact-mojun-nengliang',
+      'interact-mojun-shuai',
+    ],
+    x: 5, // 位于雪域边境右边
+    y: 3,
   },
   // 战魂封印迷宫：独立地点，通过探险家NPC传送到达
   {
@@ -338,6 +357,7 @@ export const connections = [
   // y=3 横向
   ['mimeng-zhaozhe', 'binggong'],
   ['binggong', 'xueyu-bianjing'],
+  ['xueyu-bianjing', 'mozhongjun-zhendi'], // 魔中军阵地连接
 
   // 地下城之间横向连接
   ['dixiacheng-1', 'dixiacheng-2'],

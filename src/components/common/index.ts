@@ -21,6 +21,9 @@ export { default as InfoModal } from './InfoModal';
 // 统一装备详情弹窗组件
 export { default as EquipmentDetailModal } from './EquipmentDetailModal';
 
+// 送礼选择弹窗组件
+export { default as GiftSelectModal } from './GiftSelectModal';
+
 // 公共常量导出
 export * from './constants';
 

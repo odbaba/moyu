@@ -2,8 +2,16 @@
  * 首页模块样式 (Home Module Styles)
  * 包含游戏主界面（非战斗状态）的所有样式
  * 
- * 高度分配：标题5% + 场景描述20% + 局部地图25% + 交互按钮区15% + 时间显示5% + 交互日志区30% = 100%
+ * 高度分配：顶部占位10% + 标题5% + 场景描述12% + 局部地图23% + 交互按钮区15% + 时间显示5% + 交互日志区30% = 100%
  */
+
+/* 顶部占位框 - 高度10% */
+.top-placeholder {
+  width: 100%;
+  height: 10vh;
+  background-color: #252935;
+  border-bottom: 1px solid #000000;
+}
 
 /* 顶部位置显示 - 高度5% */
 .location-header {
@@ -28,54 +36,26 @@
   margin: 0;
 }
 
-/* 角色按钮样式 - 绝对定位在标题左侧，不影响标题居中 */
-.character-button {
+/* 角色和幻兽按钮样式 - 使用交互按钮样式，绝对定位在标题两侧 */
+.location-header .interact-button {
   position: absolute; /* 绝对定位，脱离文档流 */
-  left: 10px; /* 固定在左侧 */
-  background-color: #2a2a2a;
-  color: #FFFFFF;
-  border: 1px solid #4ecdc4;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
-  white-space: nowrap;
   z-index: 10; /* 确保按钮在上层 */
 }
 
-.character-button:hover {
-  background-color: #3a3a3a;
-  border-color: #6bc5ff;
-  box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+/* 角色按钮 - 固定在左侧 */
+.location-header .interact-button:first-of-type {
+  left: 10px;
 }
 
-/* 幻兽按钮样式 - 绝对定位在标题右侧，不影响标题居中 */
-.pet-button {
-  position: absolute; /* 绝对定位，脱离文档流 */
-  right: 10px; /* 固定在右侧 */
-  background-color: #2a2a2a;
-  color: #FFFFFF;
-  border: 1px solid #ffd700;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  z-index: 10; /* 确保按钮在上层 */
+/* 幻兽按钮 - 固定在右侧 */
+.location-header .interact-button:last-of-type {
+  right: 10px;
 }
 
-.pet-button:hover {
-  background-color: #3a3a3a;
-  border-color: #ffed4a;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-}
-
-/* 场景描述 - 高度20% */
+/* 场景描述 - 高度12% */
 .scene-description {
   width: 100%;
-  height: 20vh;
+  height: 12vh;
   background-color: #252935;
   padding: 10px 20px;
   border-bottom: 1px solid #000000;
@@ -93,10 +73,10 @@
   font-weight: bold;
 }
 
-/* 局部地图 - 高度25%，移除标题 */
+/* 局部地图 - 高度23%，移除标题 */
 .local-map {
   width: 100%;
-  height: 25vh;
+  height: 23vh;
   background-color: #252935;
   padding: 10px 20px;
   border-bottom: 1px solid #000000;

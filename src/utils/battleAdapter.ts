@@ -117,8 +117,8 @@ export function characterToBattleCharacter(
     gridPosition: gridPosition
   };
 
-  // 使用统一的战斗力计算函数（包含幻兽战斗力加成）
-  battleCharacter.combatPower = calculateTotalCombatPower(characterData, pets);
+  // 使用统一的战斗力计算函数（包含幻兽战斗力加成和斗志抑扬加成）
+  battleCharacter.combatPower = calculateTotalCombatPower(characterData, pets, skills);
 
   return battleCharacter;
 }
@@ -373,8 +373,8 @@ export function createEnemyFromEnemyData(
     currentHp: enemyData.maxHp,
     maxStamina: maxStamina,
     currentStamina: maxStamina,
-    attackMin: enemyData.attack, // 使用攻击力作为最小攻击
-    attackMax: enemyData.attack, // 使用攻击力作为最大攻击
+    attackMin: enemyData.attackMin, // 使用最小攻击力
+    attackMax: enemyData.attackMax, // 使用最大攻击力
     defense: enemyData.defense,
     combatPower: calculateCombatPowerFromEnemyData(enemyData),
     dodgeRate: 0, // 敌人默认无闪避

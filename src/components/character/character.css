@@ -2,7 +2,18 @@
  * 角色信息模块样式 (Character Module Styles)
  * 包含角色信息和装备系统的所有样式
  * 移动端优化：角色属性1/3高度 + 装备展示2/3高度
+ * 
+ * 高度分配：顶部占位10% + 页面头部5% + 内容区85% = 100%
  */
+
+/* 顶部占位框 - 高度10% */
+.page-top-placeholder {
+  width: 100%;
+  height: 10vh;
+  background-color: #252935;
+  border-bottom: 1px solid #000000;
+  flex-shrink: 0;
+}
 
 /* ========== 角色信息主页面样式 ========== */
 
@@ -25,7 +36,7 @@
 
 /* 角色信息主页面容器 */
 .character-page-container {
-  background-color: rgba(20, 20, 20, 0.98);
+  background-color: #252935;
   width: 100%;
   height: 100%;
   display: flex;
@@ -38,25 +49,25 @@
   display: flex;
   justify-content: flex-end;
   padding: 8px 15px;
-  background-color: rgba(30, 30, 30, 0.8);
-  border-bottom: 1px solid #333;
+  background-color: #252935;
+  border-bottom: 1px solid #000000;
   flex-shrink: 0;
 }
 
 .character-page-close-button {
-  padding: 6px 15px;
-  background-color: rgba(255, 107, 107, 0.2);
-  border: 1px solid #ff6b6b;
+  padding: 5px 12px;
+  background-color: transparent;
+  border: none;
   border-radius: 4px;
-  color: #ff6b6b;
+  color: #FFFFFF;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 1.5rem;
+  font-weight: bold;
   transition: all 0.3s ease;
 }
 
 .character-page-close-button:hover {
-  background-color: rgba(255, 107, 107, 0.4);
-  box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+  color: #ff6b6b;
 }
 
 /* 主要内容区域 - 移动端上下布局 */
@@ -71,7 +82,7 @@
 .character-page-top {
   height: 50%;
   overflow: hidden;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #000000;
 }
 
 /* 下部：装备展示区域 (1/2高度) */
@@ -88,7 +99,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background-color: rgba(25, 25, 25, 0.9);
+  background-color: #252935;
 }
 
 /* 第一行：角色名称、等级、爵位、军衔 */
@@ -100,10 +111,9 @@
 }
 
 .character-name-compact {
-  color: #ffd700;
+  color: #FFFFFF;
   font-size: 1.1rem;
   font-weight: bold;
-  text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
 }
 
 .character-level-compact {
@@ -125,12 +135,12 @@
 }
 
 .title-rank-label {
-  color: #888;
+  color: #FFFFFF;
   font-size: 0.85rem;
 }
 
 .title-rank-value {
-  color: #ffd700;
+  color: #FFFFFF;
   font-size: 0.85rem;
   font-weight: bold;
 }
@@ -170,8 +180,10 @@
 .hp-icon,
 .stamina-icon,
 .exp-icon {
-  font-size: 1rem;
+  font-size: 0.75rem;
   flex-shrink: 0;
+  color: #FFFFFF;
+  min-width: 40px;
 }
 
 .hp-bar-compact,
@@ -242,7 +254,7 @@
   flex-direction: column;
   align-items: center;
   padding: 6px;
-  background-color: rgba(40, 40, 40, 0.5);
+  background-color: #252935;
   border-radius: 6px;
   border: 1px solid #444;
   gap: 2px;
@@ -253,12 +265,12 @@
 }
 
 .stat-label-compact {
-  color: #888;
+  color: #FFFFFF;
   font-size: 0.7rem;
 }
 
 .stat-value-compact {
-  color: #f0f0f0;
+  color: #FFFFFF;
   font-size: 0.85rem;
   font-weight: bold;
 }
@@ -294,42 +306,15 @@
   justify-content: center;
 }
 
-.combat-power-compact {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 20px;
-  background-color: rgba(255, 215, 0, 0.1);
-  border: 2px solid #ffd700;
-  border-radius: 8px;
-}
-
-.combat-power-label {
-  color: #888;
-  font-size: 0.85rem;
-}
-
-.combat-power-value {
-  color: #ffd700;
-  font-size: 1.5rem;
+/* 战斗力按钮样式 - 使用 game-btn 样式 */
+.combat-power-btn {
+  font-size: 1rem;
+  padding: 8px 25px;
   font-weight: bold;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
-.detail-button-compact {
-  padding: 4px 12px;
-  background-color: rgba(255, 215, 0, 0.2);
-  border: 1px solid #ffd700;
-  border-radius: 4px;
-  color: #ffd700;
-  cursor: pointer;
-  font-size: 0.75rem;
-  transition: all 0.3s ease;
-}
-
-.detail-button-compact:hover {
-  background-color: rgba(255, 215, 0, 0.4);
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+.combat-power-btn:hover {
+  background-color: #1a1a1a;
 }
 
 /* ========== 紧凑版装备展示样式 ========== */
@@ -339,6 +324,7 @@
   padding: 10px 15px;
   display: flex;
   flex-direction: column;
+  background-color: #252935;
 }
 
 .equipment-grid-compact {
@@ -350,14 +336,14 @@
 }
 
 .equipment-card-compact {
-  background-color: rgba(40, 40, 40, 0.8);
+  background-color: #252935;
   border: 1px solid #555;
   border-radius: 8px;
   padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -368,25 +354,43 @@
   transform: translateY(-2px);
 }
 
+/* 有装备时的样式 - 占满整个栏位 */
+.equipment-slot-filled {
+  padding: 8px;
+}
+
+.equipment-slot-filled .equipment-icon-compact {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.equipment-slot-filled .equipment-info-compact {
+  flex-shrink: 0;
+  text-align: center;
+  margin-top: 5px;
+}
+
 .equipment-icon-compact {
-  font-size: 2rem;
+  font-size: 2.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 2.5rem;
 }
 
-/* 装备图片样式 */
+/* 装备图片样式 - 放大占满栏位 */
 .equipment-image-compact {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
   image-rendering: pixelated;
 }
 
-/* 装备emoji图标样式 */
+/* 装备emoji图标样式 - 放大 */
 .equipment-emoji-compact {
-  font-size: 2rem;
+  font-size: 2.5rem;
 }
 
 .equipment-info-compact {
@@ -395,21 +399,22 @@
 }
 
 .equipment-type-compact {
-  color: #888;
-  font-size: 0.7rem;
-  margin-bottom: 2px;
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: bold;
 }
 
 .equipment-name-compact {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: bold;
-  margin-bottom: 2px;
+  margin-top: 3px;
   word-break: break-all;
 }
 
 .equipment-level-compact {
   color: #4ecdc4;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
+  margin-top: 2px;
 }
 
 /* ========== 战斗力详情弹窗样式 ========== */
@@ -429,14 +434,14 @@
 }
 
 .combat-power-modal-content {
-  background-color: #222;
+  background-color: #252935;
   border-radius: 8px;
   padding: 20px;
   width: 90%;
   max-width: 400px;
   max-height: 80vh;
   overflow-y: auto;
-  border: 2px solid #ffd700;
+  border: 1px solid #000000;
   animation: slideIn 0.3s ease;
   position: relative;
 }
@@ -451,14 +456,14 @@
 }
 
 .combat-power-modal-title {
-  color: #ffd700;
+  color: #FFFFFF;
   font-size: 1.2rem;
   margin: 0;
 }
 
 .combat-power-modal-close {
   background-color: transparent;
-  color: #f0f0f0;
+  color: #FFFFFF;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
@@ -471,7 +476,7 @@
 
 /* 战斗力详情弹窗标题 */
 .combat-power-title {
-  color: #ffd700;
+  color: #FFFFFF;
   font-size: 1.2rem;
   margin: 0 0 15px 0;
   text-align: center;
@@ -483,7 +488,7 @@
   top: 10px;
   right: 10px;
   background-color: transparent;
-  color: #f0f0f0;
+  color: #FFFFFF;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
@@ -504,9 +509,9 @@
   align-items: center;
   padding: 10px;
   margin-bottom: 8px;
-  background-color: rgba(40, 40, 40, 0.5);
+  background-color: #252935;
   border-radius: 4px;
-  border-left: 3px solid #ffd700;
+  border: 1px solid #444;
 }
 
 .combat-power-item-left {
@@ -516,7 +521,7 @@
 }
 
 .combat-power-item-label {
-  color: #888;
+  color: #FFFFFF;
   font-size: 0.9rem;
 }
 
@@ -526,7 +531,7 @@
 }
 
 .combat-power-item-value {
-  color: #ffd700;
+  color: #FFFFFF;
   font-size: 1rem;
   font-weight: bold;
 }
@@ -534,23 +539,22 @@
 .combat-power-total {
   margin-top: 15px;
   padding: 15px;
-  background-color: rgba(255, 215, 0, 0.1);
-  border: 2px solid #ffd700;
+  background-color: #252935;
+  border: 1px solid #000000;
   border-radius: 8px;
   text-align: center;
 }
 
 .combat-power-total-label {
-  color: #888;
+  color: #FFFFFF;
   font-size: 0.9rem;
   margin-bottom: 5px;
 }
 
 .combat-power-total-value {
-  color: #ffd700;
+  color: #FFFFFF;
   font-size: 1.8rem;
   font-weight: bold;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 /* ========== 动画效果 ========== */
@@ -654,12 +658,28 @@
 
 .equipment-slot-empty {
   border: 2px dashed #555;
-  background-color: rgba(30, 30, 30, 0.5);
+  background-color: #252935;
 }
 
 .equipment-slot-empty:hover {
   border-color: #4ecdc4;
   background-color: rgba(78, 205, 196, 0.1);
+}
+
+/* 空装备栏信息样式 - 字体放大居中 */
+.equipment-info-compact.empty-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.equipment-info-compact.empty-info .equipment-type-compact {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #FFFFFF;
+  margin-bottom: 5px;
 }
 
 .empty-icon {
@@ -668,13 +688,14 @@
 
 .equipment-empty-text {
   color: #666;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: bold;
+  margin-bottom: 3px;
 }
 
 .equipment-empty-hint {
   color: #555;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
 }
 
 /* ========== 装备选择弹窗样式 ========== */
@@ -694,7 +715,7 @@
 }
 
 .equipment-select-modal-content {
-  background-color: #222;
+  background-color: #252935;
   border-radius: 8px;
   padding: 20px;
   width: 90%;
@@ -711,7 +732,7 @@
   top: 10px;
   right: 10px;
   background-color: transparent;
-  color: #f0f0f0;
+  color: #FFFFFF;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
@@ -764,7 +785,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background-color: rgba(40, 40, 40, 0.8);
+  background-color: #252935;
   border: 1px solid #444;
   border-radius: 8px;
   cursor: pointer;
@@ -818,7 +839,7 @@
   display: flex;
   gap: 8px;
   font-size: 0.75rem;
-  color: #888;
+  color: #FFFFFF;
 }
 
 .select-item-level .magic-soul {
@@ -855,4 +876,132 @@
 
 .equipment-select-modal-content::-webkit-scrollbar-thumb:hover {
   background: #777;
+}
+
+/* ========== 属性详情悬浮框样式 ========== */
+
+.attribute-tooltip {
+  background-color: #252935;
+  border: 2px solid #ffd700;
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 180px;
+  max-width: 220px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.attribute-tooltip-title {
+  color: #ffd700;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #444;
+}
+
+.attribute-tooltip-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background-color: rgba(255, 215, 0, 0.1);
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.attribute-tooltip-total .attribute-tooltip-value {
+  color: #ffd700;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.attribute-tooltip-divider {
+  height: 1px;
+  background-color: #444;
+  margin: 8px 0;
+}
+
+.attribute-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  background-color: #252935;
+  border-radius: 4px;
+}
+
+.attribute-tooltip-label {
+  color: #FFFFFF;
+  font-size: 0.85rem;
+}
+
+.attribute-tooltip-value {
+  color: #FFFFFF;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.attribute-tooltip-value.base {
+  color: #4ecdc4;
+}
+
+.attribute-tooltip-value.equipment {
+  color: #ff9800;
+}
+
+.attribute-tooltip-value.pet {
+  color: #9c27b0;
+}
+
+.attribute-tooltip-value.soul {
+  color: #ffd700;
+}
+
+/* ========== 可点击属性样式 ========== */
+
+.stat-compact.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.stat-compact.clickable:hover {
+  background-color: rgba(60, 60, 60, 0.8);
+  border-color: #ffd700;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+}
+
+.stat-compact.clickable:active {
+  transform: translateY(0);
+}
+
+/* 可点击属性的下划线提示 */
+.stat-compact.clickable::after {
+  content: '▼';
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 0.5rem;
+  color: #666;
+  opacity: 0.5;
+}
+
+.stat-compact.clickable:hover::after {
+  color: #ffd700;
+  opacity: 1;
 }

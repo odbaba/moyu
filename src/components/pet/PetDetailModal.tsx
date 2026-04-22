@@ -3,7 +3,7 @@ import './pet.css';
 import React from 'react';
 
 import type { Pet } from '../../types';
-import { formatGrowthRate, getPetEmoji, getPetQualityColor } from '../common/utils';
+import { formatGrowthRate, getPetAvatar, getPetQualityColor } from '../common/utils';
 
 /**
  * 幻兽详情弹窗组件属性接口
@@ -95,7 +95,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
         {/* 幻兽头部信息：图标和名称 */}
         <div className="pet-detail-header">
           <div className="pet-detail-icon-wrapper">
-            <span className="pet-detail-emoji">{getPetEmoji(pet.hs_name)}</span>
+            <img className="pet-detail-avatar-img" src={getPetAvatar(pet.hs_name)} alt={pet.hs_name} />
           </div>
           <h3
             className="pet-detail-name"

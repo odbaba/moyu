@@ -63,6 +63,7 @@ export function rollBossSpawns(): BossSpawnResult[] {
 /**
  * 根据 BOSS 模板生成敌人数据
  * BOSS 的属性在范围内随机生成
+ * 注意：攻击力保留最小值和最大值范围，战斗时才随机取值
  *
  * @param bossTemplate BOSS 模板
  * @param spawnId 刷新配置 ID（用于生成唯一敌人 ID）
@@ -74,10 +75,9 @@ export function generateBossEnemyData(bossTemplate: BossTemplate, spawnId: strin
     bossTemplate.minHp + Math.random() * (bossTemplate.maxHp - bossTemplate.minHp)
   );
 
-  // 在范围内随机生成攻击力
-  const attack = Math.floor(
-    bossTemplate.baseAttackMin + Math.random() * (bossTemplate.baseAttackMax - bossTemplate.baseAttackMin)
-  );
+  // 直接使用 BOSS 模板的攻击力范围（战斗时才随机取值）
+  const attackMin = bossTemplate.baseAttackMin;
+  const attackMax = bossTemplate.baseAttackMax;
 
   // 使用基础防御
   const defense = bossTemplate.baseDefense;
@@ -87,7 +87,8 @@ export function generateBossEnemyData(bossTemplate: BossTemplate, spawnId: strin
     id: `${spawnId}_boss`,
     name: bossTemplate.name,
     maxHp: maxHp,
-    attack: attack,
+    attackMin: attackMin, // 最小攻击力
+    attackMax: attackMax, // 最大攻击力
     defense: defense,
     description: bossTemplate.description,
   };

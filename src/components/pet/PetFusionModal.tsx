@@ -11,7 +11,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import type { InventoryItem, Pet } from '../../types';
 import { calculateScoreRequirement, checkFusionConditions, executeFusion } from '../../utils/petFusion';
 import { gainExperience } from '../../utils/petGenerator';
-import { getPetEmoji, getPetQualityColor } from '../common/utils';
+import { getPetAvatar, getPetQualityColor } from '../common/utils';
 import FusionHelpModal from './FusionHelpModal';
 import FusionResultModal from './FusionResultModal';
 import FusionSettingsPanel, { type FusionSettings } from './FusionSettingsPanel';
@@ -454,9 +454,7 @@ const PetFusionModal: React.FC<PetFusionModalProps> = ({
             <div className="fusion-pet-info">
               {/* 幻兽头像 */}
               <div className="fusion-pet-avatar">
-                <span className="fusion-pet-emoji">
-                  {getPetEmoji(pet.hs_name)}
-                </span>
+                <img className="fusion-pet-avatar-img" src={getPetAvatar(pet.hs_name)} alt={pet.hs_name} />
               </div>
 
               {/* 幻兽详情 */}
@@ -523,6 +521,9 @@ const PetFusionModal: React.FC<PetFusionModalProps> = ({
   return (
     <div className="pet-fusion-page-overlay" onClick={handleOverlayClick}>
       <div className="pet-fusion-page-container">
+        {/* 顶部占位框 */}
+        <div className="page-top-placeholder"></div>
+
         {/* 页面顶部标题栏 */}
         <div className="pet-fusion-page-header">
           <h2 className="pet-fusion-page-title">🔮 幻兽幻化</h2>

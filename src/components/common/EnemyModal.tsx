@@ -68,8 +68,8 @@ const EnemyModal: React.FC<EnemyModalProps> = ({
               <div style={{ display: 'flex', gap: '15px', fontSize: '12px', color: '#666' }}>
                 {/* HP生命值 */}
                 <span>❤️ HP: {enemy.maxHp}</span>
-                {/* 攻击力 */}
-                <span>⚔️ 攻击: {enemy.attack}</span>
+                {/* 攻击力范围 */}
+                <span>⚔️ 攻击: {enemy.attackMin}~{enemy.attackMax}</span>
                 {/* 防御力 */}
                 <span>🛡️ 防御: {enemy.defense}</span>
               </div>

@@ -116,25 +116,25 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     isLearned: isLearned
   },
 
-  // 索引4: 斗志抑扬 - 增益技能，战斗力加成5%-50%，可升级到5级
+  // 索引4: 斗志抑扬 - 被动技能，战斗力加成5%-50%，可升级到5级
   {
     id: 'skill_fighting_spirit',
     skillIndex: 4 as SkillIndex,
     name: '斗志抑扬',
     icon: '🔥',
-    type: 'active',
+    type: 'passive',
     attackType: 'buff',
     rarity: 'legendary',
     level: 0,
     maxLevel: 5,
-    description: '激发斗志，提升战斗力。等级越高，战斗力加成越大。最高可提升50%战斗力。消耗25点体力。',
+    description: '激发斗志，被动提升战斗力。等级越高，战斗力加成越大。最高可提升50%战斗力。',
     effect: {
       battlePowerBonus: 5,
       buff: '战斗力加成',
-      duration: 3
+      duration: 0
     },
-    cost: { stamina: 25 },
-    cooldown: 5,
+    cost: { stamina: 0 },
+    cooldown: 0,
     currentCooldown: 0,
     range: '自身',
     targetType: '自身',

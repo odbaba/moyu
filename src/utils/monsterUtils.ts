@@ -104,6 +104,7 @@ export function isSpecialMonster(monsterType: MonsterType): boolean {
  * 调用 getEnemyCount 获取敌人数量
  * 为每个敌人生成 EnemyData 对象
  * 敌人属性基于怪物属性，略有随机变化（±10%）
+ * 注意：敌人的攻击力保留最小值和最大值范围，战斗时才随机取值
  *
  * @param monster - 怪物实例
  * @param spawnId - 刷新配置ID（可选，用于生成唯一敌人ID）
@@ -127,9 +128,9 @@ export function generateEnemiesForBattle(monster: Monster, spawnId?: string): En
     // 生成 0.9 到 1.1 之间的随机数
     const variationFactor = 0.9 + Math.random() * 0.2;
 
-    // 计算敌人的攻击力（取最小和最大攻击的平均值，再乘以变化系数）
-    const baseAttack = (monster.attackMin + monster.attackMax) / 2;
-    const attack = Math.round(baseAttack * variationFactor);
+    // 计算敌人的攻击力范围（保留最小和最大攻击力，应用变化系数）
+    const attackMin = Math.round(monster.attackMin * variationFactor);
+    const attackMax = Math.round(monster.attackMax * variationFactor);
 
     // 计算敌人的生命值和防御力（乘以变化系数）
     const maxHp = Math.round(monster.maxHp * variationFactor);
@@ -145,7 +146,8 @@ export function generateEnemiesForBattle(monster: Monster, spawnId?: string): En
       level: monster.level,
       combatPower: monster.combatPower,
       maxHp: maxHp,
-      attack: attack,
+      attackMin: attackMin, // 最小攻击力
+      attackMax: attackMax, // 最大攻击力
       defense: defense,
       description: monster.description,
     };

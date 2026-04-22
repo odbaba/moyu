@@ -3,7 +3,7 @@ import './pet.css';
 import React from 'react';
 
 import type { Pet } from '../../types';
-import { getPetEmoji } from '../common/utils';
+import { getPetAvatar } from '../common/utils';
 
 /**
  * 出战幻兽栏组件属性接口
@@ -121,7 +121,7 @@ const DeployedPetSlot: React.FC<DeployedPetSlotProps> = ({
       <div className="pet-info">
         {/* 幻兽头像 */}
         <div className="pet-avatar">
-          <span className="pet-emoji">{getPetEmoji(pet.hs_name)}</span>
+          <img className="pet-avatar-img" src={getPetAvatar(pet.hs_name)} alt={pet.hs_name} />
         </div>
 
         {/* 幻兽详细信息 */}

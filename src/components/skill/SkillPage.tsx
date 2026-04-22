@@ -86,6 +86,9 @@ const SkillPage: React.FC<SkillPageProps> = ({
   return (
     <div className="skill-page-overlay" onClick={handleOverlayClick}>
       <div className="skill-page-container">
+        {/* 顶部占位框 */}
+        <div className="page-top-placeholder"></div>
+
         {/* 页面顶部标题和关闭按钮 */}
         <div className="skill-page-header">
           <h2 className="skill-page-title">技能列表</h2>

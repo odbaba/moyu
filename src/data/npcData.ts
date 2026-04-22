@@ -69,43 +69,56 @@ const npc_king: NPCInteractable = {
  * 公主 NPC 配置
  * 功能：提供关系系统、送礼系统、幻兽赠送功能
  * 位置：后花园（需要爵位才能进入）
+ * 关系等级：0-未认识、1-认识、2-普通朋友、3-好朋友、4-知己、5-恋人、6-亲密恋人
  */
 const npc_princess: NPCInteractable = {
   id: 'npc_princess',
   type: 'npc',
   name: '公主',
   icon: '👸',
-  description: '国王的女儿，美丽而善良。与她建立良好关系可以获得丰厚的奖励。',
+  // 描述中包含关系等级提示，帮助玩家了解当前关系状态
+  description: '国王的女儿，美丽而善良。与她建立良好关系可以获得丰厚的奖励。\n【提示】可通过"查看关系"了解当前关系等级和亲密度。',
   location: 'houhuayuan',
   npcType: 'palace',
   options: [
+    // 查看关系选项：显示当前关系等级、亲密度和升级需求
+    {
+      text: '查看关系',
+      result: '查看与公主的关系详情。\n显示内容：当前关系等级、亲密度、升级到下一级所需亲密度。',
+      actionType: 'viewRelationship',
+      actionParams: {},
+    },
+    // 知己的礼物选项：关系等级达到4（知己）及以上时可领取年猪（一次性）
     {
       text: '知己的礼物',
       result: '获得超级幻兽年猪！',
-      actionType: 'receiveGift',
-      actionParams: { giftType: 'yearPig', requirement: 'relationship >= 5' },
+      actionType: 'receiveConfidantGift',
+      actionParams: { giftType: 'yearPig', requirement: 'relationship >= 4' },
       condition: {
         type: 'relationship',
-        value: 5,
+        value: 4,
         operator: 'gte',
       },
     },
+    // 聊天选项：每天一次，增加亲密度+1，根据关系等级获得不同幻兽奖励
     {
       text: '聊天',
       result: '与公主聊天，增加友好度。每天只能聊天一次。',
       actionType: 'chat',
       actionParams: { dailyLimit: true },
     },
+    // 送礼选项：仅周日可用，送花增加亲密度
     {
       text: '送礼',
-      result: '向公主送花，增加友好度。',
+      result: '从背包中选择玫瑰花送给公主，增加友好度。',
       actionType: 'sendGift',
       actionParams: { giftType: 'flowers' },
       condition: {
         type: 'weekday',
-        value: '星期日',
+        value: 0, // 0=周日
       },
     },
+    // 周日礼物选项：仅周日可用，根据关系等级获得不同宝石奖励
     {
       text: '星期天的礼物',
       result: '获得宝石奖励！',
@@ -113,7 +126,7 @@ const npc_princess: NPCInteractable = {
       actionParams: { giftType: 'gem' },
       condition: {
         type: 'weekday',
-        value: '星期日',
+        value: 0, // 0=周日
       },
     },
   ],
@@ -216,24 +229,33 @@ const npc_prime_minister: NPCInteractable = {
 };
 
 /**
- * 丫环 NPC 配置
- * 功能：提供游戏提示和帮助信息
- * 位置：皇宫
+ * 丫环1 NPC 配置（公主侍女）
+ * 功能：出售高级战斗力石
+ * 位置：后花园（公主所在地）
+ * 参考文档：reference/docs/project_docs/10_公主系统.md（侍女1部分）
  */
 const npc_maid_1: NPCInteractable = {
   id: 'npc_maid_1',
   type: 'npc',
   name: '丫环',
   icon: '👘',
-  description: '皇宫中的丫环，热情地为冒险者提供帮助和提示。',
-  location: 'huanggong',
+  // 丫环1的描述：自小跟随公主，与公主有福共享
+  description: '我自小跟随公主，公主向来与我们有福共享...',
+  location: 'houhuayuan',
   npcType: 'palace',
   options: [
+    // 购买高级战斗力石选项：价格2,800魔石，每天限购一个
     {
-      text: '游戏提示',
-      result: '欢迎来到亚特大陆！在这里你可以：\n- 探索各个地图，挑战怪物\n- 与NPC交互，完成任务\n- 提升军衔和爵位\n- 培养幻兽，增强实力',
-      actionType: 'showHelp',
-      actionParams: { topic: 'gameTips' },
+      text: '购买高级战斗力石（2,800魔石）',
+      result: '购买高级战斗力石，镶嵌后战斗力+5%。\n【限制】每天只能购买一个。',
+      actionType: 'buyItem',
+      actionParams: {
+        itemId: 'gaojizhandoushili',
+        price: 2800,
+        currency: 'magicStone',
+        dailyLimit: true,
+        limitCount: 1,
+      },
     },
     {
       text: '离开',
@@ -245,24 +267,32 @@ const npc_maid_1: NPCInteractable = {
 };
 
 /**
- * 丫环2 NPC 配置
- * 功能：提供游戏提示和帮助信息
- * 位置：皇宫
+ * 丫环2 NPC 配置（公主侍女）
+ * 功能：出售年猪幻兽
+ * 位置：后花园（公主所在地）
+ * 参考文档：reference/docs/project_docs/10_公主系统.md（侍女2部分）
  */
 const npc_maid_2: NPCInteractable = {
   id: 'npc_maid_2',
   type: 'npc',
   name: '丫环',
   icon: '👘',
-  description: '皇宫中的丫环，热情地为冒险者提供帮助和提示。',
-  location: 'huanggong',
+  // 丫环2的描述：公主的侍女，公主待她如同姐妹
+  description: '我是公主的侍女，公主平时代我如同姐妹一样亲...',
+  location: 'houhuayuan',
   npcType: 'palace',
   options: [
+    // 购买年猪选项：价格5,888魔石，仅限购买一个（一次性购买）
     {
-      text: '关于幻兽',
-      result: '幻兽是你的忠实伙伴！\n- 幻兽可以合体，增强你的战斗力\n- 通过幻兽研究所可以购买幻兽\n- 完成任务可以获得高品质幻兽',
-      actionType: 'showHelp',
-      actionParams: { topic: 'petSystem' },
+      text: '购买年猪（5,888魔石）',
+      result: '购买超级幻兽年猪！\n【限制】只能购买一个。',
+      actionType: 'buyPet',
+      actionParams: {
+        petType: 'nianzhu',
+        price: 5888,
+        currency: 'magicStone',
+        oneTimeLimit: true,
+      },
     },
     {
       text: '离开',
@@ -547,10 +577,6 @@ const npc_pk_match: NPCInteractable = {
       result: '报名参加PK比赛。',
       actionType: 'registerPK',
       actionParams: {},
-      condition: {
-        type: 'weekday',
-        value: '星期六',
-      },
     },
     {
       text: '随便看看',
@@ -1061,8 +1087,10 @@ export const npcByType: Record<string, NPCInteractable[]> = {
  * 按位置分组的 NPC 配置
  */
 export const npcByLocation: Record<string, NPCInteractable[]> = {
-  huanggong: [npc_king, npc_marshal, npc_prime_minister, npc_maid_1, npc_maid_2, npc_pk_match],
-  houhuayuan: [npc_princess],
+  // 皇宫NPC：国王、元帅、首相、PK赛报名官
+  huanggong: [npc_king, npc_marshal, npc_prime_minister, npc_pk_match],
+  // 后花园NPC：公主、丫环1（出售高级战斗力石）、丫环2（出售年猪）
+  houhuayuan: [npc_princess, npc_maid_1, npc_maid_2],
   'leiming-dalu': [npc_daily_task, npc_map_challenge, npc_gem_synthesizer, npc_pet_institute, npc_olympic_envoy],
   kasanuocheng: [npc_lottery, npc_pet_fusion_master, npc_map_challenge_kasanuocheng, npc_collector, npc_grocery_merchant, npc_magic_stone_merchant, npc_equipment_refiner, npc_experience_mentor],
   'yaweite-dao': [npc_map_challenge_yaweite_dao],

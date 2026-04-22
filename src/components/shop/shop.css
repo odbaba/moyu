@@ -1,7 +1,18 @@
 /**
  * 商店页面样式
  * 深色主题，适配手机屏幕
+ * 
+ * 高度分配：顶部占位10% + 页面头部10% + 内容区80% = 100%
  */
+
+/* 顶部占位框 - 高度10% */
+.page-top-placeholder {
+  width: 100%;
+  height: 10vh;
+  background-color: #252935;
+  border-bottom: 1px solid #000000;
+  flex-shrink: 0;
+}
 
 /* 商店页面容器 */
 .shop-page {
@@ -10,8 +21,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #1a1a1a;
-  color: #f0f0f0;
+  background-color: #252935;
+  color: #FFFFFF;
   display: flex;
   flex-direction: column;
   z-index: 1000;
@@ -21,7 +32,7 @@
 /* 商店头部 */
 .shop-header {
   padding: 16px;
-  background-color: #2a2a2a;
+  background-color: #252935;
   border-bottom: 2px solid #ffd700;
 }
 
@@ -42,8 +53,8 @@
   display: flex;
   justify-content: space-around;
   padding: 12px;
-  background-color: #222;
-  border-bottom: 1px solid #333;
+  background-color: #252935;
+  border-bottom: 1px solid #000000;
 }
 
 .currency-item {
@@ -72,15 +83,15 @@
   display: flex;
   gap: 8px;
   padding: 12px;
-  background-color: #222;
-  border-bottom: 1px solid #333;
+  background-color: #252935;
+  border-bottom: 1px solid #000000;
 }
 
 .mode-button {
   flex: 1;
   padding: 10px 16px;
-  background-color: #333;
-  color: #f0f0f0;
+  background-color: #252935;
+  color: #FFFFFF;
   border: 1px solid #555;
   border-radius: 4px;
   cursor: pointer;
@@ -89,12 +100,12 @@
 }
 
 .mode-button:hover {
-  background-color: #444;
+  background-color: #303545;
 }
 
 .mode-button.active {
   background-color: #ffd700;
-  color: #1a1a1a;
+  color: #252935;
   border-color: #ffd700;
   font-weight: bold;
 }

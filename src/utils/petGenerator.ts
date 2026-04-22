@@ -15,8 +15,7 @@ const petTypeBaseScore: Record<PetType, number> = {
   '奇异兽': 450,
   '圣天使': 280,
   '守护': 550,
-  '年猪': 600,
-  '噜噜': 700
+  '年猪': 380
 };
 
 // ========== 奇异兽星级罕见度加分映射 ==========
@@ -313,7 +312,7 @@ function generatePetId(petType: PetType): string {
 
 /**
  * 通用幻兽生成函数
- * 支持生成所有类型的幻兽（攻防型、调皮鬼、吉鲁猪、奇异兽、圣天使、守护、年猪、噜噜）
+ * 支持生成所有类型的幻兽（攻防型、调皮鬼、吉鲁猪、奇异兽、圣天使、守护、年猪）
  * 参考文档：reference/docs/project_docs/02_幻兽系统.md 第136-151行
  *
  * @param petType 幻兽类型
@@ -557,9 +556,21 @@ export function upgradePetLevel(pet: Pet, newLevel: number): Pet {
 // ========== 幻兽经验获取函数 ==========
 
 /**
+ * 幻兽获得经验并处理升级的结果接口
+ */
+export interface PetExperienceResult {
+  pet: Pet; // 更新后的幻兽数据
+  leveledUp: boolean; // 是否升级
+  message?: string; // 提示消息
+  luckBonus: number; // 幸运值增加量（幻兽升级时玩家幸运值+1）
+}
+
+/**
  * 幻兽获得经验并处理升级
  * 参考文档：reference/docs/project_docs/02.1_幻兽升级经验系统.md
  * 参考代码：reference/scripts/DefineSprite_139_空幻兽对象/frame_1/DoAction.as
+ *
+ * 注意：幻兽升级时，玩家的幸运值会增加（每次升级+1，上限100）
  *
  * @param pet 幻兽对象
  * @param expAmount 获得的经验值（基础值，会自动翻倍）
@@ -572,17 +583,14 @@ export function gainExperience(
   expAmount: number,
   playerLevel: number,
   skipLevelLimit: boolean = false
-): {
-  pet: Pet; // 更新后的幻兽数据
-  leveledUp: boolean; // 是否升级
-  message?: string; // 提示消息
-} {
+): PetExperienceResult {
   // 1. 等级上限检查
   if (pet.dj >= 130) {
     return {
       pet: { ...pet, jy: 0 },
       leveledUp: false,
-      message: '幻兽等级已满，无法再获得经验值了。'
+      message: '幻兽等级已满，无法再获得经验值了。',
+      luckBonus: 0
     };
   }
 
@@ -591,7 +599,8 @@ export function gainExperience(
     return {
       pet,
       leveledUp: false,
-      message: '幻兽等级已高于人物的10级，无法再获得经验值了。'
+      message: '幻兽等级已高于人物的10级，无法再获得经验值了。',
+      luckBonus: 0
     };
   }
 
@@ -604,12 +613,14 @@ export function gainExperience(
   let newPredj = pet.predj;
   let leveledUp = false;
   let message: string | undefined;
+  let luckBonus = 0; // 累计幸运值增加量
 
   // 4. 升级循环处理
   while (newExp >= newMaxExp && newLevel < 130) {
     newExp -= newMaxExp;
     newLevel++;
     leveledUp = true;
+    luckBonus++; // 每次升级幸运值+1
 
     // 更新 predj（幻化前等级记录）
     if (newPredj < newLevel) {
@@ -675,6 +686,7 @@ export function gainExperience(
     pet: updatedPet,
     leveledUp,
     message,
+    luckBonus,
   };
 }
 

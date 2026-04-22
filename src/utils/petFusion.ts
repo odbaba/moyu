@@ -101,9 +101,6 @@ function getMainAttributeScore(pet: Pet): number {
     case '年猪':
       // 年猪：全属性都是主属性
       return calculateMinAttackGrowthScore(pet) + calculateMaxAttackGrowthScore(pet) + calculateDefenseGrowthScore(pet) + calculateHpGrowthScore(pet);
-    case '噜噜':
-      // 噜噜：最小攻击成长、最大攻击成长
-      return calculateMinAttackGrowthScore(pet) + calculateMaxAttackGrowthScore(pet);
     default:
       return calculateMinAttackGrowthScore(pet) + calculateMaxAttackGrowthScore(pet);
   }
@@ -232,14 +229,6 @@ export function applyMainAttributeFusion(mainPet: Pet, _subPet: Pet, ratio: numb
       result += `最大攻击成长+${(ratio * 1.2).toFixed(1)}\n`;
       result += `防御成长+${(ratio * 1.0).toFixed(1)}\n`;
       result += `生命成长+${(ratio * 1.5).toFixed(1)}\n`;
-      break;
-
-    case '噜噜':
-      // 噜噜：最小攻击成长+ratio*1.0, 最大攻击成长+ratio*1.2
-      mainPet.cz_xgj = Math.round((mainPet.cz_xgj + ratio * 1.0) * 10) / 10;
-      mainPet.cz_dgj = Math.round((mainPet.cz_dgj + ratio * 1.2) * 10) / 10;
-      result += `最小攻击成长+${(ratio * 1.0).toFixed(1)}\n`;
-      result += `最大攻击成长+${(ratio * 1.2).toFixed(1)}\n`;
       break;
 
     default:
@@ -578,8 +567,6 @@ export function getFusionCoefficients(petType: PetType): {
       return { minAttack: 1.4, maxAttack: 1.6, defense: 0, hp: 0 };
     case '年猪':
       return { minAttack: 1.1, maxAttack: 1.2, defense: 1.0, hp: 1.5 };
-    case '噜噜':
-      return { minAttack: 1.0, maxAttack: 1.2, defense: 0, hp: 0 };
     default:
       return { minAttack: 1.0, maxAttack: 1.2, defense: 0, hp: 0 };
   }

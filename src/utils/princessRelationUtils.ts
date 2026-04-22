@@ -14,6 +14,9 @@ import type {
   PrincessRelationship,
   RelationshipLevel,
   RelationshipLevelConfig,
+  RelationshipUpgradeResult,
+  SkillDetail,
+  SkillLearnResult,
   SundayGift} from '../types';
 
 // ========== 关系等级配置数据 ==========
@@ -607,15 +610,25 @@ export const getConfidantGift = (): {
   return {
     itemId: 'year_pig',
     itemName: '年猪',
-    description: '这是公主精心为你培养的超级幻兽——年猪，它拥有强大的战斗力！'
+    description: '超级幻兽——年猪，它拥有强大的战斗力！'
   };
 };
 
 /**
  * 领取知己的礼物
+ * 关系达到知己（等级4）后，可以领取一次年猪礼物
+ *
+ * 参考文档：reference/docs/project_docs/10_公主系统.md（知己的礼物部分）
  *
  * @param relationship 当前公主关系数据
- * @returns 领取结果
+ * @returns 领取结果，包含是否成功、礼物信息和提示消息
+ *
+ * @example
+ * const result = receiveConfidantGift(princessRelationship);
+ * if (result.success) {
+ *   // 领取成功，更新状态：hasReceivedConfidantGift = true
+ *   // 将礼物添加到背包
+ * }
  */
 export const receiveConfidantGift = (
   relationship: PrincessRelationship
@@ -624,7 +637,7 @@ export const receiveConfidantGift = (
   gift: { itemId: string; itemName: string; description: string } | null;
   message: string;
 } => {
-  // 检查关系等级是否达到知己
+  // 检查关系等级是否达到知己（等级4）
   if (relationship.level < 4) {
     return {
       success: false,
@@ -633,21 +646,23 @@ export const receiveConfidantGift = (
     };
   }
 
-  // 检查是否已领取
+  // 检查是否已领取过知己礼物（只能领取一次）
   if (relationship.hasReceivedConfidantGift) {
     return {
       success: false,
       gift: null,
-      message: '已经领取过知己的礼物了。'
+      message: '你已经领取过知己的礼物了，每人只能领取一次。'
     };
   }
 
+  // 获取礼物信息
   const gift = getConfidantGift();
 
+  // 返回成功结果，包含礼物和提示消息
   return {
     success: true,
     gift,
-    message: `${gift.description}获得：${gift.itemName}！`
+    message: `公主送给了你一只${gift.description}`
   };
 };
 
@@ -781,5 +796,180 @@ export const updateRelationship = (
     intimacy: newIntimacy,
     level: newLevel,
     relationshipName: newName
+  };
+};
+
+// ========== 技能学习功能 ==========
+
+/**
+ * 检查关系等级是否需要解锁技能
+ * 根据关系等级配置检查是否需要学习"爱的力量"技能
+ *
+ * @param oldLevel 旧的关系等级
+ * @param newLevel 新的关系等级
+ * @returns 需要学习的技能信息，如果不需要则返回 null
+ *
+ * @example
+ * checkSkillUnlock(4, 5)  // 返回: { skillId: 'love_power', skillLevel: 1 }
+ * checkSkillUnlock(5, 6)  // 返回: { skillId: 'love_power', skillLevel: 2 }
+ * checkSkillUnlock(3, 4)  // 返回: null
+ */
+export const checkSkillUnlock = (
+  oldLevel: RelationshipLevel,
+  newLevel: RelationshipLevel
+): { skillId: string; skillLevel: number } | null => {
+  // 只有等级提升时才检查技能解锁
+  if (newLevel <= oldLevel) {
+    return null;
+  }
+
+  // 检查是否达到等级5（恋人）
+  if (newLevel >= 5 && oldLevel < 5) {
+    return {
+      skillId: 'skill_love_power',
+      skillLevel: 1
+    };
+  }
+
+  // 检查是否达到等级6（亲密恋人）
+  if (newLevel >= 6 && oldLevel < 6) {
+    return {
+      skillId: 'skill_love_power',
+      skillLevel: 2
+    };
+  }
+
+  return null;
+};
+
+/**
+ * 学习"爱的力量"技能
+ * 根据关系等级学习对应等级的技能
+ *
+ * @param currentSkills 当前技能列表
+ * @param skillLevel 要学习的技能等级（1或2）
+ * @returns 学习结果
+ *
+ * @example
+ * // 学习等级1
+ * learnLovePowerSkill(skills, 1)
+ *
+ * // 学习等级2（升级）
+ * learnLovePowerSkill(skills, 2)
+ */
+export const learnLovePowerSkill = (
+  currentSkills: SkillDetail[],
+  skillLevel: number
+): SkillLearnResult => {
+  // 查找"爱的力量"技能（索引5）
+  const skillIndex = currentSkills.findIndex(
+    skill => skill.id === 'skill_love_power'
+  );
+
+  // 如果找不到技能，返回错误
+  if (skillIndex === -1) {
+    return {
+      success: false,
+      skillId: 'skill_love_power',
+      skillName: '爱的力量',
+      skillLevel: 0,
+      message: '未找到"爱的力量"技能数据',
+      updatedSkills: currentSkills
+    };
+  }
+
+  const currentSkill = currentSkills[skillIndex];
+
+  // 检查是否已经学习了更高等级
+  if (currentSkill.isLearned && currentSkill.level >= skillLevel) {
+    return {
+      success: false,
+      skillId: 'skill_love_power',
+      skillName: '爱的力量',
+      skillLevel: currentSkill.level,
+      message: `"爱的力量"已达到或超过等级${skillLevel}`,
+      updatedSkills: currentSkills
+    };
+  }
+
+  // 学习或升级技能
+  const updatedSkills = [...currentSkills];
+  const newSkill: SkillDetail = {
+    ...currentSkill,
+    level: skillLevel,
+    maxLevel: 2, // 爱的力量最高等级为2
+    isLearned: true
+  };
+  updatedSkills[skillIndex] = newSkill;
+
+  // 生成提示消息
+  let message: string;
+  if (currentSkill.isLearned) {
+    // 升级
+    message = `恭喜！"爱的力量"技能升级成功！当前等级：Lv.${skillLevel}`;
+  } else {
+    // 新学习
+    message = `恭喜！学会了新技能："爱的力量" Lv.${skillLevel}`;
+  }
+
+  return {
+    success: true,
+    skillId: 'skill_love_power',
+    skillName: '爱的力量',
+    skillLevel,
+    message,
+    updatedSkills
+  };
+};
+
+/**
+ * 处理关系升级（包含技能学习）
+ * 当关系等级提升时，自动检查并学习"爱的力量"技能
+ *
+ * @param relationship 当前公主关系数据
+ * @param intimacyChange 亲密度变化值
+ * @param currentSkills 当前技能列表
+ * @returns 关系升级结果，包含更新后的关系数据和技能学习结果
+ *
+ * @example
+ * // 从知己升级到恋人
+ * const result = processRelationshipUpgrade(relationship, 50, skills);
+ * if (result.skillLearnResult?.success) {
+ *   console.log('学会了"爱的力量"技能！');
+ * }
+ */
+export const processRelationshipUpgrade = (
+  relationship: PrincessRelationship,
+  intimacyChange: number,
+  currentSkills: SkillDetail[]
+): RelationshipUpgradeResult => {
+  // 更新关系数据
+  const newRelationship = updateRelationship(relationship, intimacyChange);
+
+  // 检查是否需要学习技能
+  const skillUnlock = checkSkillUnlock(relationship.level, newRelationship.level);
+
+  let skillLearnResult: SkillLearnResult | null = null;
+  let upgradeMessage = '';
+
+  // 如果关系等级提升，生成升级消息
+  if (newRelationship.level > relationship.level) {
+    upgradeMessage = getUpgradeMessage(newRelationship.level);
+
+    // 如果需要学习技能
+    if (skillUnlock) {
+      skillLearnResult = learnLovePowerSkill(currentSkills, skillUnlock.skillLevel);
+
+      // 如果技能学习成功，添加技能学习提示
+      if (skillLearnResult.success) {
+        upgradeMessage += `\n${skillLearnResult.message}`;
+      }
+    }
+  }
+
+  return {
+    relationship: newRelationship,
+    skillLearnResult,
+    upgradeMessage
   };
 };

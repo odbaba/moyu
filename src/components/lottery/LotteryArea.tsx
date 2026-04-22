@@ -256,6 +256,9 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
 
   return (
     <div className="lottery-area">
+      {/* 顶部占位框 */}
+      <div className="page-top-placeholder"></div>
+
       {/* 头部区域 */}
       <div className="lottery-header">
         <h2>🎰 抽奖区</h2>
