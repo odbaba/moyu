@@ -3,7 +3,7 @@
 ## 目标
 根据首页的样式，调整全局所有页面的样式，使其风格统一：
 1. 页面内容高度压缩到90vh，顶部增加10vh高度的占位块，整体高度保持100vh
-2. 背景颜色调整为 `#252935`，除特殊处理外其他所有字体颜色都是 `#FFFFFF`
+2. 背景颜色调整为 `#252935`，除特殊处理外其他所有字体颜色都是 `#FCFFFF`
 3. 风格和首页保持统一
 
 ---
@@ -109,7 +109,7 @@
 
 6. 修改 `.equipment-display-compact` 背景色
 
-7. 统一字体颜色为 `#FFFFFF`（保留特殊颜色如标题、数值等）
+7. 统一字体颜色为 `#FCFFFF`（保留特殊颜色如标题、数值等）
 
 ---
 
@@ -137,7 +137,7 @@
 4. 修改 `.pet-page-content` 背景色
 5. 修改 `.deployed-pet-slot` 背景色
 6. 修改 `.pet-list-item` 背景色
-7. 统一字体颜色为 `#FFFFFF`
+7. 统一字体颜色为 `#FCFFFF`
 
 ---
 
@@ -167,7 +167,7 @@
 6. 修改 `.inventory-tabs` 背景色
 7. 修改 `.inventory-list` 背景色
 8. 修改 `.inventory-list-item` 背景色
-9. 统一字体颜色为 `#FFFFFF`
+9. 统一字体颜色为 `#FCFFFF`
 
 ---
 
@@ -195,7 +195,7 @@
 4. 修改 `.skill-stats` 背景色
 5. 修改 `.skill-page-content` 背景色
 6. 修改 `.skill-list-item` 背景色
-7. 统一字体颜色为 `#FFFFFF`
+7. 统一字体颜色为 `#FCFFFF`
 
 ---
 
@@ -210,7 +210,7 @@
 3. 修改 `.shop-header` 背景色为 `#252935`
 4. 修改 `.shop-currency` 背景色
 5. 修改 `.shop-mode-buttons` 背景色
-6. 统一字体颜色为 `#FFFFFF`
+6. 统一字体颜色为 `#FCFFFF`
 
 ---
 
@@ -225,7 +225,7 @@
 3. 修改 `.lottery-header` 背景色为 `#252935`
 4. 修改 `.lottery-currency` 背景色
 5. 修改 `.lottery-probabilities` 背景色
-6. 统一字体颜色为 `#FFFFFF`
+6. 统一字体颜色为 `#FCFFFF`
 
 ---
 
@@ -240,7 +240,7 @@
 3. 修改 `.enemy-section`、`.player-section` 背景色
 4. 修改 `.grid-cell` 背景色
 5. 修改 `.battle-log-section` 背景色
-6. 统一字体颜色为 `#FFFFFF`
+6. 统一字体颜色为 `#FCFFFF`
 
 ---
 
@@ -253,7 +253,7 @@
 1. 修改 `.pet-fusion-page-container` 背景色为 `#252935`
 2. 修改 `.pet-fusion-page-header` 背景色为 `#252935`
 3. 修改 `.pet-fusion-page-content` 背景色
-4. 统一字体颜色为 `#FFFFFF`
+4. 统一字体颜色为 `#FCFFFF`
 
 ---
 
@@ -264,7 +264,7 @@
 |------|--------|------|
 | 页面背景 | `#252935` | 主背景色 |
 | 占位框背景 | `#252935` | 与页面背景一致 |
-| 默认字体 | `#FFFFFF` | 白色 |
+| 默认字体 | `#FCFFFF` | 白色 |
 | 标题/重点文字 | `#ffd700` | 金色，保留 |
 | 数值/等级 | `#4ecdc4` | 青色，保留 |
 | 攻击力 | `#ff9800` | 橙色，保留 |

@@ -44,7 +44,7 @@
 }
 
 .battle-header h2 {
-  color: #FFFFFF;
+  color: #FCFFFF;
   font-size: 1rem;
   margin: 0;
   padding: 0;
@@ -137,7 +137,7 @@
   margin-bottom: 4px;
   padding: 0;
   font-size: 0.85rem;
-  color: #FFFFFF;
+  color: #FCFFFF;
   line-height: 1.5;
 }
 
@@ -155,7 +155,7 @@
 
 /* 行动者样式 - 白色文字 */
 .log-actor {
-  color: #FFFFFF;
+  color: #FCFFFF;
   font-weight: bold;
   margin-right: 8px;
 }
@@ -168,7 +168,7 @@
 
 /* 目标样式 - 白色文字 */
 .log-target {
-  color: #FFFFFF;
+  color: #FCFFFF;
   font-weight: 500;
   margin-right: 8px;
 }
@@ -271,7 +271,7 @@
 /* 角色卡片样式 - 完全占满九宫格格子 */
 .character-card {
   background-color: #252934;
-  border: 1px solid #FFFFFF;
+  border: 1px solid #FCFFFF;
   border-radius: 0;
   padding: 0;
   margin: 0;
@@ -291,7 +291,7 @@
 
 /* 角色卡片名称样式 - 极小化 */
 .character-card-name {
-  color: #FFFFFF;
+  color: #FCFFFF;
   font-weight: bold;
   font-size: 0.5rem;
   text-align: center;
@@ -394,22 +394,22 @@
   top: 50%;
   transform: translateY(-50%);
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9);
-  color: #ffffff;
+  color: #FCFFFF;
 }
 
 /* 战斗页面HP数值样式（纯白色） */
 .battle-hp-value {
-  color: #ffffff !important;
+  color: #FCFFFF !important;
 }
 
 /* 战斗页面体力数值样式（纯白色） */
 .battle-stamina-value {
-  color: #ffffff !important;
+  color: #FCFFFF !important;
 }
 
 /* HP数值样式（纯白色） */
 .hp-value {
-  color: #ffffff;
+  color: #FCFFFF;
 }
 
 
@@ -477,7 +477,7 @@
 
 /* 敌方行动提示样式 */
 .enemy-action-hint {
-  color: #FFFFFF;
+  color: #FCFFFF;
   font-size: 1rem;
   font-weight: bold;
   animation: pulse-opacity 1.5s ease-in-out infinite;
@@ -492,7 +492,7 @@
 /* 可选择的目标格子 - 白色闪烁效果 */
 .grid-cell.selectable {
   cursor: pointer;
-  border-color: #FFFFFF;
+  border-color: #FCFFFF;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
   animation: targetGlow 1s ease-in-out infinite;
 }
@@ -815,7 +815,7 @@
 
 /* 合体幻兽卡片样式 - 白色边框 */
 .character-card.merged-pet {
-  border: 2px solid #FFFFFF;
+  border: 2px solid #FCFFFF;
 }
 
 /* 合体幻兽卡片悬停效果 */
@@ -835,7 +835,7 @@
 /* 合体标签样式 - 金色背景、白色文字 */
 .merged-tag {
   background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
-  color: #ffffff;
+  color: #FCFFFF;
   font-size: 0.4rem;
   font-weight: bold;
   padding: 1px 4px;
@@ -1045,17 +1045,17 @@
 
 /* HP数值样式 - 白色 */
 .hp-value {
-  color: #ffffff;
+  color: #FCFFFF;
 }
 
 /* MP数值样式 - 白色 */
 .mp-value {
-  color: #ffffff;
+  color: #FCFFFF;
 }
 
 /* 体力数值样式 - 白色 */
 .stamina-value {
-  color: #ffffff;
+  color: #FCFFFF;
 }
 
 /* 攻击力数值样式 */

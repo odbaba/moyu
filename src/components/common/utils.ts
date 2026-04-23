@@ -39,7 +39,7 @@ export const getPetQualityColor = (qualityTitle: string): string => {
  * @returns 对应的颜色值
  */
 export const getEquipmentQualityColor = (quality: string): string => {
-  return EQUIPMENT_QUALITY_COLORS[quality] || '#ffffff';
+  return EQUIPMENT_QUALITY_COLORS[quality] || '#FCFFFF';
 };
 
 /**

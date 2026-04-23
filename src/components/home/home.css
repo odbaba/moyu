@@ -31,7 +31,7 @@
 .location-header h1 {
   font-size: 1.75rem;
   font-weight: normal;
-  color: #FFFFFF;
+  color: #FCFFFF;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   margin: 0;
 }
@@ -65,11 +65,11 @@
 .scene-description p {
   margin-bottom: 10px;
   line-height: 1.6;
-  color: #FFFFFF;
+  color: #FCFFFF;
 }
 
 .scene-description p:nth-child(2) {
-  color: #FFFFFF;
+  color: #FCFFFF;
   font-weight: bold;
 }
 
@@ -122,7 +122,7 @@
   justify-content: center;
   align-items: center;
   font-size: 12px;
-  color: #FFFFFF;
+  color: #FCFFFF;
 }
 
 .map-location:hover {
@@ -212,7 +212,7 @@
 /* 交互按钮样式 - 纯黑背景，手写字体，毛笔笔触边框效果 */
 .interact-button {
   background-color: #000000;
-  color: #FFFFFF;
+  color: #FCFFFF;
   border: none;
   padding: 3px 12px;
   border-radius: 0;
@@ -306,7 +306,7 @@
 /* 星期显示 */
 .time-weekday {
   font-size: 0.85rem;
-  color: #FFFFFF;
+  color: #FCFFFF;
 }
 
 /* 时间进度条容器 */
@@ -349,7 +349,7 @@
 .log-entry {
   margin-bottom: 10px;
   font-size: 0.9rem;
-  color: #FFFFFF;
+  color: #FCFFFF;
 }
 
 /* 右下角菜单 */
@@ -394,7 +394,7 @@
 
 .menu-popup button {
   background-color: #444;
-  color: #FFFFFF;
+  color: #FCFFFF;
   border: 1px solid #555;
   padding: 10px 20px;
   border-radius: 4px;
@@ -440,7 +440,7 @@
   top: 10px;
   right: 10px;
   background-color: #ff6b6b;
-  color: #FFFFFF;
+  color: #FCFFFF;
   border: none;
   padding: 5px 10px;
   border-radius: 4px;
@@ -453,7 +453,7 @@
 
 .world-map h2 {
   text-align: center;
-  color: #FFFFFF;
+  color: #FCFFFF;
   margin-bottom: 20px;
 }
 

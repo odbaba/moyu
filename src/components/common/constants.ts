@@ -21,7 +21,7 @@ export const PET_QUALITY_COLORS: Record<string, string> = {
  * 装备品质颜色映射表（用于装备详情显示）
  */
 export const EQUIPMENT_QUALITY_COLORS: Record<string, string> = {
-  '普通品': '#ffffff',
+  '普通品': '#FCFFFF',
   '良品': '#00ff00',
   '上品': '#0000ff',
   '精品': '#ff0000',

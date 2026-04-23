@@ -60,12 +60,12 @@ const EnemyModal: React.FC<EnemyModalProps> = ({
               }}
             >
               {/* 敌人名称 */}
-              <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '14px', color: '#FFFFFF' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '14px', color: '#FCFFFF' }}>
                 {enemy.name}
               </div>
 
               {/* 敌人属性展示 */}
-              <div style={{ display: 'flex', gap: '15px', fontSize: '12px', color: '#FFFFFF' }}>
+              <div style={{ display: 'flex', gap: '15px', fontSize: '12px', color: '#FCFFFF' }}>
                 {/* HP生命值 */}
                 <span>HP: {enemy.maxHp}</span>
                 {/* 攻击力范围 */}
@@ -76,7 +76,7 @@ const EnemyModal: React.FC<EnemyModalProps> = ({
 
               {/* 敌人描述（如果有） */}
               {enemy.description && (
-                <div style={{ marginTop: '8px', fontSize: '12px', color: '#FFFFFF' }}>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: '#FCFFFF' }}>
                   {enemy.description}
                 </div>
               )}

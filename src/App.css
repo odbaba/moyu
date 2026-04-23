@@ -10,7 +10,7 @@
   font-weight: 400;
 
   color-scheme: dark;
-  color: #FFFFFF;
+  color: #FCFFFF;
   background-color: #252935;
 
   font-synthesis: none;
@@ -32,7 +32,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background-color: #252935;
-  color: #FFFFFF;
+  color: #FCFFFF;
   /* 手机端优先使用 LXGW WenKai */
   font-family: 'LXGW WenKai', cursive, sans-serif;
 }
@@ -40,7 +40,7 @@ body {
 /* 全局按钮公共样式 - 纯黑背景，毛笔笔触边框效果 */
 .game-btn {
   background-color: #000000;
-  color: #FFFFFF;
+  color: #FCFFFF;
   border: none;
   padding: 3px 12px;
   border-radius: 0;
@@ -71,12 +71,12 @@ body {
 
 /* 动作类按钮样式 */
 .game-btn--action {
-  color: #FFFFFF;
+  color: #FCFFFF;
 }
 
 /* NPC类按钮样式 */
 .game-btn--npc {
-  color: #FFFFFF;
+  color: #FCFFFF;
 }
 
 /* 全局滚动条样式 */

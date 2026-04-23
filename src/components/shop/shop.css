@@ -22,7 +22,7 @@
   right: 0;
   bottom: 0;
   background-color: #252935;
-  color: #FFFFFF;
+  color: #FCFFFF;
   display: flex;
   flex-direction: column;
   z-index: 1000;
@@ -91,7 +91,7 @@
   flex: 1;
   padding: 10px 16px;
   background-color: #252935;
-  color: #FFFFFF;
+  color: #FCFFFF;
   border: 1px solid #555;
   border-radius: 4px;
   cursor: pointer;
