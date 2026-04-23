@@ -96,7 +96,7 @@ const SkillPage: React.FC<SkillPageProps> = ({
             className="skill-page-close-button"
             onClick={onClose}
           >
-            ✕ 关闭
+            ✕
           </button>
         </div>
 

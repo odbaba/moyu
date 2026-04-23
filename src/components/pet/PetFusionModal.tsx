@@ -531,7 +531,7 @@ const PetFusionModal: React.FC<PetFusionModalProps> = ({
             className="pet-fusion-page-close-button"
             onClick={onClose}
           >
-            ✕ 关闭
+            ✕
           </button>
         </div>
 

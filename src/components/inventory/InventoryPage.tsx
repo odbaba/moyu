@@ -186,7 +186,7 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
             className="inventory-page-close-button"
             onClick={onClose}
           >
-            ✕ 关闭
+            ✕
           </button>
         </div>
 
