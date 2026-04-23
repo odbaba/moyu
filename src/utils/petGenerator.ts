@@ -10,7 +10,7 @@ import type { Pet, PetRating, PetType } from '../types';
 // 参考文档：reference/docs/project_docs/02_幻兽系统.md 第386-398行
 const petTypeBaseScore: Record<PetType, number> = {
   '攻防型': 0,
-  '调皮鬼': 280,
+  '调皮猫': 280,
   '吉鲁猪': 380,
   '奇异兽': 450,
   '圣天使': 280,
@@ -312,7 +312,7 @@ function generatePetId(petType: PetType): string {
 
 /**
  * 通用幻兽生成函数
- * 支持生成所有类型的幻兽（攻防型、调皮鬼、吉鲁猪、奇异兽、圣天使、守护、年猪）
+ * 支持生成所有类型的幻兽（攻防型、调皮猫、吉鲁猪、奇异兽、圣天使、守护、年猪）
  * 参考文档：reference/docs/project_docs/02_幻兽系统.md 第136-151行
  *
  * @param petType 幻兽类型

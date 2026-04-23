@@ -722,6 +722,8 @@ const gaoJiDouZhiYiYang: SkillBookItem = {
   goldValue: 82800000,
   magicStoneValue: 25000,
   imagePath: './images/items/skillbook/gaojidouzhiyiyang.png',
+  isUpgrade: true,
+  targetLevel: 2
 };
 
 /**

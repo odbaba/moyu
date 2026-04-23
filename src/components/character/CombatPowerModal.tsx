@@ -42,7 +42,7 @@ const CombatPowerModal: React.FC<CombatPowerModalProps> = ({
   const holeCountPower = calculateAllHoleCountCombatPower(character.equipment);
   const gemPower = calculateAllGemCombatPower(character.equipment);
   const militaryRankPower = calculateMilitaryRankCombatPower(character.militaryRankName);
-  const titlePower = calculateTitleCombatPower(character.title);
+  const titlePower = calculateTitleCombatPower(character.nobleRankName);
   const fullSetMagicSoulBonus = calculateFullSetMagicSoulBonusCombatPower(character.equipment);
   const soulPower = calculateSoulCombatPower(character.equipment);
 
@@ -100,7 +100,7 @@ const CombatPowerModal: React.FC<CombatPowerModalProps> = ({
     {
       label: '爵位加成',
       value: titlePower,
-      description: `${character.title} 爵位加成`
+      description: `${character.nobleRankName} 爵位加成`
     }
   ];
 

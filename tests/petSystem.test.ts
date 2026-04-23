@@ -173,14 +173,14 @@ function testTotalScoreCalculation() {
     { baseScore: pet1.rating.pzbase, totalScore: pet1.pz }
   );
 
-  // 测试用例2: 调皮鬼幻兽（基础评分280）
-  const pet2 = generatePetByType('调皮鬼');
+  // 测试用例2: 调皮猫幻兽（基础评分280）
+  const pet2 = generatePetByType('调皮猫');
   const expectedTotal2 = pet2.rating.pzbase +
     pet2.rating.pz_chp + pet2.rating.pz_cxgj + pet2.rating.pz_cdgj + pet2.rating.pz_cfy +
     pet2.rating.pz_cz_hp + pet2.rating.pz_cz_xgj + pet2.rating.pz_cz_dgj + pet2.rating.pz_cz_fy;
   const passed2 = pet2.pz === expectedTotal2 && pet2.rating.pzbase === 280;
   logTest(
-    '调皮鬼幻兽总评分计算',
+    '调皮猫幻兽总评分计算',
     passed2,
     passed2 ? `总评分正确: ${pet2.pz}, 基础评分: ${pet2.rating.pzbase}` : `期望: ${expectedTotal2}, 实际: ${pet2.pz}`,
     { baseScore: pet2.rating.pzbase, totalScore: pet2.pz }
@@ -382,7 +382,7 @@ function testPetUpgrade() {
   );
 
   // 测试用例2: 从10级升到50级
-  const pet2 = generatePetByType('调皮鬼', { level: 10 });
+  const pet2 = generatePetByType('调皮猫', { level: 10 });
   const upgradedPet2 = upgradePetLevel(pet2, 50);
 
   const expectedMhp2 = Math.round(pet2.cz_hp * (50 - 1) + pet2.chp);
@@ -430,11 +430,11 @@ function testShopPetGeneration() {
     pet1 ? { type: pet1.hs_name, baseScore: pet1.rating.pzbase, totalScore: pet1.pz } : null
   );
 
-  // 测试用例2: 购买调皮鬼幻兽
+  // 测试用例2: 购买调皮猫幻兽
   const pet2 = generateShopPet('pet_naughty_cat');
-  const passed2 = pet2 !== null && pet2.hs_name === '调皮鬼' && pet2.rating.pzbase === 280;
+  const passed2 = pet2 !== null && pet2.hs_name === '调皮猫' && pet2.rating.pzbase === 280;
   logTest(
-    '商店购买 - 调皮鬼幻兽',
+    '商店购买 - 调皮猫幻兽',
     passed2,
     passed2 ? `生成成功，类型: ${pet2?.hs_name}, 基础评分: ${pet2?.rating.pzbase}` : '生成失败',
     pet2 ? { type: pet2.hs_name, baseScore: pet2.rating.pzbase, totalScore: pet2.pz } : null

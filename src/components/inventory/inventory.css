@@ -307,58 +307,58 @@
 /* ========== 物品列表稀有度边框颜色 ========== */
 
 .inventory-list-item.rarity-common {
-  border-left: 3px solid #666;
+  border-left: 3px solid #ffffff;
 }
 
 .inventory-list-item.rarity-common:hover {
-  border-color: #888;
-  border-left-color: #888;
+  border-color: #cccccc;
+  border-left-color: #cccccc;
 }
 
 .inventory-list-item.rarity-uncommon {
-  border-left: 3px solid #4caf50;
+  border-left: 3px solid #00ff00;
 }
 
 .inventory-list-item.rarity-uncommon:hover {
-  border-color: #66bb6a;
-  border-left-color: #66bb6a;
+  border-color: #33ff33;
+  border-left-color: #33ff33;
 }
 
 .inventory-list-item.rarity-rare {
-  border-left: 3px solid #2196f3;
+  border-left: 3px solid #0000ff;
 }
 
 .inventory-list-item.rarity-rare:hover {
-  border-color: #42a5f5;
-  border-left-color: #42a5f5;
+  border-color: #3333ff;
+  border-left-color: #3333ff;
 }
 
 .inventory-list-item.rarity-epic {
-  border-left: 3px solid #9c27b0;
+  border-left: 3px solid #ff0000;
 }
 
 .inventory-list-item.rarity-epic:hover {
-  border-color: #ba68c8;
-  border-left-color: #ba68c8;
+  border-color: #ff3333;
+  border-left-color: #ff3333;
 }
 
 .inventory-list-item.rarity-legendary {
-  border-left: 3px solid #ff9800;
+  border-left: 3px solid #cc00ff;
   animation: legendaryListGlow 2s ease-in-out infinite;
 }
 
 .inventory-list-item.rarity-legendary:hover {
-  border-color: #ffb74d;
-  border-left-color: #ffb74d;
+  border-color: #dd33ff;
+  border-left-color: #dd33ff;
 }
 
-/* 传说物品列表发光动画 */
+/* 极品物品列表发光动画 */
 @keyframes legendaryListGlow {
   0%, 100% {
-    box-shadow: 0 0 5px rgba(255, 152, 0, 0.3);
+    box-shadow: 0 0 5px rgba(204, 0, 255, 0.3);
   }
   50% {
-    box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+    box-shadow: 0 0 10px rgba(204, 0, 255, 0.5);
   }
 }
 
@@ -512,60 +512,60 @@
 /* ========== 物品稀有度边框颜色 ========== */
 
 .inventory-slot.rarity-common {
-  border-color: #666;
+  border-color: #ffffff;
 }
 
 .inventory-slot.rarity-common:hover {
-  border-color: #888;
-  box-shadow: 0 0 10px rgba(150, 150, 150, 0.3);
+  border-color: #cccccc;
+  box-shadow: 0 0 10px rgba(200, 200, 200, 0.3);
 }
 
 .inventory-slot.rarity-uncommon {
-  border-color: #4caf50;
+  border-color: #00ff00;
 }
 
 .inventory-slot.rarity-uncommon:hover {
-  border-color: #66bb6a;
-  box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+  border-color: #33ff33;
+  box-shadow: 0 0 12px rgba(0, 255, 0, 0.4);
 }
 
 .inventory-slot.rarity-rare {
-  border-color: #2196f3;
+  border-color: #0000ff;
 }
 
 .inventory-slot.rarity-rare:hover {
-  border-color: #42a5f5;
-  box-shadow: 0 0 12px rgba(33, 150, 243, 0.4);
+  border-color: #3333ff;
+  box-shadow: 0 0 12px rgba(0, 0, 255, 0.4);
 }
 
 .inventory-slot.rarity-epic {
-  border-color: #9c27b0;
+  border-color: #ff0000;
 }
 
 .inventory-slot.rarity-epic:hover {
-  border-color: #ba68c8;
-  box-shadow: 0 0 12px rgba(156, 39, 176, 0.4);
+  border-color: #ff3333;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.4);
 }
 
 .inventory-slot.rarity-legendary {
-  border-color: #ff9800;
-  box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+  border-color: #cc00ff;
+  box-shadow: 0 0 8px rgba(204, 0, 255, 0.4);
   animation: legendaryGlow 2s ease-in-out infinite;
 }
 
 .inventory-slot.rarity-legendary:hover {
-  border-color: #ffb74d;
-  box-shadow: 0 0 20px rgba(255, 152, 0, 0.6),
-              inset 0 0 15px rgba(255, 152, 0, 0.2);
+  border-color: #dd33ff;
+  box-shadow: 0 0 20px rgba(204, 0, 255, 0.6),
+              inset 0 0 15px rgba(204, 0, 255, 0.2);
 }
 
-/* 传说物品发光动画 */
+/* 极品物品发光动画 */
 @keyframes legendaryGlow {
   0%, 100% {
-    box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+    box-shadow: 0 0 8px rgba(204, 0, 255, 0.4);
   }
   50% {
-    box-shadow: 0 0 15px rgba(255, 152, 0, 0.6);
+    box-shadow: 0 0 15px rgba(204, 0, 255, 0.6);
   }
 }
 
@@ -781,21 +781,21 @@
 
 /* 背包页面标题 */
 .inventory-page-title {
-  color: #ffd700;
+  color: #ffffff;
   font-size: 1.2rem;
   margin: 0;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 /* 关闭按钮样式 */
 .inventory-page-close-button {
   padding: 6px 15px;
-  background-color: rgba(255, 107, 107, 0.2);
-  border: 1px solid #ff6b6b;
+  background-color: transparent;
+  border: none;
   border-radius: 4px;
-  color: #ff6b6b;
+  color: #ffffff;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 1.8rem;
+  font-weight: bold;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -803,9 +803,7 @@
 
 /* 关闭按钮悬停效果 */
 .inventory-page-close-button:hover {
-  background-color: rgba(255, 107, 107, 0.4);
-  box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
-  transform: translateY(-1px);
+  color: #ff6b6b;
 }
 
 /* 主要内容区域 - 移动端上下布局 */

@@ -142,7 +142,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
         {/* 生命值进度条背景 */}
         <div className="stat-bar hp-bar compact">
           {/* 生命值数值显示（当前/最大）*/}
-          <span className="stat-value-on-bar hp-value">
+          <span className="stat-value-on-bar battle-hp-value">
             {character.currentHp}/{character.maxHp}
           </span>
           {/* 生命值进度条填充 */}
@@ -159,7 +159,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
           {/* 体力进度条背景 */}
           <div className="stat-bar stamina-bar compact">
             {/* 体力数值显示（当前/最大）*/}
-            <span className="stat-value-on-bar stamina-value">
+            <span className="stat-value-on-bar battle-stamina-value">
               {(character as BattleCharacter).currentStamina}/{(character as BattleCharacter).maxStamina}
             </span>
             {/* 体力进度条填充 */}

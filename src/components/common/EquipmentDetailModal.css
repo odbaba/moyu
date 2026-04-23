@@ -24,7 +24,7 @@
 /* ========== 弹窗内容区域样式 ========== */
 
 .equipment-detail-modal-content {
-  background-color: #222;
+  background-color: #252934;
   border-radius: 8px;
   padding: 20px;
   width: 90%;
@@ -339,6 +339,65 @@
   background-color: rgba(40, 40, 40, 0.8);
   border-radius: 3px;
   font-size: 0.8rem;
+}
+
+/* 已镶嵌宝石显示样式 */
+.embedded-gem-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background-color: rgba(40, 40, 40, 0.8);
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+.gem-icon {
+  font-size: 1.2rem;
+}
+
+.gem-name {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.gem-effect {
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+/* 宝石属性统计样式 */
+.gem-stats-section {
+  margin-bottom: 8px;
+  padding: 10px;
+  background-color: rgba(156, 39, 176, 0.1);
+  border: 1px solid #9c27b0;
+  border-radius: 6px;
+}
+
+.gem-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.gem-stat-item .stat-label {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.gem-stat-item .stat-value {
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.gem-stat-item .combat-value {
+  color: #ff9800;
+}
+
+.gem-stat-item .exp-value {
+  color: #4caf50;
 }
 
 /* ========== 操作按钮区域样式 ========== */

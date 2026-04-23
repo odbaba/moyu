@@ -98,11 +98,12 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
 
   /**
    * 过滤出可用的宝石
-   * 只显示强化类宝石
+   * 显示强化类宝石和镶嵌类宝石
    */
   const availableGems = useMemo(() => {
     return inventoryGems.filter(item =>
-      item.gemType === 'enhance' || item.gemSubType === 'openHole' || item.gemSubType === 'soul'
+      item.gemType === 'enhance' || item.gemType === 'embed' ||
+      item.gemSubType === 'openHole' || item.gemSubType === 'soul' || item.gemSubType === 'embed'
     );
   }, [inventoryGems]);
 
@@ -209,32 +210,28 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
 
     let result: RefineResult;
 
-    // 根据宝石的 refineType 调用对应的精炼函数
-    // 传递 warSoulSystemEnabled 参数，用于精炼时判断是否激活战魂
-    switch (gem.refineType) {
-      case 'quality':
-        result = refineQuality(equipment, gem, warSoulSystemEnabled);
-        break;
-      case 'magicSoul':
-        result = refineMagicSoul(equipment, gem, warSoulSystemEnabled);
-        break;
-      case 'useLevel':
-        result = refineUseLevel(equipment, gem, playerLevel);
-        break;
-      case 'openHole':
-        result = refineOpenHole(equipment, gem, warSoulSystemEnabled);
-        break;
-      case 'embed':
-        result = embedGem(equipment, gem);
-        break;
-      case 'soul':
-        result = activateSoul(equipment, gem, warSoulSystemEnabled);
-        break;
-      default:
-        result = {
-          success: false,
-          message: '未知的精炼类型'
-        };
+    // 根据宝石类型调用对应的精炼函数
+    // 优先使用 refineType，不匹配时根据 gemSubType 和宝石名称判断
+    const embedGemNames = ['中级战斗力石', '高级战斗力石', '中级经验石', '高级经验石'];
+    const isEmbedGem = gem.refineType === 'embed' || gem.gemSubType === 'embed' || embedGemNames.includes(gem.name);
+
+    if (gem.refineType === 'quality') {
+      result = refineQuality(equipment, gem, warSoulSystemEnabled);
+    } else if (gem.refineType === 'magicSoul') {
+      result = refineMagicSoul(equipment, gem, warSoulSystemEnabled);
+    } else if (gem.refineType === 'useLevel') {
+      result = refineUseLevel(equipment, gem, playerLevel);
+    } else if (gem.refineType === 'openHole') {
+      result = refineOpenHole(equipment, gem, warSoulSystemEnabled);
+    } else if (isEmbedGem) {
+      result = embedGem(equipment, gem);
+    } else if (gem.refineType === 'soul' || gem.gemSubType === 'soul') {
+      result = activateSoul(equipment, gem, warSoulSystemEnabled);
+    } else {
+      result = {
+        success: false,
+        message: '未知的精炼类型'
+      };
     }
 
     // 更新装备状态

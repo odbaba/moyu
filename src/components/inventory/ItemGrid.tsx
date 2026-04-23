@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 import type { EquipmentItem, InventoryItem } from '../../types';
 import { getEquipmentDisplayName } from '../../utils/equipmentConverter';
-import { getRarityClassName, isEquipmentItem } from '../common/utils';
+import { getEquipmentQualityColor, getRarityClassName, isEquipmentItem } from '../common/utils';
 
 /**
  * 物品网格展示组件属性接口
@@ -149,7 +149,10 @@ const ItemSlotWithImage: React.FC<ItemSlotWithImageProps> = ({
       {renderItemIcon()}
 
       {/* 物品名称 */}
-      <span className="item-list-name">
+      <span
+        className="item-list-name"
+        style={isEquipment && equipmentItem ? { color: getEquipmentQualityColor(equipmentItem.equipmentQuality) } : undefined}
+      >
         {isEquipment && equipmentItem
           ? getEquipmentDisplayName(item.name, equipmentItem.equipmentQuality, equipmentItem.magicSoulLevel)
           : item.name}

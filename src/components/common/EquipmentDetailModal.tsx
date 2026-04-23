@@ -240,36 +240,68 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
           <span className="info-value">{equipment.holeCount}个</span>
         </div>
 
-        {/* 宝石属性详情 */}
-        {equipment.gemAttributes && equipment.gemAttributes.length > 0 && (
+        {/* 已镶嵌宝石详情 */}
+        {equipment.gems && equipment.gems.length > 0 && (
           <div className="gem-attributes-section">
-            <div className="gem-title">宝石属性：</div>
+            <div className="gem-title">已镶嵌宝石：</div>
             <div className="gem-attributes-list">
-              {equipment.gemAttributes.map((gem, index) => (
-                <div key={index} className="gem-attribute-item">
-                  {gem.attack !== undefined && (
-                    <span className="gem-value attack-value">攻击+{gem.attack}</span>
-                  )}
-                  {gem.defense !== undefined && (
-                    <span className="gem-value defense-value">防御+{gem.defense}</span>
-                  )}
-                  {gem.hp !== undefined && (
-                    <span className="gem-value hp-value">生命+{gem.hp}</span>
-                  )}
-                  {gem.mp !== undefined && (
-                    <span className="gem-value mp-value">魔法+{gem.mp}</span>
-                  )}
-                  {gem.dodge !== undefined && (
-                    <span className="gem-value">闪避+{gem.dodge}</span>
-                  )}
-                  {gem.luck !== undefined && (
-                    <span className="gem-value">幸运+{gem.luck}</span>
-                  )}
-                </div>
-              ))}
+              {equipment.gems.map((gemName, index) => {
+                // 根据宝石名称获取宝石效果描述
+                const getGemEffect = (name: string): { effect: string; icon: string; color: string } => {
+                  switch (name) {
+                    case '中级战斗力石':
+                      return { effect: '战斗力+3', icon: '🔶', color: '#ff9800' };
+                    case '高级战斗力石':
+                      return { effect: '战斗力+5', icon: '🔷', color: '#2196f3' };
+                    case '中级经验石':
+                      return { effect: '经验值+25%', icon: '🟢', color: '#4caf50' };
+                    case '高级经验石':
+                      return { effect: '经验值+50%', icon: '🟣', color: '#9c27b0' };
+                    default:
+                      return { effect: '未知效果', icon: '💎', color: '#999' };
+                  }
+                };
+                const gemInfo = getGemEffect(gemName);
+                return (
+                  <div key={index} className="embedded-gem-display">
+                    <span className="gem-icon" style={{ color: gemInfo.color }}>{gemInfo.icon}</span>
+                    <span className="gem-name" style={{ color: gemInfo.color }}>{gemName}</span>
+                    <span className="gem-effect">({gemInfo.effect})</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
+
+        {/* 宝石属性统计（战斗力/经验加成） */}
+        {equipment.gems && equipment.gems.length > 0 && (() => {
+          // 计算宝石战斗力加成和经验加成
+          let totalCombatPower = 0;
+          let totalExpBonus = 0;
+          equipment.gems.forEach(gemName => {
+            if (gemName === '中级战斗力石') totalCombatPower += 3;
+            else if (gemName === '高级战斗力石') totalCombatPower += 5;
+            else if (gemName === '中级经验石') totalExpBonus += 25;
+            else if (gemName === '高级经验石') totalExpBonus += 50;
+          });
+          return (
+            <div className="gem-stats-section">
+              {totalCombatPower > 0 && (
+                <div className="gem-stat-item">
+                  <span className="stat-label">宝石战斗力：</span>
+                  <span className="stat-value combat-value">+{totalCombatPower}</span>
+                </div>
+              )}
+              {totalExpBonus > 0 && (
+                <div className="gem-stat-item">
+                  <span className="stat-label">宝石经验加成：</span>
+                  <span className="stat-value exp-value">+{totalExpBonus}%</span>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* 战魂属性：显示战魂类型、等级及效果 */}
         {equipment.soulType && equipment.soulType > WarSoulType.NONE && (

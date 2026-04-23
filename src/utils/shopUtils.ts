@@ -347,7 +347,7 @@ export function generateRandomWeapon(): EquipmentItem {
  */
 const SHOP_PET_ID_TO_TYPE: Record<string, { type: 'normal' | 'star'; petType?: string; starLevel?: number }> = {
   'pet_attack_defense': { type: 'normal', petType: '攻防型' },
-  'pet_naughty_cat': { type: 'normal', petType: '调皮鬼' },
+  'pet_naughty_cat': { type: 'normal', petType: '调皮猫' },
   'pet_jilu_pig': { type: 'normal', petType: '吉鲁猪' },
   'pet_strange_beast': { type: 'normal', petType: '奇异兽' },
   'pet_guardian': { type: 'normal', petType: '守护' },

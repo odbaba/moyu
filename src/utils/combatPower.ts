@@ -430,7 +430,7 @@ export function calculateTotalCombatPower(character: CharacterData, pets?: Pet[]
   const holeCountPower = calculateAllHoleCountCombatPower(character.equipment);
   const gemPower = calculateAllGemCombatPower(character.equipment);
   const militaryRankPower = calculateMilitaryRankCombatPower(character.militaryRankName);
-  const titlePower = calculateTitleCombatPower(character.title);
+  const titlePower = calculateTitleCombatPower(character.nobleRankName);
   const fullSetMagicSoulBonus = calculateFullSetMagicSoulBonusCombatPower(character.equipment);
   const soulPower = calculateSoulCombatPower(character.equipment);
 

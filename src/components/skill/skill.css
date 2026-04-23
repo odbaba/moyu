@@ -57,21 +57,21 @@
 
 /* 技能页面标题 */
 .skill-page-title {
-  color: #ffd700;
+  color: #ffffff;
   font-size: 1.2rem;
   margin: 0;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 /* 关闭按钮样式 */
 .skill-page-close-button {
   padding: 6px 15px;
-  background-color: rgba(255, 107, 107, 0.2);
-  border: 1px solid #ff6b6b;
+  background-color: transparent;
+  border: none;
   border-radius: 4px;
-  color: #ff6b6b;
+  color: #ffffff;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 1.8rem;
+  font-weight: bold;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -79,9 +79,7 @@
 
 /* 关闭按钮悬停效果 */
 .skill-page-close-button:hover {
-  background-color: rgba(255, 107, 107, 0.4);
-  box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
-  transform: translateY(-1px);
+  color: #ff6b6b;
 }
 
 /* 技能统计信息区域 */

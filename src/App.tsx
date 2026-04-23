@@ -302,11 +302,9 @@ function App() {
 
   /**
    * 处理"开始游戏"
-   * 清除存档数据，以全新初始状态进入游戏
+   * 保留存档数据，继续之前的游戏进度
    */
   const handleStartGame = useCallback(() => {
-    // 清除存档数据，确保全新开始
-    deleteSave();
     // 关闭封面页，进入游戏主界面
     setShowCover(false);
   }, []);

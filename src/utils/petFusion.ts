@@ -87,7 +87,7 @@ function calculateHpGrowthScore(pet: Pet): number {
 function getMainAttributeScore(pet: Pet): number {
   switch (pet.hs_name) {
     case '攻防型':
-    case '调皮鬼':
+    case '调皮猫':
       // 主属性：最小攻击成长、最大攻击成长、防御成长
       return calculateMinAttackGrowthScore(pet) + calculateMaxAttackGrowthScore(pet) + calculateDefenseGrowthScore(pet);
     case '吉鲁猪':
@@ -175,8 +175,8 @@ export function applyMainAttributeFusion(mainPet: Pet, _subPet: Pet, ratio: numb
       result += `防御成长+${(ratio * 0.8).toFixed(1)}\n`;
       break;
 
-    case '调皮鬼':
-      // 调皮鬼：最小攻击成长+ratio*0.8, 最大攻击成长+ratio*1.4, 防御成长+ratio*0.7
+    case '调皮猫':
+      // 调皮猫：最小攻击成长+ratio*0.8, 最大攻击成长+ratio*1.4, 防御成长+ratio*0.7
       mainPet.cz_xgj = Math.round((mainPet.cz_xgj + ratio * 0.8) * 10) / 10;
       mainPet.cz_dgj = Math.round((mainPet.cz_dgj + ratio * 1.4) * 10) / 10;
       mainPet.cz_fy = Math.round((mainPet.cz_fy + ratio * 0.7) * 10) / 10;
@@ -266,7 +266,7 @@ export function applySubAttributeFusion(mainPet: Pet, subPet: Pet): string {
   let hasChange = false;
 
   // 根据幻兽类型确定哪些是副属性
-  // 攻防型、调皮鬼：副属性是生命成长
+  // 攻防型、调皮猫：副属性是生命成长
   // 吉鲁猪、奇异兽、守护：副属性是防御成长和生命成长
   // 圣天使：副属性是防御成长
   // 年猪：无副属性（全属性都是主属性）
@@ -555,7 +555,7 @@ export function getFusionCoefficients(petType: PetType): {
   switch (petType) {
     case '攻防型':
       return { minAttack: 1.0, maxAttack: 1.2, defense: 0.8, hp: 0 };
-    case '调皮鬼':
+    case '调皮猫':
       return { minAttack: 0.8, maxAttack: 1.4, defense: 0.7, hp: 0 };
     case '吉鲁猪':
       return { minAttack: 1.2, maxAttack: 1.6, defense: 0, hp: 0 };

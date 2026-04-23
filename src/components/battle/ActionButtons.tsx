@@ -66,7 +66,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       {skills.map((skill) => {
         const canUse = canUseSkill(skill);
         const disableReason = getDisableReason(skill);
-        const isNormalAttack = skill.id.includes('normal');
 
         return (
           <button

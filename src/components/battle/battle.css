@@ -134,16 +134,16 @@
 
 /* 战斗日志条目样式 - 参考首页日志条目，无单独容器 */
 .battle-log-entry {
-  margin-bottom: 10px;
-  padding: 8px;
-  font-size: 0.9rem;
+  margin-bottom: 4px;
+  padding: 0;
+  font-size: 0.85rem;
   color: #FFFFFF;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* 奇偶条目交替颜色 */
 .battle-log-entry:nth-child(odd) {
-  background-color: rgba(60, 60, 60, 0.5);
+  background-color: transparent;
 }
 
 /* 回合数样式 */
@@ -233,24 +233,24 @@
 
 /* 闪避日志样式 */
 .battle-log-entry.log-dodge {
-  background-color: rgba(158, 158, 158, 0.2);
+  background-color: transparent;
 }
 
 
 
 /* 增益日志样式 */
 .battle-log-entry.log-buff {
-  background-color: rgba(76, 175, 80, 0.2);
+  background-color: transparent;
 }
 
 /* 治疗日志样式 */
 .battle-log-entry.log-heal {
-  background-color: rgba(76, 175, 80, 0.15);
+  background-color: transparent;
 }
 
 /* 死亡日志样式 */
 .battle-log-entry.log-death {
-  background-color: rgba(33, 33, 33, 0.5);
+  background-color: transparent;
 }
 
 /* 脉冲动画 */
@@ -270,7 +270,7 @@
 
 /* 角色卡片样式 - 完全占满九宫格格子 */
 .character-card {
-  background-color: rgba(40, 40, 40, 0.9);
+  background-color: #252934;
   border: 1px solid #FFFFFF;
   border-radius: 0;
   padding: 0;
@@ -304,13 +304,13 @@
   display: flex;
   align-items: center;
   gap: 1px;
-  margin-bottom: 1px;
+  background-color: #252934;
 }
 
 /* 紧凑版属性条容器 - 占满宽度，左右对齐 */
 .stat-bar-container.compact {
   margin-bottom: 0px;
-  width: 100%;
+  background-color: #252934;
 }
 
 /* 最后一个属性条不需要底部间距 */
@@ -324,7 +324,7 @@
 .stat-bar {
   width: 100%;
   height: 8px;
-  background-color: rgba(50, 50, 50, 0.8);
+  background-color: #252934;
   border-radius: 0;
   overflow: hidden;
   border: none;
@@ -336,16 +336,27 @@
   height: 10px;
 }
 
-/* HP条背景样式 - 纯红色 */
+/* 紧凑版属性条容器 - 占满宽度，左右对齐 */
+.stat-bar-container.compact {
+  margin-bottom: 0px;
+  gap: 0;
+}
+
+/* 最后一个属性条不需要底部间距 */
+.stat-bar-container:last-child {
+  margin-bottom: 0;
+}
+
+/* HP条背景样式 */
 .hp-bar {
-  background-color: #ff4444;
+  background-color: #232E32;
 }
 
 
 
-/* 体力条背景样式 - 纯蓝色 */
+/* 体力条背景样式 */
 .stamina-bar {
-  background-color: #4ecdc4;
+  background-color: #232E32;
 }
 
 /* 属性条填充样式 */
@@ -386,6 +397,16 @@
   color: #ffffff;
 }
 
+/* 战斗页面HP数值样式（纯白色） */
+.battle-hp-value {
+  color: #ffffff !important;
+}
+
+/* 战斗页面体力数值样式（纯白色） */
+.battle-stamina-value {
+  color: #ffffff !important;
+}
+
 /* HP数值样式（纯白色） */
 .hp-value {
   color: #ffffff;
@@ -405,6 +426,7 @@
   align-items: center;
   justify-content: center;
   border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;
 }
 
 
@@ -450,7 +472,7 @@
   color: #ffd700;
   font-size: 0.85rem;
   font-weight: bold;
-  animation: pulse 1.5s ease-in-out infinite;
+  animation: pulse-opacity 1.5s ease-in-out infinite;
 }
 
 /* 敌方行动提示样式 */
@@ -458,11 +480,11 @@
   color: #FFFFFF;
   font-size: 1rem;
   font-weight: bold;
-  animation: pulse 1.5s ease-in-out infinite;
+  animation: pulse-opacity 1.5s ease-in-out infinite;
 }
 
-/* 脉冲动画 */
-@keyframes pulse {
+/* 透明度脉冲动画 */
+@keyframes pulse-opacity {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
@@ -633,14 +655,6 @@
   .action-section {
     padding: 10px;
   }
-
-
-
-  .action-buttons {
-    gap: 10px;
-  }
-
-
 
   .cooldown-text {
     font-size: 0.8rem;
@@ -861,8 +875,8 @@
 
 /* ========== 详情弹窗样式 ========== */
 
-/* 敌人详情弹窗覆盖层 */
-.enemy-detail-modal-overlay {
+/* 通用详情弹窗覆盖层 */
+.detail-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -873,44 +887,27 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* 通用详情弹窗内容 */
+.detail-modal-content {
+  background-color: #252935;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 350px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 /* 敌人详情弹窗内容 */
 .enemy-detail-modal-content {
-  background-color: #252935;
   border: 2px solid #ff6b6b;
-  border-radius: 12px;
-  padding: 20px;
-  max-width: 350px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-/* 角色详情弹窗覆盖层 */
-.character-detail-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.85);
-  z-index: 2600;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* 角色详情弹窗内容 */
 .character-detail-modal-content {
-  background-color: #252935;
   border: 2px solid #ffd700;
-  border-radius: 12px;
-  padding: 20px;
-  max-width: 350px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
 }
 
 
@@ -925,31 +922,26 @@
 
 
 /* 滚动条样式 */
-.enemy-detail-modal-content::-webkit-scrollbar,
-.character-detail-modal-content::-webkit-scrollbar {
+.detail-modal-content::-webkit-scrollbar {
   width: 6px;
 }
 
-.enemy-detail-modal-content::-webkit-scrollbar-track,
-.character-detail-modal-content::-webkit-scrollbar-track {
+.detail-modal-content::-webkit-scrollbar-track {
   background: rgba(30, 30, 30, 0.5);
   border-radius: 3px;
 }
 
-.enemy-detail-modal-content::-webkit-scrollbar-thumb,
-.character-detail-modal-content::-webkit-scrollbar-thumb {
+.detail-modal-content::-webkit-scrollbar-thumb {
   background: #555;
   border-radius: 3px;
 }
 
-.enemy-detail-modal-content::-webkit-scrollbar-thumb:hover,
-.character-detail-modal-content::-webkit-scrollbar-thumb:hover {
+.detail-modal-content::-webkit-scrollbar-thumb:hover {
   background: #777;
 }
 
 /* 关闭按钮 */
-.enemy-detail-close-button,
-.character-detail-close-button {
+.detail-close-button {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -963,14 +955,12 @@
   transition: color 0.3s ease;
 }
 
-.enemy-detail-close-button:hover,
-.character-detail-close-button:hover {
+.detail-close-button:hover {
   color: #ff6b6b;
 }
 
 /* 详情头部信息 */
-.enemy-detail-header,
-.character-detail-header {
+.detail-header {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -979,8 +969,7 @@
   border-bottom: 1px solid #444;
 }
 
-.enemy-detail-icon-wrapper,
-.character-detail-icon-wrapper {
+.detail-icon-wrapper {
   width: 60px;
   height: 60px;
   display: flex;
@@ -992,13 +981,11 @@
   flex-shrink: 0;
 }
 
-.enemy-detail-emoji,
-.character-detail-emoji {
+.detail-emoji {
   font-size: 2.5rem;
 }
 
-.enemy-detail-name,
-.character-detail-name {
+.detail-name {
   font-size: 1.3rem;
   margin: 0;
   color: #ffd700;
@@ -1006,24 +993,21 @@
 }
 
 /* 详细信息表格 */
-.enemy-detail-table,
-.character-detail-table {
+.detail-table {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 /* 详情行 */
-.enemy-detail-row,
-.character-detail-row {
+.detail-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
 /* 详情单元格 */
-.enemy-detail-cell,
-.character-detail-cell {
+.detail-cell {
   background-color: rgba(40, 40, 40, 0.5);
   padding: 10px;
   border-radius: 6px;
@@ -1034,8 +1018,7 @@
 }
 
 /* 全宽单元格 */
-.enemy-detail-cell.full-width,
-.character-detail-cell.full-width {
+.detail-cell.full-width {
   grid-column: 1 / -1;
 }
 
@@ -1091,8 +1074,7 @@
 }
 
 /* 技能列表 */
-.enemy-detail-skills,
-.character-detail-skills {
+.detail-skills {
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid #444;
@@ -1183,43 +1165,36 @@
 
 /* 响应式设计 - 详情弹窗移动端优化 */
 @media (max-width: 768px) {
-  .enemy-detail-modal-content,
-  .character-detail-modal-content {
+  .detail-modal-content {
     width: 95%;
     max-height: 90vh;
     padding: 15px;
   }
 
-  .enemy-detail-header,
-  .character-detail-header {
+  .detail-header {
     gap: 10px;
     margin-bottom: 15px;
     padding-bottom: 10px;
   }
 
-  .enemy-detail-icon-wrapper,
-  .character-detail-icon-wrapper {
+  .detail-icon-wrapper {
     width: 50px;
     height: 50px;
   }
 
-  .enemy-detail-emoji,
-  .character-detail-emoji {
+  .detail-emoji {
     font-size: 2rem;
   }
 
-  .enemy-detail-name,
-  .character-detail-name {
+  .detail-name {
     font-size: 1.1rem;
   }
 
-  .enemy-detail-row,
-  .character-detail-row {
+  .detail-row {
     gap: 8px;
   }
 
-  .enemy-detail-cell,
-  .character-detail-cell {
+  .detail-cell {
     padding: 8px;
   }
 

@@ -348,15 +348,8 @@
 
 .log-entry {
   margin-bottom: 10px;
-  padding: 8px;
-  background-color: rgba(50, 50, 50, 0.5);
-  border-radius: 4px;
   font-size: 0.9rem;
   color: #FFFFFF;
-}
-
-.log-entry:nth-child(odd) {
-  background-color: rgba(60, 60, 60, 0.5);
 }
 
 /* 右下角菜单 */

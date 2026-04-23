@@ -60,7 +60,7 @@ export const EQUIPMENT_SLOT_TYPE_NAMES: Record<string, string> = {
  */
 export const PET_TYPE_EMOJI: Record<string, string> = {
   '攻防型': '🦁',
-  '调皮鬼': '👹',
+  '调皮猫': '👹',
   '吉鲁猪': '🐷',
   '奇异兽': '🦄',
   '圣天使': '👼',
@@ -74,7 +74,7 @@ export const PET_TYPE_EMOJI: Record<string, string> = {
  */
 export const PET_TYPE_PINYIN: Record<string, string> = {
   '攻防型': 'gongfangxing',
-  '调皮鬼': 'tiaopigui',
+  '调皮猫': 'tiaopimao',
   '吉鲁猪': 'jiluzhu',
   '奇异兽': 'qiyishou',
   '圣天使': 'shengtianshi',
