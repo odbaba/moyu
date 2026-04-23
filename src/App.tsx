@@ -121,7 +121,7 @@ import {
 import { getChatDialogue, getDemonArmyDialogue, getNextRelationshipRequirement, getRelationshipName, performChat, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
 // 导入存档系统工具函数
 import type { SaveData } from './utils/saveUtils';
-import { deleteSave, getSaveVersion, hasSaveData, loadGame, saveGame } from './utils/saveUtils';
+import { getSaveVersion, hasSaveData, loadGame, loadMusicSettings, saveGame, saveMusicSettings } from './utils/saveUtils';
 // 导入技能学习工具函数
 import { learnSkillFromBook } from './utils/skillLearnUtils';
 // 导入背景音乐 Hook
@@ -258,15 +258,32 @@ function App() {
   // 设置页面状态
   const [showSettingsPage, setShowSettingsPage] = useState(false);
 
-  // 音乐开关状态
-  const [isMusicEnabled, setIsMusicEnabled] = useState(true);
+  // 音乐开关状态 - 从 localStorage 加载
+  const [isMusicEnabled, setIsMusicEnabled] = useState(() => {
+    const saved = loadMusicSettings();
+    return saved.isMusicEnabled;
+  });
+
+  // 音乐音量状态（0-100）- 从 localStorage 加载
+  const [musicVolume, setMusicVolume] = useState(() => {
+    const saved = loadMusicSettings();
+    return saved.musicVolume;
+  });
+
+  // 当音乐设置改变时，保存到 localStorage
+  useEffect(() => {
+    saveMusicSettings({
+      isMusicEnabled,
+      musicVolume
+    });
+  }, [isMusicEnabled, musicVolume]);
 
   // ========== 背景音乐管理 ==========
   // 使用背景音乐 Hook，设置音乐文件路径和初始音量
   const { play: playBackgroundMusic, pause: pauseBackgroundMusic } = useBackgroundMusic({
     src: '/audio/19_back.mp3.mp3',
     autoPlay: false, // 不自动播放，等进入游戏后播放
-    volume: 0.3, // 设置音量为 30%
+    volume: musicVolume / 100, // 将 0-100 转换为 0-1
     loop: true // 循环播放
   });
 
@@ -4070,7 +4087,9 @@ function App() {
           <SettingsPage
             isVisible={showSettingsPage}
             isMusicEnabled={isMusicEnabled}
+            musicVolume={musicVolume}
             onToggleMusic={() => setIsMusicEnabled(!isMusicEnabled)}
+            onVolumeChange={setMusicVolume}
             onClose={() => setShowSettingsPage(false)}
             onExitGame={handleExitGame}
           />

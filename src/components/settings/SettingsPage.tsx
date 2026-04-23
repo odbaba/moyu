@@ -11,8 +11,12 @@ interface SettingsPageProps {
   isVisible: boolean;
   /** 音乐是否开启 */
   isMusicEnabled: boolean;
+  /** 音乐音量（0-100） */
+  musicVolume: number;
   /** 切换音乐开关的回调 */
   onToggleMusic: () => void;
+  /** 音量改变的回调 */
+  onVolumeChange: (volume: number) => void;
   /** 关闭设置页面的回调 */
   onClose: () => void;
   /** 退出游戏的回调 */
@@ -21,13 +25,15 @@ interface SettingsPageProps {
 
 /**
  * 设置页面组件
- * 提供游戏设置功能，包括音乐开关和退出游戏
+ * 提供游戏设置功能，包括音乐开关、音量调节和退出游戏
  * 手机端一屏展示所有内容，无需滚动
  */
 const SettingsPage: React.FC<SettingsPageProps> = ({
   isVisible,
   isMusicEnabled,
+  musicVolume,
   onToggleMusic,
+  onVolumeChange,
   onClose,
   onExitGame
 }) => {
@@ -77,12 +83,32 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
           <div className="settings-section">
             <div className="settings-item">
               <span className="settings-label">背景音乐</span>
-              <button
-                className={`settings-toggle ${isMusicEnabled ? 'enabled' : 'disabled'}`}
-                onClick={onToggleMusic}
-              >
-                {isMusicEnabled ? '开启' : '关闭'}
-              </button>
+              <label className="settings-checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  checked={isMusicEnabled}
+                  onChange={onToggleMusic}
+                  className="settings-checkbox"
+                />
+                <span className="settings-checkbox-custom"></span>
+              </label>
+            </div>
+            
+            {/* 音量调节滑动条 */}
+            <div className="settings-volume-item">
+              <div className="settings-volume-header">
+                <span className="settings-label">音量</span>
+                <span className="settings-volume-value">{musicVolume}%</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={musicVolume}
+                onChange={(e) => onVolumeChange(Number(e.target.value))}
+                className="settings-volume-slider"
+                disabled={!isMusicEnabled}
+              />
             </div>
           </div>
 

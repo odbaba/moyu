@@ -180,3 +180,60 @@ export const deleteSave = (): boolean => {
 export const getSaveVersion = (): string => {
   return SAVE_VERSION;
 };
+
+// ========== 音乐设置持久化 ==========
+
+// 音乐设置键名
+const MUSIC_SETTINGS_KEY = 'moyu_music_settings';
+
+/**
+ * 音乐设置数据结构
+ */
+export interface MusicSettings {
+  /** 音乐是否开启 */
+  isMusicEnabled: boolean;
+  /** 音乐音量（0-100） */
+  musicVolume: number;
+}
+
+/**
+ * 保存音乐设置到 localStorage
+ * @param settings 音乐设置对象
+ * @returns 是否保存成功
+ */
+export const saveMusicSettings = (settings: MusicSettings): boolean => {
+  try {
+    localStorage.setItem(MUSIC_SETTINGS_KEY, JSON.stringify(settings));
+    return true;
+  } catch (error) {
+    console.error('保存音乐设置失败:', error);
+    return false;
+  }
+};
+
+/**
+ * 从 localStorage 加载音乐设置
+ * @returns 音乐设置对象，如果不存在则返回默认设置
+ */
+export const loadMusicSettings = (): MusicSettings => {
+  try {
+    const jsonData = localStorage.getItem(MUSIC_SETTINGS_KEY);
+    if (jsonData) {
+      const settings = JSON.parse(jsonData) as MusicSettings;
+      // 验证数据格式
+      if (typeof settings.isMusicEnabled === 'boolean' && typeof settings.musicVolume === 'number') {
+        // 确保音量在有效范围内
+        settings.musicVolume = Math.max(0, Math.min(100, settings.musicVolume));
+        return settings;
+      }
+    }
+  } catch (error) {
+    console.error('加载音乐设置失败:', error);
+  }
+
+  // 返回默认设置
+  return {
+    isMusicEnabled: true,
+    musicVolume: 30
+  };
+};

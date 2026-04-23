@@ -85,7 +85,14 @@ export function useBackgroundMusic(options: UseBackgroundMusicOptions): UseBackg
         audioRef.current = null;
       }
     };
-  }, [src, autoPlay, volume, loop]);
+  }, [src, autoPlay, loop]); // 移除 volume 依赖，避免重新创建 audio 元素
+
+  // 单独处理音量变化，不重新创建 audio 元素
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   // 播放音乐
   const play = useCallback(() => {

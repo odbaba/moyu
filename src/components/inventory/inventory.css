@@ -216,29 +216,17 @@
   border: 1px solid #555;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   align-content: start;
-  scrollbar-width: thin;
-  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+  -ms-overflow-style: none;
+  max-width: 100%;
 }
 
 /* 物品列表滚动条样式 */
 .inventory-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.inventory-list::-webkit-scrollbar-track {
-  background: rgba(30, 30, 30, 0.5);
-  border-radius: 3px;
-}
-
-.inventory-list::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #555 0%, #777 50%, #555 100%);
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.inventory-list::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #666 0%, #888 50%, #666 100%);
+  display: none;
 }
 
 /* ========== 单个物品列表条目样式 ========== */
@@ -756,6 +744,7 @@
   padding: 0;
   overflow: hidden;
   animation: fadeIn 0.3s ease;
+  max-width: 100vw;
 }
 
 /* 背包主页面容器 */
@@ -766,6 +755,7 @@
   display: flex;
   flex-direction: column;
   animation: slideIn 0.3s ease;
+  overflow-x: hidden;
 }
 
 /* 页面顶部标题和关闭按钮 */
@@ -814,6 +804,7 @@
   overflow: hidden;
   padding: 10px;
   gap: 10px;
+  max-width: 100%;
 }
 
 /* 上部：资源信息展示区域 */
@@ -839,8 +830,18 @@
 .inventory-page-bottom .inventory-list {
   flex: 1;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+}
+
+/* Firefox 隐藏滚动条 */
+.inventory-page-bottom .inventory-list {
+  -ms-overflow-style: none;
+}
+
+/* Chrome/Safari/Edge 隐藏滚动条 */
+.inventory-page-bottom .inventory-list::-webkit-scrollbar {
+  display: none;
 }
 
 /* ========== 动画效果 ========== */
@@ -894,22 +895,7 @@
 
 /* 物品列表滚动条样式 */
 .inventory-page-bottom .inventory-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.inventory-page-bottom .inventory-list::-webkit-scrollbar-track {
-  background: rgba(30, 30, 30, 0.5);
-  border-radius: 3px;
-}
-
-.inventory-page-bottom .inventory-list::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #555 0%, #777 50%, #555 100%);
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.inventory-page-bottom .inventory-list::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #666 0%, #888 50%, #666 100%);
+  display: none;
 }
 
 /* ========== 响应式设计 - 移动端优先 ========== */
