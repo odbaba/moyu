@@ -1,0 +1,200 @@
+/**
+ * 设置模块样式 (Settings Module Styles)
+ * 包含设置页面的所有样式
+ * 移动端优化：确保一屏展示所有信息
+ * 
+ * 高度分配：顶部占位10% + 页面头部5% + 内容区85% = 100%
+ */
+
+/* ========== 设置页面主容器样式 ========== */
+
+/* 设置页面覆盖层 */
+.settings-page-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 2500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 设置页面容器 */
+.settings-page-container {
+  background-color: #252935;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease;
+}
+
+/* 页面顶部关闭按钮 */
+.settings-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 15px;
+  background-color: #252935;
+  border-bottom: 1px solid #000000;
+  flex-shrink: 0;
+}
+
+.settings-page-title {
+  color: #ffd700;
+  font-size: 1.2rem;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  margin: 0;
+  padding: 0;
+}
+
+.settings-page-close-button {
+  padding: 5px 12px;
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #FFFFFF;
+  cursor: pointer;
+  font-size: 1.5rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.settings-page-close-button:hover {
+  color: #ff6b6b;
+}
+
+/* 主要内容区域 */
+.settings-page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 15px;
+  overflow-y: auto;
+  gap: 20px;
+}
+
+/* ========== 设置区域样式 ========== */
+
+.settings-section {
+  background-color: #1a1f2e;
+  border-radius: 8px;
+  border: 1px solid #3a3f4e;
+  padding: 15px;
+  transition: all 0.3s ease;
+}
+
+.settings-section:hover {
+  border-color: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+}
+
+/* 单个设置项 */
+.settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.settings-label {
+  color: #FFFFFF;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* 切换按钮样式 */
+.settings-toggle {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: 2px solid #555;
+  background-color: transparent;
+  color: #FFFFFF;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 80px;
+}
+
+/* 开启状态 */
+.settings-toggle.enabled {
+  border-color: #4CAF50;
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+
+.settings-toggle.enabled:hover {
+  background-color: rgba(76, 175, 80, 0.3);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+/* 关闭状态 */
+.settings-toggle.disabled {
+  border-color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+.settings-toggle.disabled:hover {
+  background-color: rgba(255, 107, 107, 0.3);
+  box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+}
+
+/* ========== 退出游戏区域样式 ========== */
+
+.settings-exit-section {
+  margin-top: auto;
+  padding: 20px 15px;
+}
+
+.settings-exit-button {
+  width: 100%;
+  padding: 15px;
+  border-radius: 8px;
+  border: 2px solid #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.settings-exit-button:hover {
+  background-color: rgba(255, 107, 107, 0.2);
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+  transform: translateY(-2px);
+}
+
+.settings-exit-button:active {
+  transform: translateY(0);
+}
+
+/* ========== 动画效果 ========== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

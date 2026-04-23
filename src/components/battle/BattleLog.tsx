@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-import type { BattleLogEntry, BattleLogType } from '../../types';
+import type { BattleLogEntry } from '../../types';
 
 /**
  * 战斗日志组件属性接口
@@ -8,25 +8,6 @@ import type { BattleLogEntry, BattleLogType } from '../../types';
 interface BattleLogProps {
   logs: BattleLogEntry[];
 }
-
-/**
- * 获取日志类型对应的图标
- * @param type 日志类型
- * @returns 对应的图标emoji
- */
-const getLogIcon = (type: BattleLogType): string => {
-  const iconMap: Record<BattleLogType, string> = {
-    attack: '⚔️', // 攻击
-    skill: '✨', // 技能
-    dodge: '💨', // 闪避
-    buff: '🔥', // 增益
-    damage: '💔', // 伤害
-    heal: '💚', // 治疗
-    death: '💀', // 死亡
-  };
-
-  return iconMap[type] || '📝';
-};
 
 /**
  * 获取日志条目的CSS类名
@@ -135,11 +116,6 @@ const BattleLog: React.FC<BattleLogProps> = ({ logs }) => {
       {/* 遍历日志数组，渲染每条战斗日志条目 */}
       {logs.map((log) => (
         <div key={log.id} className={getLogClassName(log)}>
-          {/* 日志图标 */}
-          <span className="log-icon">
-            {getLogIcon(log.actionType)}
-          </span>
-
           {/* 回合数显示 */}
           <span className="log-round">
             [第 {log.round} 回合]

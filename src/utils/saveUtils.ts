@@ -98,9 +98,11 @@ export const saveGame = (data: SaveData): boolean => {
   try {
     const jsonData = JSON.stringify(data);
     localStorage.setItem(SAVE_KEY, jsonData);
+
     return true;
   } catch (error) {
     console.error('保存游戏失败:', error);
+
     return false;
   }
 };
@@ -120,11 +122,14 @@ export const loadGame = (): SaveData | null => {
     // 版本兼容性检查：版本不匹配则清除存档
     if (data.version !== SAVE_VERSION) {
       deleteSave();
+
       return null;
     }
+
     return data;
   } catch (error) {
     console.error('加载游戏失败:', error);
+
     return null;
   }
 };
@@ -145,6 +150,7 @@ export const hasSaveData = (): boolean => {
     if (data.version !== SAVE_VERSION) {
       return false;
     }
+
     return true;
   } catch {
     return false;
@@ -158,9 +164,11 @@ export const hasSaveData = (): boolean => {
 export const deleteSave = (): boolean => {
   try {
     localStorage.removeItem(SAVE_KEY);
+
     return true;
   } catch (error) {
     console.error('删除存档失败:', error);
+
     return false;
   }
 };

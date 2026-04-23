@@ -26,3 +26,6 @@ export * from './skill';
 
 // 抽奖模块组件
 export * from './lottery';
+
+// 设置模块组件
+export * from './settings';

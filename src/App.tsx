@@ -5,6 +5,7 @@ import './components/common/common.css';
 import './components/character/character.css';
 import './components/inventory/inventory.css';
 import './components/cover/cover.css';
+import './components/settings/settings.css';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -38,6 +39,8 @@ import UseItemTargetModal from './components/inventory/UseItemTargetModal';
 import { LotteryArea } from './components/lottery';
 // 导入组件 - 幻兽模块
 import { PetFusionModal, PetInstituteModal, PetPage } from './components/pet';
+// 导入组件 - 设置模块
+import { SettingsPage } from './components/settings';
 // 导入组件 - 商店模块
 import { ShopPage } from './components/shop';
 // 导入组件 - 技能模块
@@ -121,10 +124,10 @@ import type { SaveData } from './utils/saveUtils';
 import { deleteSave, getSaveVersion, hasSaveData, loadGame, saveGame } from './utils/saveUtils';
 // 导入技能学习工具函数
 import { learnSkillFromBook } from './utils/skillLearnUtils';
-// 导入战魂物品掉落工具函数
-import { checkWarSoulDrop } from './utils/warSoulDropUtils';
 // 导入背景音乐 Hook
 import { useBackgroundMusic } from './utils/useBackgroundMusic';
+// 导入战魂物品掉落工具函数
+import { checkWarSoulDrop } from './utils/warSoulDropUtils';
 
 // 初始化空装备槽位
 const createEmptyEquippedItems = (): Record<EquipmentSlotType, EquipmentDetail | null> => ({
@@ -252,9 +255,15 @@ function App() {
   // 默认为 true，进入游戏时先显示封面页
   const [showCover, setShowCover] = useState(true);
 
+  // 设置页面状态
+  const [showSettingsPage, setShowSettingsPage] = useState(false);
+
+  // 音乐开关状态
+  const [isMusicEnabled, setIsMusicEnabled] = useState(true);
+
   // ========== 背景音乐管理 ==========
   // 使用背景音乐 Hook，设置音乐文件路径和初始音量
-  const { play: playBackgroundMusic } = useBackgroundMusic({
+  const { play: playBackgroundMusic, pause: pauseBackgroundMusic } = useBackgroundMusic({
     src: '/audio/19_back.mp3.mp3',
     autoPlay: false, // 不自动播放，等进入游戏后播放
     volume: 0.3, // 设置音量为 30%
@@ -263,10 +272,21 @@ function App() {
 
   // 当封面页关闭时，开始播放背景音乐
   useEffect(() => {
-    if (!showCover) {
+    if (!showCover && isMusicEnabled) {
       playBackgroundMusic();
     }
-  }, [showCover, playBackgroundMusic]);
+  }, [showCover, playBackgroundMusic, isMusicEnabled]);
+
+  // 当音乐开关状态改变时，控制音乐播放/暂停
+  useEffect(() => {
+    if (!showCover) {
+      if (isMusicEnabled) {
+        playBackgroundMusic();
+      } else {
+        pauseBackgroundMusic();
+      }
+    }
+  }, [isMusicEnabled, showCover, playBackgroundMusic, pauseBackgroundMusic]);
 
   // 无名氏击败状态（战魂封印迷宫）
   // 当玩家击败无名氏后，获得战魂之心
@@ -290,6 +310,17 @@ function App() {
     // 关闭封面页，进入游戏主界面
     setShowCover(false);
   }, []);
+
+  /**
+   * 处理"退出游戏"
+   * 返回封面页，不保存游戏进度
+   */
+  const handleExitGame = useCallback(() => {
+    // 暂停背景音乐
+    pauseBackgroundMusic();
+    // 显示封面页
+    setShowCover(true);
+  }, [pauseBackgroundMusic]);
 
   /**
    * 处理"继续游戏"
@@ -544,6 +575,7 @@ function App() {
     } else {
       setInteractionLog(prev => [...prev, '❌ 游戏保存失败！']);
     }
+
     return success;
   }, [
     currentLocation, timeSystem, character, playerResources, equippedItems,
@@ -3948,6 +3980,7 @@ function App() {
             onShowSkill={() => setShowSkillPage(true)}
             onShowPet={() => setShowPetPage(true)}
             onSaveGame={handleSaveGame}
+            onShowSettings={() => setShowSettingsPage(true)}
           />
 
           {/* 大地图 */}
@@ -4033,6 +4066,15 @@ function App() {
             onMerge={handleMergePet}
             onUnmerge={handleUnmergePet}
             onDeploy={handleDeployPet}
+          />
+
+          {/* 设置页面 */}
+          <SettingsPage
+            isVisible={showSettingsPage}
+            isMusicEnabled={isMusicEnabled}
+            onToggleMusic={() => setIsMusicEnabled(!isMusicEnabled)}
+            onClose={() => setShowSettingsPage(false)}
+            onExitGame={handleExitGame}
           />
 
           {/* 商店页面 */}
@@ -4145,6 +4187,8 @@ function App() {
             onShowInventory={() => setShowInventoryPage(true)}
             onShowSkill={() => setShowSkillPage(true)}
             onShowPet={() => setShowPetPage(true)}
+            onSaveGame={handleSaveGame}
+            onShowSettings={() => setShowSettingsPage(true)}
           />
 
           {/* 幻兽研究所界面 */}

@@ -137,23 +137,6 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
         )}
       </div>
 
-      {/* 角色等级显示 */}
-      <div className="character-card-level">
-        Lv.{character.level}
-      </div>
-
-      {/* 角色战斗力显示（仅角色有战斗力属性） */}
-      {!isPet && (
-        <div className="character-card-combat-power">
-          战斗力: {(character as BattleCharacter).combatPower}
-        </div>
-      )}
-
-      {/* 角色攻击力范围显示 */}
-      <div className="character-card-attack">
-        攻击: {character.attackMin}-{character.attackMax}
-      </div>
-
       {/* 生命值进度条区域 */}
       <div className="stat-bar-container compact">
         {/* 生命值进度条背景 */}

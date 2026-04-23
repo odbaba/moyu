@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import type { NPCInteractable, NPCInteractionOption, NPCType } from '../../types';
+import type { NPCInteractable, NPCInteractionOption } from '../../types';
 import { checkNPCOptionCondition, type NPCGameState } from '../../utils/npcUtils';
 
 /**
@@ -21,41 +21,9 @@ interface NPCModalProps {
 }
 
 /**
- * 获取NPC类型的显示名称
- * @param npcType NPC类型
- * @returns 类型显示名称
- */
-const getNPCTypeName = (npcType: NPCType): string => {
-  const typeNames: Record<NPCType, string> = {
-    palace: '皇宫',
-    function: '功能',
-    shop: '商店',
-    special: '特殊'
-  };
-
-  return typeNames[npcType] || '未知';
-};
-
-/**
- * 获取NPC类型的CSS类名
- * @param npcType NPC类型
- * @returns CSS类名
- */
-const getNPCTypeClassName = (npcType: NPCType): string => {
-  const classNames: Record<NPCType, string> = {
-    palace: 'npc-type-palace',
-    function: 'npc-type-function',
-    shop: 'npc-type-shop',
-    special: 'npc-type-special'
-  };
-
-  return classNames[npcType] || 'npc-type-default';
-};
-
-/**
  * NPC模态窗口组件
  * 用于显示NPC信息和交互选项
- * 支持条件选项显示、NPC类型和位置信息展示、结果反馈显示
+ * 支持条件选项显示、结果反馈显示
  */
 const NPCModal: React.FC<NPCModalProps> = ({
   isVisible,
@@ -110,18 +78,8 @@ const NPCModal: React.FC<NPCModalProps> = ({
 
         {/* NPC名称标题 */}
         <h3 className="npc-name">
-          {npcData.icon} {npcData.name}
+          {npcData.name}
         </h3>
-
-        {/* NPC类型和位置信息 */}
-        <div className="npc-meta-info">
-          {/* NPC类型标签 */}
-          <span className={`npc-type-tag ${getNPCTypeClassName(npcData.npcType)}`}>
-            {getNPCTypeName(npcData.npcType)}
-          </span>
-          {/* NPC位置信息 */}
-          <span className="npc-location">📍 {npcData.location}</span>
-        </div>
 
         {/* NPC描述文本区域 */}
         <p className="modal-description">{npcData.description}</p>

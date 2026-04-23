@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { BattleSkill, SkillAttackType } from '../../types';
+import type { BattleSkill } from '../../types';
 
 /**
  * 行动按钮组件属性接口
@@ -11,40 +11,6 @@ interface ActionButtonsProps {
   onActionSelect: (skillId: string) => void; // 技能选择回调
   disabled?: boolean; // 是否禁用所有按钮
 }
-
-/**
- * 获取技能类型图标
- * @param attackType 攻击类型
- * @returns 对应的图标emoji
- */
-const getSkillTypeIcon = (attackType: SkillAttackType): string => {
-  const iconMap: Record<SkillAttackType, string> = {
-    single: '🎯', // 单体攻击
-    aoe: '💥', // 群体攻击
-    multi: '⚔️', // 多段攻击
-    buff: '🔥', // 增益技能
-    special: '⭐' // 特殊技能
-  };
-
-  return iconMap[attackType] || '⚔️';
-};
-
-/**
- * 获取技能类型名称
- * @param attackType 攻击类型
- * @returns 对应的类型名称
- */
-const getSkillTypeName = (attackType: SkillAttackType): string => {
-  const nameMap: Record<SkillAttackType, string> = {
-    single: '单体',
-    aoe: '群体',
-    multi: '多段',
-    buff: '增益',
-    special: '特殊'
-  };
-
-  return nameMap[attackType] || '未知';
-};
 
 /**
  * 行动按钮组件
@@ -105,42 +71,18 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         return (
           <button
             key={skill.id}
-            className={`action-button ${!canUse ? 'disabled' : ''} ${isNormalAttack ? 'normal-attack' : 'skill'}`}
+            className={`game-btn ${!canUse ? 'disabled' : ''}`}
             onClick={() => canUse && onActionSelect(skill.id)}
             disabled={!canUse}
             title={disableReason || skill.name}
           >
-            {/* 技能图标和名称 */}
-            <div className="action-button-header">
-              <span className="skill-icon">{skill.icon}</span>
-              <span className="skill-type-icon">{getSkillTypeIcon(skill.attackType)}</span>
-              <div className="action-button-name">{skill.name}</div>
-            </div>
-
-            {/* 技能类型标签 */}
-            <div className="skill-type-label">
-              {getSkillTypeName(skill.attackType)}
-              {skill.level > 1 && <span className="skill-level">Lv.{skill.level}</span>}
-            </div>
-
-            {/* 显示消耗的体力 */}
-            {skill.staminaCost > 0 && (
-              <div className="action-button-cost">
-                <span className="cost-stamina">体力 {skill.staminaCost}</span>
-              </div>
-            )}
+            {/* 只显示技能名称 */}
+            {skill.name}
 
             {/* 显示冷却状态 */}
             {skill.currentCooldown > 0 && (
               <div className="cooldown-overlay">
                 <span className="cooldown-text">冷却 {skill.currentCooldown}</span>
-              </div>
-            )}
-
-            {/* 显示禁用原因提示 */}
-            {!canUse && disableReason && (
-              <div className="disable-reason">
-                {disableReason}
               </div>
             )}
           </button>

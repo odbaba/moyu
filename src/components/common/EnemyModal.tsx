@@ -54,29 +54,29 @@ const EnemyModal: React.FC<EnemyModalProps> = ({
               style={{
                 padding: '10px',
                 marginBottom: '10px',
-                backgroundColor: '#f5f5f5',
+                backgroundColor: 'rgba(50, 50, 50, 0.5)',
                 borderRadius: '8px',
-                border: '1px solid #ddd'
+                border: '1px solid #555'
               }}
             >
               {/* 敌人名称 */}
-              <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '14px' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '14px', color: '#FFFFFF' }}>
                 {enemy.name}
               </div>
 
               {/* 敌人属性展示 */}
-              <div style={{ display: 'flex', gap: '15px', fontSize: '12px', color: '#666' }}>
+              <div style={{ display: 'flex', gap: '15px', fontSize: '12px', color: '#FFFFFF' }}>
                 {/* HP生命值 */}
-                <span>❤️ HP: {enemy.maxHp}</span>
+                <span>HP: {enemy.maxHp}</span>
                 {/* 攻击力范围 */}
-                <span>⚔️ 攻击: {enemy.attackMin}~{enemy.attackMax}</span>
+                <span>攻击: {enemy.attackMin}~{enemy.attackMax}</span>
                 {/* 防御力 */}
-                <span>🛡️ 防御: {enemy.defense}</span>
+                <span>防御: {enemy.defense}</span>
               </div>
 
               {/* 敌人描述（如果有） */}
               {enemy.description && (
-                <div style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: '#FFFFFF' }}>
                   {enemy.description}
                 </div>
               )}
@@ -86,7 +86,7 @@ const EnemyModal: React.FC<EnemyModalProps> = ({
 
         {/* 按钮区域，使用横向布局 */}
         <div className="modal-options" style={{ flexDirection: 'row', gap: '10px' }}>
-          {/* 攻击按钮，红色背景，点击后执行攻击并关闭弹窗 */}
+          {/* 攻击按钮，点击后执行攻击并关闭弹窗 */}
           <button
             className="option-button"
             style={{
@@ -99,10 +99,10 @@ const EnemyModal: React.FC<EnemyModalProps> = ({
               onClose();
             }}
           >
-            ⚔️ 攻击
+            攻击
           </button>
 
-          {/* 离开按钮，默认样式，点击关闭弹窗 */}
+          {/* 离开按钮，点击关闭弹窗 */}
           <button
             className="option-button"
             style={{ flex: 1 }}

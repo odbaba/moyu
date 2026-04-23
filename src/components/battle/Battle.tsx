@@ -98,8 +98,6 @@ const Battle: React.FC<BattleProps> = ({
   const [damageNumbers, setDamageNumbers] = useState<DamageNumber[]>([]);
   // 攻击动画状态
   const [attackingCharacterId, setAttackingCharacterId] = useState<string | null>(null);
-  // 战斗日志展开/收起状态
-  const [isBattleLogExpanded, setIsBattleLogExpanded] = useState(false);
 
   // ========== 详情弹窗状态管理 ==========
   // 详情弹窗显示状态
@@ -1129,17 +1127,6 @@ const Battle: React.FC<BattleProps> = ({
     }
   }, [battleState.battleResult, battleState.player, battleState.deployedPets, onBattleEnd]);
 
-  // 监听回合变化，自动控制战斗日志展开收起
-  useEffect(() => {
-    if (battleState.isPlayerTurn) {
-      // 玩家回合，收起战斗日志
-      setIsBattleLogExpanded(false);
-    } else {
-      // 敌方回合，展开战斗日志
-      setIsBattleLogExpanded(true);
-    }
-  }, [battleState.isPlayerTurn]);
-
   /**
    * 显示角色/幻兽/敌人详情弹窗
    * 根据角色类型显示对应的详情弹窗
@@ -1304,7 +1291,7 @@ const Battle: React.FC<BattleProps> = ({
         {/* 离开战斗按钮 - 战斗进行中时显示 */}
         {battleState.battleResult === 'in_progress' && onLeaveBattle && (
           <button
-            className="leave-battle-btn"
+            className="game-btn"
             onClick={() => onLeaveBattle(battleState.player, battleState.deployedPets)}
           >
             离开战斗
@@ -1326,33 +1313,28 @@ const Battle: React.FC<BattleProps> = ({
         {renderGrid(false)}
       </div>
 
-      {/* 行动按钮区域 - 玩家回合时显示 */}
-      {battleState.isPlayerTurn && battleState.battleResult === 'in_progress' && (
-        <div className="action-section">
-          <ActionButtons
-            skills={battleState.player.skills}
-            currentStamina={battleState.player.currentStamina}
-            onActionSelect={handleActionSelect}
-            disabled={!battleState.isPlayerTurn || battleState.battleResult !== 'in_progress'}
-          />
-          {battleState.selectedAction && (
-            <div className="target-hint">请点击要攻击的敌人</div>
-          )}
-        </div>
-      )}
+      {/* 行动按钮区域 - 固定显示 */}
+      <div className="action-section">
+        {battleState.isPlayerTurn && battleState.battleResult === 'in_progress' ? (
+          <>
+            <ActionButtons
+              skills={battleState.player.skills.filter(skill => skill.type !== 'passive')}
+              currentStamina={battleState.player.currentStamina}
+              onActionSelect={handleActionSelect}
+              disabled={!battleState.isPlayerTurn || battleState.battleResult !== 'in_progress'}
+            />
+            {battleState.selectedAction && (
+              <div className="target-hint">请点击要攻击的敌人</div>
+            )}
+          </>
+        ) : battleState.battleResult === 'in_progress' ? (
+          <div className="enemy-action-hint">敌方行动中...</div>
+        ) : null}
+      </div>
 
-      {/* 战斗日志区域 - 可展开收起 */}
+      {/* 战斗日志区域 - 永远显示，参考首页交互日志 */}
       <div className="battle-log-section">
-        <div
-          className="battle-log-toggle"
-          onClick={() => setIsBattleLogExpanded(!isBattleLogExpanded)}
-        >
-          <span className="toggle-icon">{isBattleLogExpanded ? '▼' : '▶'}</span>
-          <span className="toggle-text">战斗日志</span>
-        </div>
-        {isBattleLogExpanded && (
-          <BattleLog logs={battleState.battleLogs} />
-        )}
+        <BattleLog logs={battleState.battleLogs} />
       </div>
 
       {/* ========== 详情弹窗区域 ========== */}

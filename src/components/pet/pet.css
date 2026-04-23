@@ -381,11 +381,11 @@
 }
 
 .hp-fill {
-  background: linear-gradient(90deg, #c62828 0%, #ff6b6b 50%, #c62828 100%);
+  background: #ff4444;
 }
 
 .exp-fill {
-  background: linear-gradient(90deg, #558b2f 0%, #8bc34a 50%, #558b2f 100%);
+  background: #8bc34a;
 }
 
 .stat-bar-text {

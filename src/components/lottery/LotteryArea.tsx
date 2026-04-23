@@ -53,6 +53,10 @@ interface LotteryAreaProps {
   onShowSkill?: () => void;
   /** 显示幻兽页回调 */
   onShowPet?: () => void;
+  /** 保存游戏回调 */
+  onSaveGame?: () => void;
+  /** 显示设置页回调 */
+  onShowSettings?: () => void;
 }
 
 /**
@@ -84,6 +88,8 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
   onShowInventory,
   onShowSkill,
   onShowPet,
+  onSaveGame,
+  onShowSettings,
 }) => {
   // 抽奖消耗的魔石数量
   const MAGIC_STONE_COST = 28;
@@ -406,6 +412,14 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
         onShowPet={() => {
           setMenuOpen(false);
           onShowPet?.();
+        }}
+        onSaveGame={() => {
+          setMenuOpen(false);
+          onSaveGame?.();
+        }}
+        onShowSettings={() => {
+          setMenuOpen(false);
+          onShowSettings?.();
         }}
       />
     </div>

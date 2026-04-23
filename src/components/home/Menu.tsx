@@ -21,6 +21,8 @@ interface MenuProps {
   onShowPet: () => void;
   /** 保存游戏的回调 */
   onSaveGame: () => void;
+  /** 显示设置页面的回调 */
+  onShowSettings: () => void;
 }
 
 /**
@@ -36,7 +38,8 @@ const Menu: React.FC<MenuProps> = ({
   onShowInventory,
   onShowSkill,
   onShowPet,
-  onSaveGame
+  onSaveGame,
+  onShowSettings
 }) => {
   /**
    * 处理保存游戏点击
@@ -44,6 +47,15 @@ const Menu: React.FC<MenuProps> = ({
    */
   const handleSaveGame = () => {
     onSaveGame();
+    onToggle();
+  };
+
+  /**
+   * 处理设置按钮点击
+   * 打开设置页面后关闭菜单
+   */
+  const handleShowSettings = () => {
+    onShowSettings();
     onToggle();
   };
 
@@ -62,7 +74,7 @@ const Menu: React.FC<MenuProps> = ({
           <button onClick={onShowSkill}>技能</button>
           <button onClick={onShowMap}>大地图</button>
           <button onClick={handleSaveGame}>保存游戏</button>
-          <button>设置</button>
+          <button onClick={handleShowSettings}>设置</button>
           <button>帮助</button>
         </div>
       )}

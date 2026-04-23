@@ -729,6 +729,7 @@ export interface BattleSkill {
   skillIndex: SkillIndex; // 技能索引（0-5）
   name: string; // 技能名称
   icon: string; // 技能图标
+  type: SkillType; // 技能类型（active/passive/toggle）
   attackType: SkillAttackType; // 攻击类型（single/aoe/multi/buff/special）
   level: number; // 技能等级
   damagePercent: number; // 伤害百分比

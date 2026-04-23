@@ -32,12 +32,12 @@ interface UseBackgroundMusicReturn {
 
 /**
  * 背景音乐管理 Hook
- * 
+ *
  * 用于管理游戏背景音乐的播放、暂停、音量控制等功能
- * 
+ *
  * @param options 配置选项
  * @returns 音乐控制方法和状态
- * 
+ *
  * @example
  * ```tsx
  * const { play, pause, toggle, setVolume, isPlaying } = useBackgroundMusic({
