@@ -69,6 +69,7 @@ export function learnSkillFromBook(
           updatedSkills: currentSkills
         };
       }
+
       // 如果跳级升级
       return {
         success: false,

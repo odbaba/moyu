@@ -95,6 +95,8 @@
   background-color: #252935;
   border-radius: 8px;
   overflow: hidden;
+  /* 优化SVG动画性能，减少重绘和重排 */
+  contain: layout style;
 }
 
 .map-grid {

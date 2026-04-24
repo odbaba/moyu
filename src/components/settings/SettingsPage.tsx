@@ -93,7 +93,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
                 <span className="settings-checkbox-custom"></span>
               </label>
             </div>
-            
+
             {/* 音量调节滑动条 */}
             <div className="settings-volume-item">
               <div className="settings-volume-header">

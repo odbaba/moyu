@@ -262,6 +262,7 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
                   }
                 };
                 const gemInfo = getGemEffect(gemName);
+
                 return (
                   <div key={index} className="embedded-gem-display">
                     <span className="gem-icon" style={{ color: gemInfo.color }}>{gemInfo.icon}</span>
@@ -285,6 +286,7 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
             else if (gemName === '中级经验石') totalExpBonus += 25;
             else if (gemName === '高级经验石') totalExpBonus += 50;
           });
+
           return (
             <div className="gem-stats-section">
               {totalCombatPower > 0 && (

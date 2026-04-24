@@ -204,9 +204,11 @@ export interface MusicSettings {
 export const saveMusicSettings = (settings: MusicSettings): boolean => {
   try {
     localStorage.setItem(MUSIC_SETTINGS_KEY, JSON.stringify(settings));
+
     return true;
   } catch (error) {
     console.error('保存音乐设置失败:', error);
+
     return false;
   }
 };
@@ -224,6 +226,7 @@ export const loadMusicSettings = (): MusicSettings => {
       if (typeof settings.isMusicEnabled === 'boolean' && typeof settings.musicVolume === 'number') {
         // 确保音量在有效范围内
         settings.musicVolume = Math.max(0, Math.min(100, settings.musicVolume));
+
         return settings;
       }
     }

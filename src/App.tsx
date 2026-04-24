@@ -261,12 +261,14 @@ function App() {
   // 音乐开关状态 - 从 localStorage 加载
   const [isMusicEnabled, setIsMusicEnabled] = useState(() => {
     const saved = loadMusicSettings();
+
     return saved.isMusicEnabled;
   });
 
   // 音乐音量状态（0-100）- 从 localStorage 加载
   const [musicVolume, setMusicVolume] = useState(() => {
     const saved = loadMusicSettings();
+
     return saved.musicVolume;
   });
 
