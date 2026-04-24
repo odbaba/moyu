@@ -38,7 +38,7 @@ const calculateAngle = (x1: number, y1: number, x2: number, y2: number): number 
   return radians * (180 / Math.PI);
 };
 
-const BASE_ANIMATION_DURATION = 250;
+const BASE_ANIMATION_DURATION = 100;
 
 const LocalMap: React.FC<LocalMapProps> = ({ currentLocation, onMove, isAutoMoving }) => {
   // 获取当前地点信息
@@ -48,8 +48,8 @@ const LocalMap: React.FC<LocalMapProps> = ({ currentLocation, onMove, isAutoMovi
   // 地图尺寸配置
   const cellWidth = 95; // 地点节点宽度
   const cellHeight = 38; // 地点节点高度（调小15%）
-  const cellSpacingX = 40; // 水平间距
-  const cellSpacingY = 30; // 垂直间距
+  const cellSpacingX = 25; // 水平间距（从40减小到25，使布局更紧凑，避免边缘遮挡）
+  const cellSpacingY = 20; // 垂直间距（从30减小到20，使布局更紧凑，避免边缘遮挡）
   const mapWidth = 3 * (cellWidth + cellSpacingX); // 地图容器宽度
   const mapHeight = 3 * (cellHeight + cellSpacingY); // 地图容器高度
 
@@ -276,7 +276,7 @@ const LocalMap: React.FC<LocalMapProps> = ({ currentLocation, onMove, isAutoMovi
                   <span
                     style={{
                       color: '#FCFFFF',
-                      fontSize: '13px',
+                      fontSize: '14px',
                       fontWeight: showHighlight ? 'bold' : 'normal',
                       userSelect: 'none',
                       cursor: isAdjacent && !isCurrent ? 'pointer' : 'default'

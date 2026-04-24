@@ -157,7 +157,7 @@ export const locations: LocationData = [
       'interact-huoshan-random1',
       'interact-huoshan-random2'
     ],
-    x: 5,
+    x: 4,
     y: 1
   },
   {
@@ -212,7 +212,7 @@ export const locations: LocationData = [
       'interact-shenyuan-random1',
       'interact-shenyuan-random2'
     ],
-    x: 5,
+    x: 4,
     y: 2
   },
 
