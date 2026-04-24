@@ -60,10 +60,10 @@ export const getPetAvatar = (petType: string): string => {
   const pinyin = PET_TYPE_PINYIN[petType];
 
   if (pinyin) {
-    return `/images/pet/${pinyin}.jpg`;
+    return `./images/pet/${pinyin}.jpg`;
   }
 
-  return '/images/pet/default.jpg';
+  return './images/pet/default.jpg';
 };
 
 /**

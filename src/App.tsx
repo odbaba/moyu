@@ -281,7 +281,7 @@ function App() {
   // ========== 背景音乐管理 ==========
   // 使用背景音乐 Hook，设置音乐文件路径和初始音量
   const { play: playBackgroundMusic, pause: pauseBackgroundMusic } = useBackgroundMusic({
-    src: '/audio/19_back.mp3.mp3',
+    src: './audio/19_back.mp3',
     autoPlay: false, // 不自动播放，等进入游戏后播放
     volume: musicVolume / 100, // 将 0-100 转换为 0-1
     loop: true // 循环播放

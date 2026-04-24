@@ -35,12 +35,19 @@ home/
 - **Props**: `description: string` - 场景描述文本
 
 ### LocalMap
-- **功能**: 显示当前位置周围的相邻地点，支持点击移动
+- **功能**: 显示当前位置周围的相邻地点，支持点击移动，带平滑移动动画
 - **位置**: 场景描述下方
 - **Props**: 
   - `currentLocation: string` - 当前位置ID
   - `onMove: (locationId: string) => void` - 移动回调
   - `isAutoMoving: boolean` - 是否正在自动移动
+- **动画机制**:
+  - 每个节点使用独立的CSS transition动画（`transform`过渡）
+  - 节点位置基于`displayCoord`相对于当前地点居中计算，无需容器偏移
+  - 动画时长根据曼哈顿距离动态调整：距离1=200ms，距离2=400ms
+  - 连接线在动画期间淡出，避免端点与节点位置不同步
+  - 使用`animationTimeoutRef`管理超时，防止快速移动时旧超时提前中断新动画
+  - 动画期间禁止交互（`pointerEvents: none`），防止重复移动
 
 ### InteractionButtons
 - **功能**: 显示当前地点可交互的对象按钮

@@ -339,7 +339,7 @@ function createLotteryItem(itemName: string): InventoryItem {
     equippable: false,
     goldValue: 0,
     magicStoneValue: 0,
-    imagePath: `/images/items/special/${itemName}.png`,
+    imagePath: `./images/items/special/${itemName}.png`,
   };
 }
 

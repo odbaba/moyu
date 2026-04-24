@@ -48,7 +48,7 @@ export const getEquipmentImagePath = (
   useLevel: number
 ): string => {
   // 返回public目录下的图片路径
-  return `/images/equipment/${equipmentType}/lv${useLevel}.png`;
+  return `./images/equipment/${equipmentType}/lv${useLevel}.png`;
 };
 
 /**

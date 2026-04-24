@@ -122,7 +122,7 @@ export function createConsumableItem(config: {
     equippable: false,
     goldValue: 0,
     magicStoneValue: 0,
-    imagePath: `/images/items/consumable/${id}.png`,
+    imagePath: `./images/items/consumable/${id}.png`,
   };
 }
 
@@ -172,7 +172,7 @@ export function createGemItem(config: {
     equippable: false,
     goldValue: 0,
     magicStoneValue: 0,
-    imagePath: `/images/items/gem/${id}.png`,
+    imagePath: `./images/items/gem/${id}.png`,
   };
 }
 
@@ -221,7 +221,7 @@ export function createSpecialItem(config: {
     equippable: false,
     goldValue: 0,
     magicStoneValue: 0,
-    imagePath: `/images/items/special/${id}.png`,
+    imagePath: `./images/items/special/${id}.png`,
   };
 }
 

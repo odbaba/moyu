@@ -31,7 +31,7 @@ const calculateDistance = (
 };
 
 // 基础动画时间（毫秒）
-const BASE_ANIMATION_DURATION = 200;
+const BASE_ANIMATION_DURATION = 250;
 
 const LocalMap: React.FC<LocalMapProps> = ({ currentLocation, onMove, isAutoMoving }) => {
   const currentLoc = locations.find(loc => loc.id === currentLocation);
