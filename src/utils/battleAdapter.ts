@@ -118,7 +118,7 @@ export function characterToBattleCharacter(
     gridPosition: gridPosition
   };
 
-  // 使用统一的战斗力计算函数（包含幻兽战斗力加成和斗志抑扬加成）
+  // 使用统一的战斗力计算函数（包含幻兽战斗力加成和斗志昂扬加成）
   battleCharacter.combatPower = calculateTotalCombatPower(characterData, pets, skills);
 
   return battleCharacter;

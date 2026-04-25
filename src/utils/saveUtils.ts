@@ -72,6 +72,8 @@ export interface SaveData {
   killedMonsters: string[];
   // 已刷新BOSS ID列表（序列化时 Set→Array）
   spawnedBosses: string[];
+  // 已刷新特殊怪物ID列表（序列化时 Set→Array，如蜘蛛、蜘蛛王后艾达）
+  spawnedSpecialMonsters: string[];
   // 日常任务状态
   dailyTaskState: DailyTaskState;
   // 地图挑战状态

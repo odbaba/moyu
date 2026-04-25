@@ -151,7 +151,7 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     baseDefense: 100,
     growthDefense: 33,
   },
-  // 蜘蛛：迷梦沼泽的特殊怪物，掉落技能书
+  // 蜘蛛：迷梦沼泽的特殊怪物，45级，23%每日刷新概率
   'zhizhu': {
     id: 'zhizhu',
     name: '蜘蛛',
@@ -169,6 +169,7 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     growthAttackMax: 82.5,
     baseDefense: 100,
     growthDefense: 49.5,
+    spawnChance: 23,
   },
 
   // ========== 冰宫怪物 ==========
@@ -269,7 +270,7 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     baseDefense: 300,
     growthDefense: 45,
   },
-  // 蜘蛛王后艾达：亚维特岛的特殊怪物，顶级掉落
+  // 蜘蛛王后艾达：亚维特岛的特殊怪物，80级，33%每日刷新概率
   'zhizhu-wanghou-aida': {
     id: 'zhizhu-wanghou-aida',
     name: '蜘蛛王后艾达',
@@ -287,19 +288,19 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     growthAttackMax: 132,
     baseDefense: 300,
     growthDefense: 67.5,
+    spawnChance: 33,
   },
-
-  // ========== 火山怪物 ==========
-  // 蝎怪：火山的基础怪物
-  'xieguai': {
-    id: 'xieguai',
-    name: '蝎怪',
+  // 刺虫人：亚维特岛的高级怪物，85级
+  // 属性来源：reference/scripts/frame_19/PlaceObject2_1074_59/CLIPACTIONRECORD onClipEvent(load).as
+  'ci-chong-ren': {
+    id: 'ci-chong-ren',
+    name: '刺虫人',
     type: 'normal',
     level: 85,
     combatPower: 85,
-    location: 'huoshan',
-    icon: '🦂',
-    description: '火山的常见怪物，尾部有剧毒。',
+    location: 'yaweite-dao',
+    icon: '🐛',
+    description: '亚维特岛的高级怪物，行动诡秘。',
     baseHp: 1000,
     growthHp: 300,
     baseAttackMin: 300,
@@ -309,7 +310,30 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     baseDefense: 300,
     growthDefense: 45,
   },
-  // 四牙怪：火山的中级怪物
+
+  // ========== 火山怪物 ==========
+  // 蝎怪：火山的高级怪物，100级，特殊属性（高防御）
+  // 属性来源：reference/docs/project_docs/04_怪物系统.md
+  'xieguai': {
+    id: 'xieguai',
+    name: '蝎怪',
+    type: 'normal',
+    level: 100,
+    combatPower: 100,
+    location: 'huoshan',
+    icon: '🦂',
+    description: '火山的强力怪物，尾部有剧毒，防御力极高。',
+    baseHp: 1000,
+    growthHp: 300,
+    baseAttackMin: 300,
+    growthAttackMin: 75,
+    baseAttackMax: 300,
+    growthAttackMax: 132,
+    baseDefense: 4500,
+    growthDefense: 67.5,
+  },
+  // 四牙怪：火山的基础怪物，90级
+  // 属性来源：reference/docs/project_docs/04_怪物系统.md
   'siya-guai': {
     id: 'siya-guai',
     name: '四牙怪',
@@ -318,7 +342,7 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     combatPower: 90,
     location: 'huoshan',
     icon: '🦷',
-    description: '火山的中级怪物，四颗獠牙锋利无比。',
+    description: '火山的常见怪物，四颗獠牙锋利无比。',
     baseHp: 1000,
     growthHp: 300,
     baseAttackMin: 300,
@@ -328,7 +352,8 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     baseDefense: 300,
     growthDefense: 45,
   },
-  // 炎女：火山的高级怪物
+  // 炎女：火山的中级怪物，95级
+  // 属性来源：reference/docs/project_docs/04_怪物系统.md
   'yannu': {
     id: 'yannu',
     name: '炎女',
@@ -337,7 +362,7 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     combatPower: 95,
     location: 'huoshan',
     icon: '🔥',
-    description: '火山的强力怪物，掌控火焰之力。',
+    description: '火山的中级怪物，掌控火焰之力。',
     baseHp: 1000,
     growthHp: 300,
     baseAttackMin: 300,
@@ -349,16 +374,17 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
   },
 
   // ========== 深渊迷宫怪物 ==========
-  // 暗黑格拉斯：深渊迷宫的基础怪物
-  'anhei-gelasi': {
-    id: 'anhei-gelasi',
-    name: '暗黑格拉斯',
+  // 暗黑弥塞亚：深渊迷宫的基础怪物，110级
+  // 属性来源：reference/docs/project_docs/04_怪物系统.md
+  'anhei-misaiya': {
+    id: 'anhei-misaiya',
+    name: '暗黑弥塞亚',
     type: 'normal',
-    level: 100,
-    combatPower: 100,
+    level: 110,
+    combatPower: 110,
     location: 'shenyuan-migong',
-    icon: '🌑',
-    description: '深渊迷宫的常见怪物，黑暗力量的化身。',
+    icon: '😈',
+    description: '深渊迷宫的常见怪物，黑暗的使者。',
     baseHp: 1000,
     growthHp: 300,
     baseAttackMin: 300,
@@ -368,35 +394,37 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     baseDefense: 300,
     growthDefense: 45,
   },
-  // 叹息骑士：深渊迷宫的中级怪物
-  'tanxi-qishi': {
-    id: 'tanxi-qishi',
-    name: '叹息骑士',
-    type: 'normal',
-    level: 110,
-    combatPower: 110,
-    location: 'shenyuan-migong',
-    icon: '🗡️',
-    description: '深渊迷宫的中级怪物，永远在叹息。',
-    baseHp: 10000,
-    growthHp: 400,
-    baseAttackMin: 500,
-    growthAttackMin: 75,
-    baseAttackMax: 500,
-    growthAttackMax: 112,
-    baseDefense: 500,
-    growthDefense: 64,
-  },
-  // 暗黑弥塞亚：深渊迷宫的高级怪物
-  'anhei-misaiya': {
-    id: 'anhei-misaiya',
-    name: '暗黑弥塞亚',
+  // 暗黑格拉斯：深渊迷宫的中级怪物，120级
+  // 属性来源：reference/docs/project_docs/04_怪物系统.md
+  'anhei-gelasi': {
+    id: 'anhei-gelasi',
+    name: '暗黑格拉斯',
     type: 'normal',
     level: 120,
     combatPower: 120,
     location: 'shenyuan-migong',
-    icon: '😈',
-    description: '深渊迷宫的强力怪物，黑暗的使者。',
+    icon: '🌑',
+    description: '深渊迷宫的中级怪物，黑暗力量的化身。',
+    baseHp: 1000,
+    growthHp: 300,
+    baseAttackMin: 300,
+    growthAttackMin: 50,
+    baseAttackMax: 300,
+    growthAttackMax: 88,
+    baseDefense: 300,
+    growthDefense: 45,
+  },
+  // 叹息骑士：深渊迷宫的高级怪物，130级，高属性
+  // 属性来源：reference/docs/project_docs/04_怪物系统.md
+  'tanxi-qishi': {
+    id: 'tanxi-qishi',
+    name: '叹息骑士',
+    type: 'normal',
+    level: 130,
+    combatPower: 130,
+    location: 'shenyuan-migong',
+    icon: '🗡️',
+    description: '深渊迷宫的强力怪物，永远在叹息。',
     baseHp: 10000,
     growthHp: 400,
     baseAttackMin: 500,
@@ -856,13 +884,13 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     isSpawned: true,
     interactableId: 'interact-mimeng-wangchimoren',
   },
-  // 蜘蛛（特殊怪物）
+  // 蜘蛛（特殊怪物，23%每日刷新概率）
   {
     id: 'spawn-mimeng-zhizhu',
     templateId: 'zhizhu',
     location: 'mimeng-zhaozhe',
     spawnVariable: 'mimeng_zhizhu',
-    isSpawned: true,
+    isSpawned: false,
     interactableId: 'interact-mimeng-zhizhu',
   },
   // 随机怪物（角蜥）
@@ -941,14 +969,23 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     isSpawned: true,
     interactableId: 'interact-yaweite-jufuguai',
   },
-  // 蜘蛛王后艾达（特殊怪物）
+  // 蜘蛛王后艾达（特殊怪物，33%每日刷新概率）
   {
     id: 'spawn-yaweite-zhizhuwanghou',
     templateId: 'zhizhu-wanghou-aida',
     location: 'yaweite-dao',
     spawnVariable: 'yaweite_zhizhuwanghou',
-    isSpawned: true,
+    isSpawned: false,
     interactableId: 'interact-yaweite-zhizhuwanghou',
+  },
+  // 刺虫人
+  {
+    id: 'spawn-yaweite-cichongren',
+    templateId: 'ci-chong-ren',
+    location: 'yaweite-dao',
+    spawnVariable: 'yaweite_cichongren',
+    isSpawned: true,
+    interactableId: 'interact-yaweite-cichongren',
   },
 
   // ========== 火山怪物刷新配置（5个怪物按钮）==========

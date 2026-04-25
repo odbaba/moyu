@@ -79,7 +79,7 @@ export const calculateTotalSkillDamage = (
 };
 
 /**
- * 获取战斗力加成（来自斗志抑扬技能）
+ * 获取战斗力加成（来自斗志昂扬技能）
  * @param skills 技能列表
  * @returns 战斗力加成百分比
  */
@@ -113,7 +113,7 @@ export const calculateActualBattlePower = (
  * @returns 是否可升级
  */
 export const canUpgradeSkill = (skill: SkillDetail): boolean => {
-  // 斗志抑扬可以升级到5级
+  // 斗志昂扬可以升级到5级
   if (skill.skillIndex === 4) {
     return skill.level < 5;
   }
@@ -130,7 +130,7 @@ export const canUpgradeSkill = (skill: SkillDetail): boolean => {
 export const getSkillUpgradeCost = (skill: SkillDetail): number => {
   if (!canUpgradeSkill(skill)) return 0;
 
-  // 斗志抑扬升级消耗递增
+  // 斗志昂扬升级消耗递增
   if (skill.skillIndex === 4) {
     const costs = [3000, 5000, 10000, 20000, 50000];
 

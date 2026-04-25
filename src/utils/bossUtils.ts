@@ -4,7 +4,8 @@
  */
 
 import { bossSpawnConfigs, bossTemplates } from '../data/bossData';
-import type { BossTemplate, EnemyData } from '../types';
+import { monsterSpawnConfigs, monsterTemplates } from '../data/monsterData';
+import type { BossTemplate, EnemyData, MonsterTemplate } from '../types';
 
 /**
  * 刷新结果接口
@@ -12,6 +13,15 @@ import type { BossTemplate, EnemyData } from '../types';
  */
 export interface BossSpawnResult {
   bossId: string; // BOSS 模板 ID
+  interactableId: string; // 交互对象 ID
+  message: string; // 刷新消息
+}
+
+/**
+ * 特殊怪物刷新结果接口
+ */
+export interface SpecialMonsterSpawnResult {
+  monsterId: string; // 怪物模板 ID
   interactableId: string; // 交互对象 ID
   message: string; // 刷新消息
 }
@@ -51,6 +61,45 @@ export function rollBossSpawns(): BossSpawnResult[] {
 
       results.push({
         bossId: bossTemplate.id,
+        interactableId: spawnConfig.interactableId,
+        message: message,
+      });
+    }
+  }
+
+  return results;
+}
+
+/**
+ * 执行所有特殊怪物的刷新判定
+ * 特殊怪物（如蜘蛛、蜘蛛王后艾达）有每日刷新概率
+ *
+ * @returns 刷新结果列表（包含刷新的怪物 ID 和消息）
+ */
+export function rollSpecialMonsterSpawns(): SpecialMonsterSpawnResult[] {
+  const results: SpecialMonsterSpawnResult[] = [];
+
+  // 遍历所有怪物刷新配置
+  for (const spawnConfig of monsterSpawnConfigs) {
+    // 获取怪物模板
+    const monsterTemplate = monsterTemplates[spawnConfig.templateId];
+    if (!monsterTemplate) {
+      console.warn(`怪物模板不存在: ${spawnConfig.templateId}`);
+      continue;
+    }
+
+    // 只处理有 spawnChance 的特殊怪物
+    if (monsterTemplate.type !== 'special' || !monsterTemplate.spawnChance) {
+      continue;
+    }
+
+    // 根据概率判定是否刷新
+    if (rollSpawn(monsterTemplate.spawnChance)) {
+      // 生成刷新消息
+      const message = `【特殊怪物出现】${monsterTemplate.name} 出现了！`;
+
+      results.push({
+        monsterId: monsterTemplate.id,
         interactableId: spawnConfig.interactableId,
         message: message,
       });

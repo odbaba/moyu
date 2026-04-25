@@ -107,9 +107,9 @@ export const pkMatchRewards: PKMatchReward[] = [
     group: 'level130',
     magicStone: 82800,
     exp: 250000,
-    skillBook: '高级斗志抑扬',
+    skillBook: '高级斗志昂扬',
     specialItems: ['月光宝盒增强版', '电浆药水', '999朵白玫瑰'],
-    description: '82,800魔石、250,000经验、高级斗志抑扬、月光宝盒增强版、电浆药水、999朵白玫瑰',
+    description: '82,800魔石、250,000经验、高级斗志昂扬、月光宝盒增强版、电浆药水、999朵白玫瑰',
   },
 ];
 

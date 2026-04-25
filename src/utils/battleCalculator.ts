@@ -415,7 +415,7 @@ export function executeBuffSkill(
   const buff: Buff = {
     id: `buff_${skill.id}_${Date.now()}`,
     name: skill.name,
-    type: 'combat_power' as BuffType, // 斗志抑扬类型
+    type: 'combat_power' as BuffType, // 斗志昂扬类型
     value: skill.battlePowerBonus,
     duration: skill.buffDuration,
     source: skill.id

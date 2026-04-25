@@ -104,7 +104,7 @@ export const locations: LocationData = [
     name: '雷鸣大陆',
     description: '雷鸣大陆是亚特大陆的核心区域，连接各方势力交汇之地。',
     adjacentLocations: ['leiming-kuangdong', 'kasanuocheng'],
-    // 雷鸣大陆：3个怪物按钮（龙怪x1、巨杰士x2）+ 功能 NPC（日常任务官、地图占领赛报名官、宝石合成师、幻兽研究所、2008奥运使者）
+    // 雷鸣大陆：3个怪物按钮（龙怪x1、巨杰士x2）+ 功能 NPC（日常任务官、地图占领赛报名官、宝石合成师、幻兽研究所）
     interactables: [
       'interact-leiming-longguai',
       'interact-leiming-jujieshi-1',
@@ -112,8 +112,7 @@ export const locations: LocationData = [
       'npc_daily_task',
       'npc_map_challenge',
       'npc_gem_synthesizer',
-      'npc_pet_institute',
-      'npc_olympic_envoy'
+      'npc_pet_institute'
     ],
     x: 1,
     y: 1
@@ -133,12 +132,13 @@ export const locations: LocationData = [
     name: '亚维特岛',
     description: '亚维特岛是一座神秘的岛屿，充满了未知的宝藏。',
     adjacentLocations: ['kasanuocheng', 'binggong', 'huoshan'],
-    // 亚维特岛：4个怪物按钮（鱼妖、恐兽、巨斧怪、蜘蛛王后艾达）+ 地图占领赛报名官
+    // 亚维特岛：5个怪物按钮（鱼妖、恐兽、巨斧怪、蜘蛛王后艾达、刺虫人）+ 地图占领赛报名官
     interactables: [
       'interact-yaweite-yuyao',
       'interact-yaweite-kongshou',
       'interact-yaweite-jufuguai',
       'interact-yaweite-zhizhuwanghou',
+      'interact-yaweite-cichongren',
       'npc_map_challenge_yaweite_dao'
     ],
     x: 3,

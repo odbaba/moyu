@@ -307,7 +307,7 @@ const Battle: React.FC<BattleProps> = ({
         attackMin: totalAttributes.attackMin, // 使用总最小攻击力
         attackMax: totalAttributes.attackMax, // 使用总最大攻击力
         defense: totalAttributes.defense, // 使用总防御力
-        combatPower: calculateTotalCombatPower(playerData, deployedPets, playerSkills), // 使用完整的战斗力计算（包含斗志抑扬加成）
+        combatPower: calculateTotalCombatPower(playerData, deployedPets, playerSkills), // 使用完整的战斗力计算（包含斗志昂扬加成）
         dodgeRate: totalAttributes.dodgeRate, // 使用总闪避率
         // 如果升级了，恢复满血；否则保持当前HP
         currentHp: playerLeveledUp ? totalAttributes.maxHp : prev.player.currentHp,

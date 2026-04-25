@@ -62,9 +62,9 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
   magicStones,
   onUpdateMagicStones
 }) => {
-  // 收藏架格子状态（12个格子，4列×3行）
+  // 收藏架格子状态（8个格子，4列×2行）
   const [collectorSlots, setCollectorSlots] = useState<CollectorSlot[]>(
-    Array.from({ length: 12 }, (_, index) => ({ index, item: null }))
+    Array.from({ length: 8 }, (_, index) => ({ index, item: null }))
   );
 
   // 提示消息状态
@@ -286,7 +286,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
     onUpdateMagicStones(magicStones + totalValue);
 
     // 清空收藏架
-    setCollectorSlots(Array.from({ length: 12 }, (_, index) => ({ index, item: null })));
+    setCollectorSlots(Array.from({ length: 8 }, (_, index) => ({ index, item: null })));
 
     setMessage(`出售成功！获得 ${formatMagicStoneValue(totalValue)} 魔石`);
     setTimeout(() => setMessage(''), 3000);

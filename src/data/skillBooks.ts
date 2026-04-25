@@ -103,13 +103,13 @@ export const skillBookItems: InventoryItem[] = [
     isUpgrade: true
   },
 
-  // 斗志抑扬技能书（可升级5级）
+  // 斗志昂扬技能书（可升级5级）
   {
     id: 'skillbook_fighting_spirit_1',
-    name: '斗志抑扬技能书',
+    name: '斗志昂扬技能书',
     icon: '📖',
     type: 'skillBook',
-    description: '学习斗志抑扬技能，提升战斗力5%。',
+    description: '学习斗志昂扬技能，提升战斗力5%。',
     quantity: 1,
     quality: 3,
     price: 3000,
@@ -120,10 +120,10 @@ export const skillBookItems: InventoryItem[] = [
   },
   {
     id: 'skillbook_fighting_spirit_2',
-    name: '斗志抑扬进阶卷轴',
+    name: '斗志昂扬进阶卷轴',
     icon: '📜',
     type: 'skillBook',
-    description: '将斗志抑扬升级至Lv.2，战斗力加成提升至10%。',
+    description: '将斗志昂扬升级至Lv.2，战斗力加成提升至10%。',
     quantity: 1,
     quality: 3,
     price: 5000,
@@ -135,10 +135,10 @@ export const skillBookItems: InventoryItem[] = [
   },
   {
     id: 'skillbook_fighting_spirit_3',
-    name: '斗志抑扬精修卷轴',
+    name: '斗志昂扬精修卷轴',
     icon: '📜',
     type: 'skillBook',
-    description: '将斗志抑扬升级至Lv.3，战斗力加成提升至20%。',
+    description: '将斗志昂扬升级至Lv.3，战斗力加成提升至20%。',
     quantity: 1,
     quality: 4,
     price: 10000,
@@ -150,10 +150,10 @@ export const skillBookItems: InventoryItem[] = [
   },
   {
     id: 'skillbook_fighting_spirit_4',
-    name: '斗志抑扬大师卷轴',
+    name: '斗志昂扬大师卷轴',
     icon: '📜',
     type: 'skillBook',
-    description: '将斗志抑扬升级至Lv.4，战斗力加成提升至35%。',
+    description: '将斗志昂扬升级至Lv.4，战斗力加成提升至35%。',
     quantity: 1,
     quality: 4,
     price: 20000,
@@ -165,10 +165,10 @@ export const skillBookItems: InventoryItem[] = [
   },
   {
     id: 'skillbook_fighting_spirit_5',
-    name: '斗志抑扬宗师卷轴',
+    name: '斗志昂扬宗师卷轴',
     icon: '📜',
     type: 'skillBook',
-    description: '将斗志抑扬升级至最高等级Lv.5，战斗力加成提升至50%。',
+    description: '将斗志昂扬升级至最高等级Lv.5，战斗力加成提升至50%。',
     quantity: 1,
     quality: 5,
     price: 50000,

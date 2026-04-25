@@ -4,9 +4,9 @@ import { getQualityValue } from './attributeCalculator';
 import { calculateGemCombatPower } from './equipmentConverter';
 
 /**
- * 计算斗志抑扬战斗力加成比例
- * 根据斗志抑扬等级返回战斗力加成比例
- * @param skillLevel 斗志抑扬技能等级
+ * 计算斗志昂扬战斗力加成比例
+ * 根据斗志昂扬等级返回战斗力加成比例
+ * @param skillLevel 斗志昂扬技能等级
  * @returns 战斗力加成比例（0-0.5）
  */
 export function getFightingSpiritBonus(skillLevel: number): number {
@@ -28,10 +28,10 @@ export function getFightingSpiritBonus(skillLevel: number): number {
 }
 
 /**
- * 计算斗志抑扬战斗力加成
+ * 计算斗志昂扬战斗力加成
  * @param baseCombatPower 基础战斗力
- * @param skillLevel 斗志抑扬技能等级
- * @returns 斗志抑扬加成的战斗力
+ * @param skillLevel 斗志昂扬技能等级
+ * @returns 斗志昂扬加成的战斗力
  */
 export function calculateFightingSpiritCombatPower(baseCombatPower: number, skillLevel: number): number {
   const bonus = getFightingSpiritBonus(skillLevel);
@@ -437,7 +437,7 @@ export function calculateTotalCombatPower(character: CharacterData, pets?: Pet[]
   // 计算幻兽战斗力贡献
   const petsPower = pets ? calculateAllPetsCombatPower(pets) : 0;
 
-  // 计算基础战斗力（不含斗志抑扬加成和战魂套装加成）
+  // 计算基础战斗力（不含斗志昂扬加成和战魂套装加成）
   const baseCombatPower = levelPower + equipmentBasePower + equipmentQualityPower + holeCountPower + gemPower + militaryRankPower + titlePower + fullSetMagicSoulBonus + soulPower + petsPower;
 
   // 计算战魂套装战斗力加成（基于基础战斗力）
@@ -446,7 +446,7 @@ export function calculateTotalCombatPower(character: CharacterData, pets?: Pet[]
   // 计算包含战魂套装加成的基础战斗力
   const baseCombatPowerWithWarSoulSet = baseCombatPower + warSoulSetBonus;
 
-  // 计算斗志抑扬加成（基于包含战魂套装加成的基础战斗力）
+  // 计算斗志昂扬加成（基于包含战魂套装加成的基础战斗力）
   let fightingSpiritPower = 0;
   if (skills) {
     const fightingSpiritSkill = skills.find(s => s.id === 'skill_fighting_spirit');

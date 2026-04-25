@@ -116,11 +116,11 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     isLearned: isLearned
   },
 
-  // 索引4: 斗志抑扬 - 被动技能，战斗力加成5%-50%，可升级到5级
+  // 索引4: 斗志昂扬 - 被动技能，战斗力加成5%-50%，可升级到5级
   {
     id: 'skill_fighting_spirit',
     skillIndex: 4 as SkillIndex,
-    name: '斗志抑扬',
+    name: '斗志昂扬',
     icon: '🔥',
     type: 'passive',
     attackType: 'buff',
@@ -178,13 +178,13 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
  * @returns 技能名称
  */
 export const getSkillDisplayName = (skill: SkillDetail): string => {
-  // 斗志抑扬特殊处理，显示等级
+  // 斗志昂扬特殊处理，显示等级
   if (skill.skillIndex === 4) {
     if (skill.level === 0) {
-      return '斗志抑扬（未学习）';
+      return '斗志昂扬（未学习）';
     }
 
-    return `斗志抑扬 Lv.${skill.level}`;
+    return `斗志昂扬 Lv.${skill.level}`;
   }
 
   // 爱的力量特殊处理，显示等级
@@ -220,7 +220,7 @@ export const getSkillDisplayName = (skill: SkillDetail): string => {
 };
 
 /**
- * 获取斗志抑扬的战斗力加成百分比
+ * 获取斗志昂扬的战斗力加成百分比
  * @param level 技能等级（0-5）
  * @returns 战斗力加成百分比
  */
@@ -261,7 +261,7 @@ export const getSkillDamagePercent = (skill: SkillDetail): number => {
     return 100;
   }
 
-  // 其他技能（斗志抑扬、爱的力量）返回基础伤害
+  // 其他技能（斗志昂扬、爱的力量）返回基础伤害
   return skill.effect.damagePercent || 0;
 };
 
@@ -292,7 +292,7 @@ export const exampleSkills = createInitialSkills(true);
  * @returns 升级消耗金币
  */
 export const getSkillUpgradeCost = (skill: SkillDetail): number => {
-  // 斗志抑扬升级消耗递增
+  // 斗志昂扬升级消耗递增
   if (skill.skillIndex === 4) {
     const costs = [3000, 5000, 10000, 20000, 50000];
 

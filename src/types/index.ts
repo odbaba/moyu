@@ -924,6 +924,7 @@ export interface MonsterTemplate {
   // 可选属性
   skillIds?: string[]; // 可用技能ID列表
   drops?: MonsterDrop[]; // 掉落物品配置
+  spawnChance?: number; // 每日刷新概率（0-100），用于特殊怪物
 }
 
 /**

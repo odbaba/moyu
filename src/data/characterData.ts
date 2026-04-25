@@ -191,7 +191,7 @@ const playerCharacter: CharacterData = {
 // 导出示例角色数据（计算战斗力）
 export const exampleCharacter: CharacterData = {
   ...playerCharacter,
-  // 使用完整的战斗力计算函数，包含幻兽战斗力加成和斗志抑扬加成
+  // 使用完整的战斗力计算函数，包含幻兽战斗力加成和斗志昂扬加成
   combatPower: calculateTotalCombatPower(playerCharacter, examplePets, [])
 };
 

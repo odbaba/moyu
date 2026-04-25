@@ -676,22 +676,22 @@ const gaoJiFeiTianLianZhan: SkillBookItem = {
 };
 
 /**
- * 斗志抑扬 - 战斗力加成
+ * 斗志昂扬 - 战斗力加成
  */
 const douZhiYiYang: SkillBookItem = {
   id: 'skillbook_douzhiyiyang',
-  name: '斗志抑扬',
+  name: '斗志昂扬',
   icon: '📔',
   quantity: 1,
   type: 'skillBook',
   rarity: 'epic',
   source: '蜘蛛掉落',
-  description: '记载着斗志抑扬技能的秘籍，学习后可提升战斗力。',
+  description: '记载着斗志昂扬技能的秘籍，学习后可提升战斗力。',
   maxStack: 1,
   usable: true,
   equippable: false,
   skillId: 'skill_fighting_spirit',
-  skillName: '斗志抑扬',
+  skillName: '斗志昂扬',
   skillType: 'buff',
   skillEffect: '提升战斗力',
   goldValue: 28000000,
@@ -701,22 +701,22 @@ const douZhiYiYang: SkillBookItem = {
 };
 
 /**
- * 高级斗志抑扬 - 斗志抑扬升级版
+ * 高级斗志昂扬 - 斗志昂扬升级版
  */
 const gaoJiDouZhiYiYang: SkillBookItem = {
   id: 'skillbook_gaojidouzhiyiyang',
-  name: '高级斗志抑扬',
+  name: '高级斗志昂扬',
   icon: '📓',
   quantity: 1,
   type: 'skillBook',
   rarity: 'legendary',
   source: '蜘蛛王后艾达、PK赛奖励',
-  description: '记载着高级斗志抑扬技能的秘籍，是斗志抑扬的升级版，大幅提升战斗力。',
+  description: '记载着高级斗志昂扬技能的秘籍，是斗志昂扬的升级版，大幅提升战斗力。',
   maxStack: 1,
   usable: true,
   equippable: false,
   skillId: 'skill_fighting_spirit',
-  skillName: '高级斗志抑扬',
+  skillName: '高级斗志昂扬',
   skillType: 'buff',
   skillEffect: '大幅提升战斗力',
   goldValue: 82800000,

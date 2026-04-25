@@ -36,7 +36,7 @@ interface CharacterPageProps {
    */
   pets?: Pet[];
   /**
-   * 技能列表，用于计算斗志抑扬加成
+   * 技能列表，用于计算斗志昂扬加成
    */
   skills?: SkillDetail[];
   /**

@@ -76,7 +76,7 @@ const LEGENDARY_PRIZES = [
   { id: 'nianzhu_pet', name: '年猪幻兽', type: 'pet', petType: '年猪' as PetType },
   { id: 'moon_box_enhanced', name: '月光宝盒增强版', type: 'item' },
   { id: 'plasma_potion', name: '电浆药水', type: 'item' },
-  { id: 'high_spirit_scroll', name: '高级斗志抑扬', type: 'item' },
+  { id: 'high_spirit_scroll', name: '高级斗志昂扬', type: 'item' },
   { id: 'rose_999', name: '999朵白玫瑰', type: 'item' },
   { id: 'legendary_equipment', name: '精品装备', type: 'equipment' },
 ];
@@ -91,7 +91,7 @@ const HIGH_PRIZES = [
   { id: 'saint_angel_pet', name: '圣天使幻兽', type: 'pet', petType: '圣天使' as PetType },
   { id: 'epic_equipment', name: '精品装备', type: 'equipment' },
   { id: 'flying_slash_skill', name: '飞天连斩(2/7)', type: 'item' },
-  { id: 'spirit_scroll', name: '斗志抑扬', type: 'item' },
+  { id: 'spirit_scroll', name: '斗志昂扬', type: 'item' },
   { id: 'high_star_sword', name: '高级星魔剑', type: 'item' },
   { id: 'soul_king', name: '灵魂王', type: 'item' },
   { id: 'epic_equipment_2', name: '精品装备', type: 'equipment' },

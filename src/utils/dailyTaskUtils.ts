@@ -292,7 +292,7 @@ export function getPKTaskDescription(): string {
   lines.push('PK赛奖励：');
   lines.push('  60级组：高级飞天连斩、大量经验、魔石');
   lines.push('  100级组：高级飞天连斩、大量经验、魔石、月光宝盒加强版');
-  lines.push('  100级以上组：高级斗志抑扬、大量经验、魔石、月光宝盒加强版、电浆药水、999朵白玫瑰');
+  lines.push('  100级以上组：高级斗志昂扬、大量经验、魔石、月光宝盒加强版、电浆药水、999朵白玫瑰');
   lines.push('');
   lines.push('注意事项：');
   lines.push('  - PK赛只在周六开放');

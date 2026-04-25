@@ -61,7 +61,7 @@ import { createInitialSkills, getSkillUpgradeCost } from './data/skillData';
 import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, DailyTaskState, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, MapChallengeState, NPCInteractable, Pet, PetInstituteState, PlayerResources, PrincessRelationship, RefineResult, SkillDetail, TimeSystem } from './types';
 import { gainCharacterExperience } from './utils/attributeCalculator';
 // 导入 BOSS 工具函数
-import { rollBossSpawns } from './utils/bossUtils';
+import { rollBossSpawns, rollSpecialMonsterSpawns } from './utils/bossUtils';
 import { calculatePetMergeBonus, calculateTotalCombatPower } from './utils/combatPower';
 // 导入日常任务状态管理工具函数
 import { completeTask, createInitialDailyTaskState, resetDailyTaskState } from './utils/dailyTaskStateUtils';
@@ -207,6 +207,9 @@ function App() {
 
   // 已刷新的 BOSS 交互ID列表（每日重新随机刷新）
   const [spawnedBosses, setSpawnedBosses] = useState<Set<string>>(new Set());
+
+  // 已刷新的特殊怪物交互ID列表（每日重新随机刷新，如蜘蛛、蜘蛛王后艾达）
+  const [spawnedSpecialMonsters, setSpawnedSpecialMonsters] = useState<Set<string>>(new Set());
 
   // NPC模态窗口状态
   const [showNPCModal, setShowNPCModal] = useState(false);
@@ -400,6 +403,8 @@ function App() {
       // 恢复已击杀怪物和已刷新BOSS（Array→Set）
       setKilledMonsters(new Set(savedData.killedMonsters ?? []));
       setSpawnedBosses(new Set(savedData.spawnedBosses ?? []));
+      // 恢复已刷新的特殊怪物（Array→Set）
+      setSpawnedSpecialMonsters(new Set(savedData.spawnedSpecialMonsters ?? []));
       // 恢复日常任务状态
       setDailyTaskState(savedData.dailyTaskState ?? createInitialDailyTaskState());
       // 恢复地图挑战状态
@@ -441,6 +446,7 @@ function App() {
   // 商店页面状态
   const [showShopPage, setShowShopPage] = useState(false);
   const [currentShopType, setCurrentShopType] = useState<'gold' | 'magicStone'>('gold');
+  const [shopInitialMode, setShopInitialMode] = useState<'buy' | 'sell'>('buy');
 
   // 装备精炼界面状态
   const [showRefineModal, setShowRefineModal] = useState(false);
@@ -593,6 +599,7 @@ function App() {
       warSoulSystemEnabled,
       killedMonsters: Array.from(killedMonsters),
       spawnedBosses: Array.from(spawnedBosses),
+      spawnedSpecialMonsters: Array.from(spawnedSpecialMonsters),
       dailyTaskState: _dailyTaskState,
       mapChallengeState,
       hasParticipatedPKToday,
@@ -615,7 +622,7 @@ function App() {
     inventory, pets, skills, militaryRank, battleExp, hasClaimedMilitaryPay,
     nobleRank, princessRelationship, isKingRescued, explorerUnlocked,
     mysteriousPersonTriggered, wumingshiDefeated, warSoulSystemEnabled,
-    killedMonsters, spawnedBosses, _dailyTaskState, mapChallengeState,
+    killedMonsters, spawnedBosses, spawnedSpecialMonsters, _dailyTaskState, mapChallengeState,
     hasParticipatedPKToday, maid1DailyPurchaseCount, hasPurchasedYearPig,
     hasUsedDianJiangYaoShuiToday, petInstituteState,
   ]);
@@ -638,6 +645,17 @@ function App() {
     if (bossSpawnResults.length > 0) {
       const bossMessages = bossSpawnResults.map(result => result.message);
       setInteractionLog(logs => [...logs, ...bossMessages]);
+    }
+
+    // 第一天随机刷新特殊怪物（蜘蛛、蜘蛛王后艾达）
+    const specialMonsterSpawnResults = rollSpecialMonsterSpawns();
+    const newSpawnedSpecialMonsterIds = specialMonsterSpawnResults.map(result => result.interactableId);
+    setSpawnedSpecialMonsters(new Set(newSpawnedSpecialMonsterIds));
+
+    // 将特殊怪物刷新消息添加到交互日志
+    if (specialMonsterSpawnResults.length > 0) {
+      const specialMonsterMessages = specialMonsterSpawnResults.map(result => result.message);
+      setInteractionLog(logs => [...logs, ...specialMonsterMessages]);
     }
   }, []); // 空依赖数组，只在组件挂载时执行一次
 
@@ -843,6 +861,17 @@ function App() {
       if (bossSpawnResults.length > 0) {
         const bossMessages = bossSpawnResults.map(result => result.message);
         setInteractionLog(logs => [...logs, ...bossMessages]);
+      }
+
+      // 新的一天随机刷新特殊怪物（蜘蛛、蜘蛛王后艾达）
+      const specialMonsterSpawnResults = rollSpecialMonsterSpawns();
+      const newSpawnedSpecialMonsterIds = specialMonsterSpawnResults.map(result => result.interactableId);
+      setSpawnedSpecialMonsters(new Set(newSpawnedSpecialMonsterIds));
+
+      // 将特殊怪物刷新消息添加到交互日志
+      if (specialMonsterSpawnResults.length > 0) {
+        const specialMonsterMessages = specialMonsterSpawnResults.map(result => result.message);
+        setInteractionLog(logs => [...logs, ...specialMonsterMessages]);
       }
 
       // 重置日常任务状态（对应参考文档的 nextday() 函数）
@@ -1497,23 +1526,23 @@ function App() {
           }));
           setInteractionLog(prev => [...prev, payResult.message]);
 
-          // 少将以上额外获得"高级斗志抑扬"
+          // 少将以上额外获得"高级斗志昂扬"
           if (payResult.specialReward) {
-            // 创建高级斗志抑扬物品并添加到背包
+            // 创建高级斗志昂扬物品并添加到背包
             const skillBook = {
               id: 'skillbook_gaojidouzhiyiyang',
-              name: '高级斗志抑扬',
+              name: '高级斗志昂扬',
               icon: '📓',
               quantity: 1,
               type: 'skillBook' as const,
               rarity: 'legendary' as const,
               source: '军饷奖励',
-              description: '记载着高级斗志抑扬技能的秘籍，是斗志抑扬的升级版，大幅提升战斗力。',
+              description: '记载着高级斗志昂扬技能的秘籍，是斗志昂扬的升级版，大幅提升战斗力。',
               maxStack: 1,
               usable: true,
               equippable: false,
               skillId: 'skill_gaojidouzhiyiyang',
-              skillName: '高级斗志抑扬',
+              skillName: '高级斗志昂扬',
               skillType: 'buff',
               skillEffect: '大幅提升战斗力',
               goldValue: 82800000,
@@ -2074,6 +2103,7 @@ function App() {
         if (actionParams?.shopType) {
           const shopType = actionParams.shopType as 'gold' | 'magicStone';
           setCurrentShopType(shopType);
+          setShopInitialMode('buy');
           setShowShopPage(true);
           setShowNPCModal(false); // 关闭NPC对话框
           setInteractionLog(prev => [...prev, result]);
@@ -2085,9 +2115,9 @@ function App() {
         if (actionParams?.shopType) {
           const shopType = actionParams.shopType as 'gold' | 'magicStone';
           setCurrentShopType(shopType);
+          setShopInitialMode('sell');
           setShowShopPage(true);
           setShowNPCModal(false); // 关闭NPC对话框
-          // TODO: 切换到出售模式
           setInteractionLog(prev => [...prev, result]);
         }
         break;
@@ -2257,21 +2287,13 @@ function App() {
         break;
 
       case 'improveProduction':
-        // 提高产量任务（周日开放）
+        // 提高产量任务（每周一次）
         if (petInstituteState.canDoProductionTask) {
           setShowPetInstituteModal(true);
           setShowNPCModal(false);
         } else {
-          setInteractionLog(prev => [...prev, '提高产量任务仅在周日开放！']);
+          setInteractionLog(prev => [...prev, '本周提高产量任务已完成！']);
         }
-        break;
-
-      case 'viewOlympicInfo':
-        // 查看奥运使者信息
-        const olympicInfo = '完成2008奥运任务后，幻兽研究所技术等级上限可提升至150级。';
-        setInteractionLog(prev => [...prev, olympicInfo]);
-        // 添加弹窗显示
-        showInfoModalWithContent('关于2008奥运使者', olympicInfo);
         break;
 
       // ========== 幻兽幻化 NPC 功能 ==========
@@ -3928,6 +3950,9 @@ function App() {
 
   // 获取当前位置的交互对象列表（过滤掉已击杀的怪物，添加已刷新的 BOSS）
   const currentInteractables = useMemo(() => {
+    // 特殊怪物交互ID列表（有每日刷新概率的特殊怪物）
+    const specialMonsterIds = ['interact-mimeng-zhizhu', 'interact-yaweite-zhizhuwanghou'];
+
     // 获取静态交互对象（怪物、NPC等）
     const staticInteractables = currentLoc?.interactables
       ?.map(id => interactableConfig[id])
@@ -3939,6 +3964,11 @@ function App() {
         }
         // 过滤掉已击杀的怪物
         if (killedMonsters.has(interactable.id)) {
+
+          return false;
+        }
+        // 过滤特殊怪物：只有刷新成功时才显示
+        if (specialMonsterIds.includes(interactable.id) && !spawnedSpecialMonsters.has(interactable.id)) {
 
           return false;
         }
@@ -4022,7 +4052,7 @@ function App() {
     }
 
     return [...staticInteractables, ...locationBossInteractables.filter(Boolean), ...dynamicInteractables] as (ActionInteractable | EnemyInteractable | NPCInteractable)[];
-  }, [currentLoc, killedMonsters, bossInteractables, spawnedBosses, currentLocation, explorerUnlocked, mysteriousPersonTriggered, wumingshiDefeated, character.level, isKingRescued]);
+  }, [currentLoc, killedMonsters, bossInteractables, spawnedBosses, spawnedSpecialMonsters, currentLocation, explorerUnlocked, mysteriousPersonTriggered, wumingshiDefeated, character.level, isKingRescued]);
 
   // 计算带幻兽合体加成的角色数据
   // 同时使用最新的装备槽位数据作为 equipment 字段
@@ -4247,6 +4277,7 @@ function App() {
               onPurchasePet={handlePurchasePet}
               onSell={handleSellItem}
               onClose={() => setShowShopPage(false)}
+              initialMode={shopInitialMode}
             />
           )}
 
@@ -4355,6 +4386,7 @@ function App() {
             state={petInstituteState}
             resources={playerResources}
             inventory={inventory}
+            petCount={pets.length}
             onClose={() => setShowPetInstituteModal(false)}
             onBuyPet={(pet, price) => {
               // 添加幻兽
@@ -4370,6 +4402,31 @@ function App() {
                 stock: prev.stock - 1
               }));
               setInteractionLog(prev => [...prev, `成功购买奇异兽！品质分：${pet.pz}，花费：${price} 魔石`]);
+            }}
+            onDonate={(magicStones, levelsGained, productionRateGained) => {
+              // 扣除魔石
+              setPlayerResources(prev => ({
+                ...prev,
+                magicStone: prev.magicStone - magicStones
+              }));
+              // 提升技术等级
+              setPetInstituteState(prev => {
+                const newTechLevel = Math.min(prev.techLevel + levelsGained, prev.techLevelMax);
+                // 如果生产量有增长（技术等级达到20级时自动+1）
+                const newProductionRate = productionRateGained > 0 && prev.productionRate === 0 
+                  ? prev.productionRate + productionRateGained 
+                  : prev.productionRate;
+                return {
+                  ...prev,
+                  techLevel: newTechLevel,
+                  productionRate: newProductionRate
+                };
+              });
+              // 日志提示
+              const logMsg = productionRateGained > 0 
+                ? `资助成功！技术等级 +${levelsGained}，生产量 +${productionRateGained}` 
+                : `资助成功！技术等级 +${levelsGained}`;
+              setInteractionLog(prev => [...prev, logMsg]);
             }}
             onImproveProduction={(expGained, vipGained, consumedSoulKings) => {
               // 消耗灵魂王
@@ -4416,14 +4473,14 @@ function App() {
                 setInteractionLog(prev => [...prev, `🐉 战中幻兽（${deployedCount}只）各获得了 ${bonusExp.toLocaleString()} 经验！`]);
               }
 
-              // 增加VIP等级
+              // 增加VIP等级和生产量
               setPetInstituteState(prev => ({
                 ...prev,
-                productionRate: Math.min(prev.productionRate + 1, 6),
+                productionRate: Math.min(prev.productionRate + 1, 5),
                 vipLevel: Math.min(prev.vipLevel + vipGained, 10),
                 canDoProductionTask: false
               }));
-              setInteractionLog(prev => [...prev, `完成提高产量任务！获得经验 ${bonusExp.toLocaleString()}，VIP星级 +${vipGained}`]);
+              setInteractionLog(prev => [...prev, `完成提高产量任务！生产量+1，获得经验 ${bonusExp.toLocaleString()}，VIP星级 +${vipGained}`]);
             }}
           />
 

@@ -134,6 +134,8 @@ interface ShopPageProps {
   onSell: (itemId: string, quantity: number, goldEarned: number, magicStoneEarned: number) => void;
   /** 关闭商店回调 */
   onClose: () => void;
+  /** 初始模式：buy或sell */
+  initialMode?: 'buy' | 'sell';
 }
 
 /**
@@ -151,12 +153,13 @@ const ShopPage: React.FC<ShopPageProps> = ({
   onPurchasePet,
   onSell,
   onClose,
+  initialMode = 'buy',
 }) => {
   // 商店配置
   const shopConfig = getShopConfig(shopType);
 
   // 当前模式：buy（购买）或 sell（出售）
-  const [mode, setMode] = useState<'buy' | 'sell'>('buy');
+  const [mode, setMode] = useState<'buy' | 'sell'>(initialMode);
 
   // 选中的物品
   const [selectedItem, setSelectedItem] = useState<ShopItem | InventoryItem | null>(null);

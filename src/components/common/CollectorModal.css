@@ -78,11 +78,11 @@
   border-radius: 6px;
 }
 
-/* 收藏架格子网格（4列×3行） */
+/* 收藏架格子网格（4列×2行） */
 .collector-slots-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   gap: 8px;
   margin-bottom: 15px;
   padding: 10px;
@@ -95,7 +95,7 @@
   background-color: #2a2a2a;
   border: 2px solid #444;
   border-radius: 8px;
-  min-height: 80px;
+  min-height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -163,8 +163,8 @@
 /* 背包物品区域 */
 .collector-inventory-area {
   flex: 1;
-  min-height: 120px;
-  max-height: 200px;
+  min-height: 200px;
+  max-height: 350px;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 8px;
   padding: 10px;
@@ -372,8 +372,8 @@
   }
 
   .collector-inventory-area {
-    min-height: 100px;
-    max-height: 150px;
+    min-height: 150px;
+    max-height: 250px;
     padding: 8px;
     margin-bottom: 12px;
   }
@@ -446,8 +446,8 @@
   }
 
   .collector-inventory-area {
-    min-height: 80px;
-    max-height: 120px;
+    min-height: 120px;
+    max-height: 200px;
     padding: 6px;
   }
 

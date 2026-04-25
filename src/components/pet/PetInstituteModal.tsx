@@ -1,6 +1,6 @@
 /**
  * 幻兽研究所界面组件
- * 提供购买奇异兽、查看信息、提高产量等功能
+ * 提供购买奇异兽、资助魔石、提高产量等功能
  * 参考文档：reference/docs/幻兽研究所交互逻辑文档.md
  */
 
@@ -16,9 +16,13 @@ import {
   calculatePrice,
   calculateStarLevel,
   canBuyPet,
+  canDonate,
   canImproveProduction,
+  donate,
+  formatTechLevel,
   getVipDiscountDescription,
   improveProduction,
+  MAX_PRODUCTION_RATE,
 } from '../../utils/petInstituteUtils';
 
 export interface PetInstituteModalProps {
@@ -26,8 +30,12 @@ export interface PetInstituteModalProps {
   state: PetInstituteState;
   resources: PlayerResources;
   inventory: InventoryItem[];
+  // 当前幻兽背包中的幻兽数量
+  petCount: number;
   onClose: () => void;
   onBuyPet: (pet: Pet, price: number) => void;
+  // 资助魔石回调：返回消耗的魔石数量、提升的技术等级、生产量增长
+  onDonate: (magicStones: number, levelsGained: number, productionRateGained: number) => void;
   onImproveProduction: (expGained: number, vipGained: number, consumedSoulKings: number) => void;
 }
 
@@ -36,11 +44,15 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
   state,
   resources,
   inventory,
+  petCount, // 当前幻兽数量
   onClose,
   onBuyPet,
+  onDonate,
   onImproveProduction,
 }) => {
   const [message, setMessage] = useState<string>('');
+  // 资助魔石数量输入
+  const [donateAmount, setDonateAmount] = useState<string>('100');
 
   // 计算当前品质分和价格
   const qualityScore = useMemo(() => calculatePetQuality(state.techLevel), [state.techLevel]);
@@ -60,8 +72,29 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
     [state, inventory]
   );
 
+  // 检查是否可以资助
+  const donateCheck = useMemo(() => {
+    const amount = parseInt(donateAmount) || 0;
+    return canDonate(state, amount);
+  }, [state, donateAmount]);
+
+  // 计算资助可提升的等级（每100魔石提升0.01级）
+  const donateLevelsPreview = useMemo(() => {
+    const amount = parseInt(donateAmount) || 0;
+
+    return (amount / 100 / 100).toFixed(2);
+  }, [donateAmount]);
+
   // 处理购买
   const handleBuy = () => {
+    // 检查幻兽背包是否已满（最大100只）
+    const MAX_PET_COUNT = 100;
+    if (petCount >= MAX_PET_COUNT) {
+      setMessage('幻兽背包已满，请先整理幻兽');
+
+      return;
+    }
+
     if (!buyCheck.canBuy) {
       setMessage(buyCheck.reason);
 
@@ -74,6 +107,33 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
       // 生成奇异兽
       const pet = generateStrangePet(result.qualityScore);
       onBuyPet(pet, result.price);
+      setMessage(result.message);
+    } else {
+      setMessage(result.message);
+    }
+  };
+
+  // 处理资助
+  const handleDonate = () => {
+    const amount = parseInt(donateAmount) || 0;
+
+    if (!donateCheck.canDonate) {
+      setMessage(donateCheck.reason);
+
+      return;
+    }
+
+    // 检查魔石是否足够
+    if (resources.magicStone < amount) {
+      setMessage('魔石不足');
+
+      return;
+    }
+
+    const result = donate(state, amount);
+
+    if (result.success) {
+      onDonate(amount, result.levelsGained, result.productionRateGained);
       setMessage(result.message);
     } else {
       setMessage(result.message);
@@ -117,7 +177,7 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
             <div className="info-grid">
               <div className="info-item">
                 <span className="info-label">技术等级</span>
-                <span className="info-value">{state.techLevel} / {state.techLevelMax}</span>
+                <span className="info-value">{formatTechLevel(state.techLevel)} / {formatTechLevel(state.techLevelMax)}</span>
               </div>
               <div className="info-item">
                 <span className="info-label">当前库存</span>
@@ -153,6 +213,35 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
             </div>
           </div>
 
+          {/* 资助区域 */}
+          <div className="donate-section">
+            <h3>资助魔石</h3>
+            <div className="donate-input-row">
+              <input
+                type="number"
+                value={donateAmount}
+                onChange={(e) => setDonateAmount(e.target.value)}
+                placeholder="输入魔石数量"
+                min="100"
+                step="100"
+                className="donate-input"
+              />
+              <button
+                className="action-button donate-button"
+                onClick={handleDonate}
+                disabled={!donateCheck.canDonate || resources.magicStone < (parseInt(donateAmount) || 0)}
+              >
+                资助
+              </button>
+            </div>
+            <div className="donate-info">
+              <p>每 100 魔石提升 0.01 级技术等级</p>
+              {parseInt(donateAmount) >= 100 && (
+                <p>可提升 {donateLevelsPreview} 级</p>
+              )}
+            </div>
+          </div>
+
           {/* 操作按钮 */}
           <div className="action-section">
             <button
@@ -173,11 +262,12 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
           </div>
 
           {/* 提高产量任务提示 */}
-          {state.canDoProductionTask && (
+          {state.canDoProductionTask && state.productionRate < MAX_PRODUCTION_RATE && (
             <div className="task-hint">
               <p>📋 提高产量任务已开放！</p>
               <p>所需灵魂王：{productionCheck.requiredSoulKings} 个</p>
               <p>经验奖励：{productionCheck.requiredSoulKings * 105000}</p>
+              <p>完成次数：{state.productionRate} / {MAX_PRODUCTION_RATE}</p>
             </div>
           )}
 

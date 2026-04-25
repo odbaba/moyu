@@ -149,7 +149,7 @@ const npc_marshal: NPCInteractable = {
   options: [
     {
       text: '领取军饷',
-      result: '领取本周军饷（魔石奖励）。\n少将以上额外获得"高级斗志抑扬"。',
+      result: '领取本周军饷（魔石奖励）。\n少将以上额外获得"高级斗志昂扬"。',
       actionType: 'receiveSalary',
       actionParams: { weeklyLimit: true },
     },
@@ -239,8 +239,8 @@ const npc_maid_1: NPCInteractable = {
   type: 'npc',
   name: '丫环',
   icon: '👘',
-  // 丫环1的描述：自小跟随公主，与公主有福共享
-  description: '我自小跟随公主，公主向来与我们有福共享...',
+  // 丫环1的描述：自小跟随公主，与公主有福共享，出售高级战斗力宝石
+  description: '我自小跟随公主，公主向来与我们有福共享，一在正是公主困难的时候，我一定会好好照看好公主的。\n听说有一位将军要卖一种很漂亮的宝石，叫高级战斗力宝石，听说是精练武器的宝物。他卖2,800魔石一个，如果你需要我帮你联系他吧。',
   location: 'houhuayuan',
   npcType: 'palace',
   options: [
@@ -277,8 +277,8 @@ const npc_maid_2: NPCInteractable = {
   type: 'npc',
   name: '丫环',
   icon: '👘',
-  // 丫环2的描述：公主的侍女，公主待她如同姐妹
-  description: '我是公主的侍女，公主平时代我如同姐妹一样亲...',
+  // 丫环2的描述：公主的侍女，公主待她如同姐妹，出售年猪幻兽
+  description: '我是公主的侍女，公主平时代我如同姐妹一样亲，无论发生什么事我都会陪着公主的。\n对了，上次国王赏给我一个很可爱的猪，它是一只叫年猪的幻兽，听说是极其稀有的。不知勇士能否用得上。',
   location: 'houhuayuan',
   npcType: 'palace',
   options: [
@@ -568,7 +568,7 @@ const npc_pk_match: NPCInteractable = {
   options: [
     {
       text: '查看奖品',
-      result: 'PK赛奖励：\n\n60级组：高级飞天连斩、大量经验、魔石\n\n100级组：高级飞天连斩、大量经验、魔石、月光宝盒加强版\n\n100级以上组：高级斗志抑扬、大量经验、魔石、月光宝盒加强版、电浆药水、999朵白玫瑰',
+      result: 'PK赛奖励：\n\n60级组：高级飞天连斩、大量经验、魔石\n\n100级组：高级飞天连斩、大量经验、魔石、月光宝盒加强版\n\n100级以上组：高级斗志昂扬、大量经验、魔石、月光宝盒加强版、电浆药水、999朵白玫瑰',
       actionType: 'showHelp',
       actionParams: { topic: 'pkReward' },
     },
@@ -812,52 +812,9 @@ const npc_pet_institute: NPCInteractable = {
       actionParams: {},
     },
     {
-      text: '提高产量任务（周日开放）',
+      text: '提高产量任务（每周一次）',
       result: '提交灵魂王提高产量，获得大量经验和VIP星级+1。\n\n所需灵魂王数量 = 当前产量 + 1\n经验奖励 = 105000 × (当前产量 + 1)',
       actionType: 'improveProduction',
-      actionParams: {},
-    },
-    {
-      text: '关于2008奥运使者',
-      result: '完成奥运任务后，幻兽研究所技术等级上限可提升至150级。',
-      actionType: 'viewOlympicInfo',
-      actionParams: {},
-    },
-  ],
-};
-
-// ==================== 特殊 NPC 配置 ====================
-
-/**
- * 2008奥运使者 NPC 配置
- * 功能：提供2008奥运活动任务
- * 位置：树心城（使用雷鸣大陆作为位置）
- */
-const npc_olympic_envoy: NPCInteractable = {
-  id: 'npc_olympic_envoy',
-  type: 'npc',
-  name: '2008奥运使者',
-  icon: '🏅',
-  description: '2008年北京奥运会的使者，带来了特殊的奥运任务。',
-  location: 'leiming-dalu',
-  npcType: 'special',
-  options: [
-    {
-      text: '接受奥运任务',
-      result: '帮助幻兽研究所打听幻兽培养技术。完成5个奥运项目任务，可以提升幻兽研究所技术等级上限。',
-      actionType: 'acceptOlympicTask',
-      actionParams: {},
-    },
-    {
-      text: '查看任务进度',
-      result: '查看当前奥运任务完成进度。',
-      actionType: 'viewOlympicProgress',
-      actionParams: {},
-    },
-    {
-      text: '离开',
-      result: '祝你在奥运任务中取得好成绩！',
-      actionType: 'close',
       actionParams: {},
     },
   ],
@@ -919,12 +876,6 @@ const npc_magic_stone_merchant: NPCInteractable = {
       result: '用魔石可以买到很多珍贵的东西哦！',
       actionType: 'openShop',
       actionParams: { shopType: 'magicStone' },
-    },
-    {
-      text: '出售物品',
-      result: '我不收物品，只卖东西哦。',
-      actionType: 'showMessage',
-      actionParams: { message: '魔石商人不收购物品。' },
     },
     {
       text: '离开',
@@ -1056,7 +1007,6 @@ export const npcConfig: Record<string, NPCInteractable> = {
   npc_magic_stone_merchant,
   npc_equipment_refiner,
   // 特殊 NPC
-  npc_olympic_envoy,
   npc_explorer_gebi,
   npc_mysterious_person,
 };
@@ -1080,7 +1030,7 @@ export const npcByType: Record<string, NPCInteractable[]> = {
     npc_map_challenge_binggong,
   ],
   shop: [npc_gem_synthesizer, npc_collector, npc_pet_institute, npc_grocery_merchant, npc_magic_stone_merchant, npc_equipment_refiner],
-  special: [npc_olympic_envoy, npc_explorer_gebi, npc_mysterious_person],
+  special: [npc_explorer_gebi, npc_mysterious_person],
 };
 
 /**
@@ -1091,7 +1041,7 @@ export const npcByLocation: Record<string, NPCInteractable[]> = {
   huanggong: [npc_king, npc_marshal, npc_prime_minister, npc_pk_match],
   // 后花园NPC：公主、丫环1（出售高级战斗力石）、丫环2（出售年猪）
   houhuayuan: [npc_princess, npc_maid_1, npc_maid_2],
-  'leiming-dalu': [npc_daily_task, npc_map_challenge, npc_gem_synthesizer, npc_pet_institute, npc_olympic_envoy],
+  'leiming-dalu': [npc_daily_task, npc_map_challenge, npc_gem_synthesizer, npc_pet_institute],
   kasanuocheng: [npc_lottery, npc_pet_fusion_master, npc_map_challenge_kasanuocheng, npc_collector, npc_grocery_merchant, npc_magic_stone_merchant, npc_equipment_refiner, npc_experience_mentor],
   'yaweite-dao': [npc_map_challenge_yaweite_dao],
   gebi: [npc_map_challenge_gebi, npc_explorer_gebi],

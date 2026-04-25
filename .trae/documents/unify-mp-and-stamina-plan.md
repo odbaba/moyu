@@ -9,7 +9,7 @@
    - `BattleCharacter` 同时有 `maxMp/currentMp` 和 `maxStamina/currentStamina`
 3. **技能消耗不一致**：
    - 攻击技能（风斩、裂地爆斩、星魔剑、飞天连斩）消耗 `stamina`
-   - 增益技能（斗志抑扬）消耗 `mp`
+   - 增益技能（斗志昂扬）消耗 `mp`
 4. **状态不同步**：战斗中 MP 被扣除，但战斗结束后不会同步到 `CharacterData`（因为 `CharacterData` 没有 MP 字段）
 5. **UI 显示问题**：战斗界面显示 MP 进度条，但实际消耗的是体力
 
@@ -50,7 +50,7 @@
 
 #### Step 2: 技能数据修改 (`data/skillData.ts`)
 
-1. **修改"斗志抑扬"技能**：
+1. **修改"斗志昂扬"技能**：
    - 将 `cost: { mp: 25 }` 改为 `cost: { stamina: 25 }`
    - 更新描述：将"消耗MP"改为"消耗体力"
 
@@ -131,7 +131,7 @@
 | 文件路径 | 修改内容 |
 |---------|---------|
 | `src/types/index.ts` | 移除 MP 相关字段 |
-| `src/data/skillData.ts` | 将斗志抑扬的 mp 消耗改为 stamina |
+| `src/data/skillData.ts` | 将斗志昂扬的 mp 消耗改为 stamina |
 | `src/utils/battleAdapter.ts` | 移除 MP 相关逻辑 |
 | `src/components/battle/Battle.tsx` | 移除 MP 扣除和检查逻辑 |
 | `src/components/battle/CharacterCard.tsx` | 移除 MP 显示，添加体力显示 |

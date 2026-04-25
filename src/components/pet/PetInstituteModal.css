@@ -135,6 +135,78 @@
   color: #ffd700;
 }
 
+/* 资助区域 */
+.donate-section {
+  margin-bottom: 20px;
+  padding: 12px;
+  background-color: #252934;
+}
+
+.donate-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: rgb(74, 144, 217);
+  border-bottom: 1px solid #444;
+  padding-bottom: 5px;
+}
+
+.donate-input-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.donate-input {
+  width: 120px;
+  padding: 8px;
+  background-color: #1a1a1a;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: #FCFFFF;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.donate-input:focus {
+  outline: none;
+  border-color: #ffd700;
+}
+
+.donate-button {
+  padding: 10px 20px;
+  background-color: rgb(74, 144, 217);
+  color: rgb(255, 255, 255);
+  border: 1px solid rgb(74, 144, 217);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  height: 39px;
+}
+
+.donate-button:hover:not(:disabled) {
+  background-color: rgb(84, 154, 227);
+}
+
+.donate-button:disabled {
+  background-color: #555;
+  color: #999;
+  cursor: not-allowed;
+  border-color: #777;
+}
+
+.donate-info {
+  margin-top: 10px;
+}
+
+.donate-info p {
+  margin: 3px 0;
+  font-size: 0.85rem;
+  color: #FCFFFF;
+}
+
 /* 操作按钮 */
 .action-section {
   display: flex;

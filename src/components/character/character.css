@@ -80,14 +80,14 @@
 
 /* 上部：角色信息区域 (1/2高度) */
 .character-page-top {
-  height: 50%;
+  height: 42%;
   overflow: hidden;
   border-bottom: 1px solid #000000;
 }
 
 /* 下部：装备展示区域 (1/2高度) */
 .character-page-bottom {
-  height: 50%;
+  height: 58%;
   overflow-y: auto;
 }
 

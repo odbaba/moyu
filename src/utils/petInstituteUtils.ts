@@ -14,8 +14,8 @@ export const INITIAL_TECH_LEVEL = 10;
 /** 默认技术等级上限 */
 export const DEFAULT_TECH_LEVEL_MAX = 120;
 
-/** 最大生产量 */
-export const MAX_PRODUCTION_RATE = 6;
+/** 最大生产量（最多完成5次任务，从0到5） */
+export const MAX_PRODUCTION_RATE = 5;
 
 /** 最大VIP等级 */
 export const MAX_VIP_LEVEL = 10;
@@ -27,7 +27,6 @@ export const PRODUCTION_TASK_SOUL_KING_COST: Record<number, number> = {
   2: 3,
   3: 4,
   4: 5,
-  5: 6,
 };
 
 /** 提高产量任务经验奖励映射 */
@@ -37,7 +36,6 @@ export const PRODUCTION_TASK_EXP_REWARD: Record<number, number> = {
   2: 315000,
   3: 420000,
   4: 525000,
-  5: 630000,
 };
 
 // ==================== 初始化函数 ====================
@@ -58,6 +56,15 @@ export function createInitialPetInstituteState(): PetInstituteState {
 }
 
 // ==================== 计算函数 ====================
+
+/**
+ * 格式化技术等级为两位小数
+ * @param techLevel 技术等级
+ * @returns 格式化后的字符串
+ */
+export function formatTechLevel(techLevel: number): string {
+  return techLevel.toFixed(2);
+}
 
 /**
  * 根据技术等级计算幻兽品质分
@@ -123,6 +130,11 @@ export function canBuyPet(
   state: PetInstituteState,
   resources: PlayerResources
 ): { canBuy: boolean; reason: string } {
+  // 检查技术等级是否达到20级
+  if (state.techLevel < 20) {
+    return { canBuy: false, reason: '技术20级前不能生产幻兽' };
+  }
+
   // 检查库存
   if (state.stock <= 0) {
     return { canBuy: false, reason: '库存不足，请等待每日生产' };
@@ -155,9 +167,14 @@ export function canDonate(
     return { canDonate: false, reason: '技术等级已达上限' };
   }
 
-  // 检查魔石数量
+  // 检查魔石数量是否有效
   if (magicStones <= 0) {
     return { canDonate: false, reason: '请输入有效的魔石数量' };
+  }
+
+  // 检查最低资助金额（100魔石）
+  if (magicStones < 100) {
+    return { canDonate: false, reason: '最低资助金额为100魔石' };
   }
 
   return { canDonate: true, reason: '' };
@@ -175,10 +192,10 @@ export function canImproveProduction(
 ): { canImprove: boolean; reason: string; requiredSoulKings: number } {
   // 检查是否可以完成任务
   if (!state.canDoProductionTask) {
-    return { canImprove: false, reason: '提高产量任务仅在周日开放', requiredSoulKings: 0 };
+    return { canImprove: false, reason: '本周提高产量任务已完成', requiredSoulKings: 0 };
   }
 
-  // 检查生产量是否已满
+  // 检查生产量是否已满（最多5次任务，生产量从0到5）
   if (state.productionRate >= MAX_PRODUCTION_RATE) {
     return { canImprove: false, reason: '生产量已达上限', requiredSoulKings: 0 };
   }
@@ -233,7 +250,8 @@ export function buyPet(
 
 /**
  * 资助魔石提升技术等级
- * 每100魔石提升1级
+ * 每100魔石提升0.01级技术等级
+ * 技术等级达到20级时，如果生产量为0则自动+1
  * @param state 研究所状态
  * @param magicStones 资助魔石数量
  * @returns 资助结果
@@ -241,28 +259,35 @@ export function buyPet(
 export function donate(
   state: PetInstituteState,
   magicStones: number
-): { success: boolean; message: string; levelsGained: number } {
+): { success: boolean; message: string; levelsGained: number; productionRateGained: number } {
   const checkResult = canDonate(state, magicStones);
 
   if (!checkResult.canDonate) {
-    return { success: false, message: checkResult.reason, levelsGained: 0 };
+    return { success: false, message: checkResult.reason, levelsGained: 0, productionRateGained: 0 };
   }
 
-  // 计算提升等级（每100魔石提升1级）
-  const levelsGained = Math.floor(magicStones / 100);
+  // 计算提升等级（每100魔石提升0.01级）
+  const levelsGained = magicStones / 100 / 100;
 
   // 检查是否超过上限
   const newLevel = Math.min(state.techLevel + levelsGained, state.techLevelMax);
   const actualLevelsGained = newLevel - state.techLevel;
 
-  if (actualLevelsGained === 0) {
-    return { success: false, message: '魔石数量不足以提升技术等级', levelsGained: 0 };
+  if (actualLevelsGained <= 0) {
+    return { success: false, message: '魔石数量不足以提升技术等级', levelsGained: 0, productionRateGained: 0 };
+  }
+
+  // 检查技术等级是否达到20级且生产量为0，自动增加生产量
+  let productionRateGained = 0;
+  if (newLevel >= 20 && state.productionRate === 0) {
+    productionRateGained = 1;
   }
 
   return {
     success: true,
-    message: `成功提升技术等级 ${actualLevelsGained} 级！当前等级：${newLevel}`,
+    message: `成功提升技术等级 ${actualLevelsGained.toFixed(2)} 级！当前等级：${newLevel.toFixed(2)}`,
     levelsGained: actualLevelsGained,
+    productionRateGained,
   };
 }
 
@@ -320,7 +345,7 @@ export function getInstituteInfo(state: PetInstituteState): string {
   const discount = getVipDiscountDescription(state.vipLevel);
 
   let info = '【幻兽研究所信息】\n\n';
-  info += `技术等级：${state.techLevel} / ${state.techLevelMax}\n`;
+  info += `技术等级：${formatTechLevel(state.techLevel)} / ${formatTechLevel(state.techLevelMax)}\n`;
   info += `当前库存：${state.stock}\n`;
   info += `每日产量：${state.productionRate}\n`;
   info += `VIP星级：${state.vipLevel} 星（${discount}）\n\n`;

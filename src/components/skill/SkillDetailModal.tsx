@@ -83,7 +83,7 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
       );
     }
 
-    // 战斗力加成（斗志抑扬）
+    // 战斗力加成（斗志昂扬）
     if (skill.skillIndex === 4 && skill.isLearned) {
       const bonus = getFightingSpiritBonus(skill.level);
       effects.push(

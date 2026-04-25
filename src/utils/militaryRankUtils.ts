@@ -102,7 +102,7 @@ export function canClaimMilitaryPay(weekday: Weekday): boolean {
 /**
  * 领取军饷
  * 周日根据军衔等级发放魔石奖励
- * 军衔≥7级（少将以上）额外获得"高级斗志抑扬"
+ * 军衔≥7级（少将以上）额外获得"高级斗志昂扬"
  * @param militaryRankLevel 军衔等级
  * @param weekday 当前星期
  * @param hasClaimedToday 今天是否已领取
@@ -147,7 +147,7 @@ export function claimMilitaryPay(
   // 少将以上额外奖励
   let specialReward: string | undefined;
   if (militaryRankLevel >= 7) {
-    specialReward = '高级斗志抑扬';
+    specialReward = '高级斗志昂扬';
   }
 
   // 构建成功消息
@@ -391,7 +391,7 @@ export function getMilitaryRankDescription(): string {
   text += '【军衔奖励】\n';
   text += '1. 战斗力加成：根据军衔等级获得战斗力加成\n';
   text += '2. 军饷领取：周日可领取魔石奖励\n';
-  text += '3. 特殊奖励：少将以上额外获得"高级斗志抑扬"\n\n';
+  text += '3. 特殊奖励：少将以上额外获得"高级斗志昂扬"\n\n';
 
   text += '【军衔等级与军饷对照表】\n';
   MILITARY_RANKS.forEach(rank => {
