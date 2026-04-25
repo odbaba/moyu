@@ -18,6 +18,7 @@ import { DonationModal, EnemyModal, NPCModal } from './components/common';
 import CollectorModal from './components/common/CollectorModal';
 import EquipmentRefineModal from './components/common/EquipmentRefineModal';
 import ExperienceExchangeModal from './components/common/ExperienceExchangeModal';
+import FloatingTextManager, { type FloatingTextItem } from './components/common/FloatingTextManager';
 import GiftSelectModal from './components/common/GiftSelectModal';
 import InfoModal from './components/common/InfoModal';
 // 导入组件 - 封面页模块
@@ -32,6 +33,7 @@ import {
   SceneDescription,
   TimeDisplay,
   WorldMap} from './components/home';
+import { getWeekday } from './components/home/TimeDisplay';
 // 导入组件 - 背包模块
 import InventoryPage from './components/inventory/InventoryPage';
 import UseItemTargetModal from './components/inventory/UseItemTargetModal';
@@ -118,7 +120,7 @@ import {
   getInstituteInfo,
 } from './utils/petInstituteUtils';
 // 导入 NPC 相关工具函数
-import { getChatDialogue, getDemonArmyDialogue, getNextRelationshipRequirement, getRelationshipName, performChat, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
+import { canGiftRose, getChatDialogue, getDemonArmyDialogue, getNextRelationshipRequirement, getRelationshipName, MAX_WEEKLY_ROSE_GIFT_COUNT, performChat, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
 // 导入存档系统工具函数
 import type { SaveData } from './utils/saveUtils';
 import { getSaveVersion, hasSaveData, loadGame, loadMusicSettings, saveGame, saveMusicSettings } from './utils/saveUtils';
@@ -219,6 +221,7 @@ function App() {
     canGiftToday: true, // 今天可以送礼
     canReceiveSundayGift: true, // 本周可以领取周日礼物
     hasReceivedConfidantGift: false, // 未领取知己礼物
+    weeklyRoseGiftCount: 0, // 本周已赠送玫瑰花数量
   });
 
   // 丫环交易状态
@@ -229,6 +232,16 @@ function App() {
 
   // 电浆药水使用状态（每天只能使用一瓶）
   const [hasUsedDianJiangYaoShuiToday, setHasUsedDianJiangYaoShuiToday] = useState(false);
+
+  // 浮动文字状态管理
+  const [floatingTexts, setFloatingTexts] = useState<FloatingTextItem[]>([]);
+  const floatingTextIdCounterRef = useRef(0);
+
+  // 每日提示状态管理（避免重复提示）
+  const [hasShownSaturdayPKTip, setHasShownSaturdayPKTip] = useState(false); // 当天是否已显示星期六PK大赛提示
+  const [hasShownSundayMilitaryPayTip, setHasShownSundayMilitaryPayTip] = useState(false); // 当天是否已显示星期日军饷提示
+  const [hasShownSundayPrincessGiftTip, setHasShownSundayPrincessGiftTip] = useState(false); // 当天是否已显示星期日公主礼物提示
+  const [hasShownSundayPrincessFlowerTip, setHasShownSundayPrincessFlowerTip] = useState(false); // 当天是否已显示星期日公主鲜花提示
 
   // 军衔和战功状态
   // 注意：setMilitaryRank和setBattleExp将在战斗结束后使用
@@ -283,7 +296,7 @@ function App() {
   // ========== 背景音乐管理 ==========
   // 使用背景音乐 Hook，设置音乐文件路径和初始音量
   const { play: playBackgroundMusic, pause: pauseBackgroundMusic } = useBackgroundMusic({
-    src: './audio/19_back.mp3',
+    src: '/audio/19_back.mp3',
     autoPlay: false, // 不自动播放，等进入游戏后播放
     volume: musicVolume / 100, // 将 0-100 转换为 0-1
     loop: true // 循环播放
@@ -369,8 +382,11 @@ function App() {
       setHasClaimedMilitaryPay(savedData.hasClaimedMilitaryPay ?? false);
       // 恢复爵位
       setNobleRank(savedData.nobleRank ?? 0);
-      // 恢复公主关系
-      setPrincessRelationship(savedData.princessRelationship);
+      // 恢复公主关系（兼容旧存档，添加 weeklyRoseGiftCount 默认值）
+      setPrincessRelationship({
+        ...savedData.princessRelationship,
+        weeklyRoseGiftCount: savedData.princessRelationship.weeklyRoseGiftCount ?? 0,
+      });
       // 恢复国王救出状态
       _setIsKingRescued(savedData.isKingRescued ?? false);
       // 恢复探险家解锁状态
@@ -772,6 +788,25 @@ function App() {
     });
   }, []);
 
+  /**
+   * 添加浮动文字提示
+   * @param text 显示的文字内容
+   * @param duration 动画持续时间，默认3000ms
+   */
+  const addFloatingText = useCallback((text: string, duration?: number) => {
+    const id = floatingTextIdCounterRef.current + 1;
+    floatingTextIdCounterRef.current = id;
+    setFloatingTexts(prev => [...prev, { id, text, duration }]);
+  }, []);
+
+  /**
+   * 移除浮动文字
+   * @param id 浮动文字ID
+   */
+  const removeFloatingText = useCallback((id: number) => {
+    setFloatingTexts(prev => prev.filter(t => t.id !== id));
+  }, []);
+
   // 监听天数变化，处理新的一天的逻辑
   useEffect(() => {
     // 只有当天数发生变化时才执行
@@ -843,8 +878,53 @@ function App() {
           setInteractionLog(logs => [...logs, '黑夜到来时，魔的能量将所有死亡的魔族军队复活了']);
         }
       }
+
+      // 重置每日提示状态
+      setHasShownSaturdayPKTip(false);
+      setHasShownSundayMilitaryPayTip(false);
+      setHasShownSundayPrincessGiftTip(false);
+      setHasShownSundayPrincessFlowerTip(false);
+
+      // 检测星期并显示提示
+      const weekday = getWeekday(timeSystem.nowday);
+
+      // 星期六PK大赛提示
+      if (weekday === '星期六' && !hasShownSaturdayPKTip) {
+        setTimeout(() => {
+          addFloatingText('今天是星期六，PK大赛即将开始，如果要参加比赛请到皇宫周赛PK报名官那里报名吧。');
+          setHasShownSaturdayPKTip(true);
+        }, 1000);
+      }
+
+      // 星期日提示
+      if (weekday === '星期日') {
+        // 军饷提示（有军衔时）
+        if (militaryRank > 0 && !hasShownSundayMilitaryPayTip) {
+          setTimeout(() => {
+            addFloatingText('今天是星期天啦，如果你有军衔了就可以去元帅那里领取军饷。');
+            setHasShownSundayMilitaryPayTip(true);
+          }, 1000);
+        }
+
+        // 公主礼物提示（认识公主时）
+        if (princessRelationship.level > 0 && !hasShownSundayPrincessGiftTip) {
+          setTimeout(() => {
+            addFloatingText('今天是星期天啦，如果你认识了公主那今天她会送你一份礼物。');
+            setHasShownSundayPrincessGiftTip(true);
+          }, 2500);
+        }
+
+        // 公主鲜花提示（认识公主时）
+        if (princessRelationship.level > 0 && !hasShownSundayPrincessFlowerTip) {
+          setTimeout(() => {
+            const relationshipName = princessRelationship.relationshipName;
+            addFloatingText(`公主是你的${relationshipName}。星期天了，公主很想收到一束漂亮的鲜花，你是否会给她送上一束呢。`);
+            setHasShownSundayPrincessFlowerTip(true);
+          }, 4000);
+        }
+      }
     }
-  }, [timeSystem.nowday]);
+  }, [timeSystem.nowday, addFloatingText, militaryRank, princessRelationship.level, princessRelationship.relationshipName, hasShownSaturdayPKTip, hasShownSundayMilitaryPayTip, hasShownSundayPrincessGiftTip, hasShownSundayPrincessFlowerTip, isKingRescued, _dailyTaskState]);
 
   /**
    * 挖矿逻辑
@@ -1043,6 +1123,17 @@ function App() {
    * @param flowers 花朵列表（支持多种花朵）
    */
   const handleConfirmGift = (flowers: Array<{ type: '99朵白玫瑰' | '999朵白玫瑰'; quantity: number }>) => {
+    // 计算总赠送数量（999玫瑰和99玫瑰合计）
+    const totalQuantity = flowers.reduce((sum, { quantity }) => sum + quantity, 0);
+
+    // 检查每周赠送限制
+    const giftCheck = canGiftRose(princessRelationship, totalQuantity);
+    if (!giftCheck.canGift) {
+      showInfoModalWithContent('赠送限制', giftCheck.message);
+
+      return;
+    }
+
     // 计算总亲密度增加
     let totalIntimacyGain = 0;
     const giftDetails: string[] = [];
@@ -1081,15 +1172,22 @@ function App() {
       return newInventory;
     });
 
-    // 更新公主关系状态
+    // 更新公主关系状态（包括每周赠送计数）
     setPrincessRelationship(prev => ({
       ...prev,
       intimacy: prev.intimacy + totalIntimacyGain,
       canGiftToday: false,
+      weeklyRoseGiftCount: (prev.weeklyRoseGiftCount || 0) + totalQuantity,
     }));
 
     // 显示成功消息
-    const message = `公主收下了你的${giftDetails.join('、')}，友好度+${totalIntimacyGain}！`;
+    const remainingCount = MAX_WEEKLY_ROSE_GIFT_COUNT - (princessRelationship.weeklyRoseGiftCount || 0) - totalQuantity;
+    let message = `公主收下了你的${giftDetails.join('、')}，友好度+${totalIntimacyGain}！`;
+    if (remainingCount > 0) {
+      message += `\n本周还能赠送${remainingCount}个玫瑰花。`;
+    } else {
+      message += '\n本周玫瑰花赠送次数已用完。';
+    }
     setInteractionLog(prev => [...prev, message]);
     showInfoModalWithContent('送礼成功', message);
   };
@@ -3667,6 +3765,9 @@ function App() {
   const handleUseItemOnPlayer = useCallback(() => {
     if (!currentUseItem) return;
 
+    // 记录升级前的等级，用于判断是否升级
+    const previousLevel = character.level;
+
     // 使用统一的升级函数处理角色经验获取
     setCharacter(prev => {
       const result = gainCharacterExperience(prev, 2700);
@@ -3699,10 +3800,32 @@ function App() {
       return prev;
     });
 
+    // 使用setTimeout确保在状态更新后执行
+    setTimeout(() => {
+      // 检查是否升级了（通过比较character.level）
+      setCharacter(prev => {
+        if (prev.level > previousLevel) {
+          // 升级了，显示浮动文字提示
+          addFloatingText(`恭喜升级！当前等级：${prev.level}级`);
+
+          // 检查是否达到装备使用等级节点
+          const equipmentLevelNodes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 125];
+          if (equipmentLevelNodes.includes(prev.level)) {
+            // 延迟显示装备升级提示，避免与升级提示重叠
+            setTimeout(() => {
+              addFloatingText(`你已经${prev.level}级了，你可以使用更加高级的装备了，到装备打造师那里把你的装备升级吧。`);
+            }, 1500);
+          }
+        }
+
+        return prev;
+      });
+    }, 0);
+
     setInteractionLog(prev => [...prev, `对玩家使用了 ${currentUseItem.name}，获得 2700 经验值`]);
     setShowUseItemTargetModal(false);
     setCurrentUseItem(null);
-  }, [currentUseItem]);
+  }, [currentUseItem, character.level, addFloatingText]);
 
   /**
    * 对幻兽使用满经验球
@@ -3831,6 +3954,21 @@ function App() {
         }
 
         return true;
+      })
+      // 对地图占领赛报名官 NPC 添加爵位名称前缀
+      ?.map(interactable => {
+        if (interactable.id.startsWith('npc_map_challenge') && interactable.type === 'npc') {
+          const npc = interactable as NPCInteractable;
+          const config = getMapChallengeConfig(npc.location);
+          if (config) {
+            return {
+              ...npc,
+              name: `[${config.requiredNobleRankName}] ${npc.name}`,
+            };
+          }
+        }
+
+        return interactable;
       }) || [];
 
     // 获取当前地图的 BOSS 交互对象（过滤掉已击杀的 BOSS）
@@ -4152,6 +4290,7 @@ function App() {
             isVisible={showGiftSelectModal}
             onClose={() => setShowGiftSelectModal(false)}
             inventoryItems={inventory}
+            weeklyRoseGiftCount={princessRelationship.weeklyRoseGiftCount || 0}
             onConfirmGift={handleConfirmGift}
           />
 
@@ -4317,6 +4456,12 @@ function App() {
               // 使用统一处理函数获取功勋
               handleGainMerit(gainedMerit, `捐献 ${donatedGold.toLocaleString()} 金币`);
             }}
+          />
+
+          {/* 浮动文字管理器 */}
+          <FloatingTextManager
+            texts={floatingTexts}
+            onRemove={removeFloatingText}
           />
         </>
       )}

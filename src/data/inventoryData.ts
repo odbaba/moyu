@@ -370,7 +370,7 @@ const tiLiYao: InventoryItem = {
   equippable: false,
   goldValue: 1000,
   magicStoneValue: 0,
-  imagePath: './images/items/consumable/tiliyao.png',
+  imagePath: './images/items/consumable/tiliyao.jpg',
 };
 
 /**
@@ -390,7 +390,7 @@ const guoZi: InventoryItem = {
   equippable: false,
   goldValue: 1000,
   magicStoneValue: 0,
-  imagePath: './images/items/consumable/guozi.png',
+  imagePath: './images/items/consumable/guozi.jpg',
 };
 
 /**
@@ -410,7 +410,7 @@ export const manJingYanQiu: InventoryItem = {
   equippable: false,
   goldValue: 1000,
   magicStoneValue: 100,
-  imagePath: './images/items/consumable/manjingyanqiu.png',
+  imagePath: './images/items/consumable/manjingyanqiu.jpg',
 };
 
 /**
@@ -430,7 +430,7 @@ export const kongJingYanQiu: InventoryItem = {
   equippable: false,
   goldValue: 1000,
   magicStoneValue: 0,
-  imagePath: './images/items/consumable/kongjingyanqiu.png',
+  imagePath: './images/items/consumable/kongjingyanqiu.jpg',
 };
 
 /**
@@ -471,7 +471,7 @@ const shengMingYaoJi: InventoryItem = {
   equippable: false,
   goldValue: 100,
   magicStoneValue: 0,
-  imagePath: './images/items/consumable/tiliyao.png',
+  imagePath: './images/items/consumable/tiliyao.jpg',
 };
 
 /**
@@ -492,7 +492,7 @@ const gaoJiShengMingYaoJi: InventoryItem = {
   equippable: false,
   goldValue: 500,
   magicStoneValue: 0,
-  imagePath: './images/items/consumable/guozi.png',
+  imagePath: './images/items/consumable/guozi.jpg',
 };
 
 /**
@@ -513,7 +513,7 @@ const moLiYaoJi: InventoryItem = {
   equippable: false,
   goldValue: 300,
   magicStoneValue: 0,
-  imagePath: './images/items/consumable/tiliyao.png',
+  imagePath: './images/items/consumable/tiliyao.jpg',
 };
 
 /**
@@ -534,7 +534,7 @@ const jingLingZhiLei: InventoryItem = {
   equippable: false,
   goldValue: 5000,
   magicStoneValue: 50,
-  imagePath: './images/items/consumable/guozi.png',
+  imagePath: './images/items/consumable/guozi.jpg',
 };
 
 // ==================== 技能书类物品 ====================
@@ -1240,7 +1240,7 @@ const moLingCao: InventoryItem = {
   equippable: false,
   goldValue: 5000,
   magicStoneValue: 0,
-  imagePath: './images/items/consumable/guozi.png',
+  imagePath: './images/items/consumable/guozi.jpg',
 };
 
 // ==================== 任务物品类 ====================

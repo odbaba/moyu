@@ -22,6 +22,12 @@ import type {
 // ========== 关系等级配置数据 ==========
 
 /**
+ * 每周最大玫瑰花赠送数量
+ * 999玫瑰和99玫瑰合计最多12个
+ */
+export const MAX_WEEKLY_ROSE_GIFT_COUNT = 12;
+
+/**
  * 关系等级配置表
  * 定义每个关系等级的详细信息
  * 参考文档：reference/docs/scripts_analysis/15_公主关系系统.md
@@ -430,6 +436,44 @@ export const calculateGiftIntimacy = (
 };
 
 /**
+ * 检查是否可以赠送玫瑰花
+ * 检查本周已赠送数量是否达到上限
+ *
+ * @param relationship 当前公主关系数据
+ * @param quantity 本次要赠送的数量
+ * @returns 是否可以赠送
+ */
+export const canGiftRose = (
+  relationship: PrincessRelationship,
+  quantity: number
+): { canGift: boolean; remainingCount: number; message: string } => {
+  const currentCount = relationship.weeklyRoseGiftCount || 0;
+  const remainingCount = MAX_WEEKLY_ROSE_GIFT_COUNT - currentCount;
+
+  if (currentCount >= MAX_WEEKLY_ROSE_GIFT_COUNT) {
+    return {
+      canGift: false,
+      remainingCount: 0,
+      message: `本周已赠送${MAX_WEEKLY_ROSE_GIFT_COUNT}个玫瑰花，下周再来吧。`
+    };
+  }
+
+  if (quantity > remainingCount) {
+    return {
+      canGift: false,
+      remainingCount,
+      message: `本周还能赠送${remainingCount}个玫瑰花，请减少数量。`
+    };
+  }
+
+  return {
+    canGift: true,
+    remainingCount,
+    message: ''
+  };
+};
+
+/**
  * 执行送礼功能
  * 送花给公主，增加亲密度
  *
@@ -761,7 +805,7 @@ export const resetDailyStatus = (
 
 /**
  * 重置每周状态
- * 每周日重置礼物领取状态
+ * 每周日重置礼物领取状态和玫瑰花赠送计数
  *
  * @param relationship 当前公主关系数据
  * @returns 重置后的关系数据
@@ -771,7 +815,8 @@ export const resetWeeklyStatus = (
 ): PrincessRelationship => {
   return {
     ...relationship,
-    canReceiveSundayGift: true
+    canReceiveSundayGift: true,
+    weeklyRoseGiftCount: 0 // 重置每周玫瑰花赠送计数
   };
 };
 

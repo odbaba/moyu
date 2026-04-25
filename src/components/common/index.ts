@@ -24,6 +24,10 @@ export { default as EquipmentDetailModal } from './EquipmentDetailModal';
 // 送礼选择弹窗组件
 export { default as GiftSelectModal } from './GiftSelectModal';
 
+// 浮动文字管理器组件
+export type { FloatingTextItem } from './FloatingTextManager';
+export { default as FloatingTextManager } from './FloatingTextManager';
+
 // 公共常量导出
 export * from './constants';
 

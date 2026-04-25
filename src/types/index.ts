@@ -1031,6 +1031,7 @@ export interface PrincessRelationship {
   canGiftToday: boolean; // 今天是否可以送礼
   canReceiveSundayGift: boolean; // 本周是否可以领取周日礼物
   hasReceivedConfidantGift: boolean; // 是否已领取知己的礼物
+  weeklyRoseGiftCount: number; // 本周已赠送的玫瑰花数量（999玫瑰和99玫瑰合计最多12个）
 }
 
 /**

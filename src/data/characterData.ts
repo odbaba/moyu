@@ -219,7 +219,8 @@ export const examplePrincessRelationship: PrincessRelationship = {
   canChatToday: true, // 今天可以聊天
   canGiftToday: true, // 今天可以送礼
   canReceiveSundayGift: true, // 本周可以领取周日礼物
-  hasReceivedConfidantGift: false // 未领取知己的礼物
+  hasReceivedConfidantGift: false, // 未领取知己的礼物
+  weeklyRoseGiftCount: 0 // 本周已赠送玫瑰花数量
 };
 
 /**
@@ -233,7 +234,8 @@ export const confidantPrincessRelationship: PrincessRelationship = {
   canChatToday: true, // 今天可以聊天
   canGiftToday: true, // 今天可以送礼
   canReceiveSundayGift: true, // 本周可以领取周日礼物
-  hasReceivedConfidantGift: false // 未领取知己的礼物
+  hasReceivedConfidantGift: false, // 未领取知己的礼物
+  weeklyRoseGiftCount: 0 // 本周已赠送玫瑰花数量
 };
 
 /**
@@ -247,5 +249,6 @@ export const loverPrincessRelationship: PrincessRelationship = {
   canChatToday: true, // 今天可以聊天
   canGiftToday: true, // 今天可以送礼
   canReceiveSundayGift: true, // 本周可以领取周日礼物
-  hasReceivedConfidantGift: true // 已领取知己的礼物
+  hasReceivedConfidantGift: true, // 已领取知己的礼物
+  weeklyRoseGiftCount: 0 // 本周已赠送玫瑰花数量
 };

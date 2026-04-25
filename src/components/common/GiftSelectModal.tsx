@@ -3,6 +3,7 @@ import './GiftSelectModal.css';
 import React, { useMemo, useState } from 'react';
 
 import type { InventoryItem } from '../../types';
+import { MAX_WEEKLY_ROSE_GIFT_COUNT } from '../../utils/princessRelationUtils';
 
 /**
  * 送礼选择模态窗口组件属性接口
@@ -14,6 +15,8 @@ interface GiftSelectModalProps {
   onClose: () => void;
   /** 背包物品列表 */
   inventoryItems: InventoryItem[];
+  /** 本周已赠送的玫瑰花数量 */
+  weeklyRoseGiftCount: number;
   /** 确认送礼的回调函数 */
   onConfirmGift: (flowers: Array<{ type: '99朵白玫瑰' | '999朵白玫瑰'; quantity: number }>) => void;
 }
@@ -26,6 +29,7 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
   isVisible,
   onClose,
   inventoryItems,
+  weeklyRoseGiftCount,
   onConfirmGift
 }) => {
   // 99朵白玫瑰数量
@@ -34,6 +38,9 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
   const [rose999Quantity, setRose999Quantity] = useState(0);
   // 提示消息
   const [message, setMessage] = useState('');
+
+  // 计算本周剩余可赠送数量
+  const remainingWeeklyCount = MAX_WEEKLY_ROSE_GIFT_COUNT - weeklyRoseGiftCount;
 
   // 从背包中筛选出玫瑰花
   const roses = useMemo(() => {
@@ -65,6 +72,9 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
            calculateIntimacyGain('999朵白玫瑰', rose999Quantity);
   }, [rose99Quantity, rose999Quantity]);
 
+  // 计算当前选择的总数量
+  const totalSelectedQuantity = rose99Quantity + rose999Quantity;
+
   // 处理遮罩层点击
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -74,7 +84,10 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
 
   // 处理99朵白玫瑰数量变化
   const handleRose99Change = (delta: number) => {
-    const maxQuantity = roses['99朵白玫瑰'];
+    const inventoryMax = roses['99朵白玫瑰'];
+    // 计算当前还能选择的最大数量（考虑每周限制）
+    const maxAllowed = remainingWeeklyCount - rose999Quantity;
+    const maxQuantity = Math.min(inventoryMax, maxAllowed);
     const newQuantity = Math.max(0, Math.min(maxQuantity, rose99Quantity + delta));
     setRose99Quantity(newQuantity);
     setMessage('');
@@ -82,7 +95,10 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
 
   // 处理999朵白玫瑰数量变化
   const handleRose999Change = (delta: number) => {
-    const maxQuantity = roses['999朵白玫瑰'];
+    const inventoryMax = roses['999朵白玫瑰'];
+    // 计算当前还能选择的最大数量（考虑每周限制）
+    const maxAllowed = remainingWeeklyCount - rose99Quantity;
+    const maxQuantity = Math.min(inventoryMax, maxAllowed);
     const newQuantity = Math.max(0, Math.min(maxQuantity, rose999Quantity + delta));
     setRose999Quantity(newQuantity);
     setMessage('');
@@ -92,6 +108,14 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
   const handleConfirm = () => {
     if (rose99Quantity === 0 && rose999Quantity === 0) {
       setMessage('请至少选择一种花朵！');
+      setTimeout(() => setMessage(''), 2000);
+
+      return;
+    }
+
+    // 检查是否超过每周限制
+    if (totalSelectedQuantity > remainingWeeklyCount) {
+      setMessage(`本周还能赠送${remainingWeeklyCount}个玫瑰花！`);
       setTimeout(() => setMessage(''), 2000);
 
       return;
@@ -121,6 +145,12 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
   // 如果不可见，不渲染
   if (!isVisible) return null;
 
+  // 计算按钮禁用状态
+  const rose99MaxAllowed = remainingWeeklyCount - rose999Quantity;
+  const rose999MaxAllowed = remainingWeeklyCount - rose99Quantity;
+  const canAddRose99 = rose99Quantity < Math.min(roses['99朵白玫瑰'], rose99MaxAllowed);
+  const canAddRose999 = rose999Quantity < Math.min(roses['999朵白玫瑰'], rose999MaxAllowed);
+
   return (
     <div className="gift-select-modal-overlay" onClick={handleOverlayClick}>
       <div className="gift-select-modal">
@@ -135,10 +165,17 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
           选择背包中的玫瑰花送给公主，增加亲密度（可同时选择多种）
         </div>
 
+        {/* 每周赠送限制提示 */}
+        <div className="gift-select-weekly-limit">
+          本周赠送: {weeklyRoseGiftCount}/{MAX_WEEKLY_ROSE_GIFT_COUNT} 个
+          {remainingWeeklyCount > 0 && <span className="remaining"> (剩余{remainingWeeklyCount}个)</span>}
+          {remainingWeeklyCount === 0 && <span className="exhausted"> (已达上限)</span>}
+        </div>
+
         {/* 花朵选择 */}
         <div className="gift-select-flowers">
           {/* 99朵白玫瑰 */}
-          <div className={`flower-option ${roses['99朵白玫瑰'] === 0 ? 'disabled' : ''} ${rose99Quantity > 0 ? 'selected' : ''}`}>
+          <div className={`flower-option ${roses['99朵白玫瑰'] === 0 || remainingWeeklyCount === 0 ? 'disabled' : ''} ${rose99Quantity > 0 ? 'selected' : ''}`}>
             <div className="flower-icon">💐</div>
             <div className="flower-info">
               <div className="flower-name">99朵白玫瑰</div>
@@ -157,7 +194,7 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
               <button
                 className="quantity-btn"
                 onClick={() => handleRose99Change(1)}
-                disabled={rose99Quantity >= roses['99朵白玫瑰']}
+                disabled={!canAddRose99}
               >
                 +
               </button>
@@ -165,7 +202,7 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
           </div>
 
           {/* 999朵白玫瑰 */}
-          <div className={`flower-option ${roses['999朵白玫瑰'] === 0 ? 'disabled' : ''} ${rose999Quantity > 0 ? 'selected' : ''}`}>
+          <div className={`flower-option ${roses['999朵白玫瑰'] === 0 || remainingWeeklyCount === 0 ? 'disabled' : ''} ${rose999Quantity > 0 ? 'selected' : ''}`}>
             <div className="flower-icon">🌹</div>
             <div className="flower-info">
               <div className="flower-name">999朵白玫瑰</div>
@@ -184,7 +221,7 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
               <button
                 className="quantity-btn"
                 onClick={() => handleRose999Change(1)}
-                disabled={rose999Quantity >= roses['999朵白玫瑰']}
+                disabled={!canAddRose999}
               >
                 +
               </button>

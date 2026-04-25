@@ -19,6 +19,8 @@
 | InteractionButtons | `InteractionButtons.tsx` | 交互按钮列表组件 |
 | EnemyModal | `EnemyModal.tsx` | 敌人信息弹窗组件 |
 | NPCModal | `NPCModal.tsx` | NPC对话弹窗组件 |
+| FloatingTextManager | `FloatingTextManager.tsx` | 浮动文字管理器组件，管理多个浮动文字的显示队列 |
+| FloatingText | `FloatingText.tsx` | 浮动文字组件，实现白色文字从屏幕中间上浮并逐渐消失的动画效果 |
 
 ---
 
@@ -432,6 +434,87 @@ const handleActionInteract = (interactable: ActionInteractable) => {
      performNewAction(interactable.actionParams);
      break;
    ```
+
+---
+
+## 浮动文字组件
+
+### FloatingTextManager 组件
+
+浮动文字管理器组件，管理多个浮动文字的显示队列，支持同时显示多条文字（依次显示，避免重叠）。
+
+```typescript
+interface FloatingTextItem {
+  /** 唯一标识ID */
+  id: number;
+  /** 显示的文字内容 */
+  text: string;
+  /** 动画持续时间，默认3000ms */
+  duration?: number;
+}
+
+interface FloatingTextManagerProps {
+  /** 浮动文字列表 */
+  texts: FloatingTextItem[];
+  /** 移除浮动文字的回调函数 */
+  onRemove: (id: number) => void;
+}
+```
+
+**使用示例：**
+
+```tsx
+// 在App.tsx中
+const [floatingTexts, setFloatingTexts] = useState<FloatingTextItem[]>([]);
+const floatingTextIdCounterRef = useRef(0);
+
+// 添加浮动文字的方法
+const addFloatingText = useCallback((text: string, duration?: number) => {
+  const id = floatingTextIdCounterRef.current + 1;
+  floatingTextIdCounterRef.current = id;
+  setFloatingTexts(prev => [...prev, { id, text, duration }]);
+}, []);
+
+// 移除浮动文字的方法
+const removeFloatingText = useCallback((id: number) => {
+  setFloatingTexts(prev => prev.filter(t => t.id !== id));
+}, []);
+
+// 渲染浮动文字管理器
+<FloatingTextManager
+  texts={floatingTexts}
+  onRemove={removeFloatingText}
+/>
+```
+
+### FloatingText 组件
+
+浮动文字组件，实现白色文字从屏幕中间上浮并逐渐消失的动画效果，参考战斗页面的伤害数字动画。
+
+```typescript
+interface FloatingTextProps {
+  /** 显示的文字内容 */
+  text: string;
+  /** 动画持续时间，默认3000ms */
+  duration?: number;
+  /** 动画完成回调 */
+  onComplete?: () => void;
+}
+```
+
+**动画效果：**
+- 白色文字（#FCFFFF）
+- 从屏幕中间上浮100px
+- 逐渐放大到1.1倍
+- 逐渐消失（透明度从1到0）
+- 动画持续3秒
+
+**应用场景：**
+1. 背包页面使用满经验球后的升级日志
+2. 角色升级到装备使用等级节点（10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 125级）
+3. 星期六PK大赛提示
+4. 星期日军饷和公主礼物提示
+5. 星期日公主关系鲜花提示
 
 ---
 

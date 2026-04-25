@@ -9,15 +9,15 @@
  */
 export const ITEM_IMAGE_MAP: Record<string, string> = {
   // ========== 消耗品类 ==========
-  consumable_tiliyao: './images/items/consumable/tiliyao.png',
-  consumable_guozi: './images/items/consumable/guozi.png',
-  consumable_manjingyanqiu: './images/items/consumable/manjingyanqiu.png',
-  consumable_kongjingyanqiu: './images/items/consumable/kongjingyanqiu.png',
+  consumable_tiliyao: './images/items/consumable/tiliyao.jpg',
+  consumable_guozi: './images/items/consumable/guozi.jpg',
+  consumable_manjingyanqiu: './images/items/consumable/manjingyanqiu.jpg',
+  consumable_kongjingyanqiu: './images/items/consumable/kongjingyanqiu.jpg',
   consumable_dianjiangyaoshui: './images/items/consumable/dianjiangyaoshui.png',
-  consumable_shengmingyaoji: './images/items/consumable/tiliyao.png', // 使用体力药图片
-  consumable_gaojishengmingyaoji: './images/items/consumable/guozi.png', // 使用果子图片
-  consumable_moliyaoji: './images/items/consumable/tiliyao.png', // 使用体力药图片
-  consumable_jinglingzhilei: './images/items/consumable/guozi.png', // 使用果子图片
+  consumable_shengmingyaoji: './images/items/consumable/tiliyao.jpg', // 使用体力药图片
+  consumable_gaojishengmingyaoji: './images/items/consumable/guozi.jpg', // 使用果子图片
+  consumable_moliyaoji: './images/items/consumable/tiliyao.jpg', // 使用体力药图片
+  consumable_jinglingzhilei: './images/items/consumable/guozi.jpg', // 使用果子图片
 
   // ========== 技能书类 ==========
   skillbook_xingmojian: './images/items/skillbook/xingmojian.png',

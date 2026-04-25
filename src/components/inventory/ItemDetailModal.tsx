@@ -2,9 +2,28 @@ import './ItemDetailModal.css';
 
 import React, { useState } from 'react';
 
-import type { EquipmentItem, InventoryItem } from '../../types';
+import type { EquipmentItem, InventoryItem, ItemRarity } from '../../types';
 import { EQUIPMENT_SLOT_TYPE_NAMES, ITEM_TYPE_NAMES, RARITY_CONFIG } from '../common/constants';
-import { getEquipmentQualityColor, getRarityColor, isEquipmentItem } from '../common/utils';
+import { getEquipmentQualityColor, isEquipmentItem } from '../common/utils';
+
+/**
+ * 背包物品边框颜色映射（与 inventory.css 中的稀有度边框颜色一致）
+ * 用于物品详情弹窗中的名称和稀有度颜色显示
+ */
+const INVENTORY_BORDER_COLORS: Record<ItemRarity, string> = {
+  common: '#FCFFFF', // 白色
+  uncommon: '#00ff00', // 绿色
+  rare: '#0000ff', // 蓝色
+  epic: '#ff0000', // 红色
+  legendary: '#cc00ff' // 紫色
+};
+
+/**
+ * 根据稀有度获取背包边框颜色
+ */
+const getInventoryBorderColor = (rarity: ItemRarity): string => {
+  return INVENTORY_BORDER_COLORS[rarity] || INVENTORY_BORDER_COLORS.common;
+};
 
 /**
  * 物品详情弹窗组件 Props 接口
@@ -284,8 +303,8 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
     return <span className="item-icon">{item.icon}</span>;
   };
 
-  // 获取当前物品的稀有度配置
-  const currentRarityColor = getRarityColor(item.rarity || 'common');
+  // 获取当前物品的稀有度配置（使用背包边框颜色）
+  const currentRarityColor = getInventoryBorderColor((item.rarity || 'common') as ItemRarity);
 
   return (
     <div
@@ -353,14 +372,6 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             {/* 普通物品属性区域 */}
             {renderAttributes()}
           </>
-        )}
-
-        {/* 获取途径 */}
-        {item.source && (
-          <div className="item-source-section">
-            <div className="section-title">获取途径</div>
-            <div className="item-source">{item.source}</div>
-          </div>
         )}
 
         {/* 物品描述 */}

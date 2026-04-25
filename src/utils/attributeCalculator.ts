@@ -248,10 +248,10 @@ export function getQualityValue(quality: string): number {
 
 /**
  * 预计算所有等级的升级所需经验
- * @param maxLevel 最高等级（默认125）
+ * @param maxLevel 最高等级（默认132）
  * @returns 等级 -> 升级所需经验的映射表
  */
-export function preCalculateMaxExpTable(maxLevel: number = 125): Map<number, number> {
+export function preCalculateMaxExpTable(maxLevel: number = 132): Map<number, number> {
   const table = new Map<number, number>();
   let maxExp = 10; // 1级升2级需要10经验
   let hun = 0;
@@ -305,7 +305,7 @@ export interface CharacterExperienceResult {
  * 1. 检查经验值是否足够升级
  * 2. 升级循环处理（可能连续升级）
  * 3. 升级后更新属性（HP、MP、攻击、防御等）
- * 4. 等级上限检查（最高125级）
+ * 4. 等级上限检查（最高132级）
  *
  * @param character 角色对象
  * @param expAmount 获得的经验值
@@ -316,7 +316,7 @@ export function gainCharacterExperience(
   expAmount: number
 ): CharacterExperienceResult {
   // 1. 等级上限检查
-  if (character.level >= 125) {
+  if (character.level >= 132) {
     return {
       character: { ...character, exp: 0 },
       leveledUp: false,
@@ -333,7 +333,7 @@ export function gainCharacterExperience(
   let leveledUp = false;
 
   // 3. 升级循环处理
-  while (newExp >= newMaxExp && newLevel < 125) {
+  while (newExp >= newMaxExp && newLevel < 132) {
     newExp -= newMaxExp;
     newLevel++;
     levelUpCount++;

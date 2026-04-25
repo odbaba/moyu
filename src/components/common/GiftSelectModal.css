@@ -66,6 +66,24 @@
   text-align: center;
 }
 
+/* 每周赠送限制提示样式 */
+.gift-select-weekly-limit {
+  padding: 10px 20px;
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  font-size: 14px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.gift-select-weekly-limit .remaining {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.gift-select-weekly-limit .exhausted {
+  color: #ff6b6b;
+}
+
 .gift-select-flowers {
   padding: 16px;
   display: flex;
