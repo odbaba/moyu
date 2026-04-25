@@ -33,6 +33,7 @@
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.4.0",
     "lxgw-wenkai-webfont": "^1.7.0",
+    "sharp": "^0.34.5",
     "ts-prune": "^0.10.3",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1",

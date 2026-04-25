@@ -1,41 +1,49 @@
 /**
- * 批量图片增强脚本
- * 使用豆包seedream4.5 AI接口将图片变得更清晰
+ * Batch Image Enhancement Script
+ * Use Doubao seedream4.5 AI API to enhance image quality
+ * Then compress images to reduce file size
  */
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import sharp from 'sharp';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// API配置
+// API Configuration
 const API_KEY = 'ark-723d46c8-07f1-4084-8750-5d45cb53eae5-c67eb';
 const API_URL = 'https://ark.cn-beijing.volces.com/api/v3/images/generations';
 const MODEL = 'doubao-seedream-4-5-251128';
 
-// 图片目录配置
-const EQUIPMENT_DIR = path.join(__dirname, '../public/images/equipment');
-const OUTPUT_DIR = path.join(__dirname, '../public/images/equipment_enhanced');
+// Image directory configuration
+const INPUT_DIR = path.join(__dirname, '../public/images/items');
+const OUTPUT_DIR = path.join(__dirname, '../public/images/items_enhanced');
 
-// 支持的图片格式
+// Supported image formats
 const SUPPORTED_FORMATS = ['.png', '.jpg', '.jpeg', '.webp'];
 
-// 延迟函数，避免API调用过快
+// Compression settings
+const MAX_WIDTH = 512; // Maximum width
+const MAX_HEIGHT = 512; // Maximum height
+const JPEG_QUALITY = 80; // JPEG quality (1-100)
+const PNG_COMPRESSION_LEVEL = 6; // PNG compression level (0-9)
+
+// Delay function to avoid API rate limiting
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
- * 将图片文件转换为base64格式
- * @param {string} imagePath - 图片文件路径
- * @returns {string} base64编码的图片数据
+ * Convert image file to base64 format
+ * @param {string} imagePath - Image file path
+ * @returns {string} Base64 encoded image data
  */
 function imageToBase64(imagePath) {
   const imageBuffer = fs.readFileSync(imagePath);
   const base64 = imageBuffer.toString('base64');
   const ext = path.extname(imagePath).toLowerCase();
   
-  // 根据文件扩展名确定MIME类型
+  // Determine MIME type based on file extension
   const mimeTypes = {
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
@@ -48,14 +56,14 @@ function imageToBase64(imagePath) {
 }
 
 /**
- * 调用豆包API增强图片
- * @param {string} imageBase64 - base64编码的图片
- * @param {string} imageName - 图片名称（用于生成prompt）
- * @returns {Promise<string>} 增强后的图片URL
+ * Call Doubao API to enhance image
+ * @param {string} imageBase64 - Base64 encoded image
+ * @param {string} imageName - Image name (for prompt generation)
+ * @returns {Promise<string>} Enhanced image URL
  */
 async function enhanceImage(imageBase64, imageName) {
-  // 根据图片名称生成合适的prompt
-  const prompt = `将这张游戏装备图片变得更清晰、更精致，保持原有风格和细节，提升画质和清晰度：${imageName}`;
+  // Generate appropriate prompt based on image name
+  const prompt = `Enhance this game item image to be clearer and more refined, maintain original style and details, improve image quality and clarity: ${imageName}`;
   
   try {
     const response = await fetch(API_URL, {
@@ -78,63 +86,114 @@ async function enhanceImage(imageBase64, imageName) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`API请求失败: ${response.status} - ${errorText}`);
+      throw new Error(`API request failed: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
     
-    // 检查返回的数据结构
+    // Check returned data structure
     if (result.data && result.data[0] && result.data[0].url) {
       return result.data[0].url;
     } else if (result.url) {
       return result.url;
     } else {
-      throw new Error(`API返回数据格式异常: ${JSON.stringify(result)}`);
+      throw new Error(`API returned unexpected data format: ${JSON.stringify(result)}`);
     }
   } catch (error) {
-    console.error(`增强图片失败 (${imageName}):`, error.message);
+    console.error(`Failed to enhance image (${imageName}):`, error.message);
     throw error;
   }
 }
 
 /**
- * 下载图片并保存到本地
- * @param {string} url - 图片URL
- * @param {string} outputPath - 输出文件路径
+ * Download image and save to local
+ * @param {string} url - Image URL
+ * @returns {Promise<Buffer>} Image buffer
  */
-async function downloadImage(url, outputPath) {
+async function downloadImage(url) {
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`下载图片失败: ${response.status}`);
+    throw new Error(`Failed to download image: ${response.status}`);
   }
   
   const arrayBuffer = await response.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
+  return Buffer.from(arrayBuffer);
+}
+
+/**
+ * Compress image using sharp
+ * @param {Buffer} imageBuffer - Original image buffer
+ * @param {string} outputPath - Output file path
+ * @returns {Promise<{originalSize: number, compressedSize: number}>}
+ */
+async function compressImage(imageBuffer, outputPath) {
+  const originalSize = imageBuffer.length;
+  const ext = path.extname(outputPath).toLowerCase();
   
-  // 确保输出目录存在
+  // Ensure output directory exists
   const outputDir = path.dirname(outputPath);
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
   
-  fs.writeFileSync(outputPath, buffer);
+  let sharpInstance = sharp(imageBuffer)
+    .resize(MAX_WIDTH, MAX_HEIGHT, {
+      fit: 'inside', // Maintain aspect ratio
+      withoutEnlargement: true // Don't enlarge smaller images
+    });
+  
+  // Apply format-specific compression
+  if (ext === '.jpg' || ext === '.jpeg') {
+    sharpInstance = sharpInstance.jpeg({ 
+      quality: JPEG_QUALITY,
+      progressive: true
+    });
+  } else if (ext === '.png') {
+    sharpInstance = sharpInstance.png({ 
+      compressionLevel: PNG_COMPRESSION_LEVEL,
+      progressive: true
+    });
+  } else if (ext === '.webp') {
+    sharpInstance = sharpInstance.webp({ 
+      quality: JPEG_QUALITY
+    });
+  }
+  
+  await sharpInstance.toFile(outputPath);
+  
+  // Get compressed file size
+  const stats = fs.statSync(outputPath);
+  const compressedSize = stats.size;
+  
+  return { originalSize, compressedSize };
 }
 
 /**
- * 获取所有需要处理的图片文件
+ * Format file size for display
+ * @param {number} bytes - Size in bytes
+ * @returns {string} Formatted size string
+ */
+function formatSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+/**
+ * Get all images that need to be processed
  * @returns {Array<{category: string, file: string, path: string}>}
  */
 function getAllImages() {
   const images = [];
   
-  // 读取equipment目录下的所有子目录
-  const categories = fs.readdirSync(EQUIPMENT_DIR, { withFileTypes: true })
+  // Read all subdirectories in the input directory
+  const categories = fs.readdirSync(INPUT_DIR, { withFileTypes: true })
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name);
   
-  // 遍历每个分类目录
+  // Traverse each category directory
   for (const category of categories) {
-    const categoryPath = path.join(EQUIPMENT_DIR, category);
+    const categoryPath = path.join(INPUT_DIR, category);
     const files = fs.readdirSync(categoryPath);
     
     for (const file of files) {
@@ -153,87 +212,111 @@ function getAllImages() {
 }
 
 /**
- * 主函数：批量处理所有图片
+ * Main function: Batch process all images
  */
 async function main() {
   console.log('========================================');
-  console.log('图片批量增强脚本启动');
+  console.log('Image Batch Enhancement Script Started');
   console.log('========================================\n');
   
-  // 获取所有图片
+  console.log('Compression Settings:');
+  console.log(`  Max Size: ${MAX_WIDTH}x${MAX_HEIGHT}px`);
+  console.log(`  JPEG Quality: ${JPEG_QUALITY}`);
+  console.log(`  PNG Compression: ${PNG_COMPRESSION_LEVEL}\n`);
+  
+  // Get all images
   const images = getAllImages();
-  console.log(`找到 ${images.length} 张图片需要处理\n`);
+  console.log(`Found ${images.length} images to process\n`);
   
   if (images.length === 0) {
-    console.log('没有找到需要处理的图片');
+    console.log('No images found to process');
     return;
   }
   
-  // 创建输出目录
+  // Create output directory
   if (!fs.existsSync(OUTPUT_DIR)) {
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   }
   
-  // 统计信息
+  // Statistics
   let successCount = 0;
   let failCount = 0;
+  let totalOriginalSize = 0;
+  let totalCompressedSize = 0;
   const failedImages = [];
   
-  // 处理每张图片
+  // Process each image
   for (let i = 0; i < images.length; i++) {
     const { category, file, path: imagePath } = images[i];
     const imageBase64 = imageToBase64(imagePath);
     
-    console.log(`[${i + 1}/${images.length}] 正在处理: ${category}/${file}`);
+    console.log(`[${i + 1}/${images.length}] Processing: ${category}/${file}`);
     
     try {
-      // 调用API增强图片
+      // Call API to enhance image
       const enhancedUrl = await enhanceImage(imageBase64, `${category}/${file}`);
-      console.log(`  ✓ API处理成功，正在下载...`);
+      console.log(`  [OK] API processing successful, downloading...`);
       
-      // 下载并保存增强后的图片
+      // Download enhanced image
+      const imageBuffer = await downloadImage(enhancedUrl);
+      
+      // Compress and save image
       const outputPath = path.join(OUTPUT_DIR, category, file);
-      await downloadImage(enhancedUrl, outputPath);
+      const { originalSize, compressedSize } = await compressImage(imageBuffer, outputPath);
       
-      console.log(`  ✓ 已保存到: ${outputPath}\n`);
+      totalOriginalSize += originalSize;
+      totalCompressedSize += compressedSize;
+      
+      const reduction = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+      console.log(`  [OK] Compressed: ${formatSize(originalSize)} -> ${formatSize(compressedSize)} (${reduction}% reduction)`);
+      console.log(`  [OK] Saved to: ${outputPath}\n`);
+      
       successCount++;
       
-      // 延迟2秒，避免API调用过快
+      // Delay 2 seconds to avoid API rate limiting
       if (i < images.length - 1) {
-        console.log(`  等待2秒后继续...\n`);
+        console.log(`  Waiting 2 seconds...\n`);
         await delay(2000);
       }
       
     } catch (error) {
-      console.error(`  ✗ 处理失败: ${error.message}\n`);
+      console.error(`  [FAIL] Processing failed: ${error.message}\n`);
       failCount++;
       failedImages.push({ category, file, error: error.message });
       
-      // 失败后等待更长时间
+      // Wait longer after failure
       if (i < images.length - 1) {
-        console.log(`  等待5秒后继续...\n`);
+        console.log(`  Waiting 5 seconds...\n`);
         await delay(5000);
       }
     }
   }
   
-  // 输出统计信息
+  // Output statistics
   console.log('\n========================================');
-  console.log('处理完成！');
+  console.log('Processing Complete!');
   console.log('========================================');
-  console.log(`总计: ${images.length} 张图片`);
-  console.log(`成功: ${successCount} 张`);
-  console.log(`失败: ${failCount} 张`);
+  console.log(`Total: ${images.length} images`);
+  console.log(`Success: ${successCount} images`);
+  console.log(`Failed: ${failCount} images`);
+  
+  if (successCount > 0) {
+    const totalReduction = ((1 - totalCompressedSize / totalOriginalSize) * 100).toFixed(1);
+    console.log(`\nCompression Statistics:`);
+    console.log(`  Original Total: ${formatSize(totalOriginalSize)}`);
+    console.log(`  Compressed Total: ${formatSize(totalCompressedSize)}`);
+    console.log(`  Total Reduction: ${totalReduction}%`);
+  }
   
   if (failedImages.length > 0) {
-    console.log('\n失败的图片列表:');
+    console.log('\nFailed images list:');
     failedImages.forEach(({ category, file, error }) => {
       console.log(`  - ${category}/${file}: ${error}`);
     });
   }
   
-  console.log(`\n增强后的图片保存在: ${OUTPUT_DIR}`);
+  console.log(`\nEnhanced images saved to: ${OUTPUT_DIR}`);
 }
 
-// 运行脚本
+// Run script
 main().catch(console.error);
