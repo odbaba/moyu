@@ -68,7 +68,6 @@ const UseItemTargetModal: React.FC<UseItemTargetModalProps> = ({
           {/* 玩家选项 */}
           <div className="target-item player-target" onClick={() => {
             onSelectPlayer();
-            onClose();
           }}>
             <div className="target-icon">👤</div>
             <div className="target-info">
@@ -85,7 +84,6 @@ const UseItemTargetModal: React.FC<UseItemTargetModalProps> = ({
               className="target-item pet-target"
               onClick={() => {
                 onSelectPet(pet.id);
-                onClose();
               }}
             >
               <div className="target-icon">🐉</div>

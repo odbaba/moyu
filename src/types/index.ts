@@ -667,6 +667,7 @@ export interface Pet {
   qualityTitle: string; // 品质称号（如"极品12星"、"万众瞩目"等）
   isDeployed: boolean; // 是否出战中
   isMerged: boolean; // 是否合体中
+  luck: number; // 幸运值 (0-100)，幻兽在战斗中受到致命伤害时有概率保留1血并降低幸运值
   // 初始属性
   chp: number; // 初始生命值 (20-34)
   cxgj: number; // 初始最小攻击 (10-14)
@@ -792,6 +793,7 @@ export interface BattlePet {
   attackMin: number; // 最小攻击力
   attackMax: number; // 最大攻击力
   defense: number; // 防御力
+  luck: number; // 幸运值 (0-100)，幻兽在战斗中受到致命伤害时有概率保留1血并降低幸运值
   isMerged: boolean; // 是否合体状态（合体时属性加成到玩家）
   isPlayer: boolean; // 固定为 false，表示是幻兽
   gridPosition: GridPosition; // 九宫格位置
@@ -981,6 +983,12 @@ export interface MonsterSpawnConfig {
  * BOSS 模板接口
  * 定义 BOSS 的基础属性和刷新概率
  * 参考文档：reference/docs/project_docs/04_怪物系统.md
+ * 
+ * BOSS属性计算公式：
+ * - 生命值 = minGrowthHp~maxGrowthHp × 等级
+ * - 最小攻击 = baseAttackMin + growthAttackMin × 等级
+ * - 最大攻击 = baseAttackMax + growthAttackMax × 等级
+ * - 防御 = baseDefense + growthDefense × 等级
  */
 export interface BossTemplate {
   id: string; // BOSS 模板唯一ID
@@ -991,12 +999,16 @@ export interface BossTemplate {
   locationName: string; // 所在地图名称（用于日志显示）
   icon: string; // BOSS 图标
   description: string; // BOSS 描述
-  // 属性范围
-  minHp: number; // 最小生命值
-  maxHp: number; // 最大生命值
-  baseAttackMin: number; // 基础最小攻击
-  baseAttackMax: number; // 基础最大攻击
-  baseDefense: number; // 基础防御
+  // 基础属性（BOSS的基础属性通常为0）
+  baseHp: number; // 基础生命值（通常为0）
+  minGrowthHp: number; // 最小生命成长系数
+  maxGrowthHp: number; // 最大生命成长系数
+  baseAttackMin: number; // 基础最小攻击（通常为0）
+  growthAttackMin: number; // 最小攻击成长系数
+  baseAttackMax: number; // 基础最大攻击（通常为0）
+  growthAttackMax: number; // 最大攻击成长系数
+  baseDefense: number; // 基础防御（通常为0）
+  growthDefense: number; // 防御成长系数
   // 刷新概率
   spawnChance: number; // 刷新概率（0-100）
 }
@@ -1032,7 +1044,7 @@ export interface PrincessRelationship {
   canGiftToday: boolean; // 今天是否可以送礼
   canReceiveSundayGift: boolean; // 本周是否可以领取周日礼物
   hasReceivedConfidantGift: boolean; // 是否已领取知己的礼物
-  weeklyRoseGiftCount: number; // 本周已赠送的玫瑰花数量（999玫瑰和99玫瑰合计最多12个）
+  canGiftThisWeek: boolean; // 本周是否可以送礼（一周只能送一次，一次最多12个）
 }
 
 /**

@@ -323,7 +323,15 @@ const PetFusionModal: React.FC<PetFusionModalProps> = ({
     }
     onUpdateInventory(newInventory);
 
-    return { success: true, pet: result.pet, message: `使用满经验球，幻兽升级到${result.pet.dj}级` };
+    // 保留原始幻兽的顿悟参数（predj、prejy、premjy），避免顿悟数据丢失
+    const updatedPet: Pet = {
+      ...result.pet,
+      predj: pet.predj,
+      prejy: pet.prejy,
+      premjy: pet.premjy,
+    };
+
+    return { success: true, pet: updatedPet, message: `使用满经验球，幻兽升级到${updatedPet.dj}级` };
   };
 
   /**
@@ -619,7 +627,7 @@ const PetFusionModal: React.FC<PetFusionModalProps> = ({
               disabled={!fusionCheck.canFuse}
               onClick={handleFusion}
             >
-              ⚡ 开始幻化
+              开始幻化
             </button>
 
             {/* 辅助按钮组 */}
@@ -628,14 +636,14 @@ const PetFusionModal: React.FC<PetFusionModalProps> = ({
                 className="pet-fusion-button secondary"
                 onClick={() => setShowHelpModal(true)}
               >
-                ❓ 帮助
+                帮助
               </button>
               <button
                 className="pet-fusion-button secondary"
                 disabled={!mainPet}
                 onClick={handleAutoAddSubPet}
               >
-                🔄 自动放入
+                自动放入
               </button>
               <button
                 className={`pet-fusion-button secondary ${showSettingsPanel ? 'active' : ''}`}

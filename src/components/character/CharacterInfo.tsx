@@ -1,6 +1,6 @@
 import './character.css';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { exampleCharacter } from '../../data/characterData';
 import type { CharacterData, Pet, SkillDetail } from '../../types';
@@ -9,8 +9,33 @@ import {
   calculateCharacterBaseAttributes,
   calculateSoulAttackBonus,
   calculateTotalCharacterAttributes} from '../../utils/attributeCalculator';
-import { calculateTotalCombatPower } from '../../utils/combatPower';
+import {
+  calculateDiHunSetSuppression,
+  calculateTianHunSetSuppression,
+  calculateTotalCombatPower,
+  calculateWarSoulSetCombatPowerBonus,
+  calculateWarSoulSetCombatPowerPercent,
+  checkWarSoulSet
+} from '../../utils/combatPower';
 import AttributeDetailTooltip, { type AttributeDetailData } from './AttributeDetailTooltip';
+
+/**
+ * 套装类型枚举
+ * 用于区分不同类型的战魂套装
+ */
+type SetType = 'warSoul' | 'tianHun' | 'diHun';
+
+/**
+ * 套装图标信息接口
+ * 定义单个套装图标的显示信息
+ */
+interface SetIconInfo {
+  type: SetType;
+  level: number;
+  icon: string;
+  color: string;
+  tooltipLines: string[];
+}
 
 /**
  * 角色信息组件属性接口
@@ -33,6 +58,154 @@ interface CharacterInfoProps {
    * 点击详细按钮时触发的回调函数
    */
   onShowDetail?: () => void;
+}
+
+/**
+ * 战魂套装图标组件属性接口
+ */
+interface WarSoulSetIconProps {
+  setInfo: SetIconInfo;
+}
+
+/**
+ * 战魂套装图标组件
+ * 显示单个套装图标，点击显示悬浮提示
+ */
+const WarSoulSetIcon: React.FC<WarSoulSetIconProps> = ({ setInfo }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  return (
+    <div
+      className="war-soul-set-icon-wrapper"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+      onClick={() => setShowTooltip(!showTooltip)}
+    >
+      <span
+        className="war-soul-set-icon"
+        style={{ color: setInfo.color }}
+      >
+        {setInfo.icon}
+      </span>
+      {showTooltip && (
+        <div className="war-soul-set-tooltip">
+          {setInfo.tooltipLines.map((line, index) => (
+            <div key={index} className="war-soul-set-tooltip-line">
+              {line}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
+ * 检测所有激活的套装
+ * @param equipment 装备数据
+ * @param baseCombatPower 基础战斗力（用于计算战魂套装加成）
+ * @returns 激活的套装图标信息数组
+ */
+function detectActiveSets(
+  equipment: CharacterData['equipment'],
+  baseCombatPower: number
+): SetIconInfo[] {
+  const activeSets: SetIconInfo[] = [];
+
+  // 检查战魂套装状态
+  const setInfo = checkWarSoulSet(equipment);
+
+  // 如果没有激活任何套装，返回空数组
+  if (!setInfo.isActive) return [];
+
+  // 天魂套装（setType = 1）
+  if (setInfo.setType === 1) {
+    // 计算天魂套装压制百分比
+    const suppressionPercent = Math.round(calculateTianHunSetSuppression(equipment) * 100);
+
+    // 添加天魂套装图标
+    activeSets.push({
+      type: 'tianHun',
+      level: setInfo.setLevel,
+      icon: '💠',
+      color: '#4fc3f7',
+      tooltipLines: [
+        `天魂套装${setInfo.setLevel}级`,
+        `全身装备都有天魂战魂而产生的神圣力量，`,
+        `使得战斗中所有敌人的战斗力下降${suppressionPercent}%`
+      ]
+    });
+
+    // 同时添加战魂套装图标（因为天魂套装也满足战魂套装条件）
+    const combatPowerPercent = Math.round(calculateWarSoulSetCombatPowerPercent(equipment) * 100);
+    const combatPowerBonus = calculateWarSoulSetCombatPowerBonus(equipment, baseCombatPower);
+
+    activeSets.push({
+      type: 'warSoul',
+      level: setInfo.setLevel,
+      icon: '✨',
+      color: '#ffd700',
+      tooltipLines: [
+        `战魂套装${setInfo.setLevel}级`,
+        `全身装备都有战魂属性所激发出来的强大力量，`,
+        `使得人物战斗力提高${combatPowerPercent}%。当前提高${combatPowerBonus}战斗力`
+      ]
+    });
+  }
+  // 地魂套装（setType = 2）
+  else if (setInfo.setType === 2) {
+    // 计算地魂套装压制百分比
+    const suppressionPercent = Math.round(calculateDiHunSetSuppression(equipment) * 100);
+
+    // 添加地魂套装图标
+    activeSets.push({
+      type: 'diHun',
+      level: setInfo.setLevel,
+      icon: '🔮',
+      color: '#9575cd',
+      tooltipLines: [
+        `地魂套装${setInfo.setLevel}级`,
+        `全身装备都有地魂战魂而产生的神圣力量，`,
+        `使得战斗中所有敌人的生命值减少${suppressionPercent}%`
+      ]
+    });
+
+    // 同时添加战魂套装图标（因为地魂套装也满足战魂套装条件）
+    const combatPowerPercent = Math.round(calculateWarSoulSetCombatPowerPercent(equipment) * 100);
+    const combatPowerBonus = calculateWarSoulSetCombatPowerBonus(equipment, baseCombatPower);
+
+    activeSets.push({
+      type: 'warSoul',
+      level: setInfo.setLevel,
+      icon: '✨',
+      color: '#ffd700',
+      tooltipLines: [
+        `战魂套装${setInfo.setLevel}级`,
+        `全身装备都有战魂属性所激发出来的强大力量，`,
+        `使得人物战斗力提高${combatPowerPercent}%。当前提高${combatPowerBonus}战斗力`
+      ]
+    });
+  }
+  // 普通战魂套装（混合类型，只有战魂套装效果）
+  else if (setInfo.setType === 0) {
+    // checkWarSoulSet 已经确认所有装备都有战魂，直接添加战魂套装图标
+    const combatPowerPercent = Math.round(calculateWarSoulSetCombatPowerPercent(equipment) * 100);
+    const combatPowerBonus = calculateWarSoulSetCombatPowerBonus(equipment, baseCombatPower);
+
+    activeSets.push({
+      type: 'warSoul',
+      level: setInfo.setLevel,
+      icon: '✨',
+      color: '#ffd700',
+      tooltipLines: [
+        `战魂套装${setInfo.setLevel}级`,
+        `全身装备都有战魂属性所激发出来的强大力量，`,
+        `使得人物战斗力提高${combatPowerPercent}%。当前提高${combatPowerBonus}战斗力`
+      ]
+    });
+  }
+
+  return activeSets;
 }
 
 /**
@@ -102,6 +275,28 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
    * 判断是否有战魂加成
    */
   const hasSoulBonus = soulAttackBonus > 0 || equipmentBonus.dodgeRate > 0;
+
+  /**
+   * 计算基础战斗力（用于战魂套装加成计算）
+   */
+  const baseCombatPowerForSet = useMemo(() => {
+    let power = 0;
+    const slots = Object.values(character.equipment);
+    slots.forEach(item => {
+      if (item) {
+        power += item.combatPower || 0;
+        power += item.soulLevel || 0;
+      }
+    });
+    return power;
+  }, [character.equipment]);
+
+  /**
+   * 检测激活的套装
+   */
+  const activeSets = useMemo(() => {
+    return detectActiveSets(character.equipment, baseCombatPowerForSet);
+  }, [character.equipment, baseCombatPowerForSet]);
 
   /**
    * 处理属性点击事件，显示详细来源
@@ -281,6 +476,15 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
           战斗力：{totalCombatPower}
         </button>
       </div>
+
+      {/* 套装图标容器 - 右下角显示，紧邻装备模块 */}
+      {activeSets.length > 0 && (
+        <div className="war-soul-set-icons-container-bottom">
+          {activeSets.map((set, index) => (
+            <WarSoulSetIcon key={`${set.type}-${index}`} setInfo={set} />
+          ))}
+        </div>
+      )}
 
       {/* 属性详情悬浮框 */}
       <AttributeDetailTooltip

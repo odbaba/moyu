@@ -15,8 +15,8 @@ interface GiftSelectModalProps {
   onClose: () => void;
   /** 背包物品列表 */
   inventoryItems: InventoryItem[];
-  /** 本周已赠送的玫瑰花数量 */
-  weeklyRoseGiftCount: number;
+  /** 本周是否可以送礼 */
+  canGiftThisWeek: boolean;
   /** 确认送礼的回调函数 */
   onConfirmGift: (flowers: Array<{ type: '99朵白玫瑰' | '999朵白玫瑰'; quantity: number }>) => void;
 }
@@ -24,12 +24,13 @@ interface GiftSelectModalProps {
 /**
  * 送礼选择模态窗口组件
  * 用于选择背包中的玫瑰花送给公主，支持同时选择多种玫瑰
+ * 一周只能送一次，一次最多送12个
  */
 const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
   isVisible,
   onClose,
   inventoryItems,
-  weeklyRoseGiftCount,
+  canGiftThisWeek,
   onConfirmGift
 }) => {
   // 99朵白玫瑰数量
@@ -38,9 +39,6 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
   const [rose999Quantity, setRose999Quantity] = useState(0);
   // 提示消息
   const [message, setMessage] = useState('');
-
-  // 计算本周剩余可赠送数量
-  const remainingWeeklyCount = MAX_WEEKLY_ROSE_GIFT_COUNT - weeklyRoseGiftCount;
 
   // 从背包中筛选出玫瑰花
   const roses = useMemo(() => {
@@ -85,8 +83,8 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
   // 处理99朵白玫瑰数量变化
   const handleRose99Change = (delta: number) => {
     const inventoryMax = roses['99朵白玫瑰'];
-    // 计算当前还能选择的最大数量（考虑每周限制）
-    const maxAllowed = remainingWeeklyCount - rose999Quantity;
+    // 计算当前还能选择的最大数量（一次最多12个）
+    const maxAllowed = MAX_WEEKLY_ROSE_GIFT_COUNT - rose999Quantity;
     const maxQuantity = Math.min(inventoryMax, maxAllowed);
     const newQuantity = Math.max(0, Math.min(maxQuantity, rose99Quantity + delta));
     setRose99Quantity(newQuantity);
@@ -96,8 +94,8 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
   // 处理999朵白玫瑰数量变化
   const handleRose999Change = (delta: number) => {
     const inventoryMax = roses['999朵白玫瑰'];
-    // 计算当前还能选择的最大数量（考虑每周限制）
-    const maxAllowed = remainingWeeklyCount - rose99Quantity;
+    // 计算当前还能选择的最大数量（一次最多12个）
+    const maxAllowed = MAX_WEEKLY_ROSE_GIFT_COUNT - rose99Quantity;
     const maxQuantity = Math.min(inventoryMax, maxAllowed);
     const newQuantity = Math.max(0, Math.min(maxQuantity, rose999Quantity + delta));
     setRose999Quantity(newQuantity);
@@ -113,9 +111,9 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
       return;
     }
 
-    // 检查是否超过每周限制
-    if (totalSelectedQuantity > remainingWeeklyCount) {
-      setMessage(`本周还能赠送${remainingWeeklyCount}个玫瑰花！`);
+    // 检查是否超过一次赠送上限
+    if (totalSelectedQuantity > MAX_WEEKLY_ROSE_GIFT_COUNT) {
+      setMessage(`一次最多只能赠送${MAX_WEEKLY_ROSE_GIFT_COUNT}个玫瑰花！`);
       setTimeout(() => setMessage(''), 2000);
 
       return;
@@ -146,8 +144,8 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
   if (!isVisible) return null;
 
   // 计算按钮禁用状态
-  const rose99MaxAllowed = remainingWeeklyCount - rose999Quantity;
-  const rose999MaxAllowed = remainingWeeklyCount - rose99Quantity;
+  const rose99MaxAllowed = MAX_WEEKLY_ROSE_GIFT_COUNT - rose999Quantity;
+  const rose999MaxAllowed = MAX_WEEKLY_ROSE_GIFT_COUNT - rose99Quantity;
   const canAddRose99 = rose99Quantity < Math.min(roses['99朵白玫瑰'], rose99MaxAllowed);
   const canAddRose999 = rose999Quantity < Math.min(roses['999朵白玫瑰'], rose999MaxAllowed);
 
@@ -165,17 +163,19 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
           选择背包中的玫瑰花送给公主，增加亲密度（可同时选择多种）
         </div>
 
-        {/* 每周赠送限制提示 */}
+        {/* 送礼限制提示 */}
         <div className="gift-select-weekly-limit">
-          本周赠送: {weeklyRoseGiftCount}/{MAX_WEEKLY_ROSE_GIFT_COUNT} 个
-          {remainingWeeklyCount > 0 && <span className="remaining"> (剩余{remainingWeeklyCount}个)</span>}
-          {remainingWeeklyCount === 0 && <span className="exhausted"> (已达上限)</span>}
+          {canGiftThisWeek ? (
+            <span>本周可送礼，一次最多{MAX_WEEKLY_ROSE_GIFT_COUNT}个</span>
+          ) : (
+            <span className="exhausted">本周已送过礼物，下周再来吧</span>
+          )}
         </div>
 
         {/* 花朵选择 */}
         <div className="gift-select-flowers">
           {/* 99朵白玫瑰 */}
-          <div className={`flower-option ${roses['99朵白玫瑰'] === 0 || remainingWeeklyCount === 0 ? 'disabled' : ''} ${rose99Quantity > 0 ? 'selected' : ''}`}>
+          <div className={`flower-option ${roses['99朵白玫瑰'] === 0 || !canGiftThisWeek ? 'disabled' : ''} ${rose99Quantity > 0 ? 'selected' : ''}`}>
             <div className="flower-icon">💐</div>
             <div className="flower-info">
               <div className="flower-name">99朵白玫瑰</div>
@@ -194,7 +194,7 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
               <button
                 className="quantity-btn"
                 onClick={() => handleRose99Change(1)}
-                disabled={!canAddRose99}
+                disabled={!canAddRose99 || !canGiftThisWeek}
               >
                 +
               </button>
@@ -202,7 +202,7 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
           </div>
 
           {/* 999朵白玫瑰 */}
-          <div className={`flower-option ${roses['999朵白玫瑰'] === 0 || remainingWeeklyCount === 0 ? 'disabled' : ''} ${rose999Quantity > 0 ? 'selected' : ''}`}>
+          <div className={`flower-option ${roses['999朵白玫瑰'] === 0 || !canGiftThisWeek ? 'disabled' : ''} ${rose999Quantity > 0 ? 'selected' : ''}`}>
             <div className="flower-icon">🌹</div>
             <div className="flower-info">
               <div className="flower-name">999朵白玫瑰</div>
@@ -221,7 +221,7 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
               <button
                 className="quantity-btn"
                 onClick={() => handleRose999Change(1)}
-                disabled={!canAddRose999}
+                disabled={!canAddRose999 || !canGiftThisWeek}
               >
                 +
               </button>
@@ -250,7 +250,7 @@ const GiftSelectModal: React.FC<GiftSelectModalProps> = ({
           <button
             className="confirm-btn"
             onClick={handleConfirm}
-            disabled={rose99Quantity === 0 && rose999Quantity === 0}
+            disabled={(rose99Quantity === 0 && rose999Quantity === 0) || !canGiftThisWeek}
           >
             确认送礼
           </button>

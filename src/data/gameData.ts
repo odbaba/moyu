@@ -298,8 +298,8 @@ export const locations: LocationData = [
     name: '地下城1层',
     description: '地下城的第一层，守卫着三只凶猛的蝎怪。消灭它们才能进入下一层。',
     adjacentLocations: ['dixiacheng-2'], // 仅与地下城2层连通，与主地图不连通
-    // 地下城1层：3个地下城蝎怪交互按钮
-    interactables: ['interact-dxc1-xieguai-1', 'interact-dxc1-xieguai-2', 'interact-dxc1-xieguai-3'],
+    // 地下城1层：3个地下城蝎怪交互按钮 + 返回卡萨诺城按钮
+    interactables: ['interact-dxc1-xieguai-1', 'interact-dxc1-xieguai-2', 'interact-dxc1-xieguai-3', 'teleport_to_kasanuocheng'],
     x: 7,
     y: 2,
   },
@@ -309,8 +309,8 @@ export const locations: LocationData = [
     name: '地下城2层',
     description: '地下城的第二层，徘徊着两个骑士亡魂。消灭它们才能进入最终层。',
     adjacentLocations: ['dixiacheng-1', 'dixiacheng-3'], // 与1层和3层连通，与主地图不连通
-    // 地下城2层：2个骑士亡魂交互按钮
-    interactables: ['interact-dxc2-qishiwanghun-1', 'interact-dxc2-qishiwanghun-2'],
+    // 地下城2层：2个骑士亡魂交互按钮 + 返回卡萨诺城按钮
+    interactables: ['interact-dxc2-qishiwanghun-1', 'interact-dxc2-qishiwanghun-2', 'teleport_to_kasanuocheng'],
     x: 8,
     y: 2,
   },
@@ -320,8 +320,8 @@ export const locations: LocationData = [
     name: '地下城3层',
     description: '地下城的最终层，传说中的呖风火龙兽在此守护着被囚禁的国王。',
     adjacentLocations: ['dixiacheng-2'], // 仅与地下城2层连通，与主地图不连通
-    // 地下城3层：1个呖风火龙兽交互按钮
-    interactables: ['interact-dxc3-huolongshou-1'],
+    // 地下城3层：1个呖风火龙兽交互按钮 + 返回卡萨诺城按钮
+    interactables: ['interact-dxc3-huolongshou-1', 'teleport_to_kasanuocheng'],
     x: 9,
     y: 2,
   }

@@ -780,6 +780,7 @@
 
 .equipment-select-grid-wrapper .inventory-list-item {
   padding: 8px 10px;
+  max-width: 48vw;
 }
 
 .equipment-select-list {
@@ -1036,10 +1037,10 @@
 
 /* ========== 战魂套装图标样式 ========== */
 
-/* 套装图标容器 - 右上角定位 */
-.war-soul-set-icons-container {
+/* 套装图标容器 - 右下角定位（角色属性模块） */
+.war-soul-set-icons-container-bottom {
   position: absolute;
-  top: 10px;
+  bottom: 5px;
   right: 10px;
   display: flex;
   gap: 8px;
@@ -1066,9 +1067,9 @@
 /* 套装悬浮提示样式 */
 .war-soul-set-tooltip {
   position: absolute;
-  top: 100%;
+  bottom: 100%;
   right: 0;
-  margin-top: 5px;
+  margin-bottom: 5px;
   background-color: #1a1a2e;
   border: 1px solid #333;
   border-radius: 6px;
@@ -1095,7 +1096,7 @@
   margin-bottom: 4px;
 }
 
-/* 确保装备展示容器有相对定位 */
-.equipment-display-compact {
+/* 确保角色信息容器有相对定位 */
+.character-info-compact {
   position: relative;
 }

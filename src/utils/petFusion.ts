@@ -428,10 +428,13 @@ function recalculatePetScore(pet: Pet): void {
  * @returns 幻化结果，包含成功状态、结果描述和更新后的幻兽
  */
 export function executeFusion(mainPet: Pet, subPet: Pet): { success: boolean; result: string; updatedPet: Pet } {
-  // 保存幻化前等级、经验、升级需求
-  mainPet.predj = mainPet.dj;
-  mainPet.prejy = mainPet.jy;
-  mainPet.premjy = mainPet.mjy;
+  // 保存幻化前等级、经验、升级需求（只有当当前等级高于已保存的顿悟等级时才更新）
+  // 这样可以保留最高的幻化前等级，确保顿悟能恢复到最高等级
+  if (mainPet.dj > mainPet.predj) {
+    mainPet.predj = mainPet.dj;
+    mainPet.prejy = mainPet.jy;
+    mainPet.premjy = mainPet.mjy;
+  }
 
   // 计算幻化系数
   const ratio = calculateFusionRatio(mainPet, subPet);

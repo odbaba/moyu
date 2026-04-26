@@ -2,6 +2,12 @@
  * BOSS 数据文件
  * 定义各地图的 BOSS 模板数据和刷新配置
  * 参考文档：reference/docs/project_docs/04_怪物系统.md
+ * 
+ * BOSS属性计算公式：
+ * - 生命值 = minGrowthHp~maxGrowthHp × 等级
+ * - 最小攻击 = baseAttackMin + growthAttackMin × 等级
+ * - 最大攻击 = baseAttackMax + growthAttackMax × 等级
+ * - 防御 = baseDefense + growthDefense × 等级
  */
 
 import type { BossSpawnConfig, BossTemplate } from '../types';
@@ -24,11 +30,15 @@ export const bossTemplates: Record<string, BossTemplate> = {
     locationName: '雷鸣大陆',
     icon: '👹',
     description: '雷鸣大陆的守护者，拥有强大的力量。',
-    minHp: 1000,
-    maxHp: 1200,
-    baseAttackMin: 50,
-    baseAttackMax: 80,
-    baseDefense: 30,
+    baseHp: 0,
+    minGrowthHp: 1000,
+    maxGrowthHp: 1200,
+    baseAttackMin: 0,
+    growthAttackMin: 22.5,
+    baseAttackMax: 0,
+    growthAttackMax: 22.5,
+    baseDefense: 0,
+    growthDefense: 30,
     spawnChance: 55, // 55% 刷新概率
   },
 
@@ -42,11 +52,15 @@ export const bossTemplates: Record<string, BossTemplate> = {
     locationName: '戈壁',
     icon: '👹',
     description: '戈壁的霸主，统治着这片荒芜之地。',
-    minHp: 1000,
-    maxHp: 2200,
-    baseAttackMin: 80,
-    baseAttackMax: 120,
-    baseDefense: 50,
+    baseHp: 0,
+    minGrowthHp: 1000,
+    maxGrowthHp: 2200,
+    baseAttackMin: 0,
+    growthAttackMin: 37.5,
+    baseAttackMax: 0,
+    growthAttackMax: 45,
+    baseDefense: 0,
+    growthDefense: 30,
     spawnChance: 45, // 45% 刷新概率
   },
 
@@ -60,11 +74,15 @@ export const bossTemplates: Record<string, BossTemplate> = {
     locationName: '迷梦沼泽',
     icon: '👹',
     description: '迷梦沼泽的梦魇，让人迷失在无尽的幻境中。',
-    minHp: 1250,
-    maxHp: 2750,
-    baseAttackMin: 120,
-    baseAttackMax: 180,
-    baseDefense: 80,
+    baseHp: 0,
+    minGrowthHp: 1250,
+    maxGrowthHp: 2750,
+    baseAttackMin: 0,
+    growthAttackMin: 52.5,
+    baseAttackMax: 0,
+    growthAttackMax: 82.5,
+    baseDefense: 0,
+    growthDefense: 49.5,
     spawnChance: 33, // 33% 刷新概率
   },
 
@@ -78,11 +96,15 @@ export const bossTemplates: Record<string, BossTemplate> = {
     locationName: '冰宫',
     icon: '👹',
     description: '冰宫的王者，寒冰之心永不融化。',
-    minHp: 1250,
-    maxHp: 2750,
-    baseAttackMin: 180,
-    baseAttackMax: 250,
-    baseDefense: 120,
+    baseHp: 0,
+    minGrowthHp: 1250,
+    maxGrowthHp: 2750,
+    baseAttackMin: 0,
+    growthAttackMin: 52.5,
+    baseAttackMax: 0,
+    growthAttackMax: 82.5,
+    baseDefense: 0,
+    growthDefense: 49.5,
     spawnChance: 23, // 23% 刷新概率
   },
 
@@ -96,11 +118,15 @@ export const bossTemplates: Record<string, BossTemplate> = {
     locationName: '亚维特岛',
     icon: '👹',
     description: '亚维特岛的海神，掌控着海洋的力量。',
-    minHp: 1500,
-    maxHp: 3300,
-    baseAttackMin: 250,
-    baseAttackMax: 350,
-    baseDefense: 180,
+    baseHp: 0,
+    minGrowthHp: 1500,
+    maxGrowthHp: 3300,
+    baseAttackMin: 0,
+    growthAttackMin: 75,
+    baseAttackMax: 0,
+    growthAttackMax: 132,
+    baseDefense: 0,
+    growthDefense: 67.5,
     spawnChance: 33, // 33% 刷新概率
   },
 
@@ -114,11 +140,15 @@ export const bossTemplates: Record<string, BossTemplate> = {
     locationName: '火山',
     icon: '👹',
     description: '火山的炎魔，熔岩是它的血液。',
-    minHp: 1500,
-    maxHp: 3300,
-    baseAttackMin: 350,
-    baseAttackMax: 450,
-    baseDefense: 220,
+    baseHp: 0,
+    minGrowthHp: 1500,
+    maxGrowthHp: 3300,
+    baseAttackMin: 0,
+    growthAttackMin: 75,
+    baseAttackMax: 0,
+    growthAttackMax: 132,
+    baseDefense: 0,
+    growthDefense: 67.5,
     spawnChance: 23, // 23% 刷新概率
   },
 
@@ -132,11 +162,15 @@ export const bossTemplates: Record<string, BossTemplate> = {
     locationName: '深渊迷宫',
     icon: '👹',
     description: '深渊迷宫的终极守护者，黑暗的化身。',
-    minHp: 2000,
-    maxHp: 4400,
-    baseAttackMin: 450,
-    baseAttackMax: 600,
-    baseDefense: 300,
+    baseHp: 0,
+    minGrowthHp: 2000,
+    maxGrowthHp: 4400,
+    baseAttackMin: 0,
+    growthAttackMin: 112.5,
+    baseAttackMax: 0,
+    growthAttackMax: 168,
+    baseDefense: 0,
+    growthDefense: 96,
     spawnChance: 33, // 33% 刷新概率
   },
 };

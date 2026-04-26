@@ -50,10 +50,10 @@
 .player-resources {
   display: flex;
   justify-content: space-around;
-  padding: 10px;
-  background-color: #252935;
-  border-radius: 8px;
-  border: 1px solid #555;
+  padding: 6px 8px;
+  background-color: transparent;
+  border-radius: 6px;
+  border: none;
   transition: all 0.3s ease;
 }
 
@@ -67,9 +67,9 @@
 .resource-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 10px;
-  border-radius: 6px;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 4px;
   transition: all 0.3s ease;
   cursor: default;
 }
@@ -109,7 +109,7 @@
 /* 资源标签样式 - 键值对形式的key部分 */
 .resource-label {
   color: #f0f0f0;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: bold;
   transition: color 0.3s ease;
 }
@@ -117,7 +117,7 @@
 /* 资源数值样式 - 键值对形式的value部分 */
 .resource-value {
   color: #f0f0f0;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: bold;
   transition: color 0.3s ease;
 }
@@ -209,11 +209,11 @@
 .inventory-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  padding: 10px;
-  background-color: #252935;
+  gap: 6px;
+  padding: 6px 0px;
+  background-color: transparent;
   border-radius: 8px;
-  border: 1px solid #555;
+  border: none;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -235,12 +235,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
+  padding: 8px 10px;
   background-color: #252935;
   border: 1px solid #444;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 100%;
+  max-width: 47vw;
+  box-sizing: border-box;
 }
 
 /* 物品列表条目悬停效果 */
@@ -264,6 +267,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   flex: 1;
+  min-width: 0;
 }
 
 /* 物品数量样式 */
@@ -763,7 +767,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 15px;
+  padding: 6px 10px;
   background-color: #252935;
   border-bottom: 1px solid #000000;
   flex-shrink: 0;
@@ -917,7 +921,7 @@
   }
 
   .player-resources {
-    padding: 6px;
+    padding: 4px 6px;
   }
 
   .resource-icon {
@@ -936,12 +940,12 @@
 
   /* 物品列表样式 */
   .inventory-list {
-    gap: 6px;
-    padding: 6px;
+    gap: 4px;
+    padding: 4px;
   }
 
   .inventory-list-item {
-    padding: 8px 10px;
+    padding: 6px 8px;
   }
 
   .item-list-name {
@@ -953,11 +957,11 @@
   }
 
   .inventory-page-header {
-    padding: 6px 10px;
+    padding: 4px 8px;
   }
 
   .inventory-page-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .inventory-page-close-button {
@@ -991,7 +995,7 @@
   }
 
   .player-resources {
-    padding: 8px;
+    padding: 5px 8px;
   }
 
   .resource-icon {
@@ -1010,12 +1014,12 @@
 
   /* 物品列表样式 */
   .inventory-list {
-    gap: 6px;
+    gap: 5px;
     padding: 4px;
   }
 
   .inventory-list-item {
-    padding: 8px 10px;
+    padding: 6px 8px;
   }
 
   .item-list-name {
@@ -1105,12 +1109,12 @@
 
   /* 物品列表样式 */
   .inventory-list {
-    gap: 8px;
-    padding: 6px;
+    gap: 6px;
+    padding: 4px;
   }
 
   .inventory-list-item {
-    padding: 10px 12px;
+    padding: 8px 10px;
   }
 
   .item-list-name {
@@ -1134,12 +1138,12 @@
 
   /* 物品列表样式 */
   .inventory-list {
-    gap: 10px;
-    padding: 8px;
+    gap: 8px;
+    padding: 6px;
   }
 
   .inventory-list-item {
-    padding: 12px 15px;
+    padding: 10px 12px;
   }
 
   .item-list-name {

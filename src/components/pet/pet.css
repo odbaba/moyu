@@ -621,7 +621,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   animation: fadeIn 0.3s ease;
+}
+
+.pet-detail-modal-overlay::-webkit-scrollbar {
+  display: none;
 }
 
 .pet-detail-modal-content {
@@ -630,29 +637,18 @@
   padding: 15px;
   width: 90%;
   max-width: 450px;
-  max-height: 85vh;
+  max-height: 88vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   border: 1px solid #000000;
   animation: slideIn 0.3s ease;
   position: relative;
+  margin: 10vh 0 2vh 0;
 }
 
 .pet-detail-modal-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.pet-detail-modal-content::-webkit-scrollbar-track {
-  background: rgba(30, 30, 30, 0.5);
-  border-radius: 3px;
-}
-
-.pet-detail-modal-content::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 3px;
-}
-
-.pet-detail-modal-content::-webkit-scrollbar-thumb:hover {
-  background: #777;
+  display: none;
 }
 
 /* 关闭按钮 */
@@ -1169,7 +1165,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   animation: fadeIn 0.3s ease;
+}
+
+.pet-select-modal-overlay::-webkit-scrollbar {
+  display: none;
 }
 
 /* 幻兽选择弹窗内容容器 */
@@ -1179,12 +1182,20 @@
   padding: 15px;
   width: 90%;
   max-width: 400px;
-  max-height: 80vh;
+  max-height: 88vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   display: flex;
   flex-direction: column;
   border: 2px solid #4ecdc4;
   animation: slideIn 0.3s ease;
   position: relative;
+  margin: 10vh 0 2vh 0;
+}
+
+.pet-select-modal-content::-webkit-scrollbar {
+  display: none;
 }
 
 /* 幻兽选择弹窗标题 */
@@ -1436,7 +1447,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   animation: fadeIn 0.3s ease;
+}
+
+.fusion-help-modal-overlay::-webkit-scrollbar {
+  display: none;
 }
 
 /* 幻化帮助弹窗内容容器 */
@@ -1446,12 +1464,20 @@
   padding: 15px;
   width: 90%;
   max-width: 400px;
-  max-height: 85vh;
+  max-height: 88vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   display: flex;
   flex-direction: column;
   border: 2px solid #ffd700;
   animation: slideIn 0.3s ease;
   position: relative;
+  margin: 10vh 0 2vh 0;
+}
+
+.fusion-help-modal-content::-webkit-scrollbar {
+  display: none;
 }
 
 /* 幻化帮助弹窗标题 */

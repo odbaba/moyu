@@ -228,7 +228,7 @@ export function createSpecialItem(config: {
 /**
  * 从模板创建物品
  * 根据物品名称查找模板并创建实例
- * 不可堆叠物品（maxStack <= 1）生成唯一ID，避免背包中出现重复key
+ * 不可堆叠物品生成唯一ID，避免背包中出现重复key
  * 可堆叠物品保留原始ID以支持堆叠合并
  *
  * @param name 物品名称
@@ -240,10 +240,8 @@ export function createItemFromTemplate(name: string, quantity: number = 1): Inve
   const template = findItemByName(name);
 
   if (template) {
-    // 判断是否为可堆叠物品
-    const isStackable = template.stackable === true || (template.maxStack && template.maxStack > 1);
-
-    if (isStackable) {
+    // 判断是否为可堆叠物品（stackable === true 或 maxStack > 1）
+    if (template.stackable === true || (template.maxStack && template.maxStack > 1)) {
       // 可堆叠物品保留原始ID，支持堆叠合并
       return {
         ...template,
@@ -276,10 +274,8 @@ export function createItemFromTemplate(name: string, quantity: number = 1): Inve
  * @returns 复制后的单个物品
  */
 export function cloneItem(item: InventoryItem): InventoryItem {
-  // 判断是否为可堆叠物品
-  const isStackable = item.stackable === true || (item.maxStack && item.maxStack > 1);
-
-  if (isStackable) {
+  // 判断是否为可堆叠物品（stackable === true 或 maxStack > 1）
+  if (item.stackable === true || (item.maxStack && item.maxStack > 1)) {
     // 可堆叠物品保留原始ID，支持堆叠合并
     return {
       ...item,
@@ -316,38 +312,22 @@ export function addItemToInventory(
   inventory: InventoryItem[],
   newItem: InventoryItem
 ): InventoryItem[] {
-  // 判断是否为可堆叠物品
-  const isStackable = newItem.stackable === true || (newItem.maxStack && newItem.maxStack > 1);
-
-  if (isStackable) {
+  // 判断是否为可堆叠物品（stackable === true 或 maxStack > 1）
+  if (newItem.stackable === true || (newItem.maxStack && newItem.maxStack > 1)) {
     // 可堆叠物品：查找背包中是否有相同ID的物品
     const existingItemIndex = inventory.findIndex(item => item.id === newItem.id);
 
     if (existingItemIndex !== -1) {
-      // 找到相同ID的物品，合并数量
+      // 找到相同ID的物品，直接合并数量
       const existingItem = inventory[existingItemIndex];
       const newQuantity = existingItem.quantity + newItem.quantity;
-
-      // 检查是否超过最大堆叠数量
-      const maxStack = existingItem.maxStack || 99;
-      const finalQuantity = Math.min(newQuantity, maxStack);
 
       // 更新物品数量
       const updatedInventory = [...inventory];
       updatedInventory[existingItemIndex] = {
         ...existingItem,
-        quantity: finalQuantity,
+        quantity: newQuantity,
       };
-
-      // 如果数量超过最大堆叠，创建新的物品实例
-      if (newQuantity > maxStack) {
-        const overflowQuantity = newQuantity - maxStack;
-        const overflowItem = {
-          ...newItem,
-          quantity: overflowQuantity,
-        };
-        updatedInventory.push(overflowItem);
-      }
 
       return updatedInventory;
     }

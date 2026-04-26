@@ -150,17 +150,6 @@ const groceryMerchantItems: ShopItem[] = [
     stackable: false,
     maxStack: 1,
   },
-  {
-    id: 'random_weapon',
-    name: '随机武器',
-    type: 'equipment',
-    priceGold: 1000,
-    priceMagicStone: 0,
-    description: '随机获得一件装备，品质和属性随机生成。',
-    icon: '❓',
-    stackable: false,
-    maxStack: 1,
-  },
 ];
 
 // ==================== 魔石商人物品列表（魔石商店）====================

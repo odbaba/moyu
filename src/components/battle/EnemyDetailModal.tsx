@@ -112,7 +112,7 @@ const EnemyDetailModal: React.FC<EnemyDetailModalProps> = ({
           <div className="enemy-detail-row">
             <div className="enemy-detail-cell full-width">
               <span className="cell-label">生命值</span>
-              <span className="cell-value hp-value">{enemy.currentHp}/{enemy.maxHp}</span>
+              <span className="cell-value hp-value">{Math.round(enemy.currentHp)}/{Math.round(enemy.maxHp)}</span>
               {/* 地魂套装压制时显示生命值降低百分比 */}
               {enemy.warSoulSuppression && enemy.warSoulSuppression.type === 'hp' && (
                 <span className="suppression-value">（-{Math.round(enemy.warSoulSuppression.percentage * 100)}%）</span>

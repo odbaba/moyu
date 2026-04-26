@@ -128,7 +128,7 @@ const DeployedPetSlot: React.FC<DeployedPetSlotProps> = ({
                 style={{ width: `${Math.round((pet.hp / pet.mhp) * 100)}%` }}
               />
               <span className="stat-bar-text">
-                {pet.hp}/{pet.mhp}
+                {Math.round(pet.hp)}/{Math.round(pet.mhp)}
               </span>
             </div>
           </div>

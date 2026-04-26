@@ -50,7 +50,7 @@ export function learnSkillFromBook(
 
   // 4. 检查是否可以学习
   if (isUpgrade) {
-    // 升级技能书：需要已学习该技能，且当前等级 + 1 === 目标等级（只能学习下一级）
+    // 升级技能书：需要已学习该技能
     if (!targetSkill.isLearned) {
       return {
         success: false,
@@ -59,21 +59,11 @@ export function learnSkillFromBook(
       };
     }
 
-    // 检查是否可以升级到目标等级（必须逐级升级）
-    if (targetSkill.level + 1 !== targetLevel) {
-      // 如果当前等级已经达到或超过目标等级
-      if (targetSkill.level >= targetLevel) {
-        return {
-          success: false,
-          message: `${targetSkill.name} 已达到或超过该等级`,
-          updatedSkills: currentSkills
-        };
-      }
-
-      // 如果跳级升级
+    // 检查是否可以升级到目标等级（允许跳级升级）
+    if (targetSkill.level >= targetLevel) {
       return {
         success: false,
-        message: `${targetSkill.name} 当前等级为 Lv.${targetSkill.level}，需要先升级到 Lv.${targetLevel - 1}`,
+        message: `${targetSkill.name} 已达到或超过该等级`,
         updatedSkills: currentSkills
       };
     }

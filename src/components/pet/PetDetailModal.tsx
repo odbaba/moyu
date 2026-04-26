@@ -131,7 +131,7 @@ const PetDetailModal: React.FC<PetDetailModalProps> = ({
           <div className="pet-detail-row">
             <div className="pet-detail-cell">
               <span className="cell-label">生命</span>
-              <span className="cell-value hp-value">{pet.hp}/{pet.mhp}</span>
+              <span className="cell-value hp-value">{Math.round(pet.hp)}/{Math.round(pet.mhp)}</span>
             </div>
             <div className="pet-detail-cell">
               <span className="cell-label">经验</span>

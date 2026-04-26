@@ -156,7 +156,7 @@ const CharacterDetailModal: React.FC<CharacterDetailModalProps> = ({
           <div className="character-detail-row">
             <div className="character-detail-cell full-width">
               <span className="cell-label">生命值</span>
-              <span className="cell-value hp-value">{character.currentHp}/{character.maxHp}</span>
+              <span className="cell-value hp-value">{Math.round(character.currentHp)}/{Math.round(character.maxHp)}</span>
               <span className="cell-percent">({getHpPercent()})</span>
             </div>
           </div>

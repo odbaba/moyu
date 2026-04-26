@@ -261,7 +261,7 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem, warSoulSys
  * @param gem - 使用的宝石（魔魂晶石或魔魂之心）
  * @returns 精炼结果
  */
-export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulSystemEnabled?: boolean): RefineResult {
+export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, _warSoulSystemEnabled?: boolean): RefineResult {
   // 验证装备是否有效
   if (!equipment || equipment.type !== 'equipment') {
     return {
@@ -285,50 +285,19 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
   // 获取当前魔魂等级
   const currentLevel = equipment.magicSoulLevel || 0;
 
-  // 检查是否已达到最高等级
-  if (currentLevel >= 12) {
-    return {
-      success: false,
-      message: '装备魔魂等级已达到最高等级（+12），无法继续提升',
-      updatedEquipment: { ...equipment },
-      usedGem: { ...gem }
-    };
-  }
-
-  // 魔魂之心：+9前100%成功
+  // 魔魂之心：100%成功，但只能升级到+9
   if (gem.name === '魔魂之心') {
+    // 检查是否已达到魔魂之心的上限（+9）
     if (currentLevel >= 9) {
       return {
         success: false,
-        message: '魔魂之心只能用于+9之前的装备',
+        message: '魔魂之心只能将魔魂等级提升到+9，当前等级已达到或超过+9，请使用魔魂晶石继续精炼',
         updatedEquipment: { ...equipment },
         usedGem: { ...gem }
       };
     }
 
     equipment.magicSoulLevel = currentLevel + 1;
-
-    // 魔魂升至12级时战魂等级提升
-    let soulLevelChange = 0;
-    if (warSoulSystemEnabled && currentLevel + 1 >= 12 && equipment.soulType && equipment.soulType > WarSoulType.NONE) {
-      const currentSoulLevel = equipment.soulLevel || 1;
-      if (currentSoulLevel < 5) {
-        equipment.soulLevel = currentSoulLevel + 1;
-        soulLevelChange = 1;
-
-        return {
-          success: true,
-          message: `使用魔魂之心精炼成功！魔魂等级提升为+${currentLevel + 1}。魔魂等级提升到了12级使得装备能量提升，战魂等级提高一级。`,
-          attributeChanges: {
-            magicSoulLevel: currentLevel + 1,
-            magicSoulChange: 1,
-            soulLevelChange
-          },
-          updatedEquipment: { ...equipment },
-          usedGem: { ...gem }
-        };
-      }
-    }
 
     return {
       success: true,
@@ -338,6 +307,16 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
         magicSoulChange: 1,
         soulLevelChange: 0
       },
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
+    };
+  }
+
+  // 魔魂晶石：检查是否已达到最高等级（+12）
+  if (currentLevel >= 12) {
+    return {
+      success: false,
+      message: '魔魂等级已达到最高等级+12，无法继续精炼',
       updatedEquipment: { ...equipment },
       usedGem: { ...gem }
     };
@@ -357,36 +336,14 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
     successRate = 0.5;
     success = Math.random() < successRate;
   }
-  // +9~+11：35%成功率
-  else if (currentLevel < 12) {
-    successRate = 0.35;
+  // +9及以上：50%成功率
+  else {
+    successRate = 0.5;
     success = Math.random() < successRate;
   }
 
   if (success) {
     equipment.magicSoulLevel = currentLevel + 1;
-
-    // 魔魂升至12级时战魂等级提升
-    let soulLevelChange = 0;
-    if (warSoulSystemEnabled && currentLevel + 1 >= 12 && equipment.soulType && equipment.soulType > WarSoulType.NONE) {
-      const currentSoulLevel = equipment.soulLevel || 1;
-      if (currentSoulLevel < 5) {
-        equipment.soulLevel = currentSoulLevel + 1;
-        soulLevelChange = 1;
-
-        return {
-          success: true,
-          message: `精炼成功！魔魂等级提升为+${currentLevel + 1}。魔魂等级提升到了12级使得装备能量提升，战魂等级提高一级。`,
-          attributeChanges: {
-            magicSoulLevel: currentLevel + 1,
-            magicSoulChange: 1,
-            soulLevelChange
-          },
-          updatedEquipment: { ...equipment },
-          usedGem: { ...gem }
-        };
-      }
-    }
 
     return {
       success: true,
@@ -400,30 +357,34 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, warSoulS
       usedGem: { ...gem }
     };
   } else {
-    // 失败处理：+9后失败不降级
-    if (currentLevel >= 9) {
-      return {
-        success: false,
-        message: `精炼失败，但魔魂等级保持在+${currentLevel}（+9后失败不降级）`,
-        updatedEquipment: { ...equipment },
-        usedGem: { ...gem }
-      };
-    } else {
-      // +9前失败降1级
-      const newLevel = Math.max(0, currentLevel - 1);
-      equipment.magicSoulLevel = newLevel;
+    // 失败处理：
+    // 如果当前等级等于9，失败不降级
+    // 如果当前等级超过9，失败降1级
+    // 如果当前等级小于9，失败降1级
+    let newLevel: number;
+    let message: string;
 
-      return {
-        success: false,
-        message: `精炼失败，魔魂等级降为+${newLevel}`,
-        attributeChanges: {
-          magicSoulLevel: newLevel,
-          magicSoulChange: newLevel - currentLevel
-        },
-        updatedEquipment: { ...equipment },
-        usedGem: { ...gem }
-      };
+    if (currentLevel === 9) {
+      // 等级等于9时，失败不降级
+      newLevel = currentLevel;
+      message = `精炼失败，魔魂等级保持+${newLevel}`;
+    } else {
+      // 其他情况，降1级
+      newLevel = Math.max(0, currentLevel - 1);
+      equipment.magicSoulLevel = newLevel;
+      message = `精炼失败，魔魂等级降为+${newLevel}`;
     }
+
+    return {
+      success: false,
+      message,
+      attributeChanges: {
+        magicSoulLevel: newLevel,
+        magicSoulChange: newLevel - currentLevel
+      },
+      updatedEquipment: { ...equipment },
+      usedGem: { ...gem }
+    };
   }
 }
 
@@ -1073,17 +1034,19 @@ export function canRefine(
   }
 
   // 魔魂提升
-  if (gemName === '魔魂晶石' || gemName === '魔魂之心') {
+  // 魔魂之心只能升级到+9，魔魂晶石最高可以升级到+12
+  if (gemName === '魔魂之心') {
+    if (equipment.magicSoulLevel >= 9) {
+      return {
+        canRefine: false,
+        reason: '魔魂之心只能将魔魂等级提升到+9，当前等级已达到或超过+9'
+      };
+    }
+  } else if (gemName === '魔魂晶石') {
     if (equipment.magicSoulLevel >= 12) {
       return {
         canRefine: false,
-        reason: '装备魔魂等级已达到最高等级（+12）'
-      };
-    }
-    if (gemName === '魔魂之心' && equipment.magicSoulLevel >= 9) {
-      return {
-        canRefine: false,
-        reason: '魔魂之心只能用于+9之前的装备'
+        reason: '魔魂等级已达到最高等级+12'
       };
     }
   }

@@ -14,7 +14,7 @@ import {
   yueGuangBaoHeZengQiangBan,
 } from '../data/inventoryData';
 import type { EquipmentItem, InventoryItem } from '../types';
-import { generateItemId } from './itemFactory';
+import { cloneItem, generateItemId } from './itemFactory';
 
 /**
  * 战利品结果接口
@@ -31,32 +31,7 @@ export interface LootResult {
  */
 const EQUIPMENT_TYPES: EquipmentItem['equipmentType'][] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
 
-/**
- * 复制物品模板用于战利品
- * 不可堆叠物品生成唯一ID，可堆叠物品保留原始ID以支持堆叠合并
- *
- * @param template 物品模板
- * @returns 战利品物品实例
- */
-function cloneItemTemplate<T extends InventoryItem>(template: T): T {
-  // 判断是否为可堆叠物品
-  const isStackable = template.stackable === true || (template.maxStack && template.maxStack > 1);
 
-  if (isStackable) {
-    // 可堆叠物品保留原始ID，支持堆叠合并
-    return {
-      ...template,
-      quantity: 1,
-    };
-  } else {
-    // 不可堆叠物品生成唯一ID，避免背包中重复key
-    return {
-      ...template,
-      id: generateItemId(template.type, template.id),
-      quantity: 1,
-    } as T;
-  }
-}
 
 /**
  * 计算战利品
@@ -129,7 +104,7 @@ export function calculateLoot(
 
     // 灵魂晶石 (2.5%概率)
     if (Math.random() * 200 < 5 * dropRate) {
-      items.push(cloneItemTemplate(lingHunJingShi));
+      items.push(cloneItem(lingHunJingShi));
       messages.push('获得: 灵魂晶石');
     }
 
@@ -162,13 +137,13 @@ function generateBossLoot(bossLevel: number, dropRate: number): { items: Invento
 
   // 灵魂晶石 (50%概率)
   if (Math.random() < 0.5) {
-    items.push(cloneItemTemplate(lingHunJingShi));
+    items.push(cloneItem(lingHunJingShi));
     messages.push('获得: 灵魂晶石');
   }
 
   // 灵魂王 (等级/10%概率)
   if (Math.random() * 100 < bossLevel / 10) {
-    items.push(cloneItemTemplate(lingHunWang));
+    items.push(cloneItem(lingHunWang));
     messages.push('获得: 灵魂王');
   }
 
@@ -176,11 +151,11 @@ function generateBossLoot(bossLevel: number, dropRate: number): { items: Invento
   if (Math.random() * 200 < 10 * dropRate) {
     if (bossLevel >= 60) {
       // 60级以上BOSS掉落月光宝盒增强版
-      items.push(cloneItemTemplate(yueGuangBaoHeZengQiangBan));
+      items.push(cloneItem(yueGuangBaoHeZengQiangBan));
       messages.push('获得: 月光宝盒增强版');
     } else {
       // 60级以下BOSS掉落月光宝盒
-      items.push(cloneItemTemplate(yueGuangBaoHe));
+      items.push(cloneItem(yueGuangBaoHe));
       messages.push('获得: 月光宝盒');
     }
   }

@@ -101,6 +101,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
         />
       );
     }
+
     return <span className="refine-slot-icon">{item.icon}</span>;
   };
 
@@ -172,6 +173,8 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
   const handleEquipmentSelect = (item: InventoryItem) => {
     onEquipmentChange(item as EquipmentItem);
     setShowSelection(false);
+    // 换装备时清空精炼结果提示
+    setRefineResult(null);
   };
 
   /**
@@ -181,6 +184,8 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
   const handleGemSelect = (item: InventoryItem) => {
     onGemChange(item as GemItem);
     setShowSelection(false);
+    // 换宝石时清空精炼结果提示
+    setRefineResult(null);
   };
 
   /**
@@ -188,6 +193,8 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
    */
   const handleRemoveEquipment = () => {
     onEquipmentChange(null);
+    // 移除装备时清空精炼结果提示
+    setRefineResult(null);
   };
 
   /**
@@ -195,6 +202,8 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
    */
   const handleRemoveGem = () => {
     onGemChange(null);
+    // 移除宝石时清空精炼结果提示
+    setRefineResult(null);
   };
 
   /**
@@ -218,10 +227,10 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
     // 显示结果
     setRefineResult(result);
 
-    // 3秒后自动清除结果
+    // 5秒后自动清除结果
     setTimeout(() => {
       setRefineResult(null);
-    }, 3000);
+    }, 5000);
   };
 
   /**
@@ -275,10 +284,10 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
     // 显示结果
     setRefineResult(result);
 
-    // 3秒后自动清除结果
+    // 5秒后自动清除结果
     setTimeout(() => {
       setRefineResult(null);
-    }, 3000);
+    }, 5000);
   };
 
   /**

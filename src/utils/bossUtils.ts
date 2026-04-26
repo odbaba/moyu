@@ -111,30 +111,46 @@ export function rollSpecialMonsterSpawns(): SpecialMonsterSpawnResult[] {
 
 /**
  * 根据 BOSS 模板生成敌人数据
- * BOSS 的属性在范围内随机生成
+ * BOSS 的属性根据等级和成长系数计算
  * 注意：攻击力保留最小值和最大值范围，战斗时才随机取值
+ * 
+ * 属性计算公式：
+ * - 生命值 = minGrowthHp~maxGrowthHp × 等级
+ * - 最小攻击 = baseAttackMin + growthAttackMin × 等级
+ * - 最大攻击 = baseAttackMax + growthAttackMax × 等级
+ * - 防御 = baseDefense + growthDefense × 等级
  *
  * @param bossTemplate BOSS 模板
  * @param spawnId 刷新配置 ID（用于生成唯一敌人 ID）
  * @returns 敌人数据
  */
 export function generateBossEnemyData(bossTemplate: BossTemplate, spawnId: string): EnemyData {
-  // 在范围内随机生成生命值
-  const maxHp = Math.floor(
-    bossTemplate.minHp + Math.random() * (bossTemplate.maxHp - bossTemplate.minHp)
+  // 计算生命值：在成长系数范围内随机选择，然后乘以等级
+  const growthHp = bossTemplate.minGrowthHp + 
+    Math.random() * (bossTemplate.maxGrowthHp - bossTemplate.minGrowthHp);
+  const maxHp = Math.floor(growthHp * bossTemplate.level);
+
+  // 计算最小攻击力 = 基础最小攻击 + 最小攻击成长 × 等级
+  const attackMin = Math.round(
+    bossTemplate.baseAttackMin + bossTemplate.growthAttackMin * bossTemplate.level
   );
 
-  // 直接使用 BOSS 模板的攻击力范围（战斗时才随机取值）
-  const attackMin = bossTemplate.baseAttackMin;
-  const attackMax = bossTemplate.baseAttackMax;
+  // 计算最大攻击力 = 基础最大攻击 + 最大攻击成长 × 等级
+  const attackMax = Math.round(
+    bossTemplate.baseAttackMax + bossTemplate.growthAttackMax * bossTemplate.level
+  );
 
-  // 使用基础防御
-  const defense = bossTemplate.baseDefense;
+  // 计算防御力 = 基础防御 + 防御成长 × 等级
+  const defense = Math.round(
+    bossTemplate.baseDefense + bossTemplate.growthDefense * bossTemplate.level
+  );
 
   // 生成敌人数据
   const enemyData: EnemyData = {
     id: `${spawnId}_boss`,
     name: bossTemplate.name,
+    level: bossTemplate.level,
+    combatPower: bossTemplate.combatPower,
     maxHp: maxHp,
     attackMin: attackMin, // 最小攻击力
     attackMax: attackMax, // 最大攻击力

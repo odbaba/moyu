@@ -887,6 +887,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.detail-modal-overlay::-webkit-scrollbar {
+  display: none;
 }
 
 /* 通用详情弹窗内容 */
@@ -896,8 +903,15 @@
   padding: 20px;
   max-width: 350px;
   width: 90%;
-  max-height: 80vh;
+  max-height: 88vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  margin: 10vh 0 2vh 0;
+}
+
+.detail-modal-content::-webkit-scrollbar {
+  display: none;
 }
 
 /* 敌人详情弹窗内容 */
@@ -1252,4 +1266,76 @@
 .suppression-info {
   color: #dc2626;
   font-size: 0.85em;
+}
+
+/* ========== 幻兽幸运值样式 ========== */
+
+/* 幸运值容器 - 用于放置幸运值文本和警告图标 */
+.luck-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 1px;
+  padding: 1px 0;
+}
+
+/* 幸运值文本样式 - 默认白色 */
+.luck-value {
+  font-size: 0.45rem;
+  color: #FCFFFF;
+  font-weight: 100;
+}
+
+/* 低幸运值警告样式 - 红色文字 */
+.luck-value.luck-warning {
+  color: #ff4444;
+  font-weight: bold;
+  animation: luckWarningPulse 1.5s ease-in-out infinite;
+}
+
+/* 低幸运值警告图标样式 */
+.luck-warning-icon {
+  font-size: 0.5rem;
+  animation: warningIconShake 0.5s ease-in-out infinite;
+  cursor: help;
+}
+
+/* 幸运值警告脉冲动画 */
+@keyframes luckWarningPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* 警告图标抖动动画 */
+@keyframes warningIconShake {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+/* 响应式设计 - 幸运值移动端优化 */
+@media (max-width: 768px) {
+  .luck-container {
+    gap: 2px;
+    margin-top: 1px;
+  }
+
+  .luck-value {
+    font-size: 0.4rem;
+  }
+
+  .luck-warning-icon {
+    font-size: 0.45rem;
+  }
 }

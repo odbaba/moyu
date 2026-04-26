@@ -12,8 +12,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   z-index: 10000;
   animation: fadeIn 0.3s ease;
+}
+
+.use-item-modal-overlay::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes fadeIn {
@@ -32,10 +39,17 @@
   padding: 20px;
   width: 90%;
   max-width: 500px;
-  max-height: 80vh;
+  max-height: 88vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   animation: slideIn 0.3s ease;
+  margin: 10vh 0 2vh 0;
+}
+
+.use-item-modal-content::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes slideIn {

@@ -18,8 +18,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   animation: fadeIn 0.3s ease;
   backdrop-filter: blur(2px);
+}
+
+.item-detail-modal-overlay::-webkit-scrollbar {
+  display: none;
 }
 
 /* ========== 弹窗内容区域样式 ========== */
@@ -31,35 +38,21 @@
   padding: 20px;
   width: 90%;
   max-width: 400px;
-  max-height: 85vh;
+  max-height: 88vh;
   overflow-y: auto;
   border: 2px solid #ffd700;
   animation: slideIn 0.3s ease;
   position: relative;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
               0 0 30px rgba(255, 215, 0, 0.2);
-  scrollbar-width: thin;
-  scrollbar-color: #555 rgba(30, 30, 30, 0.5);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  margin: 10vh 0 2vh 0;
 }
 
-/* 弹窗内容滚动条样式 */
+/* 弹窗内容滚动条样式 - 隐藏滚动条 */
 .item-detail-modal-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.item-detail-modal-content::-webkit-scrollbar-track {
-  background: rgba(30, 30, 30, 0.5);
-  border-radius: 3px;
-}
-
-.item-detail-modal-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #555 0%, #777 50%, #555 100%);
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.item-detail-modal-content::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #666 0%, #888 50%, #666 100%);
+  display: none;
 }
 
 /* ========== 关闭按钮样式 ========== */

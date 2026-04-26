@@ -98,7 +98,7 @@ onRelease = function()
 };
 onRollOver = function()
 {
-   texts = names + "\n" + "可以提升装备[魔魂]等级de宝石，成功率20%-50%";
+   texts = names + "\n" + "可以提升装备[魔魂]等级的宝石，成功率：0-5级90%，6-8级50%，9-11级35%";
    _root.wpxs.toshow(this);
 };
 onRollOut = function()

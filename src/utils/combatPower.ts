@@ -279,13 +279,20 @@ export function checkWarSoulSet(equipment: CharacterData['equipment']): WarSoulS
   const soulTypes = equippedItems.map(item => item.soulType);
   const firstSoulType = soulTypes[0];
   const allSameType = soulTypes.every(type => type === firstSoulType);
-  if (!allSameType) {
-    return { isActive: false, setType: 0, setLevel: 0 };
-  }
 
   // 计算套装等级（取最低战魂等级）
   const soulLevels = equippedItems.map(item => item.soulLevel || 0);
   const setLevel = Math.min(...soulLevels);
+
+  // 如果所有装备都有战魂，但类型不一致，返回 isActive: true, setType: 0（混合类型）
+  // 这样可以触发战魂套装效果，但不触发天魂/地魂套装效果
+  if (!allSameType) {
+    return {
+      isActive: true,
+      setType: 0,
+      setLevel
+    };
+  }
 
   return {
     isActive: true,

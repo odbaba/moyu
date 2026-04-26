@@ -59,6 +59,21 @@ const mining_4: ActionInteractable = {
   actionType: 'mining',
 };
 
+// ==================== 传送动作交互配置 ====================
+
+/**
+ * 返回卡萨诺城交互配置
+ * 点击后直接传送回卡萨诺城，无需弹窗
+ */
+const teleport_to_kasanuocheng: ActionInteractable = {
+  id: 'teleport_to_kasanuocheng',
+  type: 'action',
+  name: '返回卡萨诺城',
+  icon: '🏠',
+  actionType: 'custom',
+  actionParams: { action: 'teleportToKasanuocheng' },
+};
+
 // ==================== 敌人交互配置 ====================
 
 /**
@@ -151,6 +166,8 @@ export const interactableConfig: InteractableConfig = {
   mining_2,
   mining_3,
   mining_4,
+  // 传送动作交互
+  teleport_to_kasanuocheng,
   // 敌人交互
   patrol_soldiers,
   // NPC交互

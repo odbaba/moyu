@@ -1,5 +1,56 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+/**
+ * 战斗组件 - Battle.tsx
+ * 
+ * 本组件实现回合制战斗系统，包含以下核心功能：
+ * 1. 玩家与敌人的回合制战斗
+ * 2. 幻兽系统支持（最多2只幻兽同时出战）
+ * 3. 合体幻兽机制（幻兽合体后属性加成到玩家）
+ * 4. 幻兽幸运值机制（合体幻兽受到致命伤害时保留1血并降低幸运值）
+ * 
+ * ========== 幻兽幸运值机制说明 ==========
+ * 
+ * 【幸运值属性定义】
+ * - 属性范围：0-100
+ * - 初始值：50
+ * - 作用对象：所有幻兽（但只有合体状态的幻兽才会触发保留1血机制）
+ * 
+ * 【幸运值在战斗中的作用】
+ * 
+ * 1. 保留1血机制（仅合体幻兽）
+ *    - 触发条件：只有合体状态的幻兽才会触发此机制
+ *    - 触发时机：当合体幻兽受到致命伤害时（伤害值 >= 当前血量）
+ *    - 效果：
+ *      * 幻兽不会死亡，而是保留1点血量
+ *      * 幻兽幸运值降低10点（确保不低于0）
+ *      * 战斗日志记录："{幻兽名称} 受到致命伤害，幸运值降低10点！当前幸运值：{新幸运值}"
+ * 
+ * 2. 幸运值耗尽退出战斗机制
+ *    - 触发条件：幻兽幸运值降为0时
+ *    - 效果：
+ *      * 幻兽自动解除合体状态
+ *      * 幻兽退出战斗（从 deployedPets 中移除）
+ *      * 战斗日志记录："{幻兽名称} 幸运值耗尽，退出战斗！"
+ *      * 敌方后续攻击自动转向玩家
+ * 
+ * 3. 幸运值影响暴击率
+ *    - 幻兽的幸运值影响暴击率：暴击率 = 幸运值 / 100，最大50%
+ *    - 幸运值越高，暴击率越高
+ * 
+ * 【注意事项】
+ * - 只有合体状态的幻兽才会触发保留1血机制
+ * - 非合体幻兽受到致命伤害会直接阵亡
+ * - 幻兽退出战斗后，需要恢复血量才能再次出战
+ * - 幻兽幸运值在战斗结束后不会自动恢复，需要通过其他方式恢复
+ * 
+ * 【相关文件】
+ * - 类型定义：src/types/index.ts（Pet接口、BattlePet接口）
+ * - 战斗计算：src/utils/battleCalculator.ts（checkCritical函数）
+ * - 幸运值工具：src/utils/luckUtils.ts
+ * - 文档说明：src/components/battle/README.md
+ */
+
 // 导入战斗数据
 import { createEnemiesForBattle } from '../../data/battleData';
 // 导入新的类型定义
@@ -476,15 +527,74 @@ const Battle: React.FC<BattleProps> = ({
       }
 
       // ========== 合体幻兽伤害扣除逻辑 ==========
-      // 检查是否有合体幻兽
+      // 检查是否有合体幻兽（幻兽保留1血机制：只有合体状态的幻兽才触发保留1血机制）
       const mergedPet = newState.deployedPets.find(pet => pet.isMerged && pet.currentHp > 0);
 
       if (mergedPet && result.defender.isPlayer) {
         // 有合体幻兽，优先从幻兽血条扣除
         const damage = result.damageResult.damage;
 
-        if (mergedPet.currentHp >= damage) {
-          // 幻兽血量足够，全部从幻兽扣除
+        // 检查是否为致命伤害（伤害值 >= 当前血量）
+        // 幻兽保留1血机制：当合体幻兽受到致命伤害时，不再将血量降为0，而是保留为1
+        const isFatalDamage = damage >= mergedPet.currentHp;
+
+        if (isFatalDamage) {
+          // 幻兽保留1血机制：当合体幻兽受到致命伤害时，保留1血并降低幸运值
+          // 降低幻兽幸运值10点（确保不低于0）
+          const newLuck = Math.max(0, mergedPet.luck - 10);
+
+          // 更新幻兽状态：血量保留为1，幸运值降低
+          newState.deployedPets = newState.deployedPets.map(pet => {
+            if (pet.id === mergedPet.id) {
+              return {
+                ...pet,
+                currentHp: 1,
+                luck: newLuck
+              };
+            }
+
+            return pet;
+          });
+
+          // 添加战斗日志：记录幸运值降低信息
+          const luckLogEntry: BattleLogEntry = {
+            id: generateLogId(),
+            round: newState.round,
+            actor: mergedPet.name,
+            actorId: mergedPet.id,
+            action: `${mergedPet.name} 受到致命伤害，幸运值降低10点！当前幸运值：${newLuck}`,
+            actionType: 'damage',
+            damage: damage,
+            target: mergedPet.name,
+            targetId: mergedPet.id
+          };
+          newState.battleLogs = [...newState.battleLogs, luckLogEntry];
+
+          // 幻兽幸运值耗尽退出战斗机制
+          // 当幻兽幸运值降为0时，幻兽自动解除合体状态并退出战斗
+          if (newLuck === 0) {
+            // 将幻兽从deployedPets中移除（退出战斗）
+            newState.deployedPets = newState.deployedPets.filter(pet => pet.id !== mergedPet.id);
+
+            // 添加战斗日志：记录幻兽因幸运值耗尽而退出战斗
+            const exitLogEntry: BattleLogEntry = {
+              id: generateLogId(),
+              round: newState.round,
+              actor: mergedPet.name,
+              actorId: mergedPet.id,
+              action: `${mergedPet.name} 幸运值耗尽，退出战斗！`,
+              actionType: 'damage',
+              damage: 0,
+              target: mergedPet.name,
+              targetId: mergedPet.id
+            };
+            newState.battleLogs = [...newState.battleLogs, exitLogEntry];
+
+            // 幻兽退出战斗后，敌方后续攻击将自动转向玩家
+            // 因为mergedPet查找会返回undefined，攻击逻辑会自然转向玩家
+          }
+        } else {
+          // 幻兽血量足够，正常扣除幻兽血量
           newState.deployedPets = newState.deployedPets.map(pet => {
             if (pet.id === mergedPet.id) {
               return {
@@ -495,51 +605,6 @@ const Battle: React.FC<BattleProps> = ({
 
             return pet;
           });
-
-          // 检查幻兽是否阵亡
-          if (mergedPet.currentHp - damage <= 0) {
-            const deathLogEntry: BattleLogEntry = {
-              id: generateLogId(),
-              round: newState.round,
-              actor: mergedPet.name,
-              actorId: mergedPet.id,
-              action: `${mergedPet.name} 阵亡了！`,
-              actionType: 'death',
-              damage: 0,
-              target: mergedPet.name,
-              targetId: mergedPet.id
-            };
-            newState.battleLogs = [...newState.battleLogs, deathLogEntry];
-          }
-        } else {
-          // 幻兽血量不足，将幻兽血量清零，溢出伤害不再扣除主角血量
-          // 扣除幻兽血量（降为0）
-          newState.deployedPets = newState.deployedPets.map(pet => {
-            if (pet.id === mergedPet.id) {
-              return {
-                ...pet,
-                currentHp: 0
-              };
-            }
-
-            return pet;
-          });
-
-          // 添加幻兽阵亡日志
-          const deathLogEntry: BattleLogEntry = {
-            id: generateLogId(),
-            round: newState.round,
-            actor: mergedPet.name,
-            actorId: mergedPet.id,
-            action: `${mergedPet.name} 阵亡了！`,
-            actionType: 'death',
-            damage: 0,
-            target: mergedPet.name,
-            targetId: mergedPet.id
-          };
-          newState.battleLogs = [...newState.battleLogs, deathLogEntry];
-
-          // 溢出伤害消失，不再扣除主角血量
         }
       } else {
         // 没有合体幻兽，直接扣除主角血量
@@ -754,16 +819,103 @@ const Battle: React.FC<BattleProps> = ({
               action: `使用 ${skill.name} 第 ${index + 1} 击攻击 ${currentDefender.name}`
             } : result.logEntries[index];
 
-            // 直接从当前HP扣除本次伤害
-            const updatedDefender = {
-              ...currentDefender,
-              currentHp: Math.max(0, currentDefender.currentHp - damageResult.damage)
-            };
+            // ========== 合体幻兽伤害扣除逻辑（多段攻击） ==========
+            // 检查是否有合体幻兽（幻兽保留1血机制：只有合体状态的幻兽才触发保留1血机制）
+            const mergedPetForMulti = newState.deployedPets.find(pet => pet.isMerged && pet.currentHp > 0);
 
             // 更新防御者
-            if (updatedDefender.isPlayer) {
-              newState.player = updatedDefender;
+            if (currentDefender.isPlayer) {
+              // 玩家受到伤害，检查是否有合体幻兽
+              if (mergedPetForMulti) {
+                // 有合体幻兽，优先从幻兽血条扣除
+                const damage = damageResult.damage;
+
+                // 检查是否为致命伤害（伤害值 >= 当前血量）
+                // 幻兽保留1血机制：当合体幻兽受到致命伤害时，不再将血量降为0，而是保留为1
+                const isFatalDamage = damage >= mergedPetForMulti.currentHp;
+
+                if (isFatalDamage) {
+                  // 幻兽保留1血机制：当合体幻兽受到致命伤害时，保留1血并降低幸运值
+                  // 降低幻兽幸运值10点（确保不低于0）
+                  const newLuck = Math.max(0, mergedPetForMulti.luck - 10);
+
+                  // 更新幻兽状态：血量保留为1，幸运值降低
+                  newState.deployedPets = newState.deployedPets.map(pet => {
+                    if (pet.id === mergedPetForMulti.id) {
+                      return {
+                        ...pet,
+                        currentHp: 1,
+                        luck: newLuck
+                      };
+                    }
+
+                    return pet;
+                  });
+
+                  // 添加战斗日志：记录幸运值降低信息
+                  const luckLogEntry: BattleLogEntry = {
+                    id: generateLogId(),
+                    round: newState.round,
+                    actor: mergedPetForMulti.name,
+                    actorId: mergedPetForMulti.id,
+                    action: `${mergedPetForMulti.name} 受到致命伤害，幸运值降低10点！当前幸运值：${newLuck}`,
+                    actionType: 'damage',
+                    damage: damage,
+                    target: mergedPetForMulti.name,
+                    targetId: mergedPetForMulti.id
+                  };
+                  newState.battleLogs = [...newState.battleLogs, luckLogEntry];
+
+                  // 幻兽幸运值耗尽退出战斗机制
+                  // 当幻兽幸运值降为0时，幻兽自动解除合体状态并退出战斗
+                  if (newLuck === 0) {
+                    // 将幻兽从deployedPets中移除（退出战斗）
+                    newState.deployedPets = newState.deployedPets.filter(pet => pet.id !== mergedPetForMulti.id);
+
+                    // 添加战斗日志：记录幻兽因幸运值耗尽而退出战斗
+                    const exitLogEntry: BattleLogEntry = {
+                      id: generateLogId(),
+                      round: newState.round,
+                      actor: mergedPetForMulti.name,
+                      actorId: mergedPetForMulti.id,
+                      action: `${mergedPetForMulti.name} 幸运值耗尽，退出战斗！`,
+                      actionType: 'damage',
+                      damage: 0,
+                      target: mergedPetForMulti.name,
+                      targetId: mergedPetForMulti.id
+                    };
+                    newState.battleLogs = [...newState.battleLogs, exitLogEntry];
+
+                    // 幻兽退出战斗后，敌方后续攻击将自动转向玩家
+                    // 因为mergedPetForMulti查找会返回undefined，攻击逻辑会自然转向玩家
+                  }
+                } else {
+                  // 幻兽血量足够，正常扣除幻兽血量
+                  newState.deployedPets = newState.deployedPets.map(pet => {
+                    if (pet.id === mergedPetForMulti.id) {
+                      return {
+                        ...pet,
+                        currentHp: pet.currentHp - damage
+                      };
+                    }
+
+                    return pet;
+                  });
+                }
+              } else {
+                // 没有合体幻兽，直接扣除玩家血量
+                newState.player = {
+                  ...currentDefender,
+                  currentHp: Math.max(0, currentDefender.currentHp - damageResult.damage)
+                };
+              }
             } else {
+              // 敌人受到伤害，直接扣除敌人血量
+              const updatedDefender = {
+                ...currentDefender,
+                currentHp: Math.max(0, currentDefender.currentHp - damageResult.damage)
+              };
+
               newState.enemies = newState.enemies.map(enemy =>
                 enemy.id === updatedDefender.id ? updatedDefender : enemy
               );

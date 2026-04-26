@@ -14,9 +14,15 @@
   z-index: 3100;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding-top: 10vh;
+  align-items: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   animation: fadeIn 0.3s ease;
+}
+
+.collector-modal-overlay::-webkit-scrollbar {
+  display: none;
 }
 
 /* 模态窗口内容容器 */
@@ -26,13 +32,14 @@
   padding: 20px;
   width: 95%;
   max-width: 500px;
-  max-height: 90vh;
+  max-height: 88vh;
   position: relative;
   border: 2px solid #ffd700;
   animation: slideIn 0.3s ease;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin: 10vh 0 2vh 0;
 }
 
 /* 关闭按钮 */

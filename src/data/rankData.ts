@@ -299,6 +299,7 @@ export interface LocationAccessConfig {
  * 地图权限配置表
  * 定义各地图的爵位进入要求
  * 参考文档：reference/docs/scripts_analysis/14_NPC系统.md
+ * 注意：只有后花园需要爵位限制，其他地点不需要
  */
 export const LOCATION_ACCESS_CONFIG: LocationAccessConfig[] = [
   {
@@ -306,42 +307,6 @@ export const LOCATION_ACCESS_CONFIG: LocationAccessConfig[] = [
     locationName: '后花园',
     requiredNobleRank: 1,
     description: '后花园需要勋爵以上爵位才能进入',
-  },
-  {
-    locationId: 'leiming-dalu',
-    locationName: '雷鸣大陆',
-    requiredNobleRank: 0,
-    description: '雷鸣大陆对所有玩家开放',
-  },
-  {
-    locationId: 'gebi',
-    locationName: '戈壁',
-    requiredNobleRank: 1,
-    description: '戈壁需要勋爵以上爵位才能挑战',
-  },
-  {
-    locationId: 'mimeng-zhaozhe',
-    locationName: '迷梦沼泽',
-    requiredNobleRank: 2,
-    description: '迷梦沼泽需要子爵以上爵位才能挑战',
-  },
-  {
-    locationId: 'binggong',
-    locationName: '冰宫',
-    requiredNobleRank: 3,
-    description: '冰宫需要伯爵以上爵位才能挑战',
-  },
-  {
-    locationId: 'yaweite-dao',
-    locationName: '亚维特岛',
-    requiredNobleRank: 4,
-    description: '亚维特岛需要公爵以上爵位才能挑战',
-  },
-  {
-    locationId: 'kasanuocheng',
-    locationName: '卡萨诺城',
-    requiredNobleRank: 5,
-    description: '卡萨诺城需要侯爵以上爵位才能挑战',
   },
 ];
 

@@ -60,6 +60,18 @@ export function calculateBaseDamage(attackMin: number, attackMax: number): numbe
 /**
  * 检查是否暴击
  * 根据幸运值判断是否暴击
+ * 
+ * 【幸运值影响暴击率】
+ * - 暴击率 = 幸运值 / 100，最大50%
+ * - 幸运值越高，暴击率越高
+ * - 幻兽幸运值范围：0-100，初始值50
+ * 
+ * 【幻兽幸运值机制】
+ * - 幻兽幸运值在战斗中的作用：
+ *   1. 影响暴击率（本函数）
+ *   2. 合体幻兽受到致命伤害时保留1血并降低幸运值（在Battle.tsx中实现）
+ *   3. 幸运值降为0时幻兽退出战斗（在Battle.tsx中实现）
+ * 
  * @param luck 幸运值
  * @returns 是否暴击
  */

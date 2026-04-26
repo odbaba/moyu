@@ -60,6 +60,14 @@
   padding: 10px 20px;
   border-bottom: 1px solid #000000;
   overflow-y: auto;
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* 隐藏场景描述滚动条 - Webkit浏览器 */
+.scene-description::-webkit-scrollbar {
+  display: none;
 }
 
 .scene-description p {
@@ -189,27 +197,14 @@
   align-content: flex-start;
   background-color: #252935;
   overflow-y: auto;
-  /* 滚动条悬浮显示，适合移动端 */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
-/* Webkit 浏览器滚动条样式 */
+/* 隐藏交互按钮区滚动条 - Webkit浏览器 */
 .interaction-buttons::-webkit-scrollbar {
-  width: 4px;
-}
-
-.interaction-buttons::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.interaction-buttons::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-}
-
-.interaction-buttons::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  display: none;
 }
 
 /* 交互按钮样式 - 纯黑背景，手写字体，毛笔笔触边框效果 */
@@ -347,6 +342,14 @@
   padding: 10px 20px;
   border-bottom: 1px solid #000000;
   overflow-y: auto;
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* 隐藏交互日志滚动条 - Webkit浏览器 */
+.interaction-log::-webkit-scrollbar {
+  display: none;
 }
 
 .log-entry {
@@ -436,6 +439,14 @@
   max-height: 80vh;
   overflow: auto;
   position: relative;
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* 隐藏大地图内容滚动条 - Webkit浏览器 */
+.map-content::-webkit-scrollbar {
+  display: none;
 }
 
 .close-map {

@@ -14,7 +14,6 @@ import {
   calculateSellPrice,
   canAffordPurchase,
   formatCurrency,
-  generateRandomWeapon,
   generateShopPet,
   purchaseItem,
   sellItem,
@@ -193,18 +192,6 @@ const ShopPage: React.FC<ShopPageProps> = ({
 
     // 先关闭弹窗，避免遮挡提示信息
     setSelectedItem(null);
-
-    // 检查是否是随机武器
-    if (shopItem.id === 'random_weapon') {
-      // 生成随机武器
-      const weapon = generateRandomWeapon();
-      // 这里需要调用父组件的添加装备函数
-      // 暂时显示提示
-      setMessage(`获得随机装备：${weapon.name}（${weapon.quality}）`);
-      setMessageType('success');
-
-      return;
-    }
 
     // 检查是否是幻兽
     if (shopItem.type === 'pet') {

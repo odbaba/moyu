@@ -102,11 +102,17 @@ const result = refineMagicSoul(equipment, magicGem);
 console.log(result);
 // +0~+5: 90% 成功率
 // +6~+8: 50% 成功率
-// +9~+11: 35% 成功率，失败不降级
+// +9~+11: 50% 成功率
+// 魔魂晶石最高可以升级到+12
+// 失败降级规则：
+//   - 等级等于9时失败不降级，等级保持+9
+//   - 等级超过9时失败降1级
+//   - 等级小于9时失败降1级
 
-// 使用魔魂之心（+9前100%成功）
+// 使用魔魂之心（100%成功，但只能升级到+9）
 const heartGem: GemItem = { ...magicGem, name: '魔魂之心' };
 const result2 = refineMagicSoul(equipment, heartGem);
+// 如果当前等级>=9，会返回错误：魔魂之心只能将魔魂等级提升到+9
 ```
 
 ## 4. 使用等级提升
@@ -275,14 +281,10 @@ refineQuality(sword, soulGem); // 良品→上品
 refineQuality(sword, soulGem); // 上品→精品
 refineQuality(sword, soulGem); // 精品→极品
 
-// 3. 提升魔魂等级到+12
+// 3. 提升魔魂等级到+9
 const magicGem: GemItem = { /* ... */ name: '魔魂之心' };
 for (let i = 0; i < 9; i++) {
   refineMagicSoul(sword, magicGem); // +0→+9（使用魔魂之心）
-}
-const normalMagicGem: GemItem = { /* ... */ name: '魔魂晶石' };
-for (let i = 0; i < 3; i++) {
-  refineMagicSoul(sword, normalMagicGem); // +9→+12（使用魔魂晶石）
 }
 
 // 4. 提升使用等级到125级
@@ -308,7 +310,7 @@ activateSoul(sword, soulHeart);
 console.log('最终装备：', sword);
 // {
 //   equipmentQuality: '极品',
-//   magicSoulLevel: 12,
+//   magicSoulLevel: 9,
 //   useLevel: 125,
 //   holeCount: 2,
 //   gems: ['高级战斗力石', '高级经验石'],
@@ -335,18 +337,7 @@ console.log(result);
 // { success: true, message: '...激活了装备战魂！', attributeChanges: { soulActivated: 1, ... } }
 ```
 
-## 10. 魔魂升至12级时战魂等级提升
-
-当装备魔魂等级升至12级时，如果装备已有战魂且战魂等级<5，战魂等级+1：
-
-```typescript
-// 使用魔魂晶石提升到+12，触发战魂等级提升
-const result = refineMagicSoul(equipment, magicGem, true); // warSoulSystemEnabled=true
-console.log(result);
-// { success: true, message: '...魔魂等级提升到了12级使得装备能量提升，战魂等级提高一级。', ... }
-```
-
-## 11. 摘除宝石
+## 10. 摘除宝石
 
 从装备上摘除指定位置的宝石。摘除宝石时，如果装备有战魂且战魂等级>1，战魂等级降为1：
 
@@ -360,14 +351,13 @@ console.log(result);
 const result2 = removeGem(equipment, 1);
 ```
 
-## 12. 战魂系统开关参数
+## 11. 战魂系统开关参数
 
 以下精炼函数新增了 `warSoulSystemEnabled?: boolean` 可选参数，用于控制战魂相关逻辑：
 
 | 函数 | 参数 | 说明 |
 |------|------|------|
 | `refineQuality` | `warSoulSystemEnabled?` | 升极品时是否触发战魂逻辑 |
-| `refineMagicSoul` | `warSoulSystemEnabled?` | 魔魂升至12级时是否触发战魂等级提升 |
 | `refineOpenHole` | `warSoulSystemEnabled?` | 开洞时是否触发战魂激活 |
 | `activateSoul` | `warSoulSystemEnabled?` | 战魂系统未开启时返回失败 |
 
@@ -378,7 +368,7 @@ console.log(result);
 // { success: false, message: '战魂系统尚未开启，请先击败无名氏开启战魂系统' }
 ```
 
-## 13. 战魂套装效果
+## 12. 战魂套装效果
 
 战魂套装需要所有6件装备都拥有战魂属性且类型一致：
 
@@ -437,16 +427,15 @@ if (setInfo.isActivated) {
 ## 注意事项
 
 1. **品质提升**：灵魂晶石成功率随品质提升而降低，建议使用灵魂王确保成功
-2. **魔魂提升**：+9后失败不降级，建议+9前使用魔魂之心
+2. **魔魂提升**：魔魂之心只能升级到+9，魔魂晶石最高可以升级到+12；失败时等级等于9不降级，超过9时降1级
 3. **使用等级**：升级后等级不能超过玩家等级
 4. **开洞**：月光宝盒只能开第一个洞，增强版只能开第二个洞
 5. **镶嵌**：高级宝石会提升战魂等级（最高5级）
 6. **战魂**：战魂之心100%成功，战魂晶石仅20%成功率
 7. **升极品战魂**：升极品时已有战魂则等级+1，无战魂则2.5%概率激活（需战魂系统已开启）
-8. **魔魂12级战魂**：魔魂升至12级时战魂等级+1（需战魂系统已开启）
-9. **摘除宝石**：摘除宝石会使战魂等级降为1（如果等级>1）
-10. **战魂系统开关**：使用战魂相关功能前需先击败无名氏开启战魂系统
-11. **战魂套装**：6件装备战魂类型一致时激活套装效果，天魂套装降低怪物战斗力，地魂套装降低怪物生命值
+8. **摘除宝石**：摘除宝石会使战魂等级降为1（如果等级>1）
+9. **战魂系统开关**：使用战魂相关功能前需先击败无名氏开启战魂系统
+10. **战魂套装**：6件装备战魂类型一致时激活套装效果，天魂套装降低怪物战斗力，地魂套装降低怪物生命值
 
 ## 错误处理
 

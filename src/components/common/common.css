@@ -15,7 +15,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes fadeIn {
@@ -33,9 +40,18 @@
   padding: 20px;
   width: 80%;
   max-width: 500px;
+  max-height: 88vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   position: relative;
   border: 1px solid #ffd700;
   animation: slideIn 0.3s ease;
+  margin: 10vh 0 2vh 0;
+}
+
+.modal-content::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes slideIn {
@@ -69,6 +85,7 @@
 .modal-description {
   margin-bottom: 20px;
   line-height: 1.6;
+  white-space: pre-line;
 }
 
 .modal-options {
@@ -302,6 +319,8 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 15px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .donation-input-group label {
@@ -312,6 +331,8 @@
 
 .donation-input {
   flex: 1;
+  width: 100%;
+  min-width: 0;
   padding: 10px 12px;
   background-color: #333;
   color: #f0f0f0;
@@ -319,6 +340,7 @@
   border-radius: 6px;
   font-size: 1rem;
   outline: none;
+  box-sizing: border-box;
 }
 
 .donation-input:focus {

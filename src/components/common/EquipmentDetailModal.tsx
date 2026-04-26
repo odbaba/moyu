@@ -323,7 +323,10 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
             {/* 战魂类型与等级，5级显示MAX，1-4级显示X级 */}
             <div className="equipment-detail-info-row">
               <span className="info-label">战魂</span>
-              <span className="info-value soul-value">
+              <span
+                className="info-value soul-value"
+                style={{ color: equipment.soulType === WarSoulType.TIAN_HUN ? '#1818EE' : '#000000' }}
+              >
                 {equipment.soulType === WarSoulType.TIAN_HUN
                   ? (equipment.soulLevel && equipment.soulLevel >= 5 ? '天魂MAX' : `天魂${equipment.soulLevel}级`)
                   : (equipment.soulLevel && equipment.soulLevel >= 5 ? '地魂MAX' : `地魂${equipment.soulLevel}级`)}
@@ -332,7 +335,10 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
             {/* 战魂效果：天魂加攻击百分比，地魂加闪避百分比 */}
             <div className="equipment-detail-info-row">
               <span className="info-label">战魂效果</span>
-              <span className="info-value soul-value">
+              <span
+                className="info-value soul-value"
+                style={{ color: equipment.soulType === WarSoulType.TIAN_HUN ? '#1818EE' : '#000000' }}
+              >
                 {equipment.soulType === WarSoulType.TIAN_HUN
                   ? `攻击+${(equipment.soulLevel || 1) * 5}%`
                   : `闪避+${(equipment.soulLevel || 1) * 2}%`}
