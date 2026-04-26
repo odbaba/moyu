@@ -308,7 +308,7 @@ const npc_maid_2: NPCInteractable = {
 /**
  * 日常任务官 NPC 配置
  * 功能：提供每日任务系统
- * 位置：树心城（使用雷鸣大陆作为位置）
+ * 位置：皇宫
  * 参考文档：reference/docs/日常任务官交互逻辑文档.md
  */
 const npc_daily_task: NPCInteractable = {
@@ -317,7 +317,7 @@ const npc_daily_task: NPCInteractable = {
   name: '日常任务官',
   icon: '📋',
   description: '负责发布每日任务的官员。每天都有不同的任务等待着你！',
-  location: 'leiming-dalu',
+  location: 'huanggong',
   npcType: 'function',
   options: [
     {
@@ -716,7 +716,7 @@ const npc_mysterious_person: NPCInteractable = {
 /**
  * 宝石合成师 NPC 配置
  * 功能：提供宝石合成功能
- * 位置：树心城（使用雷鸣大陆作为位置）
+ * 位置：卡萨诺城
  * 参考文档：reference/docs/宝石合成师交互逻辑文档.md
  */
 const npc_gem_synthesizer: NPCInteractable = {
@@ -725,7 +725,7 @@ const npc_gem_synthesizer: NPCInteractable = {
   name: '宝石合成师',
   icon: '💎',
   description: '精通宝石合成的工匠，可以将低级宝石合成为高级宝石。合成成功率100%！',
-  location: 'leiming-dalu',
+  location: 'kasanuocheng',
   npcType: 'function',
   options: [
     {
@@ -787,7 +787,7 @@ const npc_collector: NPCInteractable = {
 /**
  * 幻兽研究所 NPC 配置
  * 功能：提供幻兽购买、VIP系统、提高产量任务
- * 位置：树心城（使用雷鸣大陆作为位置）
+ * 位置：卡萨诺城
  * 参考文档：reference/docs/幻兽研究所交互逻辑文档.md
  */
 const npc_pet_institute: NPCInteractable = {
@@ -796,7 +796,7 @@ const npc_pet_institute: NPCInteractable = {
   name: '幻兽研究所',
   icon: '🔬',
   description: '专门研究幻兽培养技术的机构。可以购买奇异兽，提升VIP等级享受折扣。',
-  location: 'leiming-dalu',
+  location: 'kasanuocheng',
   npcType: 'function',
   options: [
     {
@@ -1037,12 +1037,12 @@ export const npcByType: Record<string, NPCInteractable[]> = {
  * 按位置分组的 NPC 配置
  */
 export const npcByLocation: Record<string, NPCInteractable[]> = {
-  // 皇宫NPC：国王、元帅、首相、PK赛报名官
-  huanggong: [npc_king, npc_marshal, npc_prime_minister, npc_pk_match],
+  // 皇宫NPC：国王、元帅、首相、PK赛报名官、日常任务官
+  huanggong: [npc_king, npc_marshal, npc_prime_minister, npc_pk_match, npc_daily_task],
   // 后花园NPC：公主、丫环1（出售高级战斗力石）、丫环2（出售年猪）
   houhuayuan: [npc_princess, npc_maid_1, npc_maid_2],
-  'leiming-dalu': [npc_daily_task, npc_map_challenge, npc_gem_synthesizer, npc_pet_institute],
-  kasanuocheng: [npc_lottery, npc_pet_fusion_master, npc_map_challenge_kasanuocheng, npc_collector, npc_grocery_merchant, npc_magic_stone_merchant, npc_equipment_refiner, npc_experience_mentor],
+  'leiming-dalu': [npc_map_challenge],
+  kasanuocheng: [npc_lottery, npc_pet_fusion_master, npc_map_challenge_kasanuocheng, npc_collector, npc_grocery_merchant, npc_magic_stone_merchant, npc_equipment_refiner, npc_experience_mentor, npc_gem_synthesizer, npc_pet_institute],
   'yaweite-dao': [npc_map_challenge_yaweite_dao],
   gebi: [npc_map_challenge_gebi, npc_explorer_gebi],
   'mimeng-zhaozhe': [npc_map_challenge_mimeng_zhaozhe],

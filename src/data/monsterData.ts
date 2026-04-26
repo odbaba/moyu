@@ -875,6 +875,15 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     isSpawned: true,
     interactableId: 'interact-mimeng-jiaoxi',
   },
+  // 角蜥
+  {
+    id: 'spawn-mimeng-jiaoxi-2',
+    templateId: 'jiaoxi',
+    location: 'mimeng-zhaozhe',
+    spawnVariable: 'mimeng_jiaoxi_2',
+    isSpawned: true,
+    interactableId: 'interact-mimeng-jiaoxi-2',
+  },
   // 望齿魔人
   {
     id: 'spawn-mimeng-wangchimoren',
@@ -884,6 +893,15 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     isSpawned: true,
     interactableId: 'interact-mimeng-wangchimoren',
   },
+  // 望齿魔人
+  {
+    id: 'spawn-mimeng-wangchimoren-2',
+    templateId: 'wangchi-moren',
+    location: 'mimeng-zhaozhe',
+    spawnVariable: 'mimeng_wangchimoren_2',
+    isSpawned: true,
+    interactableId: 'interact-mimeng-wangchimoren-2',
+  },
   // 蜘蛛（特殊怪物，23%每日刷新概率）
   {
     id: 'spawn-mimeng-zhizhu',
@@ -892,15 +910,6 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     spawnVariable: 'mimeng_zhizhu',
     isSpawned: false,
     interactableId: 'interact-mimeng-zhizhu',
-  },
-  // 随机怪物（角蜥）
-  {
-    id: 'spawn-mimeng-random1',
-    templateId: 'jiaoxi',
-    location: 'mimeng-zhaozhe',
-    spawnVariable: 'mimeng_random1',
-    isSpawned: true,
-    interactableId: 'interact-mimeng-random1',
   },
 
   // ========== 冰宫怪物刷新配置（4个怪物按钮）==========
@@ -969,15 +978,6 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     isSpawned: true,
     interactableId: 'interact-yaweite-jufuguai',
   },
-  // 蜘蛛王后艾达（特殊怪物，33%每日刷新概率）
-  {
-    id: 'spawn-yaweite-zhizhuwanghou',
-    templateId: 'zhizhu-wanghou-aida',
-    location: 'yaweite-dao',
-    spawnVariable: 'yaweite_zhizhuwanghou',
-    isSpawned: false,
-    interactableId: 'interact-yaweite-zhizhuwanghou',
-  },
   // 刺虫人
   {
     id: 'spawn-yaweite-cichongren',
@@ -987,17 +987,17 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     isSpawned: true,
     interactableId: 'interact-yaweite-cichongren',
   },
+  // 蜘蛛王后艾达（特殊怪物，33%每日刷新概率）
+  {
+    id: 'spawn-yaweite-zhizhuwanghou',
+    templateId: 'zhizhu-wanghou-aida',
+    location: 'yaweite-dao',
+    spawnVariable: 'yaweite_zhizhuwanghou',
+    isSpawned: false,
+    interactableId: 'interact-yaweite-zhizhuwanghou',
+  },
 
   // ========== 火山怪物刷新配置（5个怪物按钮）==========
-  // 蝎怪
-  {
-    id: 'spawn-huoshan-xieguai',
-    templateId: 'xieguai',
-    location: 'huoshan',
-    spawnVariable: 'huoshan_xieguai',
-    isSpawned: true,
-    interactableId: 'interact-huoshan-xieguai',
-  },
   // 四牙怪
   {
     id: 'spawn-huoshan-siyaguai',
@@ -1006,24 +1006,6 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     spawnVariable: 'huoshan_siyaguai',
     isSpawned: true,
     interactableId: 'interact-huoshan-siyaguai',
-  },
-  // 炎女
-  {
-    id: 'spawn-huoshan-yannu',
-    templateId: 'yannu',
-    location: 'huoshan',
-    spawnVariable: 'huoshan_yannu',
-    isSpawned: true,
-    interactableId: 'interact-huoshan-yannu',
-  },
-  // 随机怪物1（蝎怪）
-  {
-    id: 'spawn-huoshan-random1',
-    templateId: 'xieguai',
-    location: 'huoshan',
-    spawnVariable: 'huoshan_random1',
-    isSpawned: true,
-    interactableId: 'interact-huoshan-random1',
   },
   // 随机怪物2（四牙怪）
   {
@@ -1034,8 +1016,53 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     isSpawned: true,
     interactableId: 'interact-huoshan-random2',
   },
+  // 炎女
+  {
+    id: 'spawn-huoshan-yannu',
+    templateId: 'yannu',
+    location: 'huoshan',
+    spawnVariable: 'huoshan_yannu',
+    isSpawned: true,
+    interactableId: 'interact-huoshan-yannu',
+  },
+  // 炎女
+  {
+    id: 'spawn-huoshan-yannu-2',
+    templateId: 'yannu',
+    location: 'huoshan',
+    spawnVariable: 'huoshan_yannu_2',
+    isSpawned: true,
+    interactableId: 'interact-huoshan-yannu-2',
+  },
+  // 蝎怪
+  {
+    id: 'spawn-huoshan-xieguai',
+    templateId: 'xieguai',
+    location: 'huoshan',
+    spawnVariable: 'huoshan_xieguai',
+    isSpawned: true,
+    interactableId: 'interact-huoshan-xieguai',
+  },
 
   // ========== 深渊迷宫怪物刷新配置（6个怪物按钮）==========
+  // 暗黑弥塞亚
+  {
+    id: 'spawn-shenyuan-anheimisaiya',
+    templateId: 'anhei-misaiya',
+    location: 'shenyuan-migong',
+    spawnVariable: 'shenyuan_anheimisaiya',
+    isSpawned: true,
+    interactableId: 'interact-shenyuan-anheimisaiya',
+  },
+  // 暗黑弥塞亚
+  {
+    id: 'spawn-shenyuan-anheimisaiya-2',
+    templateId: 'anhei-misaiya',
+    location: 'shenyuan-migong',
+    spawnVariable: 'shenyuan_anheimisaiya_2',
+    isSpawned: true,
+    interactableId: 'interact-shenyuan-anheimisaiya-2', 
+  },
   // 暗黑格拉斯
   {
     id: 'spawn-shenyuan-anheigelasi',
@@ -1044,6 +1071,15 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     spawnVariable: 'shenyuan_anheigelasi',
     isSpawned: true,
     interactableId: 'interact-shenyuan-anheigelasi',
+  },
+  // 暗黑格拉斯
+  {
+    id: 'spawn-shenyuan-anheigelasi-2',
+    templateId: 'anhei-gelasi',
+    location: 'shenyuan-migong',
+    spawnVariable: 'shenyuan_anheigelasi_2',
+    isSpawned: true,
+    interactableId: 'interact-shenyuan-anheigelasi-2',
   },
   // 叹息骑士
   {
@@ -1054,41 +1090,14 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     isSpawned: true,
     interactableId: 'interact-shenyuan-tanxiqishi',
   },
-  // 暗黑弥塞亚
+  // 叹息骑士
   {
-    id: 'spawn-shenyuan-anheimisaiya',
-    templateId: 'anhei-misaiya',
-    location: 'shenyuan-migong',
-    spawnVariable: 'shenyuan_anheimisaiya',
-    isSpawned: true,
-    interactableId: 'interact-shenyuan-anheimisaiya',
-  },
-  // 骑士亡魂（特殊怪物）
-  {
-    id: 'spawn-shenyuan-qishiwanghun',
-    templateId: 'qishi-wanghun',
-    location: 'shenyuan-migong',
-    spawnVariable: 'shenyuan_qishiwanghun',
-    isSpawned: true,
-    interactableId: 'interact-shenyuan-qishiwanghun',
-  },
-  // 随机怪物1（暗黑格拉斯）
-  {
-    id: 'spawn-shenyuan-random1',
-    templateId: 'anhei-gelasi',
-    location: 'shenyuan-migong',
-    spawnVariable: 'shenyuan_random1',
-    isSpawned: true,
-    interactableId: 'interact-shenyuan-random1',
-  },
-  // 随机怪物2（叹息骑士）
-  {
-    id: 'spawn-shenyuan-random2',
+    id: 'spawn-shenyuan-tanxiqishi-2',
     templateId: 'tanxi-qishi',
     location: 'shenyuan-migong',
-    spawnVariable: 'shenyuan_random2',
+    spawnVariable: 'shenyuan_tanxiqishi_2',
     isSpawned: true,
-    interactableId: 'interact-shenyuan-random2',
+    interactableId: 'interact-shenyuan-tanxiqishi-2',
   },
 
   // ========== 雪域边境怪物刷新配置（5个怪物按钮）==========

@@ -2,142 +2,121 @@ import type { CharacterData, EquipmentDetail, PrincessRelationship } from '../ty
 import { WarSoulType } from '../types';
 import { CHARACTER_BASE_STATS, CHARACTER_GROWTH_RATES } from '../utils/attributeCalculator';
 import { calculateTotalCombatPower } from '../utils/combatPower';
+import { createEquipmentItem } from '../utils/itemFactory';
+import { equipmentItemToDetail } from '../utils/equipmentConverter';
 import { examplePets } from './petData';
 
+/**
+ * 创建带战魂属性的装备详情
+ * 使用公共接口生成装备，并添加战魂属性
+ */
+function createEquipmentWithSoul(config: {
+  equipmentType: 'weapon' | 'helmet' | 'clothes' | 'shoes' | 'bracelet' | 'necklace';
+  level: number;
+  quality: number;
+  magicSoulLevel?: number;
+  gemSlots?: number;
+  soulType?: WarSoulType;
+  soulLevel?: number;
+}): EquipmentDetail {
+  // 使用公共接口创建装备物品
+  const equipmentItem = createEquipmentItem({
+    equipmentType: config.equipmentType,
+    level: config.level,
+    quality: config.quality,
+    magicSoulLevel: config.magicSoulLevel || 0,
+    gemSlots: config.gemSlots || 0,
+  });
+
+  // 转换为装备详情
+  const equipmentDetail = equipmentItemToDetail(equipmentItem);
+
+  // 添加战魂属性
+  if (config.soulType && config.soulLevel) {
+    equipmentDetail.soulType = config.soulType;
+    equipmentDetail.soulLevel = config.soulLevel;
+  }
+
+  return equipmentDetail;
+}
+
 // 示例装备数据 - 武器
-const weapon: EquipmentDetail = {
-  id: 'weapon-001',
-  name: '魔魂战刃',
-  type: 'weapon',
-  quality: '极品',
+// 武器：最小攻击 = 20 × 等级，最大攻击 = 30 × 等级
+// 100级武器：基础攻击 2000-3000，魔魂+12追加 2400-3600
+const weapon = createEquipmentWithSoul({
+  equipmentType: 'weapon',
+  level: 100,
+  quality: 4, // 极品
   magicSoulLevel: 12,
-  attributes: {
-    attackMin: 100,
-    attackMax: 150
-  },
-  holeCount: 3,
-  gemAttributes: [
-    { attack: 20 },
-    { attack: 20 },
-    { attack: 20 }
-  ],
-  useLevel: 100,
-  combatPower: 12, // 极品品质: 4 × 3 = 12
-  // 战魂属性
-  soulType: WarSoulType.TIAN_HUN, // 天魂
-  soulLevel: 5 // 5级天魂
-};
+  gemSlots: 3,
+  soulType: WarSoulType.TIAN_HUN,
+  soulLevel: 5
+});
 
 // 示例装备数据 - 衣服
-const clothes: EquipmentDetail = {
-  id: 'clothes-001',
-  name: '魔魂战甲',
-  type: 'clothes',
-  quality: '精品',
+// 衣服：防御力 = 18 × 等级
+// 80级衣服：基础防御 1440，魔魂+10追加 1440
+const clothes = createEquipmentWithSoul({
+  equipmentType: 'clothes',
+  level: 80,
+  quality: 3, // 精品
   magicSoulLevel: 10,
-  attributes: {
-    defense: 80,
-    hp: 500
-  },
-  holeCount: 2,
-  gemAttributes: [
-    { defense: 15 },
-    { hp: 100 }
-  ],
-  useLevel: 80,
-  combatPower: 9, // 精品品质: 3 × 3 = 9
-  // 战魂属性
-  soulType: WarSoulType.TIAN_HUN, // 天魂
-  soulLevel: 4 // 4级天魂
-};
+  gemSlots: 2,
+  soulType: WarSoulType.TIAN_HUN,
+  soulLevel: 4
+});
 
 // 示例装备数据 - 战鞋
-const shoes: EquipmentDetail = {
-  id: 'shoes-001',
-  name: '幻影战靴',
-  type: 'shoes',
-  quality: '上品',
+// 战鞋：防御力 = 8 × 等级
+// 60级战鞋：基础防御 480，魔魂+8追加 384
+const shoes = createEquipmentWithSoul({
+  equipmentType: 'shoes',
+  level: 60,
+  quality: 2, // 上品
   magicSoulLevel: 8,
-  attributes: {
-    dodge: 20,
-    luck: 5
-  },
-  holeCount: 2,
-  gemAttributes: [
-    { dodge: 10 },
-    { luck: 3 }
-  ],
-  useLevel: 60,
-  combatPower: 6, // 上品品质: 2 × 3 = 6
-  // 战魂属性
-  soulType: WarSoulType.TIAN_HUN, // 天魂
-  soulLevel: 3 // 3级天魂
-};
+  gemSlots: 2,
+  soulType: WarSoulType.TIAN_HUN,
+  soulLevel: 3
+});
 
 // 示例装备数据 - 手镯
-const bracelet: EquipmentDetail = {
-  id: 'bracelet-001',
-  name: '魔灵手镯',
-  type: 'bracelet',
-  quality: '良品',
+// 手镯：最小攻击 = 10 × 等级，最大攻击 = 15 × 等级
+// 40级手镯：基础攻击 400-600，魔魂+6追加 240-360
+const bracelet = createEquipmentWithSoul({
+  equipmentType: 'bracelet',
+  level: 40,
+  quality: 1, // 良品
   magicSoulLevel: 6,
-  attributes: {
-    attackMin: 30,
-    attackMax: 40
-  },
-  holeCount: 1,
-  gemAttributes: [
-    { attack: 10 }
-  ],
-  useLevel: 40,
-  combatPower: 3, // 良品品质: 1 × 3 = 3
-  // 战魂属性
-  soulType: WarSoulType.TIAN_HUN, // 天魂
-  soulLevel: 3 // 3级天魂
-};
+  gemSlots: 1,
+  soulType: WarSoulType.TIAN_HUN,
+  soulLevel: 3
+});
 
 // 示例装备数据 - 项链
-const necklace: EquipmentDetail = {
-  id: 'necklace-001',
-  name: '魔魂项链',
-  type: 'necklace',
-  quality: '极品',
+// 项链：最小攻击 = 15 × 等级，最大攻击 = 20 × 等级
+// 100级项链：基础攻击 1500-2000，魔魂+12追加 1800-2400
+const necklace = createEquipmentWithSoul({
+  equipmentType: 'necklace',
+  level: 100,
+  quality: 4, // 极品
   magicSoulLevel: 12,
-  attributes: {
-    mp: 300,
-    luck: 10
-  },
-  holeCount: 3,
-  gemAttributes: [
-    { mp: 50 },
-    { mp: 50 },
-    { luck: 5 }
-  ],
-  useLevel: 100,
-  combatPower: 12, // 极品品质: 4 × 3 = 12
-  // 战魂属性
-  soulType: WarSoulType.TIAN_HUN, // 天魂
-  soulLevel: 5 // 5级天魂
-};
+  gemSlots: 3,
+  soulType: WarSoulType.TIAN_HUN,
+  soulLevel: 5
+});
 
 // 示例装备数据 - 头盔
-const helmet: EquipmentDetail = {
-  id: 'helmet-001',
-  name: '魔魂战盔',
-  type: 'helmet',
-  quality: '普通品',
+// 头盔：防御力 = 12 × 等级
+// 1级头盔：基础防御 12，无魔魂追加
+const helmet = createEquipmentWithSoul({
+  equipmentType: 'helmet',
+  level: 1,
+  quality: 0, // 普通品
   magicSoulLevel: 0,
-  attributes: {
-    defense: 20
-  },
-  holeCount: 1,
-  gemAttributes: [],
-  useLevel: 1,
-  combatPower: 0, // 普通品品质: 0 × 3 = 0
-  // 战魂属性
-  soulType: WarSoulType.TIAN_HUN, // 天魂
-  soulLevel: 3 // 3级天魂
-};
+  gemSlots: 1,
+  soulType: WarSoulType.TIAN_HUN,
+  soulLevel: 3
+});
 
 // 示例角色数据
 const playerCharacter: CharacterData = {

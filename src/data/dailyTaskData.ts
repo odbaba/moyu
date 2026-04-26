@@ -61,7 +61,7 @@ const dailyTaskMonday: DailyTask = {
     description: '大量经验+500功勋',
   },
   npcId: 'npc_daily_task', // 日常任务官
-  location: 'leiming-dalu', // 树心城（雷鸣大陆）
+  location: 'huanggong', // 皇宫
   icon: '💎',
 };
 
@@ -89,7 +89,7 @@ const dailyTaskTuesday: DailyTask = {
     description: '大量经验+500功勋',
   },
   npcId: 'npc_daily_task', // 日常任务官
-  location: 'leiming-dalu', // 树心城（雷鸣大陆）
+  location: 'huanggong', // 皇宫
   icon: '💎',
 };
 
@@ -117,7 +117,7 @@ const dailyTaskWednesday: DailyTask = {
     description: '魔石+1000战功（幻兽星级越高魔石越多）',
   },
   npcId: 'npc_daily_task', // 日常任务官
-  location: 'leiming-dalu', // 树心城（雷鸣大陆）
+  location: 'huanggong', // 皇宫
   icon: '🐉',
 };
 
@@ -145,7 +145,7 @@ const dailyTaskThursday: DailyTask = {
     description: '魔石+1000战功（幻兽星级越高魔石越多）',
   },
   npcId: 'npc_daily_task', // 日常任务官
-  location: 'leiming-dalu', // 树心城（雷鸣大陆）
+  location: 'huanggong', // 皇宫
   icon: '🐉',
 };
 
@@ -172,7 +172,7 @@ const dailyTaskFriday: DailyTask = {
     description: '大量战功（10000点）',
   },
   npcId: 'npc_daily_task', // 日常任务官
-  location: 'leiming-dalu', // 树心城（雷鸣大陆）
+  location: 'huanggong', // 皇宫
   icon: '⚔️',
 };
 
@@ -229,7 +229,7 @@ const dailyTaskSunday: DailyTask = {
     description: '功勋值（1000点）+经验',
   },
   npcId: 'npc_daily_task', // 日常任务官
-  location: 'leiming-dalu', // 树心城（雷鸣大陆）
+  location: 'huanggong', // 皇宫
   icon: '🏰',
 };
 

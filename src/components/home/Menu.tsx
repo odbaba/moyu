@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 /**
  * 菜单组件属性接口
@@ -41,6 +41,28 @@ const Menu: React.FC<MenuProps> = ({
   onSaveGame,
   onShowSettings
 }) => {
+  // 菜单容器引用，用于检测点击是否在菜单外部
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * 点击菜单外部时关闭菜单
+   */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // 如果菜单打开且点击不在菜单容器内部，则关闭菜单
+      if (isOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onToggle();
+      }
+    };
+
+    // 添加全局点击事件监听
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onToggle]);
+
   /**
    * 处理保存游戏点击
    * 保存后关闭菜单
@@ -60,7 +82,7 @@ const Menu: React.FC<MenuProps> = ({
   };
 
   return (
-    <div className="menu-container">
+    <div className="menu-container" ref={menuRef}>
       {/* 菜单按钮 */}
       <button className="menu-button" onClick={onToggle}>
         ☰

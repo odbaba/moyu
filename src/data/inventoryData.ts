@@ -19,7 +19,7 @@ import type {
  * 装备等级列表
  * 游戏中装备分为12个等级档次
  */
-export const EQUIPMENT_LEVELS = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110] as const;
+export const EQUIPMENT_LEVELS = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 125] as const;
 
 /**
  * 装备名称映射表
@@ -38,7 +38,7 @@ export const EQUIPMENT_NAMES: Record<EquipmentItem['equipmentType'], Record<numb
     80: '血咒剑',
     90: '燃烧巨剑',
     100: '月神之光',
-    110: '魔吟神剑',
+    125: '魔吟神剑',
   },
   helmet: {
     1: '九耀御雷',
@@ -52,7 +52,7 @@ export const EQUIPMENT_NAMES: Record<EquipmentItem['equipmentType'], Record<numb
     80: '恐惧首级',
     90: '噩梦之首',
     100: '凌霄翼盔',
-    110: '武神宝盔',
+    125: '武神宝盔',
   },
   clothes: {
     1: '锁环甲',
@@ -66,7 +66,7 @@ export const EQUIPMENT_NAMES: Record<EquipmentItem['equipmentType'], Record<numb
     80: '虹冥铠',
     90: '圣痕之铠',
     100: '奇迹庇佑',
-    110: '夜魔战甲',
+    125: '夜魔战甲',
   },
   shoes: {
     1: '辉煌战靴',
@@ -80,7 +80,7 @@ export const EQUIPMENT_NAMES: Record<EquipmentItem['equipmentType'], Record<numb
     80: '金色梦想',
     90: '护卫使命',
     100: '银澜月华',
-    110: '龙神御风',
+    125: '龙神御风',
   },
   bracelet: {
     1: '缠绕手镯',
@@ -94,7 +94,7 @@ export const EQUIPMENT_NAMES: Record<EquipmentItem['equipmentType'], Record<numb
     80: '烈焰永恒',
     90: '紫电风暴',
     100: '光明天兆',
-    110: '武神手镯',
+    125: '武神手镯',
   },
   necklace: {
     1: '撼雷战符',
@@ -108,7 +108,7 @@ export const EQUIPMENT_NAMES: Record<EquipmentItem['equipmentType'], Record<numb
     80: '炙日战符',
     90: '黑月战符',
     100: '辉煌战符',
-    110: '怒雷战符',
+    125: '怒雷战符',
   },
 };
 
@@ -168,24 +168,24 @@ export const createEquipment = (
 
   switch (equipmentType) {
     case 'weapon':
-      attackMin = 10 * useLevel;
+      attackMin = 20 * useLevel;
       attackMax = 30 * useLevel;
       break;
     case 'helmet':
-      defense = 6 * useLevel;
+      defense = 12 * useLevel;
       break;
     case 'clothes':
-      defense = 8 * useLevel;
+      defense = 18 * useLevel;
       break;
     case 'shoes':
-      defense = 4 * useLevel;
+      defense = 8 * useLevel;
       break;
     case 'bracelet':
-      attackMin = 5 * useLevel;
+      attackMin = 10 * useLevel;
       attackMax = 15 * useLevel;
       break;
     case 'necklace':
-      attackMin = 8 * useLevel;
+      attackMin = 15 * useLevel;
       attackMax = 20 * useLevel;
       break;
   }
@@ -230,9 +230,14 @@ export const createEquipment = (
     equipmentQuality: qualityName,
     magicSoulLevel,
     holeCount,
-    attackMin: attackMin + addAttackMin,
-    attackMax: attackMax + addAttackMax,
-    defense: defense + addDefense,
+    // 基础属性（不包含魔魂追加）
+    attackMin,
+    attackMax,
+    defense,
+    // 追加属性（魔魂加成）
+    bonusAttackMin: addAttackMin,
+    bonusAttackMax: addAttackMax,
+    bonusDefense: addDefense,
     goldValue: 100 * useLevel * (equipmentQuality + 1) + 100 * magicSoulLevel + 10000 * holeCount * holeCount * holeCount,
     magicStoneValue: equipmentQuality === 4 ? Math.floor(28 * (useLevel * 2.5 + 50) + magicSoulLevel * 128 + 1500 * holeCount * holeCount * holeCount) : 0,
     imagePath: `./images/equipment/${equipmentType}/lv${useLevel}.png`,
@@ -329,13 +334,13 @@ const shoes_lv100 = createEquipment('shoes', 100, 0, 0, 0);
 const bracelet_lv100 = createEquipment('bracelet', 100, 0, 0, 0);
 const necklace_lv100 = createEquipment('necklace', 100, 0, 0, 0);
 
-// 110级装备（最高等级）
-const weapon_lv110 = createEquipment('weapon', 110, 0, 0, 0);
-const helmet_lv110 = createEquipment('helmet', 110, 0, 0, 0);
-const armor_lv110 = createEquipment('clothes', 110, 0, 0, 0);
-const shoes_lv110 = createEquipment('shoes', 110, 0, 0, 0);
-const bracelet_lv110 = createEquipment('bracelet', 110, 0, 0, 0);
-const necklace_lv110 = createEquipment('necklace', 110, 0, 0, 0);
+// 125级装备（最高等级）
+const weapon_lv125 = createEquipment('weapon', 125, 0, 0, 0);
+const helmet_lv125 = createEquipment('helmet', 125, 0, 0, 0);
+const armor_lv125 = createEquipment('clothes', 125, 0, 0, 0);
+const shoes_lv125 = createEquipment('shoes', 125, 0, 0, 0);
+const bracelet_lv125 = createEquipment('bracelet', 125, 0, 0, 0);
+const necklace_lv125 = createEquipment('necklace', 125, 0, 0, 0);
 
 // ==================== 示例高品质装备 ====================
 
@@ -940,7 +945,7 @@ export const zhanHunZhiXin: GemItem = {
   id: 'gem_zhanhunzhixin',
   name: '战魂之心',
   icon: '❤️‍🔥',
-  quantity: 2,
+  quantity: 200,
   type: 'gem',
   rarity: 'legendary',
   source: '商城购买、活动奖励',
@@ -1090,7 +1095,7 @@ export const yueGuangBaoHeZengQiangBan: GemItem = {
   id: 'gem_yueguangbaohezengqiangban',
   name: '月光宝盒增强版',
   icon: '🎁',
-  quantity: 1,
+  quantity: 100,
   type: 'gem',
   rarity: 'legendary',
   source: 'BOSS掉落、商城购买',
@@ -1416,7 +1421,7 @@ export const exampleItems: InventoryItem[] = [
   weapon_lv80, helmet_lv80, armor_lv80, shoes_lv80, bracelet_lv80, necklace_lv80,
   weapon_lv90, helmet_lv90, armor_lv90, shoes_lv90, bracelet_lv90, necklace_lv90,
   weapon_lv100, helmet_lv100, armor_lv100, shoes_lv100, bracelet_lv100, necklace_lv100,
-  weapon_lv110, helmet_lv110, armor_lv110, shoes_lv110, bracelet_lv110, necklace_lv110,
+  weapon_lv125, helmet_lv125, armor_lv125, shoes_lv125, bracelet_lv125, necklace_lv125,
 
   // 装备类 - 高品质示例
   weapon_lv100_legendary, helmet_lv100_legendary, armor_lv100_legendary,

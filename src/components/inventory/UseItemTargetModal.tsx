@@ -90,7 +90,7 @@ const UseItemTargetModal: React.FC<UseItemTargetModalProps> = ({
             >
               <div className="target-icon">🐉</div>
               <div className="target-info">
-                <div className="target-name">{pet.othername}（{pet.hs_name}）</div>
+                <div className="target-name">{pet.othername}</div>
                 <div className="target-details">
                   <span>等级: {pet.dj}</span>
                   <span>品质: {pet.qualityTitle}</span>

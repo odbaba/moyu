@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import type { EquipmentDetail } from '../../types';
 import { WarSoulType } from '../../types';
+import { canEquipEquipment, getEquipmentLevelRequirementMessage } from '../../utils/equipmentUtils';
 import { EQUIPMENT_SLOT_TYPE_NAMES } from '../common/constants';
 import { getEquipmentQualityColor } from '../common/utils';
 
@@ -19,6 +20,10 @@ interface EquipmentDetailModalProps {
    * 装备详情数据
    */
   equipment: EquipmentDetail | null;
+  /**
+   * 角色等级（用于装备等级限制检查）
+   */
+  characterLevel?: number;
   /**
    * 关闭弹窗回调
    */
@@ -45,6 +50,7 @@ interface EquipmentDetailModalProps {
 const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
   isVisible,
   equipment,
+  characterLevel,
   onClose,
   onEquip,
   onUnequip,
@@ -106,9 +112,15 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
   const isAttackType = ['weapon', 'bracelet', 'necklace'].includes(equipment.type);
   const isDefenseType = ['clothes', 'shoes', 'helmet'].includes(equipment.type);
 
-  // 计算追加属性（基于魔魂等级）
-  const calculateAddAttack = (base: number) => Math.floor(base / 10) * equipment.magicSoulLevel;
-  const calculateAddDefense = (base: number) => Math.floor(base / 10) * equipment.magicSoulLevel;
+  // 获取基础属性（不包含魔魂追加）
+  const baseAttackMin = equipment.baseAttackMin ?? 0;
+  const baseAttackMax = equipment.baseAttackMax ?? 0;
+  const baseDefense = equipment.baseDefense ?? 0;
+
+  // 获取追加属性（魔魂加成）
+  const bonusAttackMin = equipment.bonusAttackMin ?? 0;
+  const bonusAttackMax = equipment.bonusAttackMax ?? 0;
+  const bonusDefense = equipment.bonusDefense ?? 0;
 
   // 判断是否为已装备状态（有卸下和替换回调）
   const isEquipped = !!(onUnequip || onReplace);
@@ -188,19 +200,19 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
         {/* 装备属性区域 */}
         <div className="equipment-detail-attributes">
           {/* 攻击型装备显示攻击力 */}
-          {isAttackType && equipment.attributes.attackMin !== undefined && equipment.attributes.attackMax !== undefined && (
+          {isAttackType && (
             <>
               <div className="attribute-row">
                 <span className="attribute-label">攻击：</span>
                 <span className="attribute-value attack-value">
-                  {equipment.attributes.attackMin}-{equipment.attributes.attackMax}
+                  {baseAttackMin}-{baseAttackMax}
                 </span>
               </div>
               {equipment.magicSoulLevel > 0 && (
                 <div className="attribute-row">
                   <span className="attribute-label">追加攻击：</span>
                   <span className="attribute-value attack-value">
-                    +{calculateAddAttack(equipment.attributes.attackMin)}-+{calculateAddAttack(equipment.attributes.attackMax)}
+                    +{bonusAttackMin}-+{bonusAttackMax}
                   </span>
                 </div>
               )}
@@ -208,19 +220,19 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
           )}
 
           {/* 防御型装备显示防御力 */}
-          {isDefenseType && equipment.attributes.defense !== undefined && (
+          {isDefenseType && (
             <>
               <div className="attribute-row">
                 <span className="attribute-label">防御：</span>
                 <span className="attribute-value defense-value">
-                  {equipment.attributes.defense}
+                  {baseDefense}
                 </span>
               </div>
               {equipment.magicSoulLevel > 0 && (
                 <div className="attribute-row">
                   <span className="attribute-label">追加防御：</span>
                   <span className="attribute-value defense-value">
-                    +{calculateAddDefense(equipment.attributes.defense)}
+                    +{bonusDefense}
                   </span>
                 </div>
               )}
@@ -349,12 +361,21 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
             </>
           ) : (
             /* 背包状态：显示装备按钮 */
-            <button
-              className="equip-button"
-              onClick={handleEquipClick}
-            >
-              装备
-            </button>
+            <>
+              {/* 等级不足提示 */}
+              {characterLevel !== undefined && equipment && !canEquipEquipment(equipment, characterLevel) && (
+                <div className="level-requirement-warning">
+                  {getEquipmentLevelRequirementMessage(equipment, characterLevel)}
+                </div>
+              )}
+              <button
+                className="equip-button"
+                onClick={handleEquipClick}
+                disabled={characterLevel !== undefined && equipment ? !canEquipEquipment(equipment, characterLevel) : false}
+              >
+                装备
+              </button>
+            </>
           )}
         </div>
       </div>

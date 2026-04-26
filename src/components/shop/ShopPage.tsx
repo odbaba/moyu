@@ -437,9 +437,6 @@ const ShopPage: React.FC<ShopPageProps> = ({
             </div>
             <div className="shop-detail-info">
               <h3>{selectedItem.name}</h3>
-              <p className="shop-detail-type">
-                {isBuying ? shopItem!.type : inventoryItem!.type}
-              </p>
             </div>
           </div>
 

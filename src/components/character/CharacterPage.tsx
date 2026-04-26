@@ -238,6 +238,7 @@ const CharacterPage: React.FC<CharacterPageProps> = ({
         <EquipmentDetailModal
           isVisible={showEquipmentDetailModal}
           equipment={selectedEquipment}
+          characterLevel={character.level}
           onClose={handleCloseEquipmentDetailModal}
           onEquip={isEquippedState ? undefined : handleEquipInventoryItem}
           onUnequip={isEquippedState ? handleUnequipItem : undefined}

@@ -78,7 +78,7 @@ const LEGENDARY_PRIZES = [
   { id: 'plasma_potion', name: '电浆药水', type: 'item' },
   { id: 'high_spirit_scroll', name: '高级斗志昂扬', type: 'item' },
   { id: 'rose_999', name: '999朵白玫瑰', type: 'item' },
-  { id: 'legendary_equipment', name: '精品装备', type: 'equipment' },
+  { id: 'legendary_equipment', name: '极品装备', type: 'equipment' },
 ];
 
 // ==================== 高级奖品配置 ====================
@@ -89,12 +89,12 @@ const LEGENDARY_PRIZES = [
  */
 const HIGH_PRIZES = [
   { id: 'saint_angel_pet', name: '圣天使幻兽', type: 'pet', petType: '圣天使' as PetType },
-  { id: 'epic_equipment', name: '精品装备', type: 'equipment' },
+  { id: 'epic_equipment', name: '极品装备', type: 'equipment' },
   { id: 'flying_slash_skill', name: '飞天连斩(2/7)', type: 'item' },
   { id: 'spirit_scroll', name: '斗志昂扬', type: 'item' },
   { id: 'high_star_sword', name: '高级星魔剑', type: 'item' },
   { id: 'soul_king', name: '灵魂王', type: 'item' },
-  { id: 'epic_equipment_2', name: '精品装备', type: 'equipment' },
+  { id: 'epic_equipment_2', name: '极品装备', type: 'equipment' },
 ];
 
 // ==================== 中级奖品配置 ====================
@@ -105,7 +105,7 @@ const HIGH_PRIZES = [
  */
 const MEDIUM_PRIZES = [
   { id: '8star_pet', name: '8星奇异兽', type: 'pet', petType: '奇异兽' as PetType, starLevel: 8 },
-  { id: 'rare_equipment', name: '精品装备', type: 'equipment' },
+  { id: 'rare_equipment', name: '极品装备', type: 'equipment' },
   { id: '12star_pet', name: '12星奇异兽', type: 'pet', petType: '奇异兽' as PetType, starLevel: 12 },
   { id: 'magic_heart', name: '幻魔之心', type: 'item' },
   { id: 'soul_heart', name: '魔魂之心', type: 'item' },
@@ -119,7 +119,7 @@ const MEDIUM_PRIZES = [
  */
 const COMMON_PRIZES = [
   { id: 'exp_orb', name: '满经验球', type: 'item' },
-  { id: 'good_equipment', name: '优秀装备', type: 'equipment' },
+  { id: 'good_equipment', name: '精品装备', type: 'equipment' },
   { id: 'soul_crystal', name: '灵魂晶石', type: 'item' },
   { id: 'rose_99', name: '99朵白玫瑰', type: 'item' },
 ];
@@ -177,7 +177,7 @@ export function selectLegendaryPrize(playerLevel: number): { name: string; item?
   } else if (prize.type === 'equipment') {
     return {
       name: prize.name,
-      item: generateLotteryEquipment(playerLevel, 3),
+      item: generateLotteryEquipment(playerLevel, 4),
     };
   } else {
     return {
@@ -207,7 +207,7 @@ export function selectHighPrize(playerLevel: number): { name: string; item?: Inv
   } else if (prize.type === 'equipment') {
     return {
       name: prize.name,
-      item: generateLotteryEquipment(playerLevel, 3),
+      item: generateLotteryEquipment(playerLevel, 4),
     };
   } else {
     return {
@@ -237,7 +237,7 @@ export function selectMediumPrize(playerLevel: number): { name: string; item?: I
   } else if (prize.type === 'equipment') {
     return {
       name: prize.name,
-      item: generateLotteryEquipment(playerLevel, 3),
+      item: generateLotteryEquipment(playerLevel, 4),
     };
   } else {
     return {
@@ -261,7 +261,7 @@ export function selectCommonPrize(playerLevel: number): { name: string; item?: I
   if (prize.type === 'equipment') {
     return {
       name: prize.name,
-      item: generateLotteryEquipment(playerLevel, 2),
+      item: generateLotteryEquipment(playerLevel, 3),
     };
   } else {
     return {

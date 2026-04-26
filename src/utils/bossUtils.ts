@@ -5,7 +5,7 @@
 
 import { bossSpawnConfigs, bossTemplates } from '../data/bossData';
 import { monsterSpawnConfigs, monsterTemplates } from '../data/monsterData';
-import type { BossTemplate, EnemyData, MonsterTemplate } from '../types';
+import type { BossTemplate, EnemyData } from '../types';
 
 /**
  * 刷新结果接口

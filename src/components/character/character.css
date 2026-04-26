@@ -723,14 +723,16 @@
 .equipment-select-modal-content {
   background-color: #252935;
   border-radius: 8px;
-  padding: 20px;
+  padding: 8px 2px;
   width: 90%;
   max-width: 500px;
-  max-height: 80vh;
-  overflow-y: auto;
+  max-height: 85vh;
+  overflow-y: hidden;
   border: 2px solid #4ecdc4;
   animation: slideIn 0.3s ease;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .equipment-select-close-modal {
@@ -750,14 +752,34 @@
   color: #4ecdc4;
   font-size: 1.1rem;
   font-weight: bold;
-  margin: 0 0 15px 0;
+  margin: 0 0 10px 0;
   text-align: center;
+  flex-shrink: 0;
 }
 
 /* 装备选择弹窗网格包装器 */
 .equipment-select-grid-wrapper {
-  max-height: 60vh;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.equipment-select-grid-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* 弹窗内的物品列表样式覆盖 - 移除多余的边距和边框 */
+.equipment-select-grid-wrapper .inventory-list {
+  padding: 6px;
+  border: none;
+  background-color: transparent;
+  gap: 6px;
+}
+
+.equipment-select-grid-wrapper .inventory-list-item {
+  padding: 8px 10px;
 }
 
 .equipment-select-list {
@@ -1010,4 +1032,70 @@
 .stat-compact.clickable:hover::after {
   color: #ffd700;
   opacity: 1;
+}
+
+/* ========== 战魂套装图标样式 ========== */
+
+/* 套装图标容器 - 右上角定位 */
+.war-soul-set-icons-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+/* 单个套装图标包装器 */
+.war-soul-set-icon-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+/* 套装图标样式 */
+.war-soul-set-icon {
+  font-size: 1.5rem;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  transition: transform 0.2s ease;
+}
+
+.war-soul-set-icon:hover {
+  transform: scale(1.2);
+}
+
+/* 套装悬浮提示样式 */
+.war-soul-set-tooltip {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 5px;
+  background-color: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 8px 12px;
+  min-width: 200px;
+  max-width: 280px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+/* 悬浮提示单行样式 */
+.war-soul-set-tooltip-line {
+  color: #FCFFFF;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.war-soul-set-tooltip-line:first-child {
+  font-weight: bold;
+  color: #ffd700;
+  margin-bottom: 4px;
+}
+
+/* 确保装备展示容器有相对定位 */
+.equipment-display-compact {
+  position: relative;
 }

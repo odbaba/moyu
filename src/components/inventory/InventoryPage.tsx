@@ -51,6 +51,10 @@ interface InventoryPageProps {
    */
   resources?: PlayerResources;
   /**
+   * 角色等级（用于装备等级限制检查）
+   */
+  characterLevel?: number;
+  /**
    * 关闭按钮点击回调
    */
   onClose: () => void;
@@ -74,6 +78,7 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
   isVisible,
   items = exampleItems,
   resources = exampleResources,
+  characterLevel,
   onClose,
   onUseItem,
   onEquipItem
@@ -245,6 +250,7 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
           <EquipmentDetailModal
             isVisible={showItemDetailModal}
             equipment={equipmentItemToDetail(selectedEquipmentItem)}
+            characterLevel={characterLevel}
             onClose={handleCloseItemDetailModal}
             onEquip={onEquipItem ? handleEquipItem : undefined}
           />

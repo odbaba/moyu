@@ -57,7 +57,7 @@ const FusionResultModal: React.FC<FusionResultModalProps> = ({
       <div className="fusion-result-modal-content">
         {/* 关闭按钮 - 右上角 */}
         <button
-          className="fusion-result-close-button"
+          className="fusion-result-modal-close"
           onClick={handleConfirm}
           aria-label="关闭弹窗"
         >

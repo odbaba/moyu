@@ -78,7 +78,7 @@ import {
 } from './utils/dailyTaskUtils';
 import { equipmentDetailToItem, equipmentItemToDetail } from './utils/equipmentConverter';
 // 导入装备检测工具函数
-import { checkAllEquipmentLegendary } from './utils/equipmentUtils';
+import { canEquipEquipment, checkAllEquipmentLegendary } from './utils/equipmentUtils';
 // 导入经验计算工具函数
 import { calculateCombatPowerBonusExp } from './utils/experienceUtils';
 // 导入宝石合成工具函数
@@ -117,7 +117,12 @@ import { gainExperience, generatePetByType, generateStarStrangePet } from './uti
 import {
   consumeItemFromInventory,
   createInitialPetInstituteState,
+  dailyReset,
   getInstituteInfo,
+  MAX_PRODUCTION_RATE,
+  PRODUCTION_TASK_EXP_REWARD,
+  PRODUCTION_TASK_SOUL_KING_COST,
+  weeklyReset,
 } from './utils/petInstituteUtils';
 // 导入 NPC 相关工具函数
 import { canGiftRose, getChatDialogue, getDemonArmyDialogue, getNextRelationshipRequirement, getRelationshipName, MAX_WEEKLY_ROSE_GIFT_COUNT, performChat, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
@@ -346,20 +351,20 @@ function App() {
 
   /**
    * 处理"退出游戏"
-   * 返回封面页，不保存游戏进度
+   * 刷新页面，重新开始游戏
    */
   const handleExitGame = useCallback(() => {
-    // 暂停背景音乐
-    pauseBackgroundMusic();
-    // 显示封面页
-    setShowCover(true);
-  }, [pauseBackgroundMusic]);
+    // 刷新页面
+    window.location.reload();
+  }, []);
 
   /**
    * 处理"继续游戏"
    * 从存档读取所有数据，完整恢复游戏状态
    */
   const handleContinueGame = useCallback(() => {
+    // 先设置 isInitializedRef，防止第一天初始化的 useEffect 执行
+    isInitializedRef.current = true;
     // 从存档读取数据
     const savedData = loadGame();
     if (savedData) {
@@ -418,6 +423,8 @@ function App() {
       setHasUsedDianJiangYaoShuiToday(savedData.hasUsedDianJiangYaoShuiToday ?? false);
       // 恢复幻兽研究所状态
       setPetInstituteState(savedData.petInstituteState ?? createInitialPetInstituteState());
+      // 更新 prevDayRef 为存档中的天数，防止继续游戏时触发每日初始化
+      prevDayRef.current = savedData.timeSystem?.nowday ?? 1;
     }
     // 关闭封面页，进入游戏主界面
     setShowCover(false);
@@ -477,6 +484,9 @@ function App() {
   const [infoModalTitle, setInfoModalTitle] = useState('');
   const [infoModalContent, setInfoModalContent] = useState('');
   const [infoModalOnConfirm, setInfoModalOnConfirm] = useState<(() => void) | undefined>(undefined);
+  // InfoModal 按钮文本状态
+  const [infoModalConfirmText, setInfoModalConfirmText] = useState<string | undefined>(undefined);
+  const [infoModalCancelText, setInfoModalCancelText] = useState<string | undefined>(undefined);
 
   // 捐献金币弹窗状态
   const [showDonationModal, setShowDonationModal] = useState(false);
@@ -567,6 +577,9 @@ function App() {
   // currentLocation 引用，用于解决闭包问题
   const currentLocationRef = useRef(currentLocation);
 
+  // 用于防止提高产量任务重复执行
+  const productionTaskExecutedRef = useRef(false);
+
   // 当战魂系统状态或无名氏击败状态或PK赛参与状态或国王救出状态变化时，不再自动保存
   // 改为手动保存（菜单中"保存游戏"按钮触发）
 
@@ -628,8 +641,11 @@ function App() {
   ]);
 
   // 游戏初始化时的第一天日志和 BOSS 刷新
+  // 只有当封面页关闭且未初始化时才执行
   useEffect(() => {
-    // 防止 React StrictMode 导致的重复执行
+    // 封面页未关闭时不执行
+    if (showCover) return;
+    // 防止重复执行
     if (isInitializedRef.current) return;
     isInitializedRef.current = true;
 
@@ -657,7 +673,7 @@ function App() {
       const specialMonsterMessages = specialMonsterSpawnResults.map(result => result.message);
       setInteractionLog(logs => [...logs, ...specialMonsterMessages]);
     }
-  }, []); // 空依赖数组，只在组件挂载时执行一次
+  }, [showCover]); // 监听 showCover 状态变化
 
   useEffect(() => {
     currentLocationRef.current = currentLocation;
@@ -825,126 +841,162 @@ function App() {
     setFloatingTexts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  // 监听天数变化，处理新的一天的逻辑
-  useEffect(() => {
-    // 只有当天数发生变化时才执行
-    if (timeSystem.nowday !== prevDayRef.current) {
-      // 更新追踪的天数
-      prevDayRef.current = timeSystem.nowday;
+  /**
+   * 处理角色升级后的提示
+   * @param previousLevel 升级前的等级
+   * @param currentLevel 升级后的等级
+   */
+  const handleCharacterLevelUp = useCallback((previousLevel: number, currentLevel: number) => {
+    // 检查是否升级了
+    if (currentLevel > previousLevel) {
+      // 升级了，显示浮动文字提示
+      addFloatingText(`恭喜升级！当前等级：${currentLevel}级`);
 
-      // 添加新的一天提示到交互日志
-      setInteractionLog(logs => [...logs, `新的一天开始了！现在是第${timeSystem.nowday}天`]);
-
-      // 新的一天恢复HP和体力到最大值
-      setCharacter(prev => ({
-        ...prev,
-        currentHp: prev.maxHp,
-        currentStamina: prev.maxStamina,
-      }));
-
-      // Recover all pets to max HP at the start of a new day
-      setPets(prevPets => prevPets.map(pet =>
-        pet.hp < pet.mhp
-          ? { ...pet, hp: pet.mhp }
-          : pet
-      ));
-
-      // 新的一天刷新所有怪物
-      setKilledMonsters(new Set());
-
-      // 新的一天随机刷新 BOSS
-      const bossSpawnResults = rollBossSpawns();
-      const newSpawnedBossIds = bossSpawnResults.map(result => result.interactableId);
-      setSpawnedBosses(new Set(newSpawnedBossIds));
-
-      // 将 BOSS 刷新消息添加到交互日志
-      if (bossSpawnResults.length > 0) {
-        const bossMessages = bossSpawnResults.map(result => result.message);
-        setInteractionLog(logs => [...logs, ...bossMessages]);
-      }
-
-      // 新的一天随机刷新特殊怪物（蜘蛛、蜘蛛王后艾达）
-      const specialMonsterSpawnResults = rollSpecialMonsterSpawns();
-      const newSpawnedSpecialMonsterIds = specialMonsterSpawnResults.map(result => result.interactableId);
-      setSpawnedSpecialMonsters(new Set(newSpawnedSpecialMonsterIds));
-
-      // 将特殊怪物刷新消息添加到交互日志
-      if (specialMonsterSpawnResults.length > 0) {
-        const specialMonsterMessages = specialMonsterSpawnResults.map(result => result.message);
-        setInteractionLog(logs => [...logs, ...specialMonsterMessages]);
-      }
-
-      // 重置日常任务状态（对应参考文档的 nextday() 函数）
-      setDailyTaskState(prev => resetDailyTaskState(prev, timeSystem.nowday));
-
-      // 重置地图挑战状态
-      setMapChallengeState((prev: MapChallengeState) => resetMapChallengeDaily(prev));
-
-      // 重置丫环1每日购买数量
-      setMaid1DailyPurchaseCount(0);
-
-      // 重置电浆药水使用状态（每天可以使用一瓶）
-      setHasUsedDianJiangYaoShuiToday(false);
-
-      // 重置公主关系每日状态（每天可以聊天和送礼）
-      setPrincessRelationship(prev => ({
-        ...prev,
-        canChatToday: true,
-        canGiftToday: true,
-        canReceiveSundayGift: true, // 每天重置，但周日礼物选项只在周日显示
-      }));
-
-      // 重置PK赛参与状态（每天重置，周六可以再次参加）
-      setHasParticipatedPKToday(false);
-
-      // 魔军复活提示：国王救出后，如果有魔族大军被击败，显示复活提示
-      if (isKingRescued) {
-        const taskState = _dailyTaskState;
-        // 检查是否有魔族大军被击败（状态为 false）
-        const hasDefeatedDemonArmy = !taskState.mj_gj || !taskState.mj_fy || !taskState.mj_tt ||
-                                       !taskState.mj_sm || !taskState.mj_zs || !taskState.mj_nl;
-        if (hasDefeatedDemonArmy) {
-          setInteractionLog(logs => [...logs, '黑夜到来时，魔的能量将所有死亡的魔族军队复活了']);
+      // 检查是否跨过了装备使用等级节点
+      const equipmentLevelNodes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 125];
+      
+      // 找出所有跨过的装备使用等级节点
+      const crossedNodes: number[] = [];
+      for (let level = previousLevel + 1; level <= currentLevel; level++) {
+        if (equipmentLevelNodes.includes(level)) {
+          crossedNodes.push(level);
         }
       }
 
-      // 重置每日提示状态
-      setHasShownSaturdayPKTip(false);
-      setHasShownSundayMilitaryPayTip(false);
-      setHasShownSundayPrincessGiftTip(false);
-      setHasShownSundayPrincessFlowerTip(false);
-
-      // 检测星期并显示提示
-      const weekday = getWeekday(timeSystem.nowday);
-
-      // 星期六PK大赛提示
-      if (weekday === '星期六' && !hasShownSaturdayPKTip) {
+      // 为每个跨过的节点显示提示（延迟显示，避免重叠）
+      crossedNodes.forEach((node, index) => {
         setTimeout(() => {
-          addFloatingText('今天是星期六，PK大赛即将开始，如果要参加比赛请到皇宫周赛PK报名官那里报名吧。');
-          setHasShownSaturdayPKTip(true);
+          addFloatingText(`你已经${node}级了，你可以使用更加高级的装备了，到装备打造师那里把你的装备升级吧。`);
+        }, 1500 + index * 2000); // 第一个延迟1.5秒，后续每个延迟2秒
+      });
+    }
+  }, [addFloatingText]);
+
+  /**
+   * 处理新的一天的逻辑
+   * 统一管理所有每日初始化相关的逻辑
+   */
+  const handleNewDay = useCallback(() => {
+    // 添加新的一天提示到交互日志
+    setInteractionLog(logs => [...logs, `新的一天开始了！现在是第${timeSystem.nowday}天`]);
+
+    // 新的一天恢复HP和体力到最大值
+    setCharacter(prev => ({
+      ...prev,
+      currentHp: prev.maxHp,
+      currentStamina: prev.maxStamina,
+    }));
+
+    // Recover all pets to max HP at the start of a new day
+    setPets(prevPets => prevPets.map(pet =>
+      pet.hp < pet.mhp
+        ? { ...pet, hp: pet.mhp }
+        : pet
+    ));
+
+    // 新的一天刷新所有怪物
+    setKilledMonsters(new Set());
+
+    // 新的一天随机刷新 BOSS
+    const bossSpawnResults = rollBossSpawns();
+    const newSpawnedBossIds = bossSpawnResults.map(result => result.interactableId);
+    setSpawnedBosses(new Set(newSpawnedBossIds));
+
+    // 将 BOSS 刷新消息添加到交互日志
+    if (bossSpawnResults.length > 0) {
+      const bossMessages = bossSpawnResults.map(result => result.message);
+      setInteractionLog(logs => [...logs, ...bossMessages]);
+    }
+
+    // 新的一天随机刷新特殊怪物（蜘蛛、蜘蛛王后艾达）
+    const specialMonsterSpawnResults = rollSpecialMonsterSpawns();
+    const newSpawnedSpecialMonsterIds = specialMonsterSpawnResults.map(result => result.interactableId);
+    setSpawnedSpecialMonsters(new Set(newSpawnedSpecialMonsterIds));
+
+    // 将特殊怪物刷新消息添加到交互日志
+    if (specialMonsterSpawnResults.length > 0) {
+      const specialMonsterMessages = specialMonsterSpawnResults.map(result => result.message);
+      setInteractionLog(logs => [...logs, ...specialMonsterMessages]);
+    }
+
+    // 重置日常任务状态（对应参考文档的 nextday() 函数）
+    setDailyTaskState(prev => resetDailyTaskState(prev, timeSystem.nowday));
+
+    // 幻兽研究所：每日重置，库存增加（等于生产量）
+    setPetInstituteState(prev => dailyReset(prev));
+
+    // 重置地图挑战状态
+    setMapChallengeState((prev: MapChallengeState) => resetMapChallengeDaily(prev));
+
+    // 重置丫环1每日购买数量
+    setMaid1DailyPurchaseCount(0);
+
+    // 重置电浆药水使用状态（每天可以使用一瓶）
+    setHasUsedDianJiangYaoShuiToday(false);
+
+    // 重置公主关系每日状态（每天可以聊天和送礼）
+    setPrincessRelationship(prev => ({
+      ...prev,
+      canChatToday: true,
+      canGiftToday: true,
+      canReceiveSundayGift: true, // 每天重置，但周日礼物选项只在周日显示
+    }));
+
+    // 重置PK赛参与状态（每天重置，周六可以再次参加）
+    setHasParticipatedPKToday(false);
+
+    // 魔军复活提示：国王救出后，如果有魔族大军被击败，显示复活提示
+    if (isKingRescued) {
+      const taskState = _dailyTaskState;
+      // 检查是否有魔族大军被击败（状态为 false）
+      const hasDefeatedDemonArmy = !taskState.mj_gj || !taskState.mj_fy || !taskState.mj_tt ||
+                                     !taskState.mj_sm || !taskState.mj_zs || !taskState.mj_nl;
+      if (hasDefeatedDemonArmy) {
+        setInteractionLog(logs => [...logs, '黑夜到来时，魔的能量将所有死亡的魔族军队复活了']);
+      }
+    }
+
+    // 重置每日提示状态
+    setHasShownSaturdayPKTip(false);
+    setHasShownSundayMilitaryPayTip(false);
+    setHasShownSundayPrincessGiftTip(false);
+    setHasShownSundayPrincessFlowerTip(false);
+
+    // 检测星期并显示提示
+    const weekday = getWeekday(timeSystem.nowday);
+
+    // 幻兽研究所：周日重置，开启提高产量任务
+    if (weekday === '星期日') {
+      setPetInstituteState(prev => weeklyReset(prev));
+    }
+
+    // 星期六PK大赛提示（只在当天第一次显示）
+    if (weekday === '星期六' && !hasShownSaturdayPKTip) {
+      setTimeout(() => {
+        addFloatingText('今天是星期六，PK大赛即将开始，如果要参加比赛请到皇宫周赛PK报名官那里报名吧。');
+        setHasShownSaturdayPKTip(true);
+      }, 100);
+    }
+
+    // 星期日提示（只在当天第一次显示）
+    if (weekday === '星期日') {
+      // 军饷提示（有军衔时）
+      if (militaryRank > 0 && !hasShownSundayMilitaryPayTip) {
+        setTimeout(() => {
+          addFloatingText('今天是星期天啦，如果你有军衔了就可以去元帅那里领取军饷。');
+          setHasShownSundayMilitaryPayTip(true);
         }, 1000);
       }
 
-      // 星期日提示
-      if (weekday === '星期日') {
-        // 军饷提示（有军衔时）
-        if (militaryRank > 0 && !hasShownSundayMilitaryPayTip) {
-          setTimeout(() => {
-            addFloatingText('今天是星期天啦，如果你有军衔了就可以去元帅那里领取军饷。');
-            setHasShownSundayMilitaryPayTip(true);
-          }, 1000);
-        }
+      // 公主礼物提示（认识公主时）
+      if (princessRelationship.level > 0 && !hasShownSundayPrincessGiftTip) {
+        setTimeout(() => {
+          addFloatingText('今天是星期天啦，如果你认识了公主那今天她会送你一份礼物。');
+          setHasShownSundayPrincessGiftTip(true);
+        }, 2500);
 
-        // 公主礼物提示（认识公主时）
-        if (princessRelationship.level > 0 && !hasShownSundayPrincessGiftTip) {
-          setTimeout(() => {
-            addFloatingText('今天是星期天啦，如果你认识了公主那今天她会送你一份礼物。');
-            setHasShownSundayPrincessGiftTip(true);
-          }, 2500);
-        }
-
-        // 公主鲜花提示（认识公主时）
-        if (princessRelationship.level > 0 && !hasShownSundayPrincessFlowerTip) {
+        // 公主鲜花提示
+        if (!hasShownSundayPrincessFlowerTip) {
           setTimeout(() => {
             const relationshipName = princessRelationship.relationshipName;
             addFloatingText(`公主是你的${relationshipName}。星期天了，公主很想收到一束漂亮的鲜花，你是否会给她送上一束呢。`);
@@ -953,7 +1005,18 @@ function App() {
         }
       }
     }
-  }, [timeSystem.nowday, addFloatingText, militaryRank, princessRelationship.level, princessRelationship.relationshipName, hasShownSaturdayPKTip, hasShownSundayMilitaryPayTip, hasShownSundayPrincessGiftTip, hasShownSundayPrincessFlowerTip, isKingRescued, _dailyTaskState]);
+  }, [timeSystem.nowday, addFloatingText, militaryRank, princessRelationship.level, princessRelationship.relationshipName, isKingRescued, _dailyTaskState]);
+
+  // 监听天数变化，处理新的一天的逻辑
+  useEffect(() => {
+    // 只有当天数发生变化时才执行
+    if (timeSystem.nowday !== prevDayRef.current) {
+      // 更新追踪的天数
+      prevDayRef.current = timeSystem.nowday;
+      // 执行新的一天逻辑
+      handleNewDay();
+    }
+  }, [timeSystem.nowday, handleNewDay]);
 
   /**
    * 挖矿逻辑
@@ -1740,6 +1803,9 @@ function App() {
                   // 计算带战斗力加成的经验值
                   const bonusExp = calculateCombatPowerBonusExp(reward.exp!, character.combatPower, character.level);
 
+                  // 记录升级前的等级
+                  const previousLevel = character.level;
+
                   // 使用统一的升级函数处理角色经验获取（使用加成后的经验）
                   setCharacter(prev => {
                     const result = gainCharacterExperience(prev, bonusExp);
@@ -1751,6 +1817,17 @@ function App() {
 
                     return result.character;
                   });
+
+                  // 使用setTimeout确保在状态更新后执行
+                  setTimeout(() => {
+                    setCharacter(prev => {
+                      // 检查是否升级了
+                      if (prev.level > previousLevel) {
+                        handleCharacterLevelUp(previousLevel, prev.level);
+                      }
+                      return prev;
+                    });
+                  }, 0);
 
                   // 给战中幻兽增加相同经验（带加成）
                   setPets(prevPets => {
@@ -2288,11 +2365,92 @@ function App() {
 
       case 'improveProduction':
         // 提高产量任务（每周一次）
-        if (petInstituteState.canDoProductionTask) {
-          setShowPetInstituteModal(true);
-          setShowNPCModal(false);
-        } else {
+        if (petInstituteState.canDoProductionTask && petInstituteState.productionRate < MAX_PRODUCTION_RATE) {
+          // 计算所需灵魂王和经验奖励
+          const requiredSoulKings = PRODUCTION_TASK_SOUL_KING_COST[petInstituteState.productionRate] || 0;
+          const expReward = PRODUCTION_TASK_EXP_REWARD[petInstituteState.productionRate] || 0;
+          
+          // 构建弹窗内容
+          const content = `提高产量任务已开放！\n\n所需灵魂王：${requiredSoulKings} 个\n经验奖励：${expReward}\n完成次数：${petInstituteState.productionRate} / ${MAX_PRODUCTION_RATE}`;
+          
+          setInfoModalTitle('提高产量任务');
+          setInfoModalContent(content);
+          setInfoModalConfirmText('接受');
+          setInfoModalCancelText('离开');
+          // 重置执行标志
+          productionTaskExecutedRef.current = false;
+          setInfoModalOnConfirm(() => () => {
+            // 防止重复执行
+            if (productionTaskExecutedRef.current) return;
+            productionTaskExecutedRef.current = true;
+            
+            // 检查灵魂王是否足够（使用最新的 inventory 状态）
+            setInventory(prevInventory => {
+              const currentSoulKingCount = prevInventory
+                .filter(item => item.name === '灵魂王')
+                .reduce((sum, item) => sum + item.quantity, 0);
+              
+              if (currentSoulKingCount < requiredSoulKings) {
+                setInteractionLog(prev => [...prev, `灵魂王不足，需要 ${requiredSoulKings} 个，当前 ${currentSoulKingCount} 个`]);
+                return prevInventory;
+              }
+              
+              // 执行提高产量任务（使用函数式更新获取最新状态）
+              setPetInstituteState(prev => {
+                // 再次检查是否可以执行任务
+                if (!prev.canDoProductionTask || prev.productionRate >= MAX_PRODUCTION_RATE) {
+                  setInteractionLog(prevLog => [...prevLog, '任务已完成或已达上限']);
+                  return prev;
+                }
+                
+                // 消耗灵魂王
+                const newInventory = consumeItemFromInventory(prevInventory, '灵魂王', requiredSoulKings);
+                setInventory(newInventory);
+                
+                // 计算带战斗力加成的经验值
+                setCharacter(prevChar => {
+                  const bonusExp = calculateCombatPowerBonusExp(expReward, prevChar.combatPower, prevChar.level);
+                  
+                  // 更新角色经验
+                  const charResult = gainCharacterExperience(prevChar, bonusExp);
+                  if (charResult.message) {
+                    setInteractionLog(logs => [...logs, charResult.message!]);
+                  }
+                  
+                  // 更新幻兽经验
+                  setPets(prevPets => {
+                    return prevPets.map(pet => {
+                      if (!pet.isDeployed) return pet;
+                      const petResult = gainExperience(pet, bonusExp, charResult.character.level);
+                      if (petResult.message) {
+                        setInteractionLog(logs => [...logs, petResult.message!]);
+                      }
+                      return petResult.pet;
+                    });
+                  });
+                  
+                  setInteractionLog(prevLog => [...prevLog, `完成提高产量任务！生产量+1，获得经验 ${bonusExp.toLocaleString()}，VIP星级 +1`]);
+                  
+                  return charResult.character;
+                });
+                
+                // 更新研究所状态
+                return {
+                  ...prev,
+                  productionRate: Math.min(prev.productionRate + 1, MAX_PRODUCTION_RATE),
+                  vipLevel: Math.min(prev.vipLevel + 1, 10),
+                  canDoProductionTask: false
+                };
+              });
+              
+              return prevInventory;
+            });
+          });
+          setShowInfoModal(true);
+        } else if (!petInstituteState.canDoProductionTask) {
           setInteractionLog(prev => [...prev, '本周提高产量任务已完成！']);
+        } else {
+          setInteractionLog(prev => [...prev, '生产量已达上限！']);
         }
         break;
 
@@ -2600,6 +2758,9 @@ function App() {
     );
 
     // ========== 角色获得经验 ==========
+    // 记录升级前的等级
+    const previousLevel = character.level;
+
     // 使用统一的升级函数处理角色经验获取
     setCharacter(prev => {
       const result = gainCharacterExperience(prev, loot.experience);
@@ -2611,6 +2772,17 @@ function App() {
 
       return result.character;
     });
+
+    // 使用setTimeout确保在状态更新后执行
+    setTimeout(() => {
+      setCharacter(prev => {
+        // 检查是否升级了
+        if (prev.level > previousLevel) {
+          handleCharacterLevelUp(previousLevel, prev.level);
+        }
+        return prev;
+      });
+    }, 0);
 
     // ========== 幻兽获得同等经验 ==========
     // 给所有出战的幻兽分配相同的经验
@@ -3110,6 +3282,10 @@ function App() {
           if (pkReward.exp > 0) {
             // 计算带战斗力加成的经验值
             const bonusExp = calculateCombatPowerBonusExp(pkReward.exp, character.combatPower, character.level);
+
+            // 记录升级前的等级
+            const previousLevel = character.level;
+
             // 使用统一的升级函数处理角色经验获取
             setCharacter(prev => {
               const result = gainCharacterExperience(prev, bonusExp);
@@ -3119,6 +3295,18 @@ function App() {
 
               return result.character;
             });
+
+            // 使用setTimeout确保在状态更新后执行
+            setTimeout(() => {
+              setCharacter(prev => {
+                // 检查是否升级了
+                if (prev.level > previousLevel) {
+                  handleCharacterLevelUp(previousLevel, prev.level);
+                }
+                return prev;
+              });
+            }, 0);
+
             // 给战中幻兽增加相同经验
             setPets(prevPets => {
               return prevPets.map(pet => {
@@ -3417,6 +3605,13 @@ function App() {
   const handleEquipItem = (item: EquipmentItem) => {
     // 检查物品类型是否为装备
     if (item.type !== 'equipment') return;
+
+    // 检查角色等级是否满足装备要求
+    if (!canEquipEquipment(item, character.level)) {
+      // 显示等级不足提示
+      addFloatingText(`等级不足！需要等级 ${item.useLevel} 才能装备此物品`);
+      return;
+    }
 
     // 获取目标槽位
     const slotType = item.equipmentType;
@@ -3827,19 +4022,9 @@ function App() {
       // 检查是否升级了（通过比较character.level）
       setCharacter(prev => {
         if (prev.level > previousLevel) {
-          // 升级了，显示浮动文字提示
-          addFloatingText(`恭喜升级！当前等级：${prev.level}级`);
-
-          // 检查是否达到装备使用等级节点
-          const equipmentLevelNodes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 125];
-          if (equipmentLevelNodes.includes(prev.level)) {
-            // 延迟显示装备升级提示，避免与升级提示重叠
-            setTimeout(() => {
-              addFloatingText(`你已经${prev.level}级了，你可以使用更加高级的装备了，到装备打造师那里把你的装备升级吧。`);
-            }, 1500);
-          }
+          // 使用统一的升级处理函数
+          handleCharacterLevelUp(previousLevel, prev.level);
         }
-
         return prev;
       });
     }, 0);
@@ -3855,6 +4040,10 @@ function App() {
    */
   const handleUseItemOnPet = useCallback((petId: string) => {
     if (!currentUseItem) return;
+
+    // 记录幻兽升级前的等级
+    const pet = pets.find(p => p.id === petId);
+    const previousLevel = pet?.dj || 0;
 
     // 使用 gainExperience 函数处理经验获取和升级
     setPets(prev => prev.map(pet => {
@@ -3893,11 +4082,23 @@ function App() {
       return prev;
     });
 
-    const pet = pets.find(p => p.id === petId);
+    // 使用setTimeout确保在状态更新后执行
+    setTimeout(() => {
+      // 检查幻兽是否升级了
+      setPets(prevPets => {
+        const updatedPet = prevPets.find(p => p.id === petId);
+        if (updatedPet && updatedPet.dj > previousLevel) {
+          // 幻兽升级了，显示浮动文字提示
+          addFloatingText(`幻兽 ${updatedPet.othername} 升级了！当前等级：${updatedPet.dj}级`);
+        }
+        return prevPets;
+      });
+    }, 0);
+
     setInteractionLog(prev => [...prev, `对幻兽 ${pet?.othername} 使用了 ${currentUseItem.name}，获得 27000 经验值`]);
     setShowUseItemTargetModal(false);
     setCurrentUseItem(null);
-  }, [currentUseItem, pets, character.level]);
+  }, [currentUseItem, pets, character.level, addFloatingText]);
 
   /**
    * 添加幻兽到幻兽栏
@@ -4203,10 +4404,14 @@ function App() {
             onClose={() => {
               setShowInfoModal(false);
               setInfoModalOnConfirm(undefined);
+              setInfoModalConfirmText(undefined);
+              setInfoModalCancelText(undefined);
             }}
             title={infoModalTitle}
             content={infoModalContent}
             onConfirm={infoModalOnConfirm}
+            confirmText={infoModalConfirmText}
+            cancelText={infoModalCancelText}
           />
 
           {/* 角色信息页面 */}
@@ -4227,6 +4432,7 @@ function App() {
             isVisible={showInventoryPage}
             items={inventory}
             resources={playerResources}
+            characterLevel={character.level}
             onClose={() => setShowInventoryPage(false)}
             onUseItem={handleUseItem}
             onEquipItem={handleEquipItem}
@@ -4358,9 +4564,9 @@ function App() {
             interactionLog={interactionLog}
             onClose={() => setShowLottery(false)}
             onReturnToCity={() => {
-              setCurrentLocation('kasanuocheng');
+              setCurrentLocation('huanggong');
               setShowLottery(false);
-              setInteractionLog(prev => [...prev, '你返回了卡萨诺城']);
+              setInteractionLog(prev => [...prev, '你返回了皇宫']);
             }}
             onAddItem={handleAddItem}
             onAddPet={handleAddPet}
@@ -4403,84 +4609,19 @@ function App() {
               }));
               setInteractionLog(prev => [...prev, `成功购买奇异兽！品质分：${pet.pz}，花费：${price} 魔石`]);
             }}
-            onDonate={(magicStones, levelsGained, productionRateGained) => {
+            onDonate={(magicStones, levelsGained) => {
               // 扣除魔石
               setPlayerResources(prev => ({
                 ...prev,
                 magicStone: prev.magicStone - magicStones
               }));
               // 提升技术等级
-              setPetInstituteState(prev => {
-                const newTechLevel = Math.min(prev.techLevel + levelsGained, prev.techLevelMax);
-                // 如果生产量有增长（技术等级达到20级时自动+1）
-                const newProductionRate = productionRateGained > 0 && prev.productionRate === 0 
-                  ? prev.productionRate + productionRateGained 
-                  : prev.productionRate;
-                return {
-                  ...prev,
-                  techLevel: newTechLevel,
-                  productionRate: newProductionRate
-                };
-              });
-              // 日志提示
-              const logMsg = productionRateGained > 0 
-                ? `资助成功！技术等级 +${levelsGained}，生产量 +${productionRateGained}` 
-                : `资助成功！技术等级 +${levelsGained}`;
-              setInteractionLog(prev => [...prev, logMsg]);
-            }}
-            onImproveProduction={(expGained, vipGained, consumedSoulKings) => {
-              // 消耗灵魂王
-              const newInventory = consumeItemFromInventory(inventory, '灵魂王', consumedSoulKings);
-              setInventory(newInventory);
-
-              // 计算带战斗力加成的经验值
-              const bonusExp = calculateCombatPowerBonusExp(expGained, character.combatPower, character.level);
-
-              // 使用统一的升级函数处理角色经验获取（使用加成后的经验）
-              setCharacter(prev => {
-                const result = gainCharacterExperience(prev, bonusExp);
-
-                if (result.message) {
-                  setInteractionLog(logs => [...logs, result.message!]);
-                }
-
-                return result.character;
-              });
-
-              // 给战中幻兽增加相同经验（带加成）
-              setPets(prevPets => {
-                return prevPets.map(pet => {
-                  // 只给出战的幻兽分配经验
-                  if (!pet.isDeployed) {
-                    return pet;
-                  }
-
-                  // 使用 gainExperience 函数处理经验获取和升级
-                  const result = gainExperience(pet, bonusExp, character.level);
-
-                  // 如果有升级消息，打印到日志
-                  if (result.message) {
-                    setInteractionLog(logs => [...logs, result.message!]);
-                  }
-
-                  return result.pet;
-                });
-              });
-
-              // 打印战中幻兽获得经验的日志
-              const deployedCount = pets.filter(p => p.isDeployed).length;
-              if (deployedCount > 0) {
-                setInteractionLog(prev => [...prev, `🐉 战中幻兽（${deployedCount}只）各获得了 ${bonusExp.toLocaleString()} 经验！`]);
-              }
-
-              // 增加VIP等级和生产量
               setPetInstituteState(prev => ({
                 ...prev,
-                productionRate: Math.min(prev.productionRate + 1, 5),
-                vipLevel: Math.min(prev.vipLevel + vipGained, 10),
-                canDoProductionTask: false
+                techLevel: Math.min(prev.techLevel + levelsGained, prev.techLevelMax)
               }));
-              setInteractionLog(prev => [...prev, `完成提高产量任务！生产量+1，获得经验 ${bonusExp.toLocaleString()}，VIP星级 +${vipGained}`]);
+              // 日志提示
+              setInteractionLog(prev => [...prev, `资助成功！技术等级 +${levelsGained.toFixed(2)}`]);
             }}
           />
 

@@ -14,7 +14,8 @@
   z-index: 3100;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 10vh;
   animation: fadeIn 0.3s ease;
 }
 
@@ -135,6 +136,16 @@
 .collector-item-icon {
   font-size: 1.8rem;
   margin-bottom: 4px;
+}
+
+/* 物品图片（与背包展示一致） */
+.collector-item-image {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  margin-bottom: 4px;
+  image-rendering: auto;
+  display: inline-block;
 }
 
 /* 物品名称 */
@@ -361,6 +372,11 @@
   .collector-item-icon {
     font-size: 1.5rem;
     margin-bottom: 2px;
+  }
+
+  .collector-item-image {
+    width: 24px;
+    height: 24px;
   }
 
   .collector-item-name {

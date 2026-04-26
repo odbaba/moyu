@@ -12,30 +12,34 @@ import type { InventoryItem, PetInstituteState, PlayerResources } from '../types
 export const INITIAL_TECH_LEVEL = 10;
 
 /** 默认技术等级上限 */
-export const DEFAULT_TECH_LEVEL_MAX = 120;
+export const DEFAULT_TECH_LEVEL_MAX = 150;
 
-/** 最大生产量（最多完成5次任务，从0到5） */
-export const MAX_PRODUCTION_RATE = 5;
+/** 最大生产量（初始1，完成7次任务后达到8） */
+export const MAX_PRODUCTION_RATE = 8;
 
 /** 最大VIP等级 */
 export const MAX_VIP_LEVEL = 10;
 
-/** 提高产量任务所需灵魂王数量映射 */
+/** 提高产量任务所需灵魂王数量映射（根据当前生产量） */
 export const PRODUCTION_TASK_SOUL_KING_COST: Record<number, number> = {
-  0: 1,
-  1: 2,
-  2: 3,
-  3: 4,
-  4: 5,
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  7: 7,
 };
 
-/** 提高产量任务经验奖励映射 */
+/** 提高产量任务经验奖励映射（根据当前生产量） */
 export const PRODUCTION_TASK_EXP_REWARD: Record<number, number> = {
-  0: 105000,
-  1: 210000,
-  2: 315000,
-  3: 420000,
-  4: 525000,
+  1: 105000,
+  2: 210000,
+  3: 315000,
+  4: 420000,
+  5: 525000,
+  6: 630000,
+  7: 735000,
 };
 
 // ==================== 初始化函数 ====================
@@ -48,10 +52,10 @@ export function createInitialPetInstituteState(): PetInstituteState {
   return {
     techLevel: INITIAL_TECH_LEVEL,
     techLevelMax: DEFAULT_TECH_LEVEL_MAX,
-    productionRate: 0,
+    productionRate: 1, // 初始每日产量为1
     stock: 0,
     vipLevel: 0,
-    canDoProductionTask: false,
+    canDoProductionTask: true, // 初始可以进行提高产量任务
   };
 }
 
@@ -277,17 +281,11 @@ export function donate(
     return { success: false, message: '魔石数量不足以提升技术等级', levelsGained: 0, productionRateGained: 0 };
   }
 
-  // 检查技术等级是否达到20级且生产量为0，自动增加生产量
-  let productionRateGained = 0;
-  if (newLevel >= 20 && state.productionRate === 0) {
-    productionRateGained = 1;
-  }
-
   return {
     success: true,
     message: `成功提升技术等级 ${actualLevelsGained.toFixed(2)} 级！当前等级：${newLevel.toFixed(2)}`,
     levelsGained: actualLevelsGained,
-    productionRateGained,
+    productionRateGained: 0,
   };
 }
 

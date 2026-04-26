@@ -1,6 +1,6 @@
 import './EquipmentRefineModal.css';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import type { EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, InventoryItem, RefineResult } from '../../types';
 import { equipmentDetailToItem, getEquipmentDisplayName } from '../../utils/equipmentConverter';
@@ -73,6 +73,36 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
 
   // 是否显示选择列表
   const [showSelection, setShowSelection] = useState(false);
+
+  // 图片加载失败状态
+  const [equipImageError, setEquipImageError] = useState(false);
+  const [gemImageError, setGemImageError] = useState(false);
+
+  // 每次装备或宝石切换时重置图片错误状态
+  useEffect(() => {
+    setEquipImageError(false);
+  }, [equipment?.id]);
+
+  useEffect(() => {
+    setGemImageError(false);
+  }, [gem?.id]);
+
+  /**
+   * 渲染物品图标（优先显示图片，加载失败回退到emoji）
+   */
+  const renderItemIcon = (item: { icon: string; imagePath?: string }, isImageError: boolean, onError: () => void) => {
+    if (item.imagePath && !isImageError) {
+      return (
+        <img
+          src={item.imagePath}
+          alt={item.icon}
+          className="refine-slot-image"
+          onError={onError}
+        />
+      );
+    }
+    return <span className="refine-slot-icon">{item.icon}</span>;
+  };
 
   /**
    * 合并背包装备和角色装备
@@ -286,7 +316,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
             >
               {equipment ? (
                 <div className="slot-content">
-                  <div className="slot-icon">{equipment.icon}</div>
+                  {renderItemIcon(equipment, equipImageError, () => setEquipImageError(true))}
                   <div
                     className="slot-name"
                     style={{ color: getEquipmentQualityColor(equipment.equipmentQuality) }}
@@ -350,7 +380,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
             >
               {gem ? (
                 <div className="slot-content">
-                  <div className="slot-icon">{gem.icon}</div>
+                  {renderItemIcon(gem, gemImageError, () => setGemImageError(true))}
                   <div className="slot-name">{gem.name}</div>
                   <div className="slot-info">
                     <div>效果: {gem.effect}</div>
@@ -376,37 +406,6 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
         {refineResult && (
           <div className={`refine-result ${refineResult.success ? 'success' : 'failure'}`}>
             <div className="result-message">{refineResult.message}</div>
-            {refineResult.attributeChanges && (
-              <div className="result-changes">
-                {Object.entries(refineResult.attributeChanges).map(([key, value]) => {
-                  // 属性名称映射表（英文 -> 中文）
-                  const attributeNameMap: Record<string, string> = {
-                    qualityLevel: '品质等级',
-                    combatPowerChange: '战斗力变化',
-                    magicSoulLevel: '魔魂等级',
-                    magicSoulChange: '魔魂变化',
-                    useLevel: '使用等级',
-                    useLevelChange: '等级变化',
-                    holeCount: '洞数',
-                    soulLevel: '战魂等级',
-                    soulType: '战魂类型',
-                    soulActivated: '战魂激活',
-                    attackMinChange: '最小攻击变化',
-                    attackMaxChange: '最大攻击变化',
-                    defenseChange: '防御变化',
-                  };
-
-                  const displayName = attributeNameMap[key] || key;
-                  const displayValue = typeof value === 'number' && value > 0 ? `+${value}` : value;
-
-                  return (
-                    <div key={key} className="change-item">
-                      {displayName}: {displayValue}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </div>
         )}
 

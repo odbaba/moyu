@@ -1,6 +1,6 @@
 /**
  * 幻兽研究所界面组件
- * 提供购买奇异兽、资助魔石、提高产量等功能
+ * 提供购买奇异兽、资助魔石等功能
  * 参考文档：reference/docs/幻兽研究所交互逻辑文档.md
  */
 
@@ -17,12 +17,9 @@ import {
   calculateStarLevel,
   canBuyPet,
   canDonate,
-  canImproveProduction,
   donate,
   formatTechLevel,
   getVipDiscountDescription,
-  improveProduction,
-  MAX_PRODUCTION_RATE,
 } from '../../utils/petInstituteUtils';
 
 export interface PetInstituteModalProps {
@@ -34,21 +31,19 @@ export interface PetInstituteModalProps {
   petCount: number;
   onClose: () => void;
   onBuyPet: (pet: Pet, price: number) => void;
-  // 资助魔石回调：返回消耗的魔石数量、提升的技术等级、生产量增长
-  onDonate: (magicStones: number, levelsGained: number, productionRateGained: number) => void;
-  onImproveProduction: (expGained: number, vipGained: number, consumedSoulKings: number) => void;
+  // 资助魔石回调：返回消耗的魔石数量、提升的技术等级
+  onDonate: (magicStones: number, levelsGained: number) => void;
 }
 
 const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
   isVisible,
   state,
   resources,
-  inventory,
+  inventory: _inventory, // 重命名为 _inventory，表示未使用
   petCount, // 当前幻兽数量
   onClose,
   onBuyPet,
   onDonate,
-  onImproveProduction,
 }) => {
   const [message, setMessage] = useState<string>('');
   // 资助魔石数量输入
@@ -64,12 +59,6 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
   const buyCheck = useMemo(
     () => canBuyPet(state, resources),
     [state, resources]
-  );
-
-  // 检查是否可以做提高产量任务
-  const productionCheck = useMemo(
-    () => canImproveProduction(state, inventory),
-    [state, inventory]
   );
 
   // 检查是否可以资助
@@ -133,25 +122,7 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
     const result = donate(state, amount);
 
     if (result.success) {
-      onDonate(amount, result.levelsGained, result.productionRateGained);
-      setMessage(result.message);
-    } else {
-      setMessage(result.message);
-    }
-  };
-
-  // 处理提高产量任务
-  const handleImproveProduction = () => {
-    if (!productionCheck.canImprove) {
-      setMessage(productionCheck.reason);
-
-      return;
-    }
-
-    const result = improveProduction(state, inventory);
-
-    if (result.success) {
-      onImproveProduction(result.expGained, result.vipGained, result.consumedSoulKings);
+      onDonate(amount, result.levelsGained);
       setMessage(result.message);
     } else {
       setMessage(result.message);
@@ -175,22 +146,14 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
           <div className="institute-info-section">
             <h3>研究所信息</h3>
             <div className="info-grid">
-              <div className="info-item">
-                <span className="info-label">技术等级</span>
-                <span className="info-value">{formatTechLevel(state.techLevel)} / {formatTechLevel(state.techLevelMax)}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">当前库存</span>
-                <span className="info-value">{state.stock}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">每日产量</span>
-                <span className="info-value">{state.productionRate}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">VIP星级</span>
-                <span className="info-value">{state.vipLevel} 星（{discount}）</span>
-              </div>
+              <span className="info-label">技术等级</span>
+              <span className="info-value">{formatTechLevel(state.techLevel)} / {formatTechLevel(state.techLevelMax)}</span>
+              <span className="info-label">当前库存</span>
+              <span className="info-value">{state.stock}</span>
+              <span className="info-label">每日产量</span>
+              <span className="info-value">{state.productionRate}</span>
+              <span className="info-label">VIP星级</span>
+              <span className="info-value">{state.vipLevel} 星（{discount}）</span>
             </div>
           </div>
 
@@ -251,25 +214,7 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
             >
               购买奇异兽
             </button>
-
-            <button
-              className="action-button production-button"
-              onClick={handleImproveProduction}
-              disabled={!productionCheck.canImprove}
-            >
-              提高产量任务
-            </button>
           </div>
-
-          {/* 提高产量任务提示 */}
-          {state.canDoProductionTask && state.productionRate < MAX_PRODUCTION_RATE && (
-            <div className="task-hint">
-              <p>📋 提高产量任务已开放！</p>
-              <p>所需灵魂王：{productionCheck.requiredSoulKings} 个</p>
-              <p>经验奖励：{productionCheck.requiredSoulKings * 105000}</p>
-              <p>完成次数：{state.productionRate} / {MAX_PRODUCTION_RATE}</p>
-            </div>
-          )}
 
           {/* 消息提示 */}
           {message && (

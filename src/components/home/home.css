@@ -367,18 +367,18 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: #ffd700;
-  color: #121212;
+  background-color: #000000;
+  color: #FCFFFF;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
 }
 
 .menu-button:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
 .menu-popup {

@@ -641,7 +641,7 @@ const PetFusionModal: React.FC<PetFusionModalProps> = ({
                 className={`pet-fusion-button secondary ${showSettingsPanel ? 'active' : ''}`}
                 onClick={() => setShowSettingsPanel(!showSettingsPanel)}
               >
-                ⚙️ 设置
+                设置
               </button>
             </div>
           </div>

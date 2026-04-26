@@ -462,13 +462,15 @@ export function generateStrangePet(qualityScore: number, options?: PetGenerateOp
   // 生成奇异兽基础属性
   const pet = generatePetByType('奇异兽', options);
 
-  // 计算需要额外增加的评分
-  // 品质分 = 基础评分 + 额外评分
-  // 额外评分 = 品质分 - 当前评分
-  const extraScore = qualityScore - pet.pz;
+  // 计算其他各项评分总和（不包括基础评分）
+  const otherScore = pet.rating.pz_chp + pet.rating.pz_cxgj + pet.rating.pz_cdgj + pet.rating.pz_cfy +
+    pet.rating.pz_cz_hp + pet.rating.pz_cz_xgj + pet.rating.pz_cz_dgj + pet.rating.pz_cz_fy;
 
-  // 更新评分为传入的品质分
-  const pz = qualityScore;
+  // 基础评分就是 qualityScore
+  const pzbase = qualityScore;
+
+  // 总评分 = 基础评分 + 其他各项评分
+  const pz = pzbase + otherScore;
 
   // 更新评级信息
   const qualityTitle = getQualityTitle(pz);
@@ -478,10 +480,10 @@ export function generateStrangePet(qualityScore: number, options?: PetGenerateOp
     ...pet,
     pz,
     qualityTitle,
-    // 更新评分详情，增加额外评分到基础评分中
+    // 更新评分详情，基础评分设为 qualityScore
     rating: {
       ...pet.rating,
-      pzbase: pet.rating.pzbase + extraScore
+      pzbase
     }
   };
 }

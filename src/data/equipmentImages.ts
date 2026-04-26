@@ -34,7 +34,7 @@ export const EQUIPMENT_LEVEL_FRAME_MAP: Record<number, number> = {
   80: 53, // 80级装备使用53.png
   90: 59, // 90级装备使用59.png
   100: 66, // 100级装备使用66.png
-  110: 74, // 110级装备使用74.png
+  125: 74, // 125级装备使用74.png
 };
 
 /**

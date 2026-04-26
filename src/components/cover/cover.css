@@ -4,13 +4,17 @@
  */
 
 /* 封面页容器 - 全屏居中 */
+/* 使用 fixed 定位确保在所有浏览器上都能正确居中 */
 .cover-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  min-height: 100dvh;
   background-color: #252935;
   padding: 20px;
   gap: 40px;

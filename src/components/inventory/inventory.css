@@ -6,10 +6,10 @@
  * 高度分配：顶部占位10% + 页面头部5% + 内容区85% = 100%
  */
 
-/* 顶部占位框 - 高度10% */
+/* 顶部占位框 - 高度5% */
 .page-top-placeholder {
   width: 100%;
-  height: 10vh;
+  height: 5vh;
   background-color: #252935;
   border-bottom: 1px solid #000000;
   flex-shrink: 0;
@@ -804,8 +804,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: 10px;
-  gap: 10px;
+  padding: 6px;
+  gap: 6px;
   max-width: 100%;
 }
 
@@ -825,7 +825,7 @@
 /* 分类筛选区域包装器 - 固定在顶部 */
 .inventory-category-wrapper {
   flex-shrink: 0;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
 }
 
 /* 使物品列表在页面中正确显示 */
@@ -834,6 +834,9 @@
   overflow-y: auto;
   scrollbar-width: none;
   scrollbar-color: transparent transparent;
+  padding: 4px;
+  border: none;
+  background-color: transparent;
 }
 
 /* Firefox 隐藏滚动条 */
@@ -963,8 +966,16 @@
   }
 
   .inventory-page-content {
-    padding: 8px;
-    gap: 8px;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .inventory-category-wrapper {
+    padding-bottom: 2px;
+  }
+
+  .inventory-page-bottom .inventory-list {
+    padding: 2px;
   }
 }
 
@@ -999,12 +1010,12 @@
 
   /* 物品列表样式 */
   .inventory-list {
-    gap: 8px;
-    padding: 8px;
+    gap: 6px;
+    padding: 4px;
   }
 
   .inventory-list-item {
-    padding: 10px 12px;
+    padding: 8px 10px;
   }
 
   .item-list-name {
@@ -1061,8 +1072,8 @@
   }
 
   .inventory-page-content {
-    padding: 15px;
-    gap: 15px;
+    padding: 10px;
+    gap: 10px;
   }
 
   .inventory-container {
@@ -1094,12 +1105,12 @@
 
   /* 物品列表样式 */
   .inventory-list {
-    gap: 10px;
-    padding: 12px;
+    gap: 8px;
+    padding: 6px;
   }
 
   .inventory-list-item {
-    padding: 12px 15px;
+    padding: 10px 12px;
   }
 
   .item-list-name {
@@ -1123,12 +1134,12 @@
 
   /* 物品列表样式 */
   .inventory-list {
-    gap: 12px;
-    padding: 15px;
+    gap: 10px;
+    padding: 8px;
   }
 
   .inventory-list-item {
-    padding: 14px 18px;
+    padding: 12px 15px;
   }
 
   .item-list-name {
@@ -1152,7 +1163,7 @@
 
   /* 物品列表样式 */
   .inventory-list {
-    gap: 15px;
+    gap: 10px;
   }
 }
 
@@ -1248,12 +1259,12 @@
 .inventory-category-filter {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px;
-  background: #252935;
+  gap: 4px;
+  padding: 4px;
+  background: transparent;
   border-radius: 6px;
-  margin-bottom: 8px;
-  border: 1px solid #444;
+  margin-bottom: 4px;
+  border: none;
 }
 
 /* 单个分类复选框样式 */
@@ -1299,8 +1310,8 @@
 .inventory-filter-info {
   font-size: 11px;
   color: #888;
-  margin-bottom: 6px;
-  padding: 0 4px;
+  margin-bottom: 2px;
+  padding: 0 2px;
 }
 
 /* 空状态提示 */
@@ -1327,12 +1338,13 @@
 /* 响应式优化 - 小屏幕手机 */
 @media (max-width: 374px) {
   .inventory-category-filter {
-    gap: 4px;
-    padding: 6px;
+    gap: 3px;
+    padding: 3px;
+    margin-bottom: 2px;
   }
 
   .category-checkbox {
-    padding: 3px 6px;
+    padding: 2px 4px;
     font-size: 10px;
   }
 

@@ -12,12 +12,12 @@ export const EQUIPMENT_BASE_COEFFICIENTS: Record<EquipmentSlotType, {
   attackMax: number; // 最大攻击系数
   defense: number; // 防御系数
 }> = {
-  weapon: { attackMin: 10, attackMax: 30, defense: 0 }, // 武器：10×等级 ~ 30×等级
-  helmet: { attackMin: 0, attackMax: 0, defense: 6 }, // 头盔：6×等级防御
-  clothes: { attackMin: 0, attackMax: 0, defense: 8 }, // 衣服：8×等级防御（使用 clothes 而非 armor）
-  shoes: { attackMin: 0, attackMax: 0, defense: 4 }, // 战鞋：4×等级防御
-  bracelet: { attackMin: 5, attackMax: 15, defense: 0 }, // 手镯：5×等级 ~ 15×等级
-  necklace: { attackMin: 8, attackMax: 20, defense: 0 } // 项链：8×等级 ~ 20×等级
+  weapon: { attackMin: 20, attackMax: 30, defense: 0 }, // 武器：20×等级 ~ 30×等级
+  helmet: { attackMin: 0, attackMax: 0, defense: 12 }, // 头盔：12×等级防御
+  clothes: { attackMin: 0, attackMax: 0, defense: 18 }, // 衣服：18×等级防御（使用 clothes 而非 armor）
+  shoes: { attackMin: 0, attackMax: 0, defense: 8 }, // 战鞋：8×等级防御
+  bracelet: { attackMin: 10, attackMax: 15, defense: 0 }, // 手镯：10×等级 ~ 15×等级
+  necklace: { attackMin: 15, attackMax: 20, defense: 0 } // 项链：15×等级 ~ 20×等级
 };
 
 /**

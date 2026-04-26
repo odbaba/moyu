@@ -208,7 +208,7 @@ function generateRandomEquipment(monsterLevel: number, dropRate: number, isBossL
   if (monsterLevel < 10) {
     equipLevel = 1;
   } else if (monsterLevel > 100) {
-    equipLevel = 110;
+    equipLevel = 125;
   } else {
     // 找到最接近的装备等级
     equipLevel = EQUIPMENT_LEVELS.reduce((prev, curr) =>

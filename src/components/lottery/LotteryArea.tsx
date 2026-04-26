@@ -12,7 +12,6 @@ import type { InventoryItem, Pet, PlayerResources, TimeSystem } from '../../type
 import type { LotteryResult } from '../../utils/lotterySystem';
 import {
   executeLottery,
-  getPrizeProbabilities,
   PRIZE_LEVEL_NAMES,
 } from '../../utils/lotterySystem';
 import { InteractionLog, Menu, TimeDisplay } from '../home';
@@ -33,7 +32,7 @@ interface LotteryAreaProps {
   interactionLog: string[];
   /** 关闭抽奖区回调 */
   onClose: () => void;
-  /** 返回卡萨诺城回调 */
+  /** 返回皇宫回调 */
   onReturnToCity: () => void;
   /** 添加物品到背包回调 */
   onAddItem?: (item: InventoryItem) => void;
@@ -99,9 +98,9 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
   // 菜单状态
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // 七个宝箱的状态
+  // 十五个宝箱的状态
   const [chests, setChests] = useState<ChestState[]>(() =>
-    Array.from({ length: 7 }, (_, i) => ({
+    Array.from({ length: 15 }, (_, i) => ({
       id: `lottery_box_${i + 1}`,
       isOpened: false,
     }))
@@ -184,13 +183,13 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
   };
 
   /**
-   * 处理返回卡萨诺城
-   * 调用回调函数，传送玩家至卡萨诺城并关闭抽奖区界面
+   * 处理返回皇宫
+   * 调用回调函数，传送玩家至皇宫并关闭抽奖区界面
    */
   const handleReturnToCity = () => {
     // 重置宝箱状态
     setChests(
-      Array.from({ length: 7 }, (_, i) => ({
+      Array.from({ length: 15 }, (_, i) => ({
         id: `lottery_box_${i + 1}`,
         isOpened: false,
       }))
@@ -199,7 +198,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
     setShowResultModal(false);
     setCurrentResult(null);
 
-    // 调用返回卡萨诺城回调
+    // 调用返回皇宫回调
     onReturnToCity();
   };
 
@@ -216,7 +215,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
    */
   const handleResetChests = () => {
     setChests(
-      Array.from({ length: 7 }, (_, i) => ({
+      Array.from({ length: 15 }, (_, i) => ({
         id: `lottery_box_${i + 1}`,
         isOpened: false,
       }))
@@ -243,7 +242,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
    */
   const getPrizeLevelColor = (level: string): string => {
     const colors: Record<string, string> = {
-      legendary: '#ffd700',
+      legendary: '#cc00ff',
       high: '#ff6b6b',
       medium: '#4ecdc4',
       common: '#95a5a6',
@@ -257,9 +256,6 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
     return null;
   }
 
-  // 获取奖品概率信息
-  const probabilities = getPrizeProbabilities();
-
   return (
     <div className="lottery-area">
       {/* 顶部占位框 */}
@@ -267,27 +263,10 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
 
       {/* 头部区域 */}
       <div className="lottery-header">
-        <h2>🎰 抽奖区</h2>
+        <h2>抽奖区</h2>
         <p className="lottery-description">
           选择一个宝箱，花费 {MAGIC_STONE_COST} 魔石进行抽奖
         </p>
-      </div>
-
-      {/* 魔石显示 */}
-      <div className="lottery-currency">
-        <div className="currency-item">
-          <span className="currency-icon">💎</span>
-          <span className="currency-label">魔石：</span>
-          <span className="currency-value">{playerResources.magicStone}</span>
-        </div>
-      </div>
-
-      {/* 概率说明 */}
-      <div className="lottery-probabilities">
-        <span className="prob-item legendary">极品 {probabilities.legendary}%</span>
-        <span className="prob-item high">高级 {probabilities.high}%</span>
-        <span className="prob-item medium">中级 {probabilities.medium}%</span>
-        <span className="prob-item common">普通 {probabilities.common}%</span>
       </div>
 
       {/* 提示消息 */}
@@ -328,15 +307,15 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
           className="lottery-reset-button"
           onClick={handleResetChests}
         >
-          🔄 重置宝箱
+          重置宝箱
         </button>
 
-        {/* 回城按钮 - 使用不同颜色区分 */}
+        {/* 返回皇宫按钮 */}
         <button
           className="lottery-return-button"
           onClick={handleReturnToCity}
         >
-          🏠 返回卡萨诺城
+          返回皇宫
         </button>
       </div>
 
@@ -353,14 +332,11 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
 
             <div className="result-header">
               <h3 style={{ color: getPrizeLevelColor(currentResult.prizeLevel) }}>
-                🎉 {PRIZE_LEVEL_NAMES[currentResult.prizeLevel]}
+                {PRIZE_LEVEL_NAMES[currentResult.prizeLevel]}
               </h3>
             </div>
 
             <div className="result-content">
-              <div className="result-icon">
-                {currentResult.prizePet ? '🐉' : '🎁'}
-              </div>
               <div className="result-name" style={{ color: getPrizeLevelColor(currentResult.prizeLevel) }}>
                 {currentResult.prizeName}
               </div>

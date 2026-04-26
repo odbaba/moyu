@@ -82,8 +82,8 @@ export const locations: LocationData = [
     name: '皇宫',
     description: '皇宫是卡萨诺城的政治中心，富丽堂皇。',
     adjacentLocations: ['houhuayuan', 'kasanuocheng'],
-    // 皇宫 NPC：国王、元帅、首相、抽奖官、PK赛报名官
-    interactables: ['npc_king', 'npc_marshal', 'npc_prime_minister', 'npc_lottery', 'npc_pk_match'],
+    // 皇宫 NPC：国王、元帅、首相、抽奖官、PK赛报名官、日常任务官
+    interactables: ['npc_king', 'npc_marshal', 'npc_prime_minister', 'npc_lottery', 'npc_pk_match', 'npc_daily_task'],
     x: 2,
     y: 0
   },
@@ -104,15 +104,12 @@ export const locations: LocationData = [
     name: '雷鸣大陆',
     description: '雷鸣大陆是亚特大陆的核心区域，连接各方势力交汇之地。',
     adjacentLocations: ['leiming-kuangdong', 'kasanuocheng'],
-    // 雷鸣大陆：3个怪物按钮（龙怪x1、巨杰士x2）+ 功能 NPC（日常任务官、地图占领赛报名官、宝石合成师、幻兽研究所）
+    // 雷鸣大陆：3个怪物按钮（龙怪x1、巨杰士x2）+ 功能 NPC（地图占领赛报名官）
     interactables: [
       'interact-leiming-longguai',
       'interact-leiming-jujieshi-1',
       'interact-leiming-jujieshi-2',
-      'npc_daily_task',
-      'npc_map_challenge',
-      'npc_gem_synthesizer',
-      'npc_pet_institute'
+      'npc_map_challenge'
     ],
     x: 1,
     y: 1
@@ -122,8 +119,8 @@ export const locations: LocationData = [
     name: '卡萨诺城',
     description: '卡萨诺城是亚特大陆最繁华的城市，商贸云集。',
     adjacentLocations: ['huanggong', 'leiming-dalu', 'yaweite-dao', 'gebi'],
-    // 卡萨诺城 NPC：地图占领赛报名官、收藏家、杂货商、魔石商人、装备打造师、幻兽幻化师、经验导师
-    interactables: ['npc_map_challenge_kasanuocheng', 'npc_collector', 'npc_grocery_merchant', 'npc_magic_stone_merchant', 'npc_equipment_refiner', 'npc_pet_fusion_master', 'npc_experience_mentor'],
+    // 卡萨诺城 NPC：地图占领赛报名官、收藏家、杂货商、魔石商人、装备打造师、幻兽幻化师、经验导师、宝石合成师、幻兽研究所
+    interactables: ['npc_map_challenge_kasanuocheng', 'npc_collector', 'npc_grocery_merchant', 'npc_magic_stone_merchant', 'npc_equipment_refiner', 'npc_pet_fusion_master', 'npc_experience_mentor', 'npc_gem_synthesizer', 'npc_pet_institute'],
     x: 2,
     y: 1
   },
@@ -151,11 +148,11 @@ export const locations: LocationData = [
     adjacentLocations: ['yaweite-dao', 'shenyuan-migong'],
     // 火山：5个怪物按钮（蝎怪、四牙怪、炎女、随机怪物x2）
     interactables: [
-      'interact-huoshan-xieguai',
       'interact-huoshan-siyaguai',
-      'interact-huoshan-yannv',
-      'interact-huoshan-random1',
-      'interact-huoshan-random2'
+      'interact-huoshan-random2',
+      'interact-huoshan-yannu-2',
+      'interact-huoshan-yannu',
+      'interact-huoshan-xieguai',
     ],
     x: 4,
     y: 1
@@ -189,10 +186,10 @@ export const locations: LocationData = [
     // 戈壁：5个怪物按钮（冰妖剑士、杰克灯笼、提风、随机怪物x2）+ 地图占领赛报名官
     interactables: [
       'interact-gebi-bingyaojianshi',
-      'interact-gebi-jiekedenglong',
-      'interact-gebi-tifeng',
       'interact-gebi-random1',
+      'interact-gebi-jiekedenglong',
       'interact-gebi-random2',
+      'interact-gebi-tifeng',
       'npc_map_challenge_gebi'
     ],
     x: 2,
@@ -205,12 +202,12 @@ export const locations: LocationData = [
     adjacentLocations: ['huoshan'],
     // 深渊迷宫：6个怪物按钮（暗黑格拉斯、叹息骑士、暗黑弥塞亚、骑士亡魂、随机怪物x2）
     interactables: [
-      'interact-shenyuan-anheigelasi',
-      'interact-shenyuan-tanxiqishi',
       'interact-shenyuan-anheimisaiya',
-      'interact-shenyuan-qishiwanghun',
-      'interact-shenyuan-random1',
-      'interact-shenyuan-random2'
+      'interact-shenyuan-anheimisaiya-2',
+      'interact-shenyuan-anheigelasi',
+      'interact-shenyuan-anheigelasi-2',
+      'interact-shenyuan-tanxiqishi',
+      'interact-shenyuan-tanxiqishi-2',
     ],
     x: 4,
     y: 2
@@ -225,9 +222,10 @@ export const locations: LocationData = [
     // 迷梦沼泽：4个怪物按钮（角蜥、望齿魔人、蜘蛛、随机怪物x1）+ 地图占领赛报名官
     interactables: [
       'interact-mimeng-jiaoxi',
+      'interact-mimeng-jiaoxi-2',
       'interact-mimeng-wangchimoren',
+      'interact-mimeng-wangchimoren-2',
       'interact-mimeng-zhizhu',
-      'interact-mimeng-random1',
       'npc_map_challenge_mimeng_zhaozhe'
     ],
     x: 2,
@@ -241,8 +239,8 @@ export const locations: LocationData = [
     // 冰宫：4个怪物按钮（塔亚龙、死亡骑士、随机怪物x2）+ 地图占领赛报名官
     interactables: [
       'interact-binggong-tayalong',
-      'interact-binggong-siwangqishi',
       'interact-binggong-random1',
+      'interact-binggong-siwangqishi',
       'interact-binggong-random2',
       'npc_map_challenge_binggong'
     ],
@@ -260,8 +258,8 @@ export const locations: LocationData = [
       'interact-xueyu-shibing-1',
       'interact-xueyu-shibing-2',
       'interact-xueyu-shiguan-1',
-      'interact-xueyu-junguan',
       'interact-xueyu-shiguan-2',
+      'interact-xueyu-junguan',
     ],
     x: 4,
     y: 3

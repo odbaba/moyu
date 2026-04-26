@@ -2,12 +2,14 @@ import './CollectorModal.css';
 
 import React, { useMemo, useState } from 'react';
 
-import type { InventoryItem } from '../../types';
+import type { EquipmentItem, InventoryItem } from '../../types';
+import { getEquipmentDisplayName } from '../../utils/equipmentConverter';
 import {
   calculateItemMagicStoneValue,
   calculatePurchasePrice,
   formatMagicStoneValue
 } from '../../utils/itemValueCalculator';
+import { getEquipmentQualityColor, isEquipmentItem } from '../common/utils';
 
 /**
  * 收藏架模态窗口组件属性接口
@@ -77,6 +79,68 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
     maxQuantity: 1,
     selectedQuantity: 1
   });
+
+  // 图片加载失败状态管理
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  /**
+   * 处理图片加载失败
+   */
+  const handleImageError = (itemId: string) => {
+    setImageErrors(prev => ({ ...prev, [itemId]: true }));
+  };
+
+  /**
+   * 获取物品图片路径
+   */
+  const getItemImagePath = (item: InventoryItem): string | null => {
+    if (isEquipmentItem(item)) {
+      const equipItem = item as EquipmentItem;
+      if (equipItem.imagePath) return equipItem.imagePath;
+    }
+    if (item.imagePath) return item.imagePath;
+    return null;
+  };
+
+  /**
+   * 渲染物品图标（与背包展示一致：优先显示图片，加载失败回退到emoji）
+   */
+  const renderItemIcon = (item: InventoryItem) => {
+    const imagePath = getItemImagePath(item);
+    if (imagePath && !imageErrors[item.id]) {
+      return (
+        <img
+          src={imagePath}
+          alt={item.name}
+          className="collector-item-image"
+          onError={() => handleImageError(item.id)}
+        />
+      );
+    }
+    return <span className="collector-item-icon">{item.icon}</span>;
+  };
+
+  /**
+   * 获取物品显示名称（装备使用getEquipmentDisplayName格式化）
+   */
+  const getDisplayName = (item: InventoryItem): string => {
+    if (isEquipmentItem(item)) {
+      const equipItem = item as EquipmentItem;
+      return getEquipmentDisplayName(item.name, equipItem.equipmentQuality, equipItem.magicSoulLevel);
+    }
+    return item.name;
+  };
+
+  /**
+   * 获取物品名称样式（装备使用品质颜色）
+   */
+  const getNameStyle = (item: InventoryItem): React.CSSProperties | undefined => {
+    if (isEquipmentItem(item)) {
+      const equipItem = item as EquipmentItem;
+      return { color: getEquipmentQualityColor(equipItem.equipmentQuality) };
+    }
+    return undefined;
+  };
 
   /**
    * 计算收藏架中所有物品的总价值（收购价格）
@@ -319,9 +383,9 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
             >
               {slot.item ? (
                 <div className="collector-slot-content">
-                  <div className="collector-item-icon">{slot.item.icon}</div>
-                  <div className="collector-item-name">
-                    {slot.item.name}
+                  {renderItemIcon(slot.item)}
+                  <div className="collector-item-name" style={getNameStyle(slot.item)}>
+                    {getDisplayName(slot.item)}
                     {slot.item.quantity && slot.item.quantity > 1 && ` x${slot.item.quantity}`}
                   </div>
                   <div className="collector-item-value">
@@ -354,9 +418,9 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
                     className={`collector-inventory-item ${hasValue ? 'has-value' : 'no-value'}`}
                     onClick={() => handleInventoryItemClick(item)}
                   >
-                    <div className="collector-item-icon">{item.icon}</div>
-                    <div className="collector-item-name">
-                      {item.name}
+                    {renderItemIcon(item)}
+                    <div className="collector-item-name" style={getNameStyle(item)}>
+                      {getDisplayName(item)}
                       {item.quantity && item.quantity > 1 && ` x${item.quantity}`}
                     </div>
                     {hasValue && (
