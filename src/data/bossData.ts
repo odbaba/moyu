@@ -2,7 +2,7 @@
  * BOSS 数据文件
  * 定义各地图的 BOSS 模板数据和刷新配置
  * 参考文档：reference/docs/project_docs/04_怪物系统.md
- * 
+ *
  * BOSS属性计算公式：
  * - 生命值 = minGrowthHp~maxGrowthHp × 等级
  * - 最小攻击 = baseAttackMin + growthAttackMin × 等级

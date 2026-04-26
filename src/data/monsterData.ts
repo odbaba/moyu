@@ -1061,7 +1061,7 @@ export const monsterSpawnConfigs: MonsterSpawnConfig[] = [
     location: 'shenyuan-migong',
     spawnVariable: 'shenyuan_anheimisaiya_2',
     isSpawned: true,
-    interactableId: 'interact-shenyuan-anheimisaiya-2', 
+    interactableId: 'interact-shenyuan-anheimisaiya-2',
   },
   // 暗黑格拉斯
   {

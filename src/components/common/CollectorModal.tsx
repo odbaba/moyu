@@ -99,6 +99,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
       if (equipItem.imagePath) return equipItem.imagePath;
     }
     if (item.imagePath) return item.imagePath;
+
     return null;
   };
 
@@ -117,6 +118,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
         />
       );
     }
+
     return <span className="collector-item-icon">{item.icon}</span>;
   };
 
@@ -126,8 +128,10 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
   const getDisplayName = (item: InventoryItem): string => {
     if (isEquipmentItem(item)) {
       const equipItem = item as EquipmentItem;
+
       return getEquipmentDisplayName(item.name, equipItem.equipmentQuality, equipItem.magicSoulLevel);
     }
+
     return item.name;
   };
 
@@ -137,8 +141,10 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
   const getNameStyle = (item: InventoryItem): React.CSSProperties | undefined => {
     if (isEquipmentItem(item)) {
       const equipItem = item as EquipmentItem;
+
       return { color: getEquipmentQualityColor(equipItem.equipmentQuality) };
     }
+
     return undefined;
   };
 

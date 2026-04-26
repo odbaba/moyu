@@ -2,8 +2,8 @@ import type { CharacterData, EquipmentDetail, PrincessRelationship } from '../ty
 import { WarSoulType } from '../types';
 import { CHARACTER_BASE_STATS, CHARACTER_GROWTH_RATES } from '../utils/attributeCalculator';
 import { calculateTotalCombatPower } from '../utils/combatPower';
-import { createEquipmentItem } from '../utils/itemFactory';
 import { equipmentItemToDetail } from '../utils/equipmentConverter';
+import { createEquipmentItem } from '../utils/itemFactory';
 import { examplePets } from './petData';
 
 /**

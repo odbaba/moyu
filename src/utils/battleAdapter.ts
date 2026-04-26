@@ -286,7 +286,6 @@ export function createBattleState(params: BattleInitParams, warSoulSetInfo?: War
  * - attackMin: 使用 Pet 的 xgj（最小攻击力）
  * - attackMax: 使用 Pet 的 dgj（最大攻击力）
  * - defense: 使用 Pet 的 fy（防御力）
- * - luck: 使用 Pet 的 luck（幸运值），用于战斗中致命伤害时保留1血的判定
  * - isMerged: 使用 Pet 的 isMerged（是否合体状态）
  * - isPlayer: 固定为 false（表示是幻兽）
  * - gridPosition: 由调用者提供（九宫格位置）
@@ -314,7 +313,6 @@ export function petToBattlePet(
     attackMin: pet.xgj, // 最小攻击力
     attackMax: pet.dgj, // 最大攻击力
     defense: pet.fy, // 防御力
-    luck: pet.luck, // 幸运值
     isMerged: pet.isMerged, // 是否合体状态
     isPlayer: false, // 固定为 false，表示是幻兽
     gridPosition: gridPosition, // 九宫格位置

@@ -32,7 +32,6 @@ export interface LootResult {
 const EQUIPMENT_TYPES: EquipmentItem['equipmentType'][] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
 
 
-
 /**
  * 计算战利品
  * 根据怪物等级和最大生命值计算战利品

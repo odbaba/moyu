@@ -113,7 +113,7 @@ export function rollSpecialMonsterSpawns(): SpecialMonsterSpawnResult[] {
  * 根据 BOSS 模板生成敌人数据
  * BOSS 的属性根据等级和成长系数计算
  * 注意：攻击力保留最小值和最大值范围，战斗时才随机取值
- * 
+ *
  * 属性计算公式：
  * - 生命值 = minGrowthHp~maxGrowthHp × 等级
  * - 最小攻击 = baseAttackMin + growthAttackMin × 等级
@@ -126,7 +126,7 @@ export function rollSpecialMonsterSpawns(): SpecialMonsterSpawnResult[] {
  */
 export function generateBossEnemyData(bossTemplate: BossTemplate, spawnId: string): EnemyData {
   // 计算生命值：在成长系数范围内随机选择，然后乘以等级
-  const growthHp = bossTemplate.minGrowthHp + 
+  const growthHp = bossTemplate.minGrowthHp +
     Math.random() * (bossTemplate.maxGrowthHp - bossTemplate.minGrowthHp);
   const maxHp = Math.floor(growthHp * bossTemplate.level);
 

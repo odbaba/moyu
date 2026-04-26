@@ -36,9 +36,9 @@
   background-color: #252934;
   border: 2px solid #0f3460;
   border-radius: 12px;
-  padding: 20px;
+  padding: 12px;
   width: 90%;
-  max-width: 500px;
+  max-width: 400px;
   max-height: 88vh;
   overflow-y: auto;
   scrollbar-width: none;
@@ -67,15 +67,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
   border-bottom: 1px solid #0f3460;
 }
 
 .use-item-modal-header h3 {
   margin: 0;
   color: #e94560;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 /* 关闭按钮 - 方形样式 */
@@ -83,11 +83,11 @@
   background: none;
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #fff;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   cursor: pointer;
   padding: 0;
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,33 +101,33 @@
 
 .use-item-info {
   text-align: center;
-  padding: 10px;
+  padding: 6px;
   background-color: rgba(233, 69, 96, 0.1);
-  border-radius: 8px;
-  margin-bottom: 15px;
+  border-radius: 6px;
+  margin-bottom: 8px;
 }
 
 .item-name {
   color: #e94560;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
 }
 
 .target-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .target-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 8px;
+  padding: 8px;
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -139,48 +139,61 @@
 }
 
 .target-icon {
-  font-size: 2rem;
-  width: 50px;
-  height: 50px;
+  font-size: 1.5rem;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* 幻兽头像图片样式 */
+.pet-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .target-info {
   flex: 1;
+  min-width: 0;
 }
 
 .target-name {
   color: #fff;
   font-weight: bold;
-  font-size: 1rem;
-  margin-bottom: 4px;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
 }
 
 .target-details {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   color: #aaa;
-  font-size: 0.85rem;
-  margin-bottom: 4px;
+  font-size: 0.75rem;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
 }
 
 .target-description {
   color: #4caf50;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
 }
 
 .target-action {
-  padding: 8px 16px;
+  padding: 5px 10px;
   background-color: #e94560;
   color: #fff;
-  border-radius: 6px;
+  border-radius: 4px;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   transition: background-color 0.3s;
+  flex-shrink: 0;
 }
 
 .target-item:hover .target-action {
@@ -210,8 +223,8 @@
 .use-item-hint {
   text-align: center;
   color: #aaa;
-  font-size: 0.85rem;
-  padding-top: 10px;
+  font-size: 0.75rem;
+  padding-top: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -219,30 +232,31 @@
 @media (max-width: 768px) {
   .use-item-modal-content {
     width: 95%;
-    padding: 15px;
-  }
-
-  .target-item {
     padding: 10px;
   }
 
+  .target-item {
+    padding: 6px;
+    gap: 6px;
+  }
+
   .target-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
   }
 
   .target-name {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
   }
 
   .target-details {
-    flex-wrap: wrap;
-    gap: 5px;
+    gap: 4px;
+    font-size: 0.7rem;
   }
 
   .target-action {
-    padding: 6px 12px;
-    font-size: 0.85rem;
+    padding: 4px 8px;
+    font-size: 0.75rem;
   }
 }

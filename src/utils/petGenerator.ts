@@ -379,10 +379,6 @@ export function generatePetByType(petType: PetType, options?: PetGenerateOptions
     qualityTitle: getQualityTitle(pz),
     isDeployed,
     isMerged,
-    // 幸运值初始化为100
-    // 幸运值范围：0-100，用于幻兽在战斗中受到致命伤害时有概率保留1血并降低幸运值
-    // 初始值为100，表示新幻兽有满额的幸运值保护
-    luck: 100,
     chp: attributes.chp,
     cxgj: attributes.cxgj,
     cdgj: attributes.cdgj,

@@ -8,6 +8,7 @@ import './UseItemTargetModal.css';
 import React from 'react';
 
 import type { Pet } from '../../types';
+import { getPetAvatar } from '../common/utils';
 
 /**
  * 使用物品目标选择弹窗 Props 接口
@@ -86,12 +87,14 @@ const UseItemTargetModal: React.FC<UseItemTargetModalProps> = ({
                 onSelectPet(pet.id);
               }}
             >
-              <div className="target-icon">🐉</div>
+              <div className="target-icon">
+                <img src={getPetAvatar(pet.hs_name)} alt={pet.hs_name} className="pet-avatar-img" />
+              </div>
               <div className="target-info">
                 <div className="target-name">{pet.othername}</div>
                 <div className="target-details">
-                  <span>等级: {pet.dj}</span>
-                  <span>品质: {pet.qualityTitle}</span>
+                  <span>Lv.{pet.dj}</span>
+                  <span>{pet.qualityTitle}</span>
                   <span>经验: {pet.jy}/{pet.mjy}</span>
                 </div>
                 <div className="target-description">对幻兽使用，增加27000经验</div>

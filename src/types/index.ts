@@ -667,7 +667,6 @@ export interface Pet {
   qualityTitle: string; // 品质称号（如"极品12星"、"万众瞩目"等）
   isDeployed: boolean; // 是否出战中
   isMerged: boolean; // 是否合体中
-  luck: number; // 幸运值 (0-100)，幻兽在战斗中受到致命伤害时有概率保留1血并降低幸运值
   // 初始属性
   chp: number; // 初始生命值 (20-34)
   cxgj: number; // 初始最小攻击 (10-14)
@@ -793,7 +792,6 @@ export interface BattlePet {
   attackMin: number; // 最小攻击力
   attackMax: number; // 最大攻击力
   defense: number; // 防御力
-  luck: number; // 幸运值 (0-100)，幻兽在战斗中受到致命伤害时有概率保留1血并降低幸运值
   isMerged: boolean; // 是否合体状态（合体时属性加成到玩家）
   isPlayer: boolean; // 固定为 false，表示是幻兽
   gridPosition: GridPosition; // 九宫格位置
@@ -983,7 +981,7 @@ export interface MonsterSpawnConfig {
  * BOSS 模板接口
  * 定义 BOSS 的基础属性和刷新概率
  * 参考文档：reference/docs/project_docs/04_怪物系统.md
- * 
+ *
  * BOSS属性计算公式：
  * - 生命值 = minGrowthHp~maxGrowthHp × 等级
  * - 最小攻击 = baseAttackMin + growthAttackMin × 等级

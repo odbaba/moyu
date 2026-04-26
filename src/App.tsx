@@ -58,7 +58,7 @@ import { examplePets } from './data/petData';
 import { createPKBossEnemyData, getPKMatchGroup, getPKMatchReward, isSaturday } from './data/pkMatchData';
 import { getShopItemById } from './data/shopData';
 import { createInitialSkills, getSkillUpgradeCost } from './data/skillData';
-import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, DailyTaskState, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, MapChallengeState, NPCInteractable, Pet, PetInstituteState, PlayerResources, PrincessRelationship, RefineResult, SkillDetail, TimeSystem } from './types';
+import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, DailyTaskState, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, MapChallengeState, NPCInteractable, Pet, PetInstituteState, PetType, PlayerResources, PrincessRelationship, RefineResult, SkillDetail, TimeSystem } from './types';
 import { gainCharacterExperience } from './utils/attributeCalculator';
 // 导入 BOSS 工具函数
 import { rollBossSpawns, rollSpecialMonsterSpawns } from './utils/bossUtils';
@@ -125,7 +125,7 @@ import {
   weeklyReset,
 } from './utils/petInstituteUtils';
 // 导入 NPC 相关工具函数
-import { calculateRelationshipLevel, canGiftRose, getChatDialogue, getDemonArmyDialogue, getNextRelationshipRequirement, getRelationshipName, MAX_WEEKLY_ROSE_GIFT_COUNT, performChat, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
+import { calculateRelationshipLevel, canGiftRose, checkSkillUnlock, getChatDialogue, getDemonArmyDialogue, getNextRelationshipRequirement, getRelationshipName, learnLovePowerSkill, performChat, receiveConfidantGift, receiveSundayGift } from './utils/princessRelationUtils';
 // 导入存档系统工具函数
 import type { SaveData } from './utils/saveUtils';
 import { getSaveVersion, hasSaveData, loadGame, loadMusicSettings, saveGame, saveMusicSettings } from './utils/saveUtils';
@@ -778,11 +778,12 @@ function App() {
     const location = locations.find(loc => loc.id === locationId);
     if (location) {
     // 检查爵位进入限制
-    if (!checkLocationAccess(nobleRank, locationId)) {
-      const hint = getLocationAccessHint(nobleRank, locationId);
-      setInteractionLog(prev => [...prev, hint]);
-      return;
-    }
+      if (!checkLocationAccess(nobleRank, locationId)) {
+        const hint = getLocationAccessHint(nobleRank, locationId);
+        setInteractionLog(prev => [...prev, hint]);
+
+        return;
+      }
 
       setCurrentLocation(locationId);
       setInteractionLog(prev => [...prev, `你移动到了${location.name}`]);
@@ -875,7 +876,7 @@ function App() {
 
       // 检查是否跨过了装备使用等级节点
       const equipmentLevelNodes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 125];
-      
+
       // 找出所有跨过的装备使用等级节点
       const crossedNodes: number[] = [];
       for (let level = previousLevel + 1; level <= currentLevel; level++) {
@@ -988,6 +989,11 @@ function App() {
     // 幻兽研究所：周日重置，开启提高产量任务
     if (weekday === '星期日') {
       setPetInstituteState(prev => weeklyReset(prev));
+      // 公主关系：周日重置送礼状态
+      setPrincessRelationship(prev => ({
+        ...prev,
+        canGiftThisWeek: true,
+      }));
     }
 
     // 星期六PK大赛提示（只在当天第一次显示）
@@ -1294,19 +1300,29 @@ function App() {
     });
 
     // 更新公主关系状态（标记本周已送礼，同时更新关系等级）
-    setPrincessRelationship(prev => {
-      const newIntimacy = prev.intimacy + totalIntimacyGain;
-      const newLevel = calculateRelationshipLevel(newIntimacy);
-      const newRelationshipName = getRelationshipName(newLevel);
+    const oldLevel = princessRelationship.level;
+    const newIntimacy = princessRelationship.intimacy + totalIntimacyGain;
+    const newLevel = calculateRelationshipLevel(newIntimacy);
+    const newRelationshipName = getRelationshipName(newLevel);
 
-      return {
-        ...prev,
-        intimacy: newIntimacy,
-        level: newLevel,
-        relationshipName: newRelationshipName,
-        canGiftThisWeek: false, // 本周已送礼
-      };
-    });
+    setPrincessRelationship(prev => ({
+      ...prev,
+      intimacy: newIntimacy,
+      level: newLevel,
+      relationshipName: newRelationshipName,
+      canGiftThisWeek: false, // 本周已送礼
+    }));
+
+    // 检查是否需要学习技能（关系等级提升到恋人或亲密恋人时）
+    const skillUnlock = checkSkillUnlock(oldLevel, newLevel);
+    if (skillUnlock) {
+      const skillResult = learnLovePowerSkill(skills, skillUnlock.skillLevel);
+      if (skillResult.success) {
+        setSkills(skillResult.updatedSkills);
+        // 添加技能学习日志
+        setInteractionLog(prev => [...prev, skillResult.message]);
+      }
+    }
 
     // 显示成功消息
     const message = `公主收下了你的${giftDetails.join('、')}，友好度+${totalIntimacyGain}！\n本周送礼次数已用完，下周再来吧。`;
@@ -1393,6 +1409,36 @@ function App() {
               relationshipName: getRelationshipName(chatResult.newLevel),
               canChatToday: false,
             }));
+
+            // 处理聊天奖励：生成幻兽并添加到玩家幻兽列表
+            if (chatResult.reward) {
+              const reward = chatResult.reward;
+              let pet: Pet;
+
+              // 根据星级生成对应的幻兽
+              if (reward.petStar > 0) {
+                // 有星级的奇异兽使用 generateStarStrangePet
+                pet = generateStarStrangePet(reward.petStar);
+              } else {
+                // 无星级使用 generatePetByType
+                pet = generatePetByType(reward.petType as PetType);
+              }
+
+              // 添加幻兽到玩家列表
+              setPets(prevPets => [...prevPets, pet]);
+            }
+
+            // 检查是否需要学习技能（关系等级提升到恋人或亲密恋人时）
+            const skillUnlock = checkSkillUnlock(princessRelationship.level, chatResult.newLevel);
+            if (skillUnlock) {
+              const skillResult = learnLovePowerSkill(skills, skillUnlock.skillLevel);
+              if (skillResult.success) {
+                setSkills(skillResult.updatedSkills);
+                // 添加技能学习日志
+                setInteractionLog(prev => [...prev, skillResult.message]);
+              }
+            }
+
             // 显示对话内容和结果消息
             const chatMessage = `【公主说】\n${dialogue}\n\n${chatResult.message}`;
             setInteractionLog(prev => [...prev, chatMessage]);
@@ -1855,6 +1901,7 @@ function App() {
                       if (prev.level > previousLevel) {
                         handleCharacterLevelUp(previousLevel, prev.level);
                       }
+
                       return prev;
                     });
                   }, 0);
@@ -2399,10 +2446,10 @@ function App() {
           // 计算所需灵魂王和经验奖励
           const requiredSoulKings = PRODUCTION_TASK_SOUL_KING_COST[petInstituteState.productionRate] || 0;
           const expReward = PRODUCTION_TASK_EXP_REWARD[petInstituteState.productionRate] || 0;
-          
+
           // 构建弹窗内容
           const content = `提高产量任务已开放！\n\n所需灵魂王：${requiredSoulKings} 个\n经验奖励：${expReward}\n完成次数：${petInstituteState.productionRate} / ${MAX_PRODUCTION_RATE}`;
-          
+
           setInfoModalTitle('提高产量任务');
           setInfoModalContent(content);
           setInfoModalConfirmText('接受');
@@ -2413,40 +2460,42 @@ function App() {
             // 防止重复执行
             if (productionTaskExecutedRef.current) return;
             productionTaskExecutedRef.current = true;
-            
+
             // 检查灵魂王是否足够（使用最新的 inventory 状态）
             setInventory(prevInventory => {
               const currentSoulKingCount = prevInventory
                 .filter(item => item.name === '灵魂王')
                 .reduce((sum, item) => sum + item.quantity, 0);
-              
+
               if (currentSoulKingCount < requiredSoulKings) {
                 setInteractionLog(prev => [...prev, `灵魂王不足，需要 ${requiredSoulKings} 个，当前 ${currentSoulKingCount} 个`]);
+
                 return prevInventory;
               }
-              
+
               // 执行提高产量任务（使用函数式更新获取最新状态）
               setPetInstituteState(prev => {
                 // 再次检查是否可以执行任务
                 if (!prev.canDoProductionTask || prev.productionRate >= MAX_PRODUCTION_RATE) {
                   setInteractionLog(prevLog => [...prevLog, '任务已完成或已达上限']);
+
                   return prev;
                 }
-                
+
                 // 消耗灵魂王
                 const newInventory = consumeItemFromInventory(prevInventory, '灵魂王', requiredSoulKings);
                 setInventory(newInventory);
-                
+
                 // 计算带战斗力加成的经验值
                 setCharacter(prevChar => {
                   const bonusExp = calculateCombatPowerBonusExp(expReward, prevChar.combatPower, prevChar.level);
-                  
+
                   // 更新角色经验
                   const charResult = gainCharacterExperience(prevChar, bonusExp);
                   if (charResult.message) {
                     setInteractionLog(logs => [...logs, charResult.message!]);
                   }
-                  
+
                   // 更新幻兽经验
                   setPets(prevPets => {
                     return prevPets.map(pet => {
@@ -2455,15 +2504,16 @@ function App() {
                       if (petResult.message) {
                         setInteractionLog(logs => [...logs, petResult.message!]);
                       }
+
                       return petResult.pet;
                     });
                   });
-                  
+
                   setInteractionLog(prevLog => [...prevLog, `完成提高产量任务！生产量+1，获得经验 ${bonusExp.toLocaleString()}，VIP星级 +1`]);
-                  
+
                   return charResult.character;
                 });
-                
+
                 // 更新研究所状态
                 return {
                   ...prev,
@@ -2472,7 +2522,7 @@ function App() {
                   canDoProductionTask: false
                 };
               });
-              
+
               return prevInventory;
             });
           });
@@ -2790,6 +2840,7 @@ function App() {
         if (prev.level > previousLevel) {
           handleCharacterLevelUp(previousLevel, prev.level);
         }
+
         return prev;
       });
     }, 0);
@@ -2887,7 +2938,7 @@ function App() {
     consumeTime(3);
 
     // ========== 玩家状态同步 ==========
-    // 保存战斗结束后的HP状态（无论胜负都保存）
+    // 保存战斗结束后的HP状态和幸运值（无论胜负都保存）
     // 战斗结束后体力自动恢复至最大值
     if (finalPlayerState) {
       setCharacter(prev => {
@@ -2895,19 +2946,21 @@ function App() {
         // 如果角色的最大生命值（maxHp）大于战斗结束时的最大生命值，说明升级了
         // 升级后应该保持满血状态，而不是用战斗中的血量覆盖
         if (prev.maxHp > finalPlayerState.maxHp) {
-          // 角色升级了，保持升级后的满血状态
+          // 角色升级了，保持升级后的满血状态，但同步幸运值
           return {
             ...prev,
             currentHp: prev.maxHp, // 使用升级后的最大生命值作为当前生命值
             currentStamina: prev.maxStamina, // 战斗结束后体力恢复至最大值
+            luck: finalPlayerState.luck, // 同步战斗结束时的幸运值
           };
         }
 
-        // 没有升级，正常同步战斗中的血量
+        // 没有升级，正常同步战斗中的血量和幸运值
         return {
           ...prev,
           currentHp: Math.max(1, finalPlayerState.currentHp), // 至少保留1点HP
           currentStamina: prev.maxStamina, // 战斗结束后体力恢复至最大值
+          luck: finalPlayerState.luck, // 同步战斗结束时的幸运值
         };
       });
     }
@@ -3139,6 +3192,7 @@ function App() {
             for (const lootItem of totalLoot.items) {
               newInventory = addItemToInventory(newInventory, lootItem);
             }
+
             return newInventory;
           });
         }
@@ -3195,6 +3249,7 @@ function App() {
               for (const warSoulItem of warSoulItems) {
                 newInventory = addItemToInventory(newInventory, warSoulItem);
               }
+
               return newInventory;
             });
 
@@ -3278,6 +3333,7 @@ function App() {
                 if (prev.level > previousLevel) {
                   handleCharacterLevelUp(previousLevel, prev.level);
                 }
+
                 return prev;
               });
             }, 0);
@@ -3461,23 +3517,25 @@ function App() {
     consumeTime(3);
 
     // ========== 同步角色状态 ==========
-    // 战斗结束后体力自动恢复至最大值
+    // 战斗结束后体力自动恢复至最大值，同步幸运值
     if (finalPlayerState) {
       setCharacter(prev => {
-        // 如果角色升级了，保持满血状态
+        // 如果角色升级了，保持满血状态，但同步幸运值
         if (prev.maxHp > finalPlayerState.maxHp) {
           return {
             ...prev,
             currentHp: prev.maxHp,
             currentStamina: prev.maxStamina, // 战斗结束后体力恢复至最大值
+            luck: finalPlayerState.luck, // 同步战斗结束时的幸运值
           };
         }
 
-        // 正常同步战斗中的血量
+        // 正常同步战斗中的血量和幸运值
         return {
           ...prev,
           currentHp: Math.max(1, finalPlayerState.currentHp),
           currentStamina: prev.maxStamina, // 战斗结束后体力恢复至最大值
+          luck: finalPlayerState.luck, // 同步战斗结束时的幸运值
         };
       });
     }
@@ -3592,6 +3650,7 @@ function App() {
     if (!canEquipEquipment(item, character.level)) {
       // 显示等级不足提示
       addFloatingText(`等级不足！需要等级 ${item.useLevel} 才能装备此物品`);
+
       return;
     }
 
@@ -3999,6 +4058,7 @@ function App() {
           // 使用统一的升级处理函数
           handleCharacterLevelUp(previousLevel, prev.level);
         }
+
         return prev;
       });
     }, 0);
@@ -4069,6 +4129,7 @@ function App() {
           // 幻兽升级了，显示浮动文字提示
           addFloatingText(`幻兽 ${updatedPet.othername} 升级了！当前等级：${updatedPet.dj}级`);
         }
+
         return prevPets;
       });
     }, 0);

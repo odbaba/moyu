@@ -144,18 +144,18 @@ export const createInitialSkills = (isLearned: boolean = false): SkillDetail[] =
     isLearned: isLearned
   },
 
-  // 索引5: 爱的力量 - 特殊技能，公主亲密度解锁
+  // 索引5: 爱的力量 - 被动技能，公主亲密度解锁
   {
     id: 'skill_love_power',
     skillIndex: 5 as SkillIndex,
     name: '爱的力量',
     icon: '💖',
-    type: 'active',
+    type: 'passive',
     attackType: 'special',
     rarity: 'legendary',
     level: 1,
     maxLevel: 1,
-    description: '公主的爱赋予你力量，大幅提升所有属性。需要与公主达到一定亲密度才能解锁。',
+    description: '公主的爱赋予你力量，幻兽受到致命伤害时有概率满血复活。需要与公主达到恋人关系才能解锁。',
     effect: {
       battlePowerBonus: 30,
       buff: '全属性提升',

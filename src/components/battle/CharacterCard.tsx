@@ -96,17 +96,10 @@ const renderBuff = (buff: Buff) => {
 };
 
 /**
- * 幸运值警告阈值常量
- * 当幻兽幸运值低于或等于此值时，显示红色警告标识
- */
-const LUCK_WARNING_THRESHOLD = 30;
-
-/**
  * 角色卡片组件
  * 显示角色的基本信息，包括等级、战斗力、攻击力、生命值和体力进度条、增益效果
  * 支持显示 BattleCharacter（角色）和 BattlePet（幻兽）两种类型
  * 合体幻兽会显示特殊的"合体"标签和金色边框
- * 幻兽会显示幸运值，当幸运值较低时显示警告标识
  * @param props 组件属性，包含战斗角色或幻兽数据
  * @returns 角色卡片 JSX 元素
  */
@@ -128,12 +121,6 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
   const staminaPercentage = hasStamina
     ? Math.max(0, Math.min(100, ((character as BattleCharacter).currentStamina / (character as BattleCharacter).maxStamina) * 100))
     : 0;
-
-  // 获取幻兽幸运值（仅幻兽有幸运值属性）
-  const petLuck = isPet ? (character as BattlePet).luck : null;
-  
-  // 判断幸运值是否处于警告状态（幸运值 ≤ 30 时显示警告）
-  const isLuckLow = petLuck !== null && petLuck <= LUCK_WARNING_THRESHOLD;
 
   return (
     // 角色卡片容器，合体幻兽添加特殊样式类
@@ -165,22 +152,6 @@ const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
           />
         </div>
       </div>
-
-      {/* 幸运值显示区域（仅幻兽显示） */}
-      {isPet && petLuck !== null && (
-        <div className="luck-container">
-          {/* 幸运值标签和数值 */}
-          <span className={`luck-value ${isLuckLow ? 'luck-warning' : ''}`}>
-            幸运值: {petLuck}
-          </span>
-          {/* 低幸运值警告标识：幸运值 ≤ 30 时显示 */}
-          {isLuckLow && (
-            <span className="luck-warning-icon" title="幸运值过低，幻兽在战斗中可能无法触发幸运保命效果">
-              ⚠️
-            </span>
-          )}
-        </div>
-      )}
 
       {/* 体力进度条区域（仅角色显示） */}
       {hasStamina && (

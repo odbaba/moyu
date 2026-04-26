@@ -131,7 +131,7 @@ function detectActiveSets(
       color: '#4fc3f7',
       tooltipLines: [
         `天魂套装${setInfo.setLevel}级`,
-        `全身装备都有天魂战魂而产生的神圣力量，`,
+        '全身装备都有天魂战魂而产生的神圣力量，',
         `使得战斗中所有敌人的战斗力下降${suppressionPercent}%`
       ]
     });
@@ -147,7 +147,7 @@ function detectActiveSets(
       color: '#ffd700',
       tooltipLines: [
         `战魂套装${setInfo.setLevel}级`,
-        `全身装备都有战魂属性所激发出来的强大力量，`,
+        '全身装备都有战魂属性所激发出来的强大力量，',
         `使得人物战斗力提高${combatPowerPercent}%。当前提高${combatPowerBonus}战斗力`
       ]
     });
@@ -165,7 +165,7 @@ function detectActiveSets(
       color: '#9575cd',
       tooltipLines: [
         `地魂套装${setInfo.setLevel}级`,
-        `全身装备都有地魂战魂而产生的神圣力量，`,
+        '全身装备都有地魂战魂而产生的神圣力量，',
         `使得战斗中所有敌人的生命值减少${suppressionPercent}%`
       ]
     });
@@ -181,7 +181,7 @@ function detectActiveSets(
       color: '#ffd700',
       tooltipLines: [
         `战魂套装${setInfo.setLevel}级`,
-        `全身装备都有战魂属性所激发出来的强大力量，`,
+        '全身装备都有战魂属性所激发出来的强大力量，',
         `使得人物战斗力提高${combatPowerPercent}%。当前提高${combatPowerBonus}战斗力`
       ]
     });
@@ -199,7 +199,7 @@ function detectActiveSets(
       color: '#ffd700',
       tooltipLines: [
         `战魂套装${setInfo.setLevel}级`,
-        `全身装备都有战魂属性所激发出来的强大力量，`,
+        '全身装备都有战魂属性所激发出来的强大力量，',
         `使得人物战斗力提高${combatPowerPercent}%。当前提高${combatPowerBonus}战斗力`
       ]
     });
@@ -288,6 +288,7 @@ const CharacterInfo: React.FC<CharacterInfoProps> = ({
         power += item.soulLevel || 0;
       }
     });
+
     return power;
   }, [character.equipment]);
 

@@ -64,6 +64,7 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
   // 检查是否可以资助
   const donateCheck = useMemo(() => {
     const amount = parseInt(donateAmount) || 0;
+
     return canDonate(state, amount);
   }, [state, donateAmount]);
 

@@ -41,7 +41,7 @@ export function canEquipEquipment(
   // 获取装备的使用等级
   // EquipmentItem 和 EquipmentDetail 都有 useLevel 字段
   const useLevel = equipment.useLevel;
-  
+
   // 角色等级必须大于等于装备使用等级
   return characterLevel >= useLevel;
 }
@@ -57,10 +57,10 @@ export function getEquipmentLevelRequirementMessage(
   characterLevel: number
 ): string | null {
   const useLevel = equipment.useLevel;
-  
+
   if (characterLevel < useLevel) {
     return `需要等级 ${useLevel} 才能装备此物品（当前等级：${characterLevel}）`;
   }
-  
+
   return null;
 }
