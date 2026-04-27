@@ -22,12 +22,13 @@ home/
 ## 组件说明
 
 ### LocationHeader
-- **功能**: 显示当前位置的标题，提供角色和幻兽系统入口
+- **功能**: 显示当前位置的标题，提供角色、背包和幻兽系统入口
 - **位置**: 页面顶部
-- **布局**: 左侧角色按钮 + 中间位置名称 + 右侧幻兽按钮
+- **布局**: 左侧角色按钮 + 背包按钮 + 中间位置名称 + 右侧幻兽按钮
 - **Props**: 
   - `location: string` - 当前位置名称
   - `onShowCharacter: () => void` - 显示角色信息页面的回调
+  - `onShowInventory: () => void` - 显示背包页面的回调
   - `onShowPet: () => void` - 显示幻兽页面的回调
 
 ### SceneDescription

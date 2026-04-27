@@ -4560,6 +4560,7 @@ function App() {
           <LocationHeader
             location={currentLoc?.name || ''}
             onShowCharacter={() => setShowCharacterPage(true)}
+            onShowInventory={() => setShowInventoryPage(true)}
             onShowPet={() => setShowPetPage(true)}
           />
 
