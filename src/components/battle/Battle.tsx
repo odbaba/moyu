@@ -77,6 +77,8 @@ import {
   executeSkill,
   generateLogId,
   removeExpiredBuffs} from '../../utils/battleCalculator';
+// 导入自动战斗设置持久化工具
+import { loadAutoBattleSetting, saveAutoBattleSetting } from '../../utils/saveUtils';
 // 导入战斗力计算函数
 import { calculateTotalCombatPower, checkWarSoulSet, type WarSoulSetInfo } from '../../utils/combatPower';
 // 导入爱的力量技能检查函数
@@ -167,8 +169,8 @@ const Battle: React.FC<BattleProps> = ({
   // 详情类型：'character' | 'pet' | 'enemy'
   const [detailType, setDetailType] = useState<'character' | 'pet' | 'enemy' | null>(null);
 
-  // 自动战斗状态
-  const [autoBattle, setAutoBattle] = useState(false);
+  // 自动战斗状态（从缓存读取上次设置）
+  const [autoBattle, setAutoBattle] = useState(() => loadAutoBattleSetting());
   // 自动战斗本轮是否已处理（避免重复触发）
   const autoBattleProcessedRef = useRef(false);
   // 存储最新的 handleActionSelect 引用，供自动战斗 useEffect 使用
@@ -352,6 +354,11 @@ const Battle: React.FC<BattleProps> = ({
   useEffect(() => {
     battleStateRef.current = battleState;
   }, [battleState]);
+
+  // 自动战斗设置变更时持久化到缓存
+  useEffect(() => {
+    saveAutoBattleSetting(autoBattle);
+  }, [autoBattle]);
 
   // 使用 ref 存储最新的敌人列表，避免依赖 battleState.enemies 导致重复触发
   const enemiesRef = useRef(battleState.enemies);

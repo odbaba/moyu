@@ -360,6 +360,7 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
         nowday={timeSystem.nowday}
         nowtime={timeSystem.nowtime}
         onedaytime={timeSystem.onedaytime}
+        onSaveGame={() => onSaveGame?.()}
       />
 
       {/* 交互日志 - 固定在底部 */}

@@ -2862,7 +2862,7 @@ function App() {
     // 计算战利品（主要是经验）
     const isBoss = enemy.name.includes('BOSS') || enemy.name.includes('boss');
     const loot = calculateLoot(
-      Math.floor(enemy.maxHp / 100), // 估算等级
+      enemy.level, // 使用怪物真实等级
       enemy.maxHp,
       isBoss,
       character.luck, // 使用角色的幸运值
@@ -3270,7 +3270,7 @@ function App() {
           // 计算战利品（使用新的经验值计算公式）
           // 参数：怪物等级、怪物最大生命值、是否BOSS、幸运值、玩家战斗力、玩家等级、宝石经验加成
           return calculateLoot(
-            Math.floor(enemy.maxHp / 100), // 估算等级
+            enemy.level || Math.floor(enemy.maxHp / 100), // 使用怪物真实等级，兜底估算
             enemy.maxHp,
             isBoss,
             character.luck, // 使用角色的幸运值

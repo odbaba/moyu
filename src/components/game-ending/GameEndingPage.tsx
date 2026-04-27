@@ -13,6 +13,8 @@ interface GameEndingPageProps {
   onPlayAgain: () => void;
   /** 读取存档回调 */
   onLoadSave: () => void;
+  /** 继续游玩回调 - 关闭结算页面，传送到皇宫继续 */
+  onContinuePlaying: () => void;
 }
 
 /**

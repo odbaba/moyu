@@ -246,3 +246,46 @@ export const loadMusicSettings = (): MusicSettings => {
     musicVolume: 30
   };
 };
+
+// ========== 自动战斗设置持久化 ==========
+
+// 自动战斗设置键名
+const AUTO_BATTLE_KEY = 'moyu_auto_battle';
+
+/**
+ * 保存自动战斗设置到 localStorage
+ * @param enabled 是否开启自动战斗
+ * @returns 是否保存成功
+ */
+export const saveAutoBattleSetting = (enabled: boolean): boolean => {
+  try {
+    localStorage.setItem(AUTO_BATTLE_KEY, JSON.stringify(enabled));
+
+    return true;
+  } catch (error) {
+    console.error('保存自动战斗设置失败:', error);
+
+    return false;
+  }
+};
+
+/**
+ * 从 localStorage 加载自动战斗设置
+ * @returns 是否开启自动战斗，默认关闭
+ */
+export const loadAutoBattleSetting = (): boolean => {
+  try {
+    const jsonData = localStorage.getItem(AUTO_BATTLE_KEY);
+    if (jsonData !== null) {
+      const enabled = JSON.parse(jsonData);
+      if (typeof enabled === 'boolean') {
+        return enabled;
+      }
+    }
+  } catch (error) {
+    console.error('加载自动战斗设置失败:', error);
+  }
+
+  // 默认关闭自动战斗
+  return false;
+};
