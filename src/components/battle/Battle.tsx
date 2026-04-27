@@ -167,6 +167,13 @@ const Battle: React.FC<BattleProps> = ({
   // 详情类型：'character' | 'pet' | 'enemy'
   const [detailType, setDetailType] = useState<'character' | 'pet' | 'enemy' | null>(null);
 
+  // 自动战斗状态
+  const [autoBattle, setAutoBattle] = useState(false);
+  // 自动战斗本轮是否已处理（避免重复触发）
+  const autoBattleProcessedRef = useRef(false);
+  // 存储最新的 handleActionSelect 引用，供自动战斗 useEffect 使用
+  const handleActionSelectRef = useRef<(skillId: string) => void>(() => {});
+
   // 战魂套装信息状态，用于对怪物属性压制和传递给敌人详情弹窗
   const [warSoulSetInfo, setWarSoulSetInfo] = useState<WarSoulSetInfo | null>(null);
 
@@ -337,6 +344,14 @@ const Battle: React.FC<BattleProps> = ({
 
   // 战斗状态
   const [battleState, setBattleState] = useState<BattleState>(initializeBattleState);
+
+  // 存储最新的 battleState 引用，供自动战斗 useEffect 使用
+  const battleStateRef = useRef(battleState);
+
+  // 保持 battleStateRef 同步
+  useEffect(() => {
+    battleStateRef.current = battleState;
+  }, [battleState]);
 
   // 使用 ref 存储最新的敌人列表，避免依赖 battleState.enemies 导致重复触发
   const enemiesRef = useRef(battleState.enemies);
@@ -1247,58 +1262,51 @@ const Battle: React.FC<BattleProps> = ({
 
   /**
    * 玩家选择行动
+   * 释放技能后自动选择生命值最低的存活敌人作为目标，无需手动选择
    * @param skillId 技能ID
    */
   const handleActionSelect = (skillId: string) => {
-    setBattleState(prev => ({
-      ...prev,
-      selectedAction: skillId
-    }));
-  };
-
-  /**
-   * 玩家选择目标
-   * @param enemyId 敌人ID
-   */
-  const handleTargetSelect = (enemyId: string) => {
-    if (!battleState.selectedAction) return;
-
     // 找到选中的技能
-    const skill = battleState.player.skills.find(s => s.id === battleState.selectedAction);
+    const skill = battleState.player.skills.find(s => s.id === skillId);
     if (!skill) return;
 
-    // 增益技能不需要选择目标
+    // 增益技能不需要选择目标，直接执行
     if (skill.attackType === 'buff') {
       executeSkillAttack(battleState.player, null, skill, () => {
-        // 清除选择并切换到敌人回合，重置敌人行动索引
         setBattleState(prev => ({
           ...prev,
           selectedAction: null,
           targetEnemy: null,
           isPlayerTurn: false,
-          currentEnemyActionIndex: 0 // 重置敌人行动索引
+          currentEnemyActionIndex: 0
         }));
       });
 
       return;
     }
 
-    // 找到目标敌人
-    const targetEnemy = battleState.enemies.find(e => e.id === enemyId && e.currentHp > 0);
-    if (!targetEnemy) return;
+    // 自动选择生命值最低的存活敌人作为目标
+    const aliveEnemies = battleState.enemies.filter(e => e.currentHp > 0);
+    if (aliveEnemies.length === 0) return;
 
-    // 执行攻击，传入回调函数在攻击完成后切换回合
-    executeSkillAttack(battleState.player, targetEnemy, skill, () => {
-      // 清除选择并切换到敌人回合，重置敌人行动索引
+    const lowestHpEnemy = aliveEnemies.reduce((lowest, enemy) =>
+      enemy.currentHp < lowest.currentHp ? enemy : lowest
+    );
+
+    // 直接执行攻击，无需玩家手动选择目标
+    executeSkillAttack(battleState.player, lowestHpEnemy, skill, () => {
       setBattleState(prev => ({
         ...prev,
         selectedAction: null,
         targetEnemy: null,
         isPlayerTurn: false,
-        currentEnemyActionIndex: 0 // 重置敌人行动索引
+        currentEnemyActionIndex: 0
       }));
     });
   };
+
+  // 同步 handleActionSelectRef，供自动战斗 useEffect 使用最新引用
+  handleActionSelectRef.current = handleActionSelect;
 
   /**
    * 敌人回合处理
@@ -1400,6 +1408,99 @@ const Battle: React.FC<BattleProps> = ({
   }, [battleState.isPlayerTurn, battleState.battleResult, battleState.currentEnemyActionIndex]); // 不依赖 battleState.enemies，使用 ref 避免重复触发
 
   /**
+   * 自动战斗逻辑
+   * 当开启自动战斗且轮到玩家回合时，自动选择技能并执行
+   * 技能选择策略：
+   * 1. 优先使用飞天连斩/高级飞天连斩（若可用）
+   * 2. 飞天连斩存在但体力不足时，使用风斩/高级风斩
+   * 3. 否则按总伤害倍率排序，选最高的（群体技能总伤害 = 倍率 × 敌人数）
+   */
+  useEffect(() => {
+    // 仅当玩家回合、自动战斗开启、战斗进行中时触发
+    if (!battleState.isPlayerTurn || !autoBattle || battleState.battleResult !== 'in_progress') {
+      // 非玩家回合时重置处理标记
+      if (!battleState.isPlayerTurn) {
+        autoBattleProcessedRef.current = false;
+      }
+
+      return;
+    }
+
+    // 本轮已自动处理过，不再重复
+    if (autoBattleProcessedRef.current) return;
+    autoBattleProcessedRef.current = true;
+
+    // 延迟执行，让玩家看到状态切换
+    const timer = setTimeout(() => {
+      const currentState = battleStateRef.current;
+
+      // 再次检查战斗状态是否有效
+      if (currentState.battleResult !== 'in_progress') return;
+
+      // 获取可用攻击技能（非被动、冷却完毕、体力足够）
+      const availableSkills = currentState.player.skills.filter(s =>
+        s.type !== 'passive'
+        && s.currentCooldown === 0
+        && s.isAvailable
+        && currentState.player.currentStamina >= s.staminaCost
+        && s.attackType !== 'buff'
+      );
+
+      if (availableSkills.length === 0) {
+        // 没有可用技能，自动结束回合
+        autoBattleProcessedRef.current = false;
+        setBattleState(prev => ({
+          ...prev,
+          selectedAction: null,
+          targetEnemy: null,
+          isPlayerTurn: false,
+          currentEnemyActionIndex: 0
+        }));
+
+        return;
+      }
+
+      // 检查是否存在飞天连斩技能（包括高级飞天连斩）
+      const flyingSlashSkill = availableSkills.find(s => s.id === 'skill_flying_slash');
+
+      if (flyingSlashSkill) {
+        // 优先使用飞天连斩/高级飞天连斩
+        handleActionSelectRef.current(flyingSlashSkill.id);
+        return;
+      }
+
+      // 检查飞天连斩是否存在但不可用（冷却中或体力不足）
+      const flyingSlashExists = currentState.player.skills.some(s =>
+        s.id === 'skill_flying_slash'
+      );
+
+      if (flyingSlashExists) {
+        // 飞天连斩存在但不可用，体力不足时使用风斩，否则用最高伤害倍率技能
+        const windSlashSkill = availableSkills.find(s => s.id === 'skill_wind_slash');
+        if (windSlashSkill && currentState.player.currentStamina < 30) {
+          // 体力不足以支撑飞天连斩（30体力），使用风斩/高级风斩（体力消耗为0）
+          handleActionSelectRef.current(windSlashSkill.id);
+          return;
+        }
+      }
+
+      // 按总伤害倍率降序排列，选择总伤害最高的技能
+      // 群体攻击（aoe）：临时总伤害 = 技能倍率 × 存活敌人数量
+      const aliveEnemyCount = currentState.enemies.filter(e => e.currentHp > 0).length;
+      const sortedSkills = [...availableSkills].sort((a, b) => {
+        const totalA = a.attackType === 'aoe' ? a.damagePercent * aliveEnemyCount : a.damagePercent;
+        const totalB = b.attackType === 'aoe' ? b.damagePercent * aliveEnemyCount : b.damagePercent;
+        return totalB - totalA;
+      });
+      const selectedSkill = sortedSkills[0];
+
+      handleActionSelectRef.current(selectedSkill.id);
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [battleState.isPlayerTurn, autoBattle, battleState.battleResult]);
+
+  /**
    * 监听战斗结果
    * 当战斗结束时，延迟2秒后通知父组件
    * 同时传递玩家和幻兽的最终状态，用于同步回全局状态
@@ -1458,7 +1559,7 @@ const Battle: React.FC<BattleProps> = ({
 
   /**
    * 处理九宫格中角色/幻兽/敌人的点击事件
-   * 区分"选择攻击目标"和"查看详情"两种情况
+   * 技能释放后自动选择生命值最低的敌人，点击只用于查看详情
    * @param character 角色或幻兽数据
    * @param isEnemy 是否是敌人
    */
@@ -1466,15 +1567,9 @@ const Battle: React.FC<BattleProps> = ({
     character: BattleCharacter | BattlePet,
     isEnemy: boolean
   ) => {
-    // 如果是玩家回合且已选择技能，且点击的是敌人
-    if (battleState.isPlayerTurn && battleState.selectedAction && isEnemy) {
-      // 执行选择攻击目标的逻辑（现有逻辑）
-      handleTargetSelect(character.id);
-    } else {
-      // 显示详情弹窗
-      showCharacterDetail(character, isEnemy);
-    }
-  }, [battleState.isPlayerTurn, battleState.selectedAction, handleTargetSelect, showCharacterDetail]);
+    // 点击角色/敌人/幻兽只用于查看详情
+    showCharacterDetail(character, isEnemy);
+  }, [showCharacterDetail]);
 
   /**
    * 关闭详情弹窗
@@ -1518,13 +1613,7 @@ const Battle: React.FC<BattleProps> = ({
           (char) => char.gridPosition.x === x && char.gridPosition.y === y
         );
 
-        // 判断是否可以选择这个角色作为目标
-        // 只有敌人阵营的角色可以被选择，且必须存活、已选择技能、玩家回合
-        const isSelectable = isEnemy &&
-          character &&
-          character.currentHp > 0 &&
-          battleState.selectedAction &&
-          battleState.isPlayerTurn;
+        // 判断是否可以选择这个角色作为目标（已弃用，技能自动选择生命值最低的敌人）
 
         // 判断这个角色是否有伤害数字
         const characterDamageNumbers = character
@@ -1534,7 +1623,7 @@ const Battle: React.FC<BattleProps> = ({
         gridCells.push(
           <div
             key={`${isEnemy ? 'enemy' : 'player'}-${x}-${y}`}
-            className={`grid-cell ${character ? 'occupied' : ''} ${isSelectable ? 'selectable' : ''} ${character && character.currentHp > 0 ? 'clickable' : ''} ${attackingCharacterId === character?.id ? 'attacking' : ''}`}
+            className={`grid-cell ${character ? 'occupied' : ''} ${character && character.currentHp > 0 ? 'clickable' : ''} ${attackingCharacterId === character?.id ? 'attacking' : ''}`}
             onClick={() => {
               // 如果有角色且存活，处理点击事件
               if (character && character.currentHp > 0) {
@@ -1609,14 +1698,28 @@ const Battle: React.FC<BattleProps> = ({
       <div className="action-section">
         {battleState.isPlayerTurn && battleState.battleResult === 'in_progress' ? (
           <>
-            <ActionButtons
-              skills={battleState.player.skills.filter(skill => skill.type !== 'passive')}
-              currentStamina={battleState.player.currentStamina}
-              onActionSelect={handleActionSelect}
-              disabled={!battleState.isPlayerTurn || battleState.battleResult !== 'in_progress'}
-            />
-            {battleState.selectedAction && (
-              <div className="target-hint">请点击要攻击的敌人</div>
+            {/* 自动战斗勾选框 */}
+            <label className="auto-battle-toggle">
+              <input
+                type="checkbox"
+                checked={autoBattle}
+                onChange={(e) => {
+                  setAutoBattle(e.target.checked);
+                  autoBattleProcessedRef.current = false;
+                }}
+              />
+              <span>自动战斗</span>
+            </label>
+            {/* 自动战斗开启时隐藏技能按钮，显示自动战斗提示 */}
+            {autoBattle ? (
+              <div className="auto-battle-hint">自动战斗中...</div>
+            ) : (
+              <ActionButtons
+                skills={battleState.player.skills.filter(skill => skill.type !== 'passive')}
+                currentStamina={battleState.player.currentStamina}
+                onActionSelect={handleActionSelect}
+                disabled={!battleState.isPlayerTurn || battleState.battleResult !== 'in_progress'}
+              />
             )}
           </>
         ) : battleState.battleResult === 'in_progress' ? (

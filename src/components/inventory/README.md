@@ -24,13 +24,16 @@ inventory/
   - `items: InventoryItem[]` - 物品列表
   - `resources: PlayerResources` - 玩家资源
 
-### InventoryGrid（待实现）
-- **功能**: 显示物品网格
+### InventoryGrid（已实现 - 对应 ItemGrid 组件）
+- **功能**: 显示物品网格（两列垂直列表布局）
 - **特性**:
   - 根据分类过滤物品
-  - 显示物品图标、名称、数量
-  - 根据稀有度显示不同边框颜色
-  - 支持物品点击查看详情
+  - 显示物品图标（装备优先显示图片，其他显示emoji）
+  - 显示物品名称（装备名称带品质颜色 + 魔魂等级）
+  - 装备名称下方小字显示使用等级
+  - 显示物品数量角标（数量 > 1 时）
+  - 根据稀有度显示不同左侧边框颜色
+  - 支持物品点击查看详情（装备物品打开装备详情弹窗，普通物品打开普通物品详情弹窗）
 - **Props**: 
   - `items: InventoryItem[]` - 物品列表
   - `onItemClick: (item: InventoryItem) => void` - 物品点击回调

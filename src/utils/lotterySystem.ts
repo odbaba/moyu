@@ -90,7 +90,7 @@ const LEGENDARY_PRIZES = [
 const HIGH_PRIZES = [
   { id: 'saint_angel_pet', name: '圣天使幻兽', type: 'pet', petType: '圣天使' as PetType },
   { id: 'epic_equipment', name: '极品装备', type: 'equipment' },
-  { id: 'flying_slash_skill', name: '飞天连斩(2/7)', type: 'item' },
+  { id: 'flying_slash_skill', name: '飞天连斩', type: 'item' },
   { id: 'spirit_scroll', name: '斗志昂扬', type: 'item' },
   { id: 'high_star_sword', name: '高级星魔剑', type: 'item' },
   { id: 'soul_king', name: '灵魂王', type: 'item' },

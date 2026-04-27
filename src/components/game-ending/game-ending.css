@@ -107,9 +107,10 @@
 .ending-buttons {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
   margin-top: 12px;
   width: 100%;
   max-width: 360px;
@@ -117,9 +118,20 @@
 
 /* 结算页面按钮 */
 .ending-btn {
-  padding: 10px 20px;
-  font-size: 1rem;
-  min-width: 120px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  min-width: 90px;
+}
+
+/* 继续游玩按钮 - 金色突出显示 */
+.ending-btn--continue {
+  background-color: #8b6914;
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.ending-btn--continue:hover {
+  background-color: #a07e1a;
 }
 
 /* 手机端响应式 - 确保一屏展示 */

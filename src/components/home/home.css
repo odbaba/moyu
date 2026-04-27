@@ -307,6 +307,13 @@
   color: #FCFFFF;
 }
 
+/* 时间组件中的保存按钮 */
+.time-save-btn {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  margin: 0 4px;
+}
+
 /* 时间提示（在60天内救出国王） */
 .time-hint {
   font-size: 0.7rem;

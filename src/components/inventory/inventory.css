@@ -258,6 +258,14 @@
   transform: scale(0.98);
 }
 
+/* 物品信息容器 - 名称和等级垂直排列 */
+.item-list-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
 /* 物品名称样式 - 常规字体 */
 .item-list-name {
   color: #f0f0f0;
@@ -266,8 +274,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
-  min-width: 0;
+}
+
+/* 装备使用等级样式 - 小字灰色 */
+.item-list-level {
+  color: #888;
+  font-size: 0.65rem;
+  font-weight: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* 物品数量样式 */

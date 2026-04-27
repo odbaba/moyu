@@ -427,6 +427,7 @@
   justify-content: center;
   border-top: 1px solid #000000;
   border-bottom: 1px solid #000000;
+  position: relative;
 }
 
 
@@ -478,6 +479,34 @@
 /* 敌方行动提示样式 */
 .enemy-action-hint {
   color: #FCFFFF;
+  font-size: 1rem;
+  font-weight: bold;
+  animation: pulse-opacity 1.5s ease-in-out infinite;
+}
+
+/* 自动战斗勾选框 - 定位于行动按钮区右上角 */
+.auto-battle-toggle {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #FCFFFF;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.auto-battle-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #4ecdc4;
+}
+
+/* 自动战斗提示 */
+.auto-battle-hint {
+  color: #4ecdc4;
   font-size: 1rem;
   font-weight: bold;
   animation: pulse-opacity 1.5s ease-in-out infinite;
@@ -664,6 +693,14 @@
 
   .target-hint {
     font-size: 0.9rem;
+  }
+
+  .auto-battle-toggle {
+    font-size: 0.75rem;
+  }
+
+  .auto-battle-hint {
+    font-size: 0.85rem;
   }
 
   /* 战斗日志区域响应式 - 固定高度25vh */

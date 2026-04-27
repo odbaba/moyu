@@ -1,4 +1,4 @@
-﻿import './App.css';
+import './App.css';
 import './components/home/home.css';
 import './components/battle/battle.css';
 import './components/common/common.css';
@@ -848,7 +848,6 @@ function App() {
   /**
    * 消耗时间单位
    * 增加已用时间单位，如果超过一天上限则进入下一天
-   * 当游戏天数超过60天时，触发游戏结束（失败结局）
    * @param units 消耗的时间单位数量
    */
   const consumeTime = useCallback((units: number) => {
@@ -858,16 +857,6 @@ function App() {
       // 如果超过一天的时间上限，进入下一天
       if (newNowtime >= prev.onedaytime) {
         const newNowday = prev.nowday + 1;
-        // 检查是否超过60天
-        if (newNowday > 60) {
-          // 超过60天，游戏结束（失败结局）
-          // 注意：这里不能直接设置状态，需要通过 useEffect 处理
-          return {
-            ...prev,
-            nowtime: 0,
-            nowday: newNowday
-          };
-        }
         return {
           ...prev,
           nowtime: 0,
@@ -1081,36 +1070,6 @@ function App() {
       handleNewDay();
     }
   }, [timeSystem.nowday, handleNewDay]);
-
-  // 监听游戏天数，处理游戏结束（60天结束）
-  useEffect(() => {
-    // 当天数超过60天时，触发游戏结束（失败结局）
-    if (timeSystem.nowday > 60 && !showGameEnding) {
-      // 设置失败状态
-      setIsWin(false);
-      // 计算结算结果
-      const params: GameEndingParams = {
-        isWin: false,
-        daysPassed: timeSystem.nowday - 1, // 实际完成的天数
-        maxCombatPower,
-        level: character.level,
-        equipment: character.equipment,
-        pets,
-        militaryRankLevel: militaryRank,
-        militaryRankName: getMilitaryRankName(militaryRank),
-        nobleRankLevel: nobleRank,
-        nobleRankName: getNobleRankName(nobleRank),
-        relationshipLevel: princessRelationship.level,
-        relationshipName: princessRelationship.relationshipName,
-        gold: playerResources.gold,
-        magicStone: playerResources.magicStone,
-      };
-      const result = calculateGameEnding(params);
-      setGameEndingResult(result);
-      // 显示结算页面
-      setShowGameEnding(true);
-    }
-  }, [timeSystem.nowday, showGameEnding, maxCombatPower, character.level, character.equipment, pets, militaryRank, nobleRank, princessRelationship.level, princessRelationship.relationshipName, playerResources.gold, playerResources.magicStone]);
 
   /**
    * 挖矿逻辑
@@ -1645,10 +1604,10 @@ function App() {
               break;
             }
 
-            // 扣除魔石
+            // 扣除魔石（使用Math.max防止出现负数）
             setPlayerResources(prev => ({
               ...prev,
-              magicStone: prev.magicStone - price,
+              magicStone: Math.max(0, prev.magicStone - price),
             }));
 
             // 创建高级战斗力石物品并添加到背包
@@ -1696,10 +1655,10 @@ function App() {
               break;
             }
 
-            // 扣除魔石
+            // 扣除魔石（使用Math.max防止出现负数）
             setPlayerResources(prev => ({
               ...prev,
-              magicStone: prev.magicStone - price,
+              magicStone: Math.max(0, prev.magicStone - price),
             }));
 
             // 生成年猪幻兽并添加到幻兽列表
@@ -2372,10 +2331,10 @@ function App() {
           const cost = (actionParams?.cost as number) || 50000;
           // 检查魔石是否足够
           if (playerResources.magicStone >= cost) {
-            // 扣除魔石
+            // 扣除魔石（使用Math.max防止出现负数）
             setPlayerResources(prev => ({
               ...prev,
-              magicStone: prev.magicStone - cost,
+              magicStone: Math.max(0, prev.magicStone - cost),
             }));
             // 消耗15个时间单位（整整一天）
             consumeTime(15);
@@ -2708,17 +2667,17 @@ function App() {
     goldSpent: number,
     magicStoneSpent: number
   ) => {
-    // 扣除货币
+    // 扣除货币（使用Math.max防止出现负数）
     if (goldSpent > 0) {
       setPlayerResources(prev => ({
         ...prev,
-        gold: prev.gold - goldSpent,
+        gold: Math.max(0, prev.gold - goldSpent),
       }));
     }
     if (magicStoneSpent > 0) {
       setPlayerResources(prev => ({
         ...prev,
-        magicStone: prev.magicStone - magicStoneSpent,
+        magicStone: Math.max(0, prev.magicStone - magicStoneSpent),
       }));
     }
 
@@ -2770,17 +2729,17 @@ function App() {
     goldSpent: number,
     magicStoneSpent: number
   ) => {
-    // 扣除货币
+    // 扣除货币（使用Math.max防止出现负数）
     if (goldSpent > 0) {
       setPlayerResources(prev => ({
         ...prev,
-        gold: prev.gold - goldSpent,
+        gold: Math.max(0, prev.gold - goldSpent),
       }));
     }
     if (magicStoneSpent > 0) {
       setPlayerResources(prev => ({
         ...prev,
-        magicStone: prev.magicStone - magicStoneSpent,
+        magicStone: Math.max(0, prev.magicStone - magicStoneSpent),
       }));
     }
 
@@ -4570,6 +4529,11 @@ function App() {
             result={gameEndingResult}
             onPlayAgain={() => window.location.reload()}
             onLoadSave={() => window.location.reload()}
+            onContinuePlaying={() => {
+              // 关闭结算页面，传送到皇宫继续游玩
+              setShowGameEnding(false);
+              setCurrentLocation('huanggong');
+            }}
           />
         )
       ) : inBattle ? (
@@ -4622,6 +4586,7 @@ function App() {
             nowday={timeSystem.nowday}
             nowtime={timeSystem.nowtime}
             onedaytime={timeSystem.onedaytime}
+            onSaveGame={handleSaveGame}
           />
 
           {/* 交互日志 */}
@@ -4868,10 +4833,10 @@ function App() {
             onBuyPet={(pet, price) => {
               // 添加幻兽
               setPets(prev => [...prev, pet]);
-              // 扣除魔石
+              // 扣除魔石（使用Math.max防止出现负数）
               setPlayerResources(prev => ({
                 ...prev,
-                magicStone: prev.magicStone - price
+                magicStone: Math.max(0, prev.magicStone - price)
               }));
               // 减少库存
               setPetInstituteState(prev => ({
@@ -4881,10 +4846,10 @@ function App() {
               setInteractionLog(prev => [...prev, `成功购买奇异兽！品质分：${pet.pz}，花费：${price} 魔石`]);
             }}
             onDonate={(magicStones, levelsGained) => {
-              // 扣除魔石
+              // 扣除魔石（使用Math.max防止出现负数）
               setPlayerResources(prev => ({
                 ...prev,
-                magicStone: prev.magicStone - magicStones
+                magicStone: Math.max(0, prev.magicStone - magicStones)
               }));
               // 提升技术等级
               setPetInstituteState(prev => ({
@@ -4923,10 +4888,10 @@ function App() {
             currentMerit={playerResources.merit}
             currentNobleRank={nobleRank}
             onDonate={(donatedGold, gainedMerit) => {
-              // 更新金币
+              // 更新金币（使用Math.max防止出现负数）
               setPlayerResources(prev => ({
                 ...prev,
-                gold: prev.gold - donatedGold,
+                gold: Math.max(0, prev.gold - donatedGold),
               }));
               // 使用统一处理函数获取功勋
               handleGainMerit(gainedMerit, `捐献 ${donatedGold.toLocaleString()} 金币`);

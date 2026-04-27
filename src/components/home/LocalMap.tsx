@@ -281,7 +281,6 @@ const LocalMap: React.FC<LocalMapProps> = ({ currentLocation, onMove, isAutoMovi
                       userSelect: 'none',
                       cursor: isAdjacent && !isCurrent ? 'pointer' : 'default'
                     }}
-                    onClick={() => handleLocationClick(loc.id, isCurrent, isAdjacent)}
                   >
                     {loc.name}
                   </span>

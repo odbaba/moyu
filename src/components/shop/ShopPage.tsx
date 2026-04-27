@@ -229,8 +229,10 @@ const ShopPage: React.FC<ShopPageProps> = ({
           return;
         }
 
-        // 调用父组件的购买幻兽回调函数
-        onPurchasePet(pet, shopItem.priceGold, shopItem.priceMagicStone);
+        // 根据商店类型只传递对应货币的价格，避免魔石商店误扣金币
+        const petGoldSpent = shopType === 'gold' ? shopItem.priceGold : 0;
+        const petMagicStoneSpent = shopType === 'magicStone' ? shopItem.priceMagicStone : 0;
+        onPurchasePet(pet, petGoldSpent, petMagicStoneSpent);
       }
 
       setMessage(`成功购买 ${quantity} 只幻兽！`);

@@ -13,6 +13,7 @@ home/
 ├── LocalMap.tsx          # 局部地图组件
 ├── InteractionButtons.tsx # 交互按钮组件
 ├── InteractionLog.tsx    # 交互日志组件
+├── TimeDisplay.tsx       # 时间显示组件（含保存按钮）
 ├── Menu.tsx              # 右下角菜单组件
 ├── WorldMap.tsx          # 大地图组件
 └── SoldierModal.tsx      # 小兵弹窗组件
@@ -61,6 +62,15 @@ home/
 - **位置**: 页面底部
 - **Props**: `logs: string[]` - 日志条目数组
 
+### TimeDisplay
+- **功能**: 显示当前天数、星期、时间进度条，以及保存游戏按钮
+- **位置**: 交互日志区顶部
+- **Props**:
+  - `nowday: number` - 当前天数
+  - `nowtime: number` - 当天已消耗的时间单位
+  - `onedaytime: number` - 一天的时间单位总数
+  - `onSaveGame: () => void` - 保存游戏回调
+
 ### Menu
 - **功能**: 右下角的悬浮菜单，提供角色信息、幻兽、背包、技能、大地图等功能入口
 - **位置**: 页面右下角固定
@@ -72,6 +82,7 @@ home/
   - `onShowInventory: () => void` - 显示背包页面回调
   - `onShowSkill: () => void` - 显示技能页面回调
   - `onShowPet: () => void` - 显示幻兽页面回调
+  - `onShowSettings: () => void` - 显示设置页面回调
 
 ### WorldMap
 - **功能**: 全屏大地图，显示所有地点，支持拖拽和点击移动

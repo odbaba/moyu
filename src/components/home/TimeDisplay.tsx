@@ -12,6 +12,8 @@ interface TimeDisplayProps {
   nowtime: number;
   /** 一天的时间单位总数 */
   onedaytime: number;
+  /** 保存游戏的回调 */
+  onSaveGame: () => void;
 }
 
 /**
@@ -51,12 +53,14 @@ export const getWeekday = (day: number): Weekday => {
 /**
  * 时间显示组件
  * 显示当前天数、星期和时间进度条
+ * 包含保存游戏按钮（放在第x天右边）
  * 固定显示在交互日志区的最上方
  */
 const TimeDisplay: React.FC<TimeDisplayProps> = ({
   nowday,
   nowtime,
-  onedaytime
+  onedaytime,
+  onSaveGame
 }) => {
   // 计算当前星期
   const weekday = getWeekday(nowday);
@@ -66,7 +70,10 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({
       {/* 天数和星期显示 */}
       <div className="time-info">
         <span className="time-day">第{nowday}天</span>
-        <span className="time-hint">（请在60天内救出国王）</span>
+        {/* 保存游戏按钮 - 放在第x天右边 */}
+        <button className="time-save-btn game-btn" onClick={onSaveGame}>
+          保存游戏
+        </button>
         <span className="time-weekday">{weekday}</span>
       </div>
 

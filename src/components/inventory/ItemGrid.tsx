@@ -148,15 +148,21 @@ const ItemSlotWithImage: React.FC<ItemSlotWithImageProps> = ({
       {/* 物品图标/图片 */}
       {renderItemIcon()}
 
-      {/* 物品名称 */}
-      <span
-        className="item-list-name"
-        style={isEquipment && equipmentItem ? { color: getEquipmentQualityColor(equipmentItem.equipmentQuality) } : undefined}
-      >
-        {isEquipment && equipmentItem
-          ? getEquipmentDisplayName(item.name, equipmentItem.equipmentQuality, equipmentItem.magicSoulLevel)
-          : item.name}
-      </span>
+      {/* 物品名称和使用等级信息 */}
+      <div className="item-list-info">
+        <span
+          className="item-list-name"
+          style={isEquipment && equipmentItem ? { color: getEquipmentQualityColor(equipmentItem.equipmentQuality) } : undefined}
+        >
+          {isEquipment && equipmentItem
+            ? getEquipmentDisplayName(item.name, equipmentItem.equipmentQuality, equipmentItem.magicSoulLevel)
+            : item.name}
+        </span>
+        {/* 装备物品显示使用等级 */}
+        {isEquipment && equipmentItem && (
+          <span className="item-list-level">使用等级 {equipmentItem.useLevel}</span>
+        )}
+      </div>
 
       {/* 物品数量标签 */}
       {item.quantity > 1 && (

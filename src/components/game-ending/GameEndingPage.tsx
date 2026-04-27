@@ -20,7 +20,7 @@ interface GameEndingPageProps {
  * 展示游戏结束时的8维度评价和综合评语
  * 手机端一屏展示所有内容
  */
-const GameEndingPage: React.FC<GameEndingPageProps> = ({ result, onPlayAgain, onLoadSave }) => {
+const GameEndingPage: React.FC<GameEndingPageProps> = ({ result, onPlayAgain, onLoadSave, onContinuePlaying }) => {
   // 渲染单个评价项
   const renderEvaluationItem = (
     label: string,
@@ -151,6 +151,9 @@ const GameEndingPage: React.FC<GameEndingPageProps> = ({ result, onPlayAgain, on
 
       {/* 操作按钮 */}
       <div className="ending-buttons">
+        <button className="game-btn ending-btn ending-btn--continue" onClick={onContinuePlaying}>
+          继续游玩
+        </button>
         <button className="game-btn ending-btn" onClick={onPlayAgain}>
           再玩一次
         </button>
