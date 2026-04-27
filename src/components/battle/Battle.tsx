@@ -170,6 +170,9 @@ const Battle: React.FC<BattleProps> = ({
   // 战魂套装信息状态，用于对怪物属性压制和传递给敌人详情弹窗
   const [warSoulSetInfo, setWarSoulSetInfo] = useState<WarSoulSetInfo | null>(null);
 
+  // 战斗日志容器引用，用于自动滚动到底部
+  const logSectionRef = useRef<HTMLDivElement>(null);
+
   // 监听装备变化，更新战魂套装信息
   useEffect(() => {
     const setInfo = checkWarSoulSet(playerData.equipment);
@@ -344,6 +347,29 @@ const Battle: React.FC<BattleProps> = ({
   }, [battleState.enemies]);
 
   /**
+   * 战斗日志自动滚动到底部
+   * 当日志更新时，自动滚动到最新的日志条目
+   */
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (logSectionRef.current) {
+        requestAnimationFrame(() => {
+          if (logSectionRef.current) {
+            logSectionRef.current.scrollTop = logSectionRef.current.scrollHeight;
+          }
+        });
+      }
+    };
+
+    // 立即执行一次
+    scrollToBottom();
+    // 延迟执行一次，确保DOM完全更新
+    const timer = setTimeout(scrollToBottom, 100);
+
+    return () => clearTimeout(timer);
+  }, [battleState.battleLogs]);
+
+  /**
    * 监听props变化，更新战斗状态中的玩家和幻兽数据
    * 当角色或幻兽在战斗中升级时，需要更新战斗状态中的属性
    */
@@ -373,7 +399,8 @@ const Battle: React.FC<BattleProps> = ({
         currentStamina: playerLeveledUp ? playerData.currentStamina : prev.player.currentStamina,
       };
 
-      // 更新幻兽数据
+      // 更新幻兽数据并收集升级的幻兽
+      const leveledUpPets: BattlePet[] = [];
       const updatedPets = prev.deployedPets.map(battlePet => {
         // 在deployedPets中找到对应的幻兽
         const pet = deployedPets.find(p => p.id === battlePet.petId);
@@ -381,6 +408,14 @@ const Battle: React.FC<BattleProps> = ({
 
         // 检查幻兽是否升级（最大生命值增加）
         const petLeveledUp = pet.mhp > battlePet.maxHp;
+
+        // 如果幻兽升级了，记录下来
+        if (petLeveledUp) {
+          leveledUpPets.push({
+            ...battlePet,
+            level: pet.dj,
+          });
+        }
 
         // 更新幻兽属性
         return {
@@ -395,10 +430,46 @@ const Battle: React.FC<BattleProps> = ({
         };
       });
 
+      // 生成新的战斗日志数组
+      const newLogs = [...prev.battleLogs];
+      const currentLogId = prev.logIdCounter + 1;
+
+      // 添加玩家升级日志
+      if (playerLeveledUp) {
+        newLogs.push({
+          id: generateLogId(),
+          round: prev.round,
+          actor: updatedPlayer.name,
+          actorId: updatedPlayer.id,
+          action: `升级了！现在等级为 ${updatedPlayer.level}`,
+          actionType: 'buff',
+          damage: 0,
+          target: '',
+          targetId: '',
+        });
+      }
+
+      // 添加幻兽升级日志
+      leveledUpPets.forEach(pet => {
+        newLogs.push({
+          id: generateLogId(),
+          round: prev.round,
+          actor: pet.name,
+          actorId: pet.id,
+          action: `升级了！现在等级为 ${pet.level}`,
+          actionType: 'buff',
+          damage: 0,
+          target: '',
+          targetId: '',
+        });
+      });
+
       return {
         ...prev,
         player: updatedPlayer,
         deployedPets: updatedPets,
+        battleLogs: newLogs,
+        logIdCounter: currentLogId + leveledUpPets.length + (playerLeveledUp ? 1 : 0),
       };
     });
   }, [playerData, deployedPets]);
@@ -1554,7 +1625,7 @@ const Battle: React.FC<BattleProps> = ({
       </div>
 
       {/* 战斗日志区域 - 永远显示，参考首页交互日志 */}
-      <div className="battle-log-section">
+      <div className="battle-log-section" ref={logSectionRef}>
         <BattleLog logs={battleState.battleLogs} />
       </div>
 

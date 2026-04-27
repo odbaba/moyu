@@ -5,6 +5,7 @@
  */
 
 import type { EnemyData } from '../types';
+import { getExperienceMultiplier } from '../utils/developerMode';
 
 // ==================== PK赛分组配置 ====================
 
@@ -83,10 +84,10 @@ export interface PKMatchReward {
 }
 
 /**
- * PK赛奖励配置列表
+ * PK赛奖励配置列表（基础值）
  * 根据分组发放不同奖励
  */
-export const pkMatchRewards: PKMatchReward[] = [
+const pkMatchRewardsBase: PKMatchReward[] = [
   {
     group: 'level60',
     magicStone: 27000,
@@ -183,12 +184,23 @@ export function getPKMatchGroup(playerLevel: number): PKMatchGroupConfig {
 }
 
 /**
- * 根据分组获取PK赛奖励
+ * 根据分组获取PK赛奖励（根据开发者模式调整经验）
  * @param group PK赛分组
  * @returns PK赛奖励配置
  */
 export function getPKMatchReward(group: PKMatchGroup): PKMatchReward | undefined {
-  return pkMatchRewards.find(reward => reward.group === group);
+  const baseReward = pkMatchRewardsBase.find(reward => reward.group === group);
+  if (!baseReward) return undefined;
+  
+  // 根据开发者模式调整经验值
+  const multiplier = getExperienceMultiplier();
+  return {
+    ...baseReward,
+    exp: Math.floor(baseReward.exp * multiplier),
+    description: multiplier === 1 
+      ? baseReward.description 
+      : `${baseReward.magicStone}魔石、${Math.floor(baseReward.exp * multiplier)}经验、${baseReward.skillBook}${baseReward.specialItems.length > 0 ? '、' + baseReward.specialItems.join('、') : ''}`,
+  };
 }
 
 /**

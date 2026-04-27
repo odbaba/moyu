@@ -1,0 +1,17 @@
+- [x] gameEndingUtils.ts 中8个维度评价函数逻辑与参考文档一致
+- [x] gameEndingUtils.ts 中综合评语生成逻辑与参考文档一致（6种评语场景）
+- [x] 装备战斗力计算正确（品质+洞数+宝石+魔魂+战魂）
+- [x] 幻兽战斗力计算正确（复用 calculateAllPetsCombatPower）
+- [x] GameEndingResult 接口导出完整，包含所有8个维度的数值和称号
+- [x] GameEndingPage 组件正确展示结算结果（标题、天数、8维度、综合评语）
+- [x] GameEndingPage 样式适配手机一屏展示
+- [x] GameEndingPage 提供"再玩一次"和"读取存档"按钮
+- [x] "再玩一次"按钮点击后执行 window.location.reload()
+- [x] "读取存档"按钮点击后执行 window.location.reload()
+- [x] SaveData 新增 isWin 和 maxCombatPower 字段
+- [x] 旧存档加载时 isWin 默认 false，maxCombatPower 默认 0
+- [x] consumeTime 当 nowday > 60 时触发结算，isWin = false
+- [x] 地下城3层通关时先显示"救出国王"弹窗，点击确定后设置 isWin = true 并触发结算
+- [x] maxCombatPower 在战斗力变化时持续更新
+- [x] 保存/加载存档正确处理 isWin 和 maxCombatPower
+- [x] App.tsx 渲染逻辑中 showGameEnding 时显示结算页面

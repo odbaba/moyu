@@ -5,6 +5,7 @@
  */
 
 import type { InventoryItem, PetInstituteState, PlayerResources } from '../types';
+import { getExperienceMultiplier } from './developerMode';
 
 // ==================== 常量定义 ====================
 
@@ -31,8 +32,8 @@ export const PRODUCTION_TASK_SOUL_KING_COST: Record<number, number> = {
   7: 7,
 };
 
-/** 提高产量任务经验奖励映射（根据当前生产量） */
-export const PRODUCTION_TASK_EXP_REWARD: Record<number, number> = {
+/** 提高产量任务经验奖励映射（根据当前生产量）- 基础值 */
+const PRODUCTION_TASK_EXP_REWARD_BASE: Record<number, number> = {
   1: 105000,
   2: 210000,
   3: 315000,
@@ -41,6 +42,16 @@ export const PRODUCTION_TASK_EXP_REWARD: Record<number, number> = {
   6: 630000,
   7: 735000,
 };
+
+/**
+ * 获取提高产量任务经验奖励（根据开发者模式调整）
+ * @param productionRate 当前生产量
+ * @returns 经验奖励值
+ */
+export function getProductionTaskExpReward(productionRate: number): number {
+  const baseExp = PRODUCTION_TASK_EXP_REWARD_BASE[productionRate] || 0;
+  return Math.floor(baseExp * getExperienceMultiplier());
+}
 
 // ==================== 初始化函数 ====================
 
@@ -317,7 +328,7 @@ export function improveProduction(
     };
   }
 
-  const expGained = PRODUCTION_TASK_EXP_REWARD[state.productionRate] || 0;
+  const expGained = getProductionTaskExpReward(state.productionRate);
   const vipGained = 1;
 
   return {

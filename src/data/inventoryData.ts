@@ -1540,3 +1540,33 @@ export function findItemByName(name: string): InventoryItem | undefined {
 export function findItemById(id: string): InventoryItem | undefined {
   return exampleItems.find(item => item.id === id);
 }
+
+// ==================== 初始装备生成函数 ====================
+
+/**
+ * 创建初始装备（非开发者模式使用）
+ * 生成一套1级装备：
+ * - 武器：1级、魔魂等级9级、品质精品
+ * - 衣服：1级、魔魂等级9级、品质精品
+ * - 头盔：1级、魔魂等级0级、品质普通品
+ * - 鞋子：1级、魔魂等级0级、品质普通品
+ * - 手镯：1级、魔魂等级0级、品质普通品
+ * - 项链：1级、魔魂等级0级、品质普通品
+ * @returns 初始装备数组
+ */
+export function createInitialEquipment(): EquipmentItem[] {
+  return [
+    // 武器：精品、魔魂+9
+    createEquipment('weapon', 1, 3, 9, 0),
+    // 衣服：精品、魔魂+9
+    createEquipment('clothes', 1, 3, 9, 0),
+    // 头盔：普通品、魔魂+0
+    createEquipment('helmet', 1, 0, 0, 0),
+    // 鞋子：普通品、魔魂+0
+    createEquipment('shoes', 1, 0, 0, 0),
+    // 手镯：普通品、魔魂+0
+    createEquipment('bracelet', 1, 0, 0, 0),
+    // 项链：普通品、魔魂+0
+    createEquipment('necklace', 1, 0, 0, 0),
+  ];
+}

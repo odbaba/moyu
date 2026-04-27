@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 import type { BattleLogEntry } from '../../types';
 
@@ -95,24 +95,11 @@ const formatDamage = (damage: number, isHeal: boolean = false): string => {
  * 显示战斗过程中的详细日志信息
  * 包括回合数、行动者、行动、伤害、目标等信息
  * 支持特殊事件显示（闪避、破防、增益）
- * 并自动滚动到底部
+ * 自动滚动逻辑在父组件 Battle.tsx 中实现
  */
 const BattleLog: React.FC<BattleLogProps> = ({ logs }) => {
-  // 引用日志容器元素，用于自动滚动
-  const logContainerRef = useRef<HTMLDivElement>(null);
-
-  /**
-   * 自动滚动到底部的效果
-   * 当 logs 数组变化时，自动滚动到最新的日志
-   */
-  useEffect(() => {
-    if (logContainerRef.current) {
-      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
-    }
-  }, [logs]);
-
   return (
-    <div className="battle-log" ref={logContainerRef}>
+    <div className="battle-log">
       {/* 遍历日志数组，渲染每条战斗日志条目 */}
       {logs.map((log) => (
         <div key={log.id} className={getLogClassName(log)}>

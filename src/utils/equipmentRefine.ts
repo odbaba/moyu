@@ -5,6 +5,7 @@
  */
 
 import { calculateEquipmentBaseAttributes, getEquipmentName } from '../data/equipmentNames';
+import { getEquipmentImagePath } from '../data/equipmentImages';
 import type { EquipmentItem, EquipmentQuality, GemItem, RefineResult } from '../types';
 import { WarSoulType } from '../types';
 
@@ -90,7 +91,7 @@ export function isWeaponOrStone(item: unknown): 0 | 1 | 2 {
 
 /**
  * 更新装备名称和基础属性
- * 当装备使用等级提升后，更新装备名称和基础属性
+ * 当装备使用等级提升后，更新装备名称、基础属性和图片路径
  * @param equipment - 待更新的装备
  * @param newLevel - 新的使用等级
  */
@@ -98,6 +99,9 @@ function updateEquipmentNameAndAttributes(equipment: EquipmentItem, newLevel: nu
   // 更新装备名称
   const newName = getEquipmentName(equipment.equipmentType, newLevel);
   equipment.name = newName;
+
+  // 更新装备图片路径
+  equipment.imagePath = getEquipmentImagePath(equipment.equipmentType, newLevel);
 
   // 计算新的基础属性
   const baseAttributes = calculateEquipmentBaseAttributes(equipment.equipmentType, newLevel);
@@ -775,8 +779,13 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem, warSoulSyst
   if (gem.name === '战魂之心') {
     const hadSoul = equipment.soulType && equipment.soulType > WarSoulType.NONE;
 
-    // 随机战魂类型：天魂或地魂
-    equipment.soulType = Math.random() < 0.5 ? WarSoulType.TIAN_HUN : WarSoulType.DI_HUN;
+    // 战魂类型切换：天魂变地魂，地魂变天魂
+    if (hadSoul) {
+      equipment.soulType = equipment.soulType === WarSoulType.TIAN_HUN ? WarSoulType.DI_HUN : WarSoulType.TIAN_HUN;
+    } else {
+      // 无战魂时随机激活天魂或地魂
+      equipment.soulType = Math.random() < 0.5 ? WarSoulType.TIAN_HUN : WarSoulType.DI_HUN;
+    }
     equipment.soulLevel = 1;
 
     const soulTypeName = equipment.soulType === WarSoulType.TIAN_HUN ? '天魂' : '地魂';

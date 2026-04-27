@@ -40,6 +40,8 @@ interface PetFusionModalProps {
   onRemovePet: (petId: string) => void;
   /** 更新背包物品回调 */
   onUpdateInventory: (inventory: InventoryItem[]) => void;
+  /** 幻兽升级幸运值增加回调 */
+  onLuckChange?: (bonus: number) => void;
 }
 
 /**
@@ -59,6 +61,7 @@ const PetFusionModal: React.FC<PetFusionModalProps> = ({
   onUpdatePet,
   onRemovePet,
   onUpdateInventory,
+  onLuckChange,
 }) => {
   // ==================== 状态管理 ====================
 
@@ -322,6 +325,11 @@ const PetFusionModal: React.FC<PetFusionModalProps> = ({
       newInventory.splice(expOrbIndex, 1);
     }
     onUpdateInventory(newInventory);
+
+    // 幻兽升级增加角色幸运值
+    if (onLuckChange && result.luckBonus > 0) {
+      onLuckChange(result.luckBonus);
+    }
 
     // 保留原始幻兽的顿悟参数（predj、prejy、premjy），避免顿悟数据丢失
     const updatedPet: Pet = {

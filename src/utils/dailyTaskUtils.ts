@@ -19,6 +19,7 @@ import type {
   InventoryItem,
   Pet,
 } from '../types';
+import { getExperienceMultiplier } from './developerMode';
 
 // ==================== 核心功能函数 ====================
 
@@ -750,7 +751,7 @@ export function calculateGemRequirement(playerLevel: number): {
 }
 
 /**
- * 计算收集宝石任务的奖励
+ * 计算收集宝石任务的奖励（根据开发者模式调整经验）
  * 参考文档：reference/docs/日常任务官交互逻辑文档.md 第118-126行
  * @param itemType 物品类型（'灵魂晶石' 或 '灵魂王'）
  * @param quantity 物品数量
@@ -760,9 +761,11 @@ export function calculateGemReward(
   itemType: string,
   quantity: number
 ): DailyTaskReward {
+  const multiplier = getExperienceMultiplier();
+  
   if (itemType === '灵魂晶石') {
     // 收集灵魂晶石：经验 = 30000 × 数量，功勋 = 500
-    const exp = 30000 * quantity;
+    const exp = Math.floor(30000 * quantity * multiplier);
 
     return {
       exp,
@@ -771,7 +774,7 @@ export function calculateGemReward(
     };
   } else {
     // 收集灵魂王：经验 = 210000 × 数量，功勋 = 2000
-    const exp = 210000 * quantity;
+    const exp = Math.floor(210000 * quantity * multiplier);
 
     return {
       exp,

@@ -6,6 +6,7 @@ import './components/character/character.css';
 import './components/inventory/inventory.css';
 import './components/cover/cover.css';
 import './components/settings/settings.css';
+import './components/game-ending/game-ending.css';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -23,6 +24,8 @@ import GiftSelectModal from './components/common/GiftSelectModal';
 import InfoModal from './components/common/InfoModal';
 // 导入组件 - 封面页模块
 import { CoverPage } from './components/cover';
+// 导入组件 - 游戏结算页模块
+import { GameEndingPage } from './components/game-ending';
 // 导入组件 - 首页模块
 import {
   InteractionButtons,
@@ -52,13 +55,13 @@ import { exampleCharacter } from './data/characterData';
 // 导入数据
 import { locations } from './data/gameData';
 import { generateBossInteractables, generateWumingshiInteractable, interactableConfig } from './data/interactableData';
-import { exampleItems } from './data/inventoryData';
+import { exampleItems, createInitialEquipment } from './data/inventoryData';
 import { examplePets } from './data/petData';
 // 导入PK赛配置数据
 import { createPKBossEnemyData, getPKMatchGroup, getPKMatchReward, isSaturday } from './data/pkMatchData';
 import { getShopItemById } from './data/shopData';
 import { createInitialSkills, getSkillUpgradeCost } from './data/skillData';
-import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, DailyTaskState, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, MapChallengeState, NPCInteractable, Pet, PetInstituteState, PetType, PlayerResources, PrincessRelationship, RefineResult, SkillDetail, TimeSystem } from './types';
+import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, DailyTaskState, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, MapChallengeState, NPCInteractable, Pet, PetInstituteState, PetType, PlayerResources, PrincessRelationship, RefineResult, RelationshipLevel, SkillDetail, TimeSystem } from './types';
 import { gainCharacterExperience } from './utils/attributeCalculator';
 // 导入 BOSS 工具函数
 import { rollBossSpawns, rollSpecialMonsterSpawns } from './utils/bossUtils';
@@ -90,7 +93,7 @@ import { calculateLoot, mergeLootResults } from './utils/lootUtils';
 // 导入爱的力量技能
 import { checkLovePower } from './utils/lovePowerSkill';
 // 导入幸运值工具函数
-import { decreaseLuck, isLuckZero, LUCK_CONSTANTS } from './utils/luckUtils';
+import { decreaseLuck, increaseLuck, isLuckZero, LUCK_CONSTANTS } from './utils/luckUtils';
 import {
   canChallengeToday,
   canClaimReward,
@@ -119,8 +122,8 @@ import {
   createInitialPetInstituteState,
   dailyReset,
   getInstituteInfo,
+  getProductionTaskExpReward,
   MAX_PRODUCTION_RATE,
-  PRODUCTION_TASK_EXP_REWARD,
   PRODUCTION_TASK_SOUL_KING_COST,
   weeklyReset,
 } from './utils/petInstituteUtils';
@@ -135,6 +138,10 @@ import { learnSkillFromBook } from './utils/skillLearnUtils';
 import { useBackgroundMusic } from './utils/useBackgroundMusic';
 // 导入战魂物品掉落工具函数
 import { checkWarSoulDrop } from './utils/warSoulDropUtils';
+// 导入游戏结算工具函数
+import { calculateGameEnding, type GameEndingParams, type GameEndingResult } from './utils/gameEndingUtils';
+// 导入开发者模式配置
+import { isDeveloperMode, getInitialGold, getInitialMagicStone, getMiningTimeCost } from './utils/developerMode';
 
 // 初始化空装备槽位
 const createEmptyEquippedItems = (): Record<EquipmentSlotType, EquipmentDetail | null> => ({
@@ -155,7 +162,8 @@ const createInitialTimeSystem = (): TimeSystem => ({
 
 function App() {
   // 游戏状态管理
-  const [currentLocation, setCurrentLocation] = useState('kasanuocheng');
+  // 初始位置设置为雷鸣大陆（新游戏开始位置）
+  const [currentLocation, setCurrentLocation] = useState('leiming-dalu');
   const [interactionLog, setInteractionLog] = useState<string[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showMap, setShowMap] = useState(false);
@@ -163,15 +171,17 @@ function App() {
   const [timeSystem, setTimeSystem] = useState<TimeSystem>(createInitialTimeSystem);
   // 玩家资源状态
   const [playerResources, setPlayerResources] = useState<PlayerResources>({
-    gold: 12568000000, // 初始金币
-    magicStone: 100000000, // 初始魔石
+    gold: getInitialGold(), // 初始金币（根据开发者模式决定）
+    magicStone: getInitialMagicStone(), // 初始魔石（根据开发者模式决定）
     battleExp: 0, // 战功
     merit: 0, // 功勋
   });
   // 角色状态（改为状态管理，支持经验值增加和升级）
   const [character, setCharacter] = useState<CharacterData>(exampleCharacter);
-  // 背包状态
-  const [inventory, setInventory] = useState<InventoryItem[]>(exampleItems);
+  // 背包状态（根据开发者模式决定初始物品）
+  const [inventory, setInventory] = useState<InventoryItem[]>(
+    isDeveloperMode ? exampleItems : createInitialEquipment()
+  );
   // 装备槽位状态
   const [equippedItems, setEquippedItems] = useState<Record<EquipmentSlotType, EquipmentDetail | null>>(createEmptyEquippedItems);
   // 战斗状态
@@ -276,6 +286,15 @@ function App() {
   // 默认为 true，进入游戏时先显示封面页
   const [showCover, setShowCover] = useState(true);
 
+  // 游戏结算页面状态
+  const [showGameEnding, setShowGameEnding] = useState(false);
+  // 是否胜利（击败最终BOSS/通关地下城3层）
+  const [isWin, setIsWin] = useState(false);
+  // 历史最高战斗力记录
+  const [maxCombatPower, setMaxCombatPower] = useState(0);
+  // 结算结果（用于传递给 GameEndingPage）
+  const [gameEndingResult, setGameEndingResult] = useState<GameEndingResult | null>(null);
+
   // 设置页面状态
   const [showSettingsPage, setShowSettingsPage] = useState(false);
 
@@ -304,7 +323,7 @@ function App() {
   // ========== 背景音乐管理 ==========
   // 使用背景音乐 Hook，设置音乐文件路径和初始音量
   const { play: playBackgroundMusic, pause: pauseBackgroundMusic } = useBackgroundMusic({
-    src: '/audio/19_back.mp3',
+    src: './audio/19_back.mp3',
     autoPlay: false, // 不自动播放，等进入游戏后播放
     volume: musicVolume / 100, // 将 0-100 转换为 0-1
     loop: true // 循环播放
@@ -391,7 +410,7 @@ function App() {
       // 恢复爵位
       setNobleRank(savedData.nobleRank ?? 0);
       // 恢复公主关系（兼容旧存档，处理 weeklyRoseGiftCount 到 canGiftThisWeek 的迁移）
-      const oldWeeklyCount = (savedData.princessRelationship as Record<string, unknown>).weeklyRoseGiftCount;
+      const oldWeeklyCount = (savedData.princessRelationship as unknown as Record<string, unknown>).weeklyRoseGiftCount;
       const canGiftThisWeek = savedData.princessRelationship.canGiftThisWeek ?? (oldWeeklyCount ? (oldWeeklyCount as number) <= 0 : true);
       setPrincessRelationship({
         ...savedData.princessRelationship,
@@ -425,6 +444,9 @@ function App() {
       setHasUsedDianJiangYaoShuiToday(savedData.hasUsedDianJiangYaoShuiToday ?? false);
       // 恢复幻兽研究所状态
       setPetInstituteState(savedData.petInstituteState ?? createInitialPetInstituteState());
+      // 恢复游戏结算状态
+      setIsWin(savedData.isWin ?? false);
+      setMaxCombatPower(savedData.maxCombatPower ?? 0);
       // 更新 prevDayRef 为存档中的天数，防止继续游戏时触发每日初始化
       prevDayRef.current = savedData.timeSystem?.nowday ?? 1;
     }
@@ -593,6 +615,8 @@ function App() {
 
   // 用于防止提高产量任务重复执行
   const productionTaskExecutedRef = useRef(false);
+  // 战斗中幻兽升级累计的幸运值增加量（用于在战斗结束时统一应用）
+  const battlePetLevelUpLuckRef = useRef(0);
 
   // 当战魂系统状态或无名氏击败状态或PK赛参与状态或国王救出状态变化时，不再自动保存
   // 改为手动保存（菜单中"保存游戏"按钮触发）
@@ -634,6 +658,8 @@ function App() {
       hasPurchasedYearPig,
       hasUsedDianJiangYaoShuiToday,
       petInstituteState,
+      isWin,
+      maxCombatPower,
     };
     const success = saveGame(saveData);
     // 在交互日志中显示保存结果
@@ -651,7 +677,7 @@ function App() {
     mysteriousPersonTriggered, wumingshiDefeated, warSoulSystemEnabled,
     killedMonsters, spawnedBosses, spawnedSpecialMonsters, _dailyTaskState, mapChallengeState,
     hasParticipatedPKToday, maid1DailyPurchaseCount, hasPurchasedYearPig,
-    hasUsedDianJiangYaoShuiToday, petInstituteState,
+    hasUsedDianJiangYaoShuiToday, petInstituteState, isWin, maxCombatPower,
   ]);
 
   // 游戏初始化时的第一天日志和 BOSS 刷新
@@ -822,6 +848,7 @@ function App() {
   /**
    * 消耗时间单位
    * 增加已用时间单位，如果超过一天上限则进入下一天
+   * 当游戏天数超过60天时，触发游戏结束（失败结局）
    * @param units 消耗的时间单位数量
    */
   const consumeTime = useCallback((units: number) => {
@@ -830,10 +857,21 @@ function App() {
 
       // 如果超过一天的时间上限，进入下一天
       if (newNowtime >= prev.onedaytime) {
+        const newNowday = prev.nowday + 1;
+        // 检查是否超过60天
+        if (newNowday > 60) {
+          // 超过60天，游戏结束（失败结局）
+          // 注意：这里不能直接设置状态，需要通过 useEffect 处理
+          return {
+            ...prev,
+            nowtime: 0,
+            nowday: newNowday
+          };
+        }
         return {
           ...prev,
           nowtime: 0,
-          nowday: prev.nowday + 1
+          nowday: newNowday
         };
       }
 
@@ -1044,15 +1082,45 @@ function App() {
     }
   }, [timeSystem.nowday, handleNewDay]);
 
+  // 监听游戏天数，处理游戏结束（60天结束）
+  useEffect(() => {
+    // 当天数超过60天时，触发游戏结束（失败结局）
+    if (timeSystem.nowday > 60 && !showGameEnding) {
+      // 设置失败状态
+      setIsWin(false);
+      // 计算结算结果
+      const params: GameEndingParams = {
+        isWin: false,
+        daysPassed: timeSystem.nowday - 1, // 实际完成的天数
+        maxCombatPower,
+        level: character.level,
+        equipment: character.equipment,
+        pets,
+        militaryRankLevel: militaryRank,
+        militaryRankName: getMilitaryRankName(militaryRank),
+        nobleRankLevel: nobleRank,
+        nobleRankName: getNobleRankName(nobleRank),
+        relationshipLevel: princessRelationship.level,
+        relationshipName: princessRelationship.relationshipName,
+        gold: playerResources.gold,
+        magicStone: playerResources.magicStone,
+      };
+      const result = calculateGameEnding(params);
+      setGameEndingResult(result);
+      // 显示结算页面
+      setShowGameEnding(true);
+    }
+  }, [timeSystem.nowday, showGameEnding, maxCombatPower, character.level, character.equipment, pets, militaryRank, nobleRank, princessRelationship.level, princessRelationship.relationshipName, playerResources.gold, playerResources.magicStone]);
+
   /**
    * 挖矿逻辑
    * 挖到金矿概率30%，银矿概率70%，品质1-10概率相等
-   * 消耗1个时间单位
+   * 消耗时间单位根据开发者模式配置
    * @param miningName 挖矿类型名称
    */
   const handleMining = (miningName: string) => {
-    // TODO：暂时调试消耗15个时间单位，后续改回1个时间单位
-    consumeTime(15);
+    // 根据开发者模式配置消耗时间单位
+    consumeTime(getMiningTimeCost());
 
     // 决定矿石类型：30%金矿，70%银矿
     const isGold = Math.random() < 0.3;
@@ -1429,7 +1497,7 @@ function App() {
             }
 
             // 检查是否需要学习技能（关系等级提升到恋人或亲密恋人时）
-            const skillUnlock = checkSkillUnlock(princessRelationship.level, chatResult.newLevel);
+            const skillUnlock = checkSkillUnlock(princessRelationship.level, chatResult.newLevel as RelationshipLevel);
             if (skillUnlock) {
               const skillResult = learnLovePowerSkill(skills, skillUnlock.skillLevel);
               if (skillResult.success) {
@@ -1907,6 +1975,7 @@ function App() {
                   }, 0);
 
                   // 给战中幻兽增加相同经验（带加成）
+                  let totalLuckBonus = 0;
                   setPets(prevPets => {
                     return prevPets.map(pet => {
                       // 只给出战的幻兽分配经验
@@ -1922,9 +1991,20 @@ function App() {
                         setInteractionLog(logs => [...logs, result.message!]);
                       }
 
+                      // 累计幻兽升级带来的幸运值增加量
+                      totalLuckBonus += result.luckBonus;
+
                       return result.pet;
                     });
                   });
+
+                  // 幻兽升级增加角色幸运值
+                  if (totalLuckBonus > 0) {
+                    setCharacter(prev => ({
+                      ...prev,
+                      luck: increaseLuck(prev.luck, totalLuckBonus)
+                    }));
+                  }
 
                   // 打印战中幻兽获得经验的日志
                   const deployedCount = pets.filter(p => p.isDeployed).length;
@@ -2445,7 +2525,7 @@ function App() {
         if (petInstituteState.canDoProductionTask && petInstituteState.productionRate < MAX_PRODUCTION_RATE) {
           // 计算所需灵魂王和经验奖励
           const requiredSoulKings = PRODUCTION_TASK_SOUL_KING_COST[petInstituteState.productionRate] || 0;
-          const expReward = PRODUCTION_TASK_EXP_REWARD[petInstituteState.productionRate] || 0;
+          const expReward = getProductionTaskExpReward(petInstituteState.productionRate);
 
           // 构建弹窗内容
           const content = `提高产量任务已开放！\n\n所需灵魂王：${requiredSoulKings} 个\n经验奖励：${expReward}\n完成次数：${petInstituteState.productionRate} / ${MAX_PRODUCTION_RATE}`;
@@ -2497,6 +2577,7 @@ function App() {
                   }
 
                   // 更新幻兽经验
+                  let totalLuckBonus = 0;
                   setPets(prevPets => {
                     return prevPets.map(pet => {
                       if (!pet.isDeployed) return pet;
@@ -2505,11 +2586,22 @@ function App() {
                         setInteractionLog(logs => [...logs, petResult.message!]);
                       }
 
+                      // 累计幻兽升级带来的幸运值增加量
+                      totalLuckBonus += petResult.luckBonus;
+
                       return petResult.pet;
                     });
                   });
 
                   setInteractionLog(prevLog => [...prevLog, `完成提高产量任务！生产量+1，获得经验 ${bonusExp.toLocaleString()}，VIP星级 +1`]);
+
+                  // 幻兽升级增加角色幸运值
+                  if (totalLuckBonus > 0) {
+                    return {
+                      ...charResult.character,
+                      luck: increaseLuck(charResult.character.luck, totalLuckBonus)
+                    };
+                  }
 
                   return charResult.character;
                 });
@@ -2577,7 +2669,10 @@ function App() {
           // 7. 标记今日已参加
           setHasParticipatedPKToday(true);
 
-          // 8. 开始战斗
+          // 8. 设置战斗交互ID（用于战斗结束时判断战斗类型）
+          setCurrentBattleInteractableId('pk_match_boss');
+
+          // 9. 开始战斗
           setBattleParams({
             enemyTemplateId: 'boss',
             enemyLevel: bossData.level!,
@@ -2586,7 +2681,7 @@ function App() {
           });
           setInBattle(true);
 
-          // 9. 显示报名成功消息
+          // 10. 显示报名成功消息
           const registerMessage = `你报名参加了PK赛${groupConfig.name}！\n正在挑战：${bossData.name}`;
           setInteractionLog(prev => [...prev, registerMessage]);
         }
@@ -2886,6 +2981,9 @@ function App() {
 
         // 如果升级了，更新幻兽属性
         if (leveledUp) {
+          // 累计幻兽升级带来的幸运值增加量
+          battlePetLevelUpLuckRef.current += (newLevel - pet.dj);
+
           // 添加幻兽升级提示到交互日志
           setInteractionLog(logs => [...logs, `🎉 ${pet.othername}升级了！等级提升到 ${newLevel} 级！`]);
 
@@ -2945,13 +3043,19 @@ function App() {
         // 检查角色是否升级了
         // 如果角色的最大生命值（maxHp）大于战斗结束时的最大生命值，说明升级了
         // 升级后应该保持满血状态，而不是用战斗中的血量覆盖
+        // 战斗中幻兽升级累计的幸运值增加量
+        const petLevelUpLuckBonus = battlePetLevelUpLuckRef.current;
+        battlePetLevelUpLuckRef.current = 0; // 重置
+
         if (prev.maxHp > finalPlayerState.maxHp) {
           // 角色升级了，保持升级后的满血状态，但同步幸运值
           return {
             ...prev,
             currentHp: prev.maxHp, // 使用升级后的最大生命值作为当前生命值
             currentStamina: prev.maxStamina, // 战斗结束后体力恢复至最大值
-            luck: finalPlayerState.luck, // 同步战斗结束时的幸运值
+            luck: petLevelUpLuckBonus > 0
+              ? increaseLuck(finalPlayerState.luck, petLevelUpLuckBonus)
+              : finalPlayerState.luck, // 同步战斗结束时的幸运值并加上幻兽升级带来的幸运值
           };
         }
 
@@ -2960,7 +3064,9 @@ function App() {
           ...prev,
           currentHp: Math.max(1, finalPlayerState.currentHp), // 至少保留1点HP
           currentStamina: prev.maxStamina, // 战斗结束后体力恢复至最大值
-          luck: finalPlayerState.luck, // 同步战斗结束时的幸运值
+          luck: petLevelUpLuckBonus > 0
+            ? increaseLuck(finalPlayerState.luck, petLevelUpLuckBonus)
+            : finalPlayerState.luck, // 同步战斗结束时的幸运值并加上幻兽升级带来的幸运值
         };
       });
     }
@@ -3138,6 +3244,32 @@ function App() {
                 `奖励：12,000功勋、极品一洞+12${equipmentNames[randomType]}、${specialItemName}、200,000魔石`
               );
             }
+            // 设置弹窗确定回调：点击确定后进入游戏结算页面（胜利结局）
+            setInfoModalOnConfirm(() => () => {
+              // 设置胜利状态
+              setIsWin(true);
+              // 计算结算结果
+              const params: GameEndingParams = {
+                isWin: true,
+                daysPassed: timeSystem.nowday,
+                maxCombatPower,
+                level: character.level,
+                equipment: character.equipment,
+                pets,
+                militaryRankLevel: nobleRank >= 5 ? 6 : militaryRank, // 如果授予王爵位，使用新的爵位
+                militaryRankName: getMilitaryRankName(militaryRank),
+                nobleRankLevel: nobleRank >= 5 ? 6 : nobleRank,
+                nobleRankName: getNobleRankName(nobleRank >= 5 ? 6 : nobleRank),
+                relationshipLevel: princessRelationship.level,
+                relationshipName: princessRelationship.relationshipName,
+                gold: playerResources.gold,
+                magicStone: playerResources.magicStone,
+              };
+              const result = calculateGameEnding(params);
+              setGameEndingResult(result);
+              // 显示结算页面
+              setShowGameEnding(true);
+            });
           } else {
             // 国王已被救出，只发放奖励
             setInfoModalTitle('地下城3层完成');
@@ -3151,6 +3283,21 @@ function App() {
       // 魔族大军被击杀后，更新 _dailyTaskState 中对应的 mj_ 变量为 false
       if (demonArmyKey) {
         const newTaskState = { ..._dailyTaskState, [demonArmyKey]: false };
+        setDailyTaskState(newTaskState);
+      }
+
+      // ========== 冰雪巨人击杀处理 ==========
+      // 冰雪巨人被击杀后，更新 _dailyTaskState 中对应的 gw_xybj 变量为 false
+      const iceGiantBattleMap: Record<string, keyof typeof _dailyTaskState> = {
+        'interact-xueyu-shibing-1': 'gw_xybj_1',
+        'interact-xueyu-shibing-2': 'gw_xybj_2',
+        'interact-xueyu-shiguan-1': 'gw_xybj_3',
+        'interact-xueyu-junguan': 'gw_xybj_4',
+        'interact-xueyu-shiguan-2': 'gw_xybj_5',
+      };
+      const iceGiantBattleKey = iceGiantBattleMap[currentBattleInteractableId];
+      if (iceGiantBattleKey) {
+        const newTaskState = { ..._dailyTaskState, [iceGiantBattleKey]: false };
         setDailyTaskState(newTaskState);
       }
 
@@ -3339,6 +3486,7 @@ function App() {
             }, 0);
 
             // 给战中幻兽增加相同经验
+            let totalLuckBonus = 0;
             setPets(prevPets => {
               return prevPets.map(pet => {
                 if (!pet.isDeployed) return pet;
@@ -3347,9 +3495,21 @@ function App() {
                   setInteractionLog(logs => [...logs, result.message!]);
                 }
 
+                // 累计幻兽升级带来的幸运值增加量
+                totalLuckBonus += result.luckBonus;
+
                 return result.pet;
               });
             });
+
+            // 幻兽升级增加角色幸运值
+            if (totalLuckBonus > 0) {
+              setCharacter(prev => ({
+                ...prev,
+                luck: increaseLuck(prev.luck, totalLuckBonus)
+              }));
+            }
+
             rewardMessages.push(`• ${bonusExp.toLocaleString()} 经验`);
           }
 
@@ -3798,6 +3958,15 @@ function App() {
         }).filter(item => item.quantity > 0); // 移除数量为0的物品
       }
 
+      // 处理摘除宝石：将摘除的宝石添加回背包
+      if (result.success && result.attributeChanges?.removedGem) {
+        const removedGemName = result.attributeChanges.removedGem as string;
+        const gemItem = createItemFromTemplate(removedGemName, 1);
+        if (gemItem) {
+          updated = addItemToInventory(updated, gemItem);
+        }
+      }
+
       // 如果精炼成功，更新背包装备
       if (result.success && result.updatedEquipment) {
         // 检查是否是角色装备
@@ -4077,6 +4246,9 @@ function App() {
     const pet = pets.find(p => p.id === petId);
     const previousLevel = pet?.dj || 0;
 
+    // 记录幻兽升级带来的幸运值增加量
+    let totalLuckBonus = 0;
+
     // 使用 gainExperience 函数处理经验获取和升级
     setPets(prev => prev.map(pet => {
       if (pet.id === petId) {
@@ -4088,11 +4260,22 @@ function App() {
           setInteractionLog(prev => [...prev, result.message!]);
         }
 
+        // 累计幻兽升级带来的幸运值增加量
+        totalLuckBonus += result.luckBonus;
+
         return result.pet;
       }
 
       return pet;
     }));
+
+    // 幻兽升级增加角色幸运值
+    if (totalLuckBonus > 0) {
+      setCharacter(prev => ({
+        ...prev,
+        luck: increaseLuck(prev.luck, totalLuckBonus)
+      }));
+    }
 
     // 减少物品数量，并更新 currentUseItem
     setInventory(prev => {
@@ -4350,6 +4533,15 @@ function App() {
     };
   }, [pets, character, equippedItems, nobleRank, militaryRank]);
 
+  // 更新历史最高战斗力
+  // 当当前战斗力 > 历史最高战斗力时，更新历史最高战斗力
+  useEffect(() => {
+    const currentCombatPower = calculateTotalCombatPower(characterWithPetBonus, pets, skills);
+    if (currentCombatPower > maxCombatPower) {
+      setMaxCombatPower(currentCombatPower);
+    }
+  }, [characterWithPetBonus, pets, skills, maxCombatPower]);
+
   // 构建 NPC 游戏状态对象
   // 包含战魂系统开启状态，用于NPC选项条件判断
   const npcGameState = useMemo(() => ({
@@ -4371,6 +4563,15 @@ function App() {
           onContinueGame={handleContinueGame}
           hasSaveData={hasSaveData()}
         />
+      ) : showGameEnding ? (
+        /* 游戏结算页面 */
+        gameEndingResult && (
+          <GameEndingPage
+            result={gameEndingResult}
+            onPlayAgain={() => window.location.reload()}
+            onLoadSave={() => window.location.reload()}
+          />
+        )
       ) : inBattle ? (
         /* 战斗界面 */
         <Battle
@@ -4706,6 +4907,12 @@ function App() {
             onUpdatePet={handleUpdatePet}
             onRemovePet={handleRemovePet}
             onUpdateInventory={setInventory}
+            onLuckChange={(bonus) => {
+              setCharacter(prev => ({
+                ...prev,
+                luck: increaseLuck(prev.luck, bonus)
+              }));
+            }}
           />
 
           {/* 捐献金币弹窗 */}

@@ -88,6 +88,10 @@ export interface SaveData {
   hasUsedDianJiangYaoShuiToday: boolean;
   // 幻兽研究所状态
   petInstituteState: PetInstituteState;
+  // 是否击败最终BOSS（通关地下城3层）
+  isWin: boolean;
+  // 历史最高战斗力记录
+  maxCombatPower: number;
 }
 
 /**

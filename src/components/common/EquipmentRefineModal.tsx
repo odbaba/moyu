@@ -1,6 +1,6 @@
 import './EquipmentRefineModal.css';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, InventoryItem, RefineResult } from '../../types';
 import { equipmentDetailToItem, getEquipmentDisplayName } from '../../utils/equipmentConverter';
@@ -70,6 +70,28 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
 
   // 精炼结果反馈状态
   const [refineResult, setRefineResult] = useState<RefineResult | null>(null);
+
+  // 自动清除精炼结果的定时器ID
+  const refineResultTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 设置精炼结果并自动清除旧的定时器
+  const setRefineResultWithCleanup = (result: RefineResult | null) => {
+    // 清除旧的定时器
+    if (refineResultTimerRef.current !== null) {
+      clearTimeout(refineResultTimerRef.current);
+      refineResultTimerRef.current = null;
+    }
+    setRefineResult(result);
+  };
+
+  // 组件卸载时清除定时器
+  useEffect(() => {
+    return () => {
+      if (refineResultTimerRef.current !== null) {
+        clearTimeout(refineResultTimerRef.current);
+      }
+    };
+  }, []);
 
   // 是否显示选择列表
   const [showSelection, setShowSelection] = useState(false);
@@ -174,7 +196,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
     onEquipmentChange(item as EquipmentItem);
     setShowSelection(false);
     // 换装备时清空精炼结果提示
-    setRefineResult(null);
+    setRefineResultWithCleanup(null);
   };
 
   /**
@@ -185,7 +207,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
     onGemChange(item as GemItem);
     setShowSelection(false);
     // 换宝石时清空精炼结果提示
-    setRefineResult(null);
+    setRefineResultWithCleanup(null);
   };
 
   /**
@@ -194,7 +216,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
   const handleRemoveEquipment = () => {
     onEquipmentChange(null);
     // 移除装备时清空精炼结果提示
-    setRefineResult(null);
+    setRefineResultWithCleanup(null);
   };
 
   /**
@@ -203,7 +225,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
   const handleRemoveGem = () => {
     onGemChange(null);
     // 移除宝石时清空精炼结果提示
-    setRefineResult(null);
+    setRefineResultWithCleanup(null);
   };
 
   /**
@@ -224,12 +246,13 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
     // 调用回调
     onRefine(result);
 
-    // 显示结果
-    setRefineResult(result);
+    // 显示结果（自动清除旧的定时器）
+    setRefineResultWithCleanup(result);
 
     // 5秒后自动清除结果
-    setTimeout(() => {
+    refineResultTimerRef.current = setTimeout(() => {
       setRefineResult(null);
+      refineResultTimerRef.current = null;
     }, 5000);
   };
 
@@ -239,7 +262,7 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
    */
   const handleRefine = () => {
     if (!equipment || !gem) {
-      setRefineResult({
+      setRefineResultWithCleanup({
         success: false,
         message: '请先选择装备和宝石！'
       });
@@ -281,12 +304,13 @@ const EquipmentRefineModal: React.FC<EquipmentRefineModalProps> = ({
     // 调用回调
     onRefine(result);
 
-    // 显示结果
-    setRefineResult(result);
+    // 显示结果（自动清除旧的定时器）
+    setRefineResultWithCleanup(result);
 
     // 5秒后自动清除结果
-    setTimeout(() => {
+    refineResultTimerRef.current = setTimeout(() => {
       setRefineResult(null);
+      refineResultTimerRef.current = null;
     }, 5000);
   };
 

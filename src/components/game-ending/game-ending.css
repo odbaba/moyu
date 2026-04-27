@@ -1,0 +1,190 @@
+/**
+ * 游戏结算页面样式
+ * 全屏深色背景，居中布局，手机端一屏展示
+ */
+
+/* 结算页面容器 - 全屏居中 */
+.game-ending-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #252935;
+  padding: 16px;
+  overflow-y: auto;
+  gap: 12px;
+}
+
+/* 标题 - 金色发光效果 */
+.ending-title {
+  color: #ffd700;
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-shadow:
+    0 0 10px rgba(255, 215, 0, 0.6),
+    0 0 20px rgba(255, 215, 0, 0.4);
+  margin: 0;
+  text-align: center;
+}
+
+/* 天数描述 */
+.ending-days {
+  color: #FCFFFF;
+  font-size: 1rem;
+  margin: 0;
+  text-align: center;
+}
+
+/* 评价项容器 */
+.ending-evaluations {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 单个评价项 */
+.ending-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  gap: 4px;
+}
+
+/* 评价项标签 */
+.ending-label {
+  color: #FCFFFF;
+  flex-shrink: 0;
+}
+
+/* 评价项数值 */
+.ending-value {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+/* 评价项称号 */
+.ending-title {
+  color: #88ff88;
+  font-size: 1.5rem;
+}
+
+/* 综合评语区域 */
+.ending-overall {
+  width: 100%;
+  max-width: 360px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+/* 综合评语标题 */
+.ending-overall-title {
+  color: #ffd700;
+  font-size: 1rem;
+  margin: 0 0 8px 0;
+}
+
+/* 综合评语内容 */
+.ending-overall-content {
+  color: #FCFFFF;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+  text-indent: 2em;
+}
+
+/* 按钮区域 */
+.ending-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+  width: 100%;
+  max-width: 360px;
+}
+
+/* 结算页面按钮 */
+.ending-btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  min-width: 120px;
+}
+
+/* 手机端响应式 - 确保一屏展示 */
+@media (max-width: 768px) {
+  .game-ending-page {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .ending-title {
+    font-size: 1rem;
+  }
+
+  .ending-days {
+    font-size: 0.9rem;
+  }
+
+  .ending-evaluations {
+    gap: 6px;
+  }
+
+  .ending-item {
+    font-size: 0.8rem;
+  }
+
+  .ending-overall {
+    padding: 10px;
+  }
+
+  .ending-overall-title {
+    font-size: 0.9rem;
+  }
+
+  .ending-overall-content {
+    font-size: 0.85rem;
+  }
+
+  .ending-buttons {
+    gap: 12px;
+  }
+
+  .ending-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    min-width: 100px;
+  }
+}
+
+/* 小屏手机适配 */
+@media (max-width: 375px) {
+  .ending-title {
+    font-size: 0.8rem;
+  }
+
+  .ending-item {
+    font-size: 0.75rem;
+  }
+
+  .ending-overall-content {
+    font-size: 0.8rem;
+  }
+
+  .ending-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    min-width: 90px;
+  }
+}

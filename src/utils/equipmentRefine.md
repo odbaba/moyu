@@ -143,6 +143,8 @@ const heartGem: GemItem = { ...levelGem, name: '幻魔之心' };
 const result2 = refineUseLevel(equipment, heartGem, playerLevel);
 ```
 
+**注意**：使用等级提升成功后，装备的名称、基础属性和图片路径都会自动更新为新等级对应的值。图片路径格式为 `./images/equipment/{equipmentType}/lv{useLevel}.png`。
+
 ## 5. 开洞
 
 ```typescript
@@ -339,16 +341,19 @@ console.log(result);
 
 ## 10. 摘除宝石
 
-从装备上摘除指定位置的宝石。摘除宝石时，如果装备有战魂且战魂等级>1，战魂等级降为1：
+从装备上摘除指定位置的宝石。摘除宝石时，如果装备有战魂且战魂等级>1，战魂等级降为1。摘除的宝石会返回到玩家背包中：
 
 ```typescript
 // 摘除第一个宝石（索引0）
 const result = removeGem(equipment, 0);
 console.log(result);
-// { success: true, message: '成功摘除高级战斗力石！ 摘除宝石操作使战魂的等级下降为1级', ... }
+// { success: true, message: '成功摘除高级战斗力石！ 摘除宝石操作使战魂的等级下降为1级', attributeChanges: { removedGem: '高级战斗力石', ... } }
 
 // 摘除第二个宝石（索引1）
 const result2 = removeGem(equipment, 1);
+
+// 注意：摘除宝石后，attributeChanges.removedGem 包含被摘除宝石的名称
+// 调用方需要将宝石添加回背包（使用 createItemFromTemplate 创建宝石物品）
 ```
 
 ## 11. 战魂系统开关参数
@@ -433,7 +438,7 @@ if (setInfo.isActivated) {
 5. **镶嵌**：高级宝石会提升战魂等级（最高5级）
 6. **战魂**：战魂之心100%成功，战魂晶石仅20%成功率
 7. **升极品战魂**：升极品时已有战魂则等级+1，无战魂则2.5%概率激活（需战魂系统已开启）
-8. **摘除宝石**：摘除宝石会使战魂等级降为1（如果等级>1）
+8. **摘除宝石**：摘除宝石会使战魂等级降为1（如果等级>1），摘除的宝石会返回背包
 9. **战魂系统开关**：使用战魂相关功能前需先击败无名氏开启战魂系统
 10. **战魂套装**：6件装备战魂类型一致时激活套装效果，天魂套装降低怪物战斗力，地魂套装降低怪物生命值
 

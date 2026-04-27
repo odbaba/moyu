@@ -307,6 +307,12 @@
   color: #FCFFFF;
 }
 
+/* 时间提示（在60天内救出国王） */
+.time-hint {
+  font-size: 0.7rem;
+  color: #888;
+}
+
 /* 时间进度条容器 */
 .time-progress {
   display: flex;

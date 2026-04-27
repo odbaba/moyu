@@ -66,6 +66,7 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({
       {/* 天数和星期显示 */}
       <div className="time-info">
         <span className="time-day">第{nowday}天</span>
+        <span className="time-hint">（请在60天内救出国王）</span>
         <span className="time-weekday">{weekday}</span>
       </div>
 
