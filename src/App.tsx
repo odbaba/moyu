@@ -89,7 +89,7 @@ import { consumeMaterials, getRecipeById, performSynthesis } from './utils/gemSy
 // 导入物品工厂工具函数
 import { addItemToInventory, cloneItem, createEquipmentItem, createItemFromTemplate, ITEM_TEMPLATES, randomGemSlots } from './utils/itemFactory';
 // 导入战利品工具函数
-import { calculateLoot, mergeLootResults } from './utils/lootUtils';
+import { calculateLoot, calculateSpecialMonsterLoot, isSpecialMonster, mergeLootResults } from './utils/lootUtils';
 // 导入爱的力量技能
 import { checkLovePower } from './utils/lovePowerSkill';
 // 导入幸运值工具函数
@@ -1130,6 +1130,11 @@ function App() {
             // 传送回卡萨诺城
             setCurrentLocation('kasanuocheng');
             setInteractionLog(prev => [...prev, '你被传送回了卡萨诺城！']);
+          } else if (interactable.actionParams?.action === 'teleportToLottery') {
+            // 传送至抽奖区
+            setCurrentLocation('lottery-area');
+            setShowLottery(true);
+            setInteractionLog(prev => [...prev, '你被传送到了抽奖区！']);
           }
           break;
         // 可扩展其他动作类型
@@ -2756,12 +2761,14 @@ function App() {
    * @param quantity 出售数量
    * @param goldEarned 获得的金币
    * @param magicStoneEarned 获得的魔石
+   * @param itemName 物品名称（可选，用于日志显示）
    */
   const handleSellItem = (
     itemId: string,
     quantity: number,
     goldEarned: number,
-    magicStoneEarned: number = 0
+    magicStoneEarned: number = 0,
+    itemName?: string
   ) => {
     // 增加金币
     if (goldEarned > 0) {
@@ -2802,7 +2809,8 @@ function App() {
     });
 
     // 构建日志消息
-    let logMessage = `出售成功：${itemId} × ${quantity}`;
+    const displayName = itemName || itemId;
+    let logMessage = `出售成功：${displayName} × ${quantity}`;
     if (goldEarned > 0 && magicStoneEarned > 0) {
       logMessage += `，获得 ${goldEarned} 金币和 ${magicStoneEarned} 魔石`;
     } else if (goldEarned > 0) {
@@ -3369,6 +3377,41 @@ function App() {
         // 将战魂物品掉落消息添加到交互日志
         if (warSoulDropMessages.length > 0) {
           setInteractionLog(prev => [...prev, ...warSoulDropMessages]);
+        }
+
+        // ========== 特殊怪物掉落处理 ==========
+        // 蜘蛛和蜘蛛王后艾达有独特的掉落规则
+        // 参考文档：reference/docs/project_docs/04_怪物系统.md
+        const specialMonsterDropMessages: string[] = [];
+
+        battleParams.enemiesData.forEach(enemy => {
+          // 检查是否为特殊怪物（蜘蛛或蜘蛛王后艾达）
+          if (isSpecialMonster(enemy.id)) {
+            // 计算暴率
+            const dropRate = 1 + (character.luck + 1) / 100;
+
+            // 计算特殊怪物掉落
+            const specialLoot = calculateSpecialMonsterLoot(enemy.id, dropRate);
+
+            // 如果有掉落物品，添加到背包
+            if (specialLoot.items.length > 0) {
+              setInventory(prev => {
+                let newInventory = [...prev];
+                for (const lootItem of specialLoot.items) {
+                  newInventory = addItemToInventory(newInventory, lootItem);
+                }
+                return newInventory;
+              });
+
+              // 记录掉落消息
+              specialMonsterDropMessages.push(...specialLoot.messages);
+            }
+          }
+        });
+
+        // 将特殊怪物掉落消息添加到交互日志
+        if (specialMonsterDropMessages.length > 0) {
+          setInteractionLog(prev => [...prev, ...specialMonsterDropMessages]);
         }
       } else {
         setInteractionLog(prev => [...prev, '战斗胜利！你击败了所有敌人。']);
@@ -4673,6 +4716,7 @@ function App() {
             onClose={() => setShowInventoryPage(false)}
             onUseItem={handleUseItem}
             onEquipItem={handleEquipItem}
+            onSell={handleSellItem}
           />
 
           {/* 技能页面 */}

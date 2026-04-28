@@ -66,6 +66,15 @@ interface InventoryPageProps {
    * 装备物品回调（用于装备详情弹窗）
    */
   onEquipItem?: (item: EquipmentItem) => void;
+  /**
+   * 出售物品回调
+   * @param itemId 物品ID
+   * @param quantity 出售数量
+   * @param goldEarned 获得的金币
+   * @param magicStoneEarned 获得的魔石
+   * @param itemName 物品名称（可选，用于日志显示）
+   */
+  onSell?: (itemId: string, quantity: number, goldEarned: number, magicStoneEarned?: number, itemName?: string) => void;
 }
 
 /**
@@ -81,7 +90,8 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
   characterLevel,
   onClose,
   onUseItem,
-  onEquipItem
+  onEquipItem,
+  onSell
 }) => {
   /**
    * 物品详情弹窗显示状态
@@ -132,6 +142,47 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
 
     return items.filter(item => selectedCategories.includes(item.type));
   }, [items, selectedCategories]);
+
+  /**
+   * 获取所有普通品装备
+   * 用于一键售出功能
+   */
+  const commonEquipments = useMemo(() => {
+    return items.filter(item => 
+      isEquipmentItem(item) && item.equipmentQuality === '普通品'
+    ) as EquipmentItem[];
+  }, [items]);
+
+  /**
+   * 计算普通品装备的总金币价值
+   */
+  const commonEquipmentsTotalGold = useMemo(() => {
+    return commonEquipments.reduce((total, item) => {
+      // 金币价值公式：100 * useLevel * (equipmentQuality + 1) + 100 * magicSoulLevel + 10000 * holeCount³
+      // 普通品 equipmentQuality = 0
+      const useLevel = item.useLevel || 1;
+      const magicSoulLevel = item.magicSoulLevel || 0;
+      const holeCount = item.holeCount || 0;
+      const goldValue = 100 * useLevel * 1 + 100 * magicSoulLevel + 10000 * Math.pow(holeCount, 3);
+      return total + goldValue;
+    }, 0);
+  }, [commonEquipments]);
+
+  /**
+   * 处理一键售出普通品装备
+   */
+  const handleSellCommonEquipments = () => {
+    if (!onSell || commonEquipments.length === 0) return;
+
+    // 逐个出售普通品装备
+    commonEquipments.forEach(item => {
+      const useLevel = item.useLevel || 1;
+      const magicSoulLevel = item.magicSoulLevel || 0;
+      const holeCount = item.holeCount || 0;
+      const goldValue = 100 * useLevel * 1 + 100 * magicSoulLevel + 10000 * Math.pow(holeCount, 3);
+      onSell(item.id, 1, goldValue, 0, item.name);
+    });
+  };
 
   /**
    * 处理物品点击事件
@@ -187,6 +238,16 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
         {/* 页面顶部关闭按钮 */}
         <div className="inventory-page-header">
           <h2 className="inventory-page-title">背包</h2>
+          {/* 一键售出白品装备按钮 */}
+          {onSell && commonEquipments.length > 0 && (
+            <button
+              className="game-btn"
+              onClick={handleSellCommonEquipments}
+              title={`售出 ${commonEquipments.length} 件白品装备，获得 ${commonEquipmentsTotalGold.toLocaleString()} 金币`}
+            >
+              售出白品装备 ({commonEquipments.length})
+            </button>
+          )}
           <button
             className="inventory-page-close-button"
             onClick={onClose}

@@ -158,20 +158,13 @@ export const locations: LocationData = [
     y: 1
   },
   {
-    // 抽奖区：独立地点，七个宝箱 + 返回按钮
+    // 抽奖区：独立地点，宝箱 + 返回按钮
     id: 'lottery-area',
     name: '抽奖区',
-    description: '神秘的抽奖房间，七个宝箱等待着幸运的冒险者',
+    description: '神秘的抽奖房间，宝箱等待着幸运的冒险者',
     adjacentLocations: [],
     interactables: [
-      'lottery_box_1',
-      'lottery_box_2',
-      'lottery_box_3',
-      'lottery_box_4',
-      'lottery_box_5',
-      'lottery_box_6',
-      'lottery_box_7',
-      'lottery_return_button'
+      'enter_lottery',
     ],
     x: 10,
     y: 1

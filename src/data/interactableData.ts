@@ -74,6 +74,19 @@ const teleport_to_kasanuocheng: ActionInteractable = {
   actionParams: { action: 'teleportToKasanuocheng' },
 };
 
+/**
+ * 进入抽奖区交互配置
+ * 点击后直接传送至抽奖区，无需弹窗
+ */
+const enter_lottery: ActionInteractable = {
+  id: 'enter_lottery',
+  type: 'action',
+  name: '进入抽奖',
+  icon: '🎰',
+  actionType: 'custom',
+  actionParams: { action: 'teleportToLottery' },
+};
+
 // ==================== 敌人交互配置 ====================
 
 /**
@@ -168,6 +181,8 @@ export const interactableConfig: InteractableConfig = {
   mining_4,
   // 传送动作交互
   teleport_to_kasanuocheng,
+  // 进入抽奖区交互
+  enter_lottery,
   // 敌人交互
   patrol_soldiers,
   // NPC交互

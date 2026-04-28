@@ -12,6 +12,15 @@ import {
   lingHunWang,
   yueGuangBaoHe,
   yueGuangBaoHeZengQiangBan,
+  // 特殊怪物掉落物品
+  xingMoJian,
+  gaoJiXingMoJian,
+  feiTianLianZhan,
+  gaoJiFeiTianLianZhan,
+  douZhiYiYang,
+  gaoJiDouZhiYiYang,
+  moHunZhiXin,
+  huanMoZhiXin,
 } from '../data/inventoryData';
 import type { EquipmentItem, InventoryItem } from '../types';
 import { cloneItem, generateItemId } from './itemFactory';
@@ -243,4 +252,134 @@ export function mergeLootResults(results: LootResult[]): LootResult {
   }
 
   return merged;
+}
+
+/**
+ * 特殊怪物ID列表
+ * 用于判断是否为特殊怪物
+ */
+const SPECIAL_MONSTER_IDS = [
+  'zhizhu',                    // 蜘蛛
+  'zhizhu-wanghou-aida',       // 蜘蛛王后艾达
+];
+
+/**
+ * 检查是否为特殊怪物
+ * @param monsterId 怪物ID
+ * @returns 是否为特殊怪物
+ */
+export function isSpecialMonster(monsterId: string): boolean {
+  // 检查怪物ID是否包含特殊怪物标识
+  return SPECIAL_MONSTER_IDS.some(id => monsterId.includes(id)) ||
+         monsterId.includes('zhizhu') || // 蜘蛛相关
+         monsterId.includes('spider');   // 英文标识
+}
+
+/**
+ * 计算特殊怪物战利品
+ * 蜘蛛和蜘蛛王后艾达有独特的掉落规则
+ *
+ * 参考文档：reference/docs/project_docs/04_怪物系统.md
+ *
+ * @param monsterId 怪物ID（用于判断是哪种特殊怪物）
+ * @param dropRate 暴率
+ * @returns 战利品结果
+ */
+export function calculateSpecialMonsterLoot(monsterId: string, dropRate: number): { items: InventoryItem[]; messages: string[] } {
+  const items: InventoryItem[] = [];
+  const messages: string[] = [];
+
+  // 判断是蜘蛛还是蜘蛛王后艾达
+  const isZhizhuWanghou = monsterId.includes('zhizhu-wanghou') ||
+                          monsterId.includes('wanghou') ||
+                          monsterId.includes('spider_queen');
+
+  if (isZhizhuWanghou) {
+    // ========== 蜘蛛王后艾达掉落（80级） ==========
+    // 参考文档：reference/docs/project_docs/04_怪物系统.md
+
+    // 高级斗志昂扬 (20% × 暴率)
+    if (Math.random() * 100 < 20 * dropRate) {
+      items.push(cloneItem(gaoJiDouZhiYiYang));
+      messages.push('获得: 高级斗志昂扬');
+    }
+
+    // 高级星魔剑 (20% × 暴率)
+    if (Math.random() * 100 < 20 * dropRate) {
+      items.push(cloneItem(gaoJiXingMoJian));
+      messages.push('获得: 高级星魔剑');
+    }
+
+    // 高级飞天连斩 (10% × 暴率)
+    if (Math.random() * 100 < 10 * dropRate) {
+      items.push(cloneItem(gaoJiFeiTianLianZhan));
+      messages.push('获得: 高级飞天连斩');
+    }
+
+    // 灵魂晶石 (80% × 暴率)
+    if (Math.random() * 100 < 80 * dropRate) {
+      items.push(cloneItem(lingHunJingShi));
+      messages.push('获得: 灵魂晶石');
+    }
+
+    // 灵魂王 (30% × 暴率)
+    if (Math.random() * 100 < 30 * dropRate) {
+      items.push(cloneItem(lingHunWang));
+      messages.push('获得: 灵魂王');
+    }
+
+    // 幻魔之心 (30% × 暴率)
+    if (Math.random() * 100 < 30 * dropRate) {
+      items.push(cloneItem(huanMoZhiXin));
+      messages.push('获得: 幻魔之心');
+    }
+
+    // 魔魂之心 (30% × 暴率)
+    if (Math.random() * 100 < 30 * dropRate) {
+      items.push(cloneItem(moHunZhiXin));
+      messages.push('获得: 魔魂之心');
+    }
+
+    // 月光宝盒增强版 (5% × 暴率)
+    if (Math.random() * 100 < 5 * dropRate) {
+      items.push(cloneItem(yueGuangBaoHeZengQiangBan));
+      messages.push('获得: 月光宝盒增强版');
+    }
+
+  } else {
+    // ========== 蜘蛛掉落（45级） ==========
+    // 参考文档：reference/docs/project_docs/04_怪物系统.md
+
+    // 斗志昂扬 (15% × 暴率)
+    if (Math.random() * 100 < 15 * dropRate) {
+      items.push(cloneItem(douZhiYiYang));
+      messages.push('获得: 斗志昂扬');
+    }
+
+    // 飞天连斩 (25% × 暴率)
+    if (Math.random() * 100 < 25 * dropRate) {
+      items.push(cloneItem(feiTianLianZhan));
+      messages.push('获得: 飞天连斩');
+    }
+
+    // 星魔剑 (30% × 暴率)
+    if (Math.random() * 100 < 30 * dropRate) {
+      items.push(cloneItem(xingMoJian));
+      messages.push('获得: 星魔剑');
+    }
+
+    // 灵魂晶石 (30% × 暴率)
+    if (Math.random() * 100 < 30 * dropRate) {
+      items.push(cloneItem(lingHunJingShi));
+      messages.push('获得: 灵魂晶石');
+    }
+
+    // 月光宝盒 (5% × 暴率)
+    if (Math.random() * 100 < 5 * dropRate) {
+      items.push(cloneItem(yueGuangBaoHe));
+      messages.push('获得: 月光宝盒');
+    }
+  }
+
+  return { items, messages };
 }

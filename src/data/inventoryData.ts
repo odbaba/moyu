@@ -1570,3 +1570,10 @@ export function createInitialEquipment(): EquipmentItem[] {
     createEquipment('necklace', 1, 0, 0, 0),
   ];
 }
+
+// ==================== 特殊怪物掉落物品导出 ====================
+
+// 技能书类 - 蜘蛛掉落
+export { xingMoJian, gaoJiXingMoJian, feiTianLianZhan, gaoJiFeiTianLianZhan, douZhiYiYang, gaoJiDouZhiYiYang };
+// 宝石类 - 蜘蛛王后艾达掉落
+export { moHunZhiXin, huanMoZhiXin };
