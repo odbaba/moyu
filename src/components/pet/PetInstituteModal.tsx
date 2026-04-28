@@ -215,6 +215,9 @@ const PetInstituteModal: React.FC<PetInstituteModalProps> = ({
             >
               购买奇异兽
             </button>
+            {!buyCheck.canBuy && state.techLevel < 20 && (
+              <p className="buy-hint">需要研究所达到20级</p>
+            )}
           </div>
 
           {/* 消息提示 */}

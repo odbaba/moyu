@@ -795,7 +795,7 @@ const npc_pet_institute: NPCInteractable = {
   type: 'npc',
   name: '幻兽研究所',
   icon: '🔬',
-  description: '专门研究幻兽培养技术的机构。可以购买奇异兽，提升VIP等级享受折扣。',
+  description: '为了提升勇士们幻兽的战斗力，国家投资100,000魔石成立了幻兽研究所，专门研究提升幻兽星级的技术。\n 　　幻兽研究所的技术每星期提升10%，每资助10,000魔石可以提升1级技术。当技术等级达到20级以上时就可以生产高星级奇异兽。每个勇士都可以购买这些极品幻兽，由于受生产量有限，所有数量也不会很多。现在生产量已经达到最高了。',
   location: 'kasanuocheng',
   npcType: 'function',
   options: [
