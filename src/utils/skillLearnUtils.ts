@@ -47,6 +47,7 @@ export function learnSkillFromBook(
   const targetSkill = currentSkills[skillIndex];
   const isUpgrade = skillBook.isUpgrade || false;
   const targetLevel = skillBook.targetLevel || 1;
+  const isIncrementalUpgrade = skillBook.isIncrementalUpgrade || false;
 
   // 4. 检查是否可以学习
   if (isUpgrade) {
@@ -59,13 +60,27 @@ export function learnSkillFromBook(
       };
     }
 
-    // 检查是否可以升级到目标等级（允许跳级升级）
-    if (targetSkill.level >= targetLevel) {
-      return {
-        success: false,
-        message: `${targetSkill.name} 已达到或超过该等级`,
-        updatedSkills: currentSkills
-      };
+    // 逐级升级技能书（如高级斗志昂扬）：每次使用等级+1
+    if (isIncrementalUpgrade) {
+      // 斗志昂扬最高等级为5级
+      const maxLevel = targetSkill.skillIndex === 4 ? 5 : (targetSkill.maxLevel || 2);
+      
+      if (targetSkill.level >= maxLevel) {
+        return {
+          success: false,
+          message: `${targetSkill.name} 已达到最高等级`,
+          updatedSkills: currentSkills
+        };
+      }
+    } else {
+      // 固定等级升级技能书：检查是否可以升级到目标等级（允许跳级升级）
+      if (targetSkill.level >= targetLevel) {
+        return {
+          success: false,
+          message: `${targetSkill.name} 已达到或超过该等级`,
+          updatedSkills: currentSkills
+        };
+      }
     }
   } else {
     // 学习新技能书：需要未学习该技能
@@ -84,13 +99,15 @@ export function learnSkillFromBook(
 
   if (isUpgrade) {
     // 升级技能
-    newSkill.level = targetLevel;
+    // 逐级升级：等级+1
+    const newLevel = isIncrementalUpgrade ? targetSkill.level + 1 : targetLevel;
+    newSkill.level = newLevel;
     newSkill.isLearned = true;
     updatedSkills[skillIndex] = newSkill;
 
     return {
       success: true,
-      message: `恭喜！${targetSkill.name} 升级成功！当前等级：Lv.${targetLevel}`,
+      message: `恭喜！${targetSkill.name} 升级成功！当前等级：Lv.${newLevel}`,
       updatedSkills
     };
   } else {

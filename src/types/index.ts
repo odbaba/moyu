@@ -289,6 +289,7 @@ export interface InventoryItem {
   skillId?: string; // 技能书关联的技能ID
   isUpgrade?: boolean; // 是否为升级技能书
   targetLevel?: number; // 升级目标等级
+  isIncrementalUpgrade?: boolean; // 是否为逐级升级技能书（每次使用等级+1）
 }
 
 // ========== 装备类物品扩展接口 ==========

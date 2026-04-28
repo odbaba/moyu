@@ -6,6 +6,8 @@
 
 import type { GemItem, InventoryItem } from '../types';
 import { cloneItem, ITEM_TEMPLATES } from './itemFactory';
+// 导入怪物刷新配置，用于从 enemy.id 中提取 templateId
+import { monsterSpawnConfigs } from '../data/monsterData';
 
 // ==================== 类型定义 ====================
 
@@ -309,13 +311,42 @@ function getWarSoulItemTemplate(itemType: WarSoulItemType): GemItem | null {
 }
 
 /**
+ * 从敌人ID中提取怪物模板ID
+ * 敌人ID格式：${spawnId}_enemy_${i+1} 或 ${templateId}_enemy_${i+1}
+ * @param enemyId 敌人ID
+ * @returns 怪物模板ID，如果无法提取则返回原始ID
+ */
+function extractTemplateIdFromEnemyId(enemyId: string): string {
+  // 尝试从 enemy.id 中提取 spawnId（去掉 '_enemy_X' 后缀）
+  const enemyMatch = enemyId.match(/^(.+)_enemy_\d+$/);
+  if (enemyMatch) {
+    const spawnId = enemyMatch[1];
+    
+    // 通过 spawnId 在 monsterSpawnConfigs 中查找 templateId
+    const spawnConfig = monsterSpawnConfigs.find(config => config.id === spawnId);
+    if (spawnConfig) {
+      return spawnConfig.templateId;
+    }
+    
+    // 如果找不到 spawnConfig，返回 spawnId（可能是 templateId）
+    return spawnId;
+  }
+  
+  // 如果不匹配 enemy.id 格式，直接返回原始ID
+  return enemyId;
+}
+
+/**
  * 获取怪物的战魂物品掉落配置
- * @param monsterId 怪物ID
+ * @param monsterId 怪物ID（可以是 templateId、spawnId 或 enemy.id）
  * @returns 该怪物的战魂物品掉落配置，如果没有配置则返回null
  */
 export function getWarSoulDropConfig(monsterId: string): WarSoulDropConfig | null {
-  // 首先尝试精确匹配怪物ID
-  const config = WAR_SOUL_DROP_CONFIGS.find((c) => c.monsterId === monsterId);
+  // 从 enemy.id 中提取 templateId
+  const templateId = extractTemplateIdFromEnemyId(monsterId);
+  
+  // 首先尝试精确匹配怪物模板ID
+  const config = WAR_SOUL_DROP_CONFIGS.find((c) => c.monsterId === templateId);
   if (config) {
     return config;
   }
@@ -323,7 +354,7 @@ export function getWarSoulDropConfig(monsterId: string): WarSoulDropConfig | nul
   // 如果没有找到，尝试根据怪物名称匹配
   // 这是为了兼容可能使用不同ID格式的情况
   const configByName = WAR_SOUL_DROP_CONFIGS.find(
-    (c) => c.monsterName === monsterId || c.monsterId.includes(monsterId) || monsterId.includes(c.monsterId)
+    (c) => c.monsterName === templateId || c.monsterId.includes(templateId) || templateId.includes(c.monsterId)
   );
 
   return configByName || null;
@@ -331,18 +362,20 @@ export function getWarSoulDropConfig(monsterId: string): WarSoulDropConfig | nul
 
 /**
  * 检查怪物是否为BOSS级怪物
- * @param monsterId 怪物ID
+ * @param monsterId 怪物ID（可以是 templateId、spawnId 或 enemy.id）
  * @returns 是否为BOSS级怪物
  */
 export function isBossMonster(monsterId: string): boolean {
-  return BOSS_MONSTER_IDS.includes(monsterId);
+  // 从 enemy.id 中提取 templateId
+  const templateId = extractTemplateIdFromEnemyId(monsterId);
+  return BOSS_MONSTER_IDS.includes(templateId);
 }
 
 /**
  * 检查战魂物品掉落
  * 根据怪物ID和战魂系统开启状态，计算掉落的战魂物品
  *
- * @param monsterId 怪物ID
+ * @param monsterId 怪物ID（可以是 templateId、spawnId 或 enemy.id）
  * @param warSoulSystemEnabled 战魂系统是否已开启
  * @returns 掉落的战魂物品列表（可能为空）
  *
@@ -355,6 +388,11 @@ export function isBossMonster(monsterId: string): boolean {
  * // 魔军突击队击败，战魂系统已开启
  * const drops = checkWarSoulDrop('mojun-tujidui', true);
  * // drops: 可能为战魂之心（25%概率）或战魂晶石（75%概率）或两者都有或都没有
+ *
+ * @example
+ * // 冰雪巨人军官击败，战魂系统已开启（使用 enemy.id 格式）
+ * const drops = checkWarSoulDrop('spawn-xueyu-junguan_enemy_1', true);
+ * // drops: [{ name: '战魂之心', ... }]（100%掉落）
  */
 export function checkWarSoulDrop(
   monsterId: string,

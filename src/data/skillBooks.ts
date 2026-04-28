@@ -118,66 +118,6 @@ export const skillBookItems: InventoryItem[] = [
     skillId: 'skill_fighting_spirit',
     targetLevel: 1
   },
-  {
-    id: 'skillbook_fighting_spirit_2',
-    name: '斗志昂扬进阶卷轴',
-    icon: '📜',
-    type: 'skillBook',
-    description: '将斗志昂扬升级至Lv.2，战斗力加成提升至10%。',
-    quantity: 1,
-    quality: 3,
-    price: 5000,
-    stackable: false,
-    usable: true,
-    skillId: 'skill_fighting_spirit',
-    isUpgrade: true,
-    targetLevel: 2
-  },
-  {
-    id: 'skillbook_fighting_spirit_3',
-    name: '斗志昂扬精修卷轴',
-    icon: '📜',
-    type: 'skillBook',
-    description: '将斗志昂扬升级至Lv.3，战斗力加成提升至20%。',
-    quantity: 1,
-    quality: 4,
-    price: 10000,
-    stackable: false,
-    usable: true,
-    skillId: 'skill_fighting_spirit',
-    isUpgrade: true,
-    targetLevel: 3
-  },
-  {
-    id: 'skillbook_fighting_spirit_4',
-    name: '斗志昂扬大师卷轴',
-    icon: '📜',
-    type: 'skillBook',
-    description: '将斗志昂扬升级至Lv.4，战斗力加成提升至35%。',
-    quantity: 1,
-    quality: 4,
-    price: 20000,
-    stackable: false,
-    usable: true,
-    skillId: 'skill_fighting_spirit',
-    isUpgrade: true,
-    targetLevel: 4
-  },
-  {
-    id: 'skillbook_fighting_spirit_5',
-    name: '斗志昂扬宗师卷轴',
-    icon: '📜',
-    type: 'skillBook',
-    description: '将斗志昂扬升级至最高等级Lv.5，战斗力加成提升至50%。',
-    quantity: 1,
-    quality: 5,
-    price: 50000,
-    stackable: false,
-    usable: true,
-    skillId: 'skill_fighting_spirit',
-    isUpgrade: true,
-    targetLevel: 5
-  }
 ];
 
 /**

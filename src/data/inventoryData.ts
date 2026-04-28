@@ -716,7 +716,7 @@ const gaoJiDouZhiYiYang: SkillBookItem = {
   type: 'skillBook',
   rarity: 'legendary',
   source: '蜘蛛王后艾达、PK赛奖励',
-  description: '记载着高级斗志昂扬技能的秘籍，是斗志昂扬的升级版，大幅提升战斗力。',
+  description: '记载着高级斗志昂扬技能的秘籍，是斗志昂扬的升级版，每次使用可提升斗志昂扬1级，最高可升至5级。',
   maxStack: 1,
   usable: true,
   equippable: false,
@@ -728,7 +728,7 @@ const gaoJiDouZhiYiYang: SkillBookItem = {
   magicStoneValue: 25000,
   imagePath: './images/items/skillbook/gaojidouzhiyiyang.png',
   isUpgrade: true,
-  targetLevel: 2
+  isIncrementalUpgrade: true
 };
 
 /**
