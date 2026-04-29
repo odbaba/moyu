@@ -538,7 +538,6 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
       success: false,
       message: '请使用月光宝盒或月光宝盒增强版',
       updatedEquipment: { ...equipment },
-      usedGem: { ...gem }
     };
   }
 
@@ -552,7 +551,6 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
         success: false,
         message: '该装备已有洞，请使用月光宝盒增强版开第二个洞',
         updatedEquipment: { ...equipment },
-        usedGem: { ...gem }
       };
     }
 
@@ -585,7 +583,6 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
         success: false,
         message: '该装备还没有洞，请先使用月光宝盒开第一个洞',
         updatedEquipment: { ...equipment },
-        usedGem: { ...gem }
       };
     }
 
@@ -594,7 +591,6 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
         success: false,
         message: '装备已达到最大洞数（2个），无法继续开洞',
         updatedEquipment: { ...equipment },
-        usedGem: { ...gem }
       };
     }
 
@@ -624,7 +620,6 @@ export function refineOpenHole(equipment: EquipmentItem, gem: GemItem, warSoulSy
     success: false,
     message: '开洞失败',
     updatedEquipment: { ...equipment },
-    usedGem: { ...gem }
   };
 }
 

@@ -1021,6 +1021,8 @@ function App() {
         ...prev,
         canGiftThisWeek: true,
       }));
+      // 重置军饷领取状态（每周可领取一次）
+      setHasClaimedMilitaryPay(false);
     }
 
     // 星期六PK大赛提示（只在当天第一次显示）
