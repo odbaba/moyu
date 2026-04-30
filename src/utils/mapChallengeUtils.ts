@@ -211,7 +211,8 @@ export function getProtectorRewardPreview(locationId: string): string {
   preview += `• 满经验球 × ${reward.expBalls}\n`;
   preview += `• ${reward.soulStoneType} × ${reward.soulStones}\n`;
   if (reward.whiteRoses && reward.roseType) {
-    preview += `• ${reward.roseType}白玫瑰 × ${reward.whiteRoses}\n`;
+    // 玫瑰物品数量固定为1（一个'999朵白玫瑰'物品就代表999朵玫瑰）
+    preview += `• ${reward.roseType}白玫瑰 × 1\n`;
   }
   if (reward.skillReward) {
     preview += `• 技能书：${reward.skillReward}\n`;
@@ -318,7 +319,8 @@ export function getMapChallengeDescription(config: MapChallengeConfig): string {
   description += `• 满经验球 × ${reward.expBalls}\n`;
   description += `• ${reward.soulStoneType} × ${reward.soulStones}\n`;
   if (reward.whiteRoses && reward.roseType) {
-    description += `• ${reward.roseType}白玫瑰\n`;
+    // 玫瑰物品数量固定为1（一个'999朵白玫瑰'物品就代表999朵玫瑰）
+    description += `• ${reward.roseType}白玫瑰 × 1\n`;
   }
   if (reward.skillReward) {
     description += `• 技能：${reward.skillReward}\n`;

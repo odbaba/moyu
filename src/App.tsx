@@ -1907,7 +1907,15 @@ function App() {
         // 根据任务类型执行不同操作
         switch (task.type) {
           case 'collect': {
-            // 收集宝石任务
+            // 收集宝石任务（周一、周二）
+            // 检查任务是否已完成
+            if (!_dailyTaskState.rw_bs) {
+              const message = '今天的收集宝石任务已完成，请明天再来！';
+              setInteractionLog(prev => [...prev, message]);
+              addFloatingText(message);
+              break;
+            }
+
             const requirement = calculateGemRequirement(character.level);
             const reward = calculateGemReward(requirement.type, requirement.quantity);
 
@@ -2017,7 +2025,15 @@ function App() {
           }
 
           case 'train': {
-            // 训练幻兽任务
+            // 训练幻兽任务（周三、周四）
+            // 检查任务是否已完成
+            if (!_dailyTaskState.rw_hs) {
+              const message = '今天的训练幻兽任务已完成，请明天再来！';
+              setInteractionLog(prev => [...prev, message]);
+              addFloatingText(message);
+              break;
+            }
+
             const validPets = getValidPetsForTraining(pets);
 
             if (validPets.length > 0) {
@@ -2241,12 +2257,14 @@ function App() {
 
           // 发放白玫瑰
           if (reward.whiteRoses && reward.whiteRoses > 0 && reward.roseType) {
-            const roseName = reward.roseType;
-            const roseItem = createItemFromTemplate(roseName, reward.whiteRoses);
+            // 将roseType转换为完整的物品名称（'99朵' -> '99朵白玫瑰'，'999朵' -> '999朵白玫瑰'）
+            const roseName = reward.roseType + '白玫瑰';
+            // 玫瑰物品数量固定为1（一个'999朵白玫瑰'物品就代表999朵玫瑰）
+            const roseItem = createItemFromTemplate(roseName, 1);
             if (roseItem) {
               // 使用统一的物品添加函数，处理堆叠合并
               setInventory(prev => addItemToInventory(prev, roseItem));
-              rewardMessages.push(`• ${roseName} × ${reward.whiteRoses}`);
+              rewardMessages.push(`• ${roseName} × 1`);
             }
           }
 
