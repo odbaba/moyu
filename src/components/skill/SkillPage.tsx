@@ -18,10 +18,6 @@ interface SkillPageProps {
   skills?: SkillDetail[];
   /** 关闭按钮点击回调 */
   onClose: () => void;
-  /** 技能升级回调 */
-  onUpgradeSkill?: (skillId: string) => void;
-  /** 当前金币数量（用于判断是否可以升级） */
-  gold?: number;
 }
 
 /**
@@ -33,9 +29,7 @@ interface SkillPageProps {
 const SkillPage: React.FC<SkillPageProps> = ({
   isVisible,
   skills = exampleSkills,
-  onClose,
-  onUpgradeSkill,
-  gold = 0
+  onClose
 }) => {
   /** 当前选中的技能ID */
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
@@ -65,13 +59,6 @@ const SkillPage: React.FC<SkillPageProps> = ({
     setShowDetailModal(false);
     setSelectedSkillId(null);
   }, []);
-
-  /** 处理技能升级 */
-  const handleUpgradeSkill = useCallback((skillId: string) => {
-    if (onUpgradeSkill) {
-      onUpgradeSkill(skillId);
-    }
-  }, [onUpgradeSkill]);
 
   /** 处理覆盖层点击事件 */
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -134,8 +121,6 @@ const SkillPage: React.FC<SkillPageProps> = ({
           isVisible={showDetailModal}
           skill={selectedSkill}
           onClose={handleCloseDetailModal}
-          onUpgrade={handleUpgradeSkill}
-          gold={gold}
         />
       </div>
     </div>

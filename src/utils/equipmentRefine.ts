@@ -169,7 +169,6 @@ export function refineQuality(equipment: EquipmentItem, gem: GemItem, warSoulSys
       success: false,
       message: '装备已达到最高品质（极品），无法继续提升',
       updatedEquipment: { ...equipment },
-      usedGem: { ...gem }
     };
   }
 
@@ -297,7 +296,6 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, _warSoul
         success: false,
         message: '魔魂之心只能将魔魂等级提升到+9，当前等级已达到或超过+9，请使用魔魂晶石继续精炼',
         updatedEquipment: { ...equipment },
-        usedGem: { ...gem }
       };
     }
 
@@ -322,7 +320,7 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, _warSoul
       success: false,
       message: '魔魂等级已达到最高等级+12，无法继续精炼',
       updatedEquipment: { ...equipment },
-      usedGem: { ...gem }
+
     };
   }
 
@@ -347,15 +345,31 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, _warSoul
   }
 
   if (success) {
-    equipment.magicSoulLevel = currentLevel + 1;
+    const newLevel = currentLevel + 1;
+    equipment.magicSoulLevel = newLevel;
+
+    // 魔魂升到+12时，战魂等级+1
+    let soulLevelChange = 0;
+    let soulLevelUpMessage = '';
+    
+    if (newLevel === 12 && _warSoulSystemEnabled) {
+      if (equipment.soulType && equipment.soulType > WarSoulType.NONE) {
+        const currentSoulLevel = equipment.soulLevel || 1;
+        if (currentSoulLevel < 5) {
+          equipment.soulLevel = currentSoulLevel + 1;
+          soulLevelChange = 1;
+          soulLevelUpMessage = ' 魔魂等级达到了+12使得装备能量提升，战魂等级提高一级。';
+        }
+      }
+    }
 
     return {
       success: true,
-      message: `精炼成功！魔魂等级提升为+${currentLevel + 1}`,
+      message: `精炼成功！魔魂等级提升为+${newLevel}${soulLevelUpMessage}`,
       attributeChanges: {
-        magicSoulLevel: currentLevel + 1,
+        magicSoulLevel: newLevel,
         magicSoulChange: 1,
-        soulLevelChange: 0
+        soulLevelChange
       },
       updatedEquipment: { ...equipment },
       usedGem: { ...gem }
@@ -434,7 +448,6 @@ export function refineUseLevel(
       success: false,
       message: '装备使用等级已达到最高等级（125级），无法继续提升',
       updatedEquipment: { ...equipment },
-      usedGem: { ...gem }
     };
   }
 
@@ -447,7 +460,6 @@ export function refineUseLevel(
       success: false,
       message: `升级后等级（${newLevel}级）将超过您的当前等级（${playerLevel}级），无法升级`,
       updatedEquipment: { ...equipment },
-      usedGem: { ...gem }
     };
   }
 
@@ -766,7 +778,6 @@ export function activateSoul(equipment: EquipmentItem, gem: GemItem, warSoulSyst
       success: false,
       message: '战魂系统尚未开启，请先击败无名氏开启战魂系统',
       updatedEquipment: { ...equipment },
-      usedGem: { ...gem }
     };
   }
 

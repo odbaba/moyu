@@ -45,6 +45,7 @@ const InteractionButtons: React.FC<InteractionButtonsProps> = ({ interactables, 
           key={interactable.id}
           className={`game-btn ${getButtonClassName(interactable.type)}`}
           onClick={() => onInteract(interactable)}
+          data-interactable-id={interactable.id}
         >
           {/* 只显示名称 */}
           <span className="interact-button__name">{interactable.name}</span>

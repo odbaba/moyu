@@ -847,22 +847,6 @@ export function getGemTaskDescription(playerLevel: number): string {
   lines.push('');
   lines.push('任务奖励：');
   lines.push(`  ${reward.description}`);
-  lines.push('');
-  lines.push('等级要求说明：');
-  lines.push(`  当前等级：${playerLevel}级`);
-  if (playerLevel < 100) {
-    lines.push('  需求物品：灵魂晶石');
-    lines.push('  计算公式：(等级+10) / 10 向下取整');
-  } else {
-    lines.push('  需求物品：灵魂王');
-    if (playerLevel < 110) {
-      lines.push('  需求数量：2个（100-109级）');
-    } else if (playerLevel < 120) {
-      lines.push('  需求数量：5个（110-119级）');
-    } else {
-      lines.push('  需求数量：10个（120级及以上）');
-    }
-  }
 
   return lines.join('\n');
 }

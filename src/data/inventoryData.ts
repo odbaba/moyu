@@ -1545,16 +1545,19 @@ export function findItemById(id: string): InventoryItem | undefined {
 
 /**
  * 创建初始装备（非开发者模式使用）
- * 生成一套1级装备：
+ * 生成一套1级装备和初始宝石：
  * - 武器：1级、魔魂等级9级、品质精品
  * - 衣服：1级、魔魂等级9级、品质精品
  * - 头盔：1级、魔魂等级0级、品质普通品
  * - 鞋子：1级、魔魂等级0级、品质普通品
  * - 手镯：1级、魔魂等级0级、品质普通品
  * - 项链：1级、魔魂等级0级、品质普通品
- * @returns 初始装备数组
+ * - 灵魂晶石 × 1
+ * - 魔魂晶石 × 1
+ * - 幻魔晶石 × 1
+ * @returns 初始物品数组
  */
-export function createInitialEquipment(): EquipmentItem[] {
+export function createInitialEquipment(): InventoryItem[] {
   return [
     // 武器：精品、魔魂+9
     createEquipment('weapon', 1, 3, 9, 0),
@@ -1568,6 +1571,12 @@ export function createInitialEquipment(): EquipmentItem[] {
     createEquipment('bracelet', 1, 0, 0, 0),
     // 项链：普通品、魔魂+0
     createEquipment('necklace', 1, 0, 0, 0),
+    // 灵魂晶石 × 1
+    { ...lingHunJingShi, quantity: 1 },
+    // 魔魂晶石 × 1
+    { ...moHunJingShi, quantity: 1 },
+    // 幻魔晶石 × 1
+    { ...huanMoJingShi, quantity: 1 },
   ];
 }
 

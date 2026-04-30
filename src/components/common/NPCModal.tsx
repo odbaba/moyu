@@ -91,6 +91,7 @@ const NPCModal: React.FC<NPCModalProps> = ({
               <button
                 key={index}
                 className="option-button"
+                data-option-index={index}
                 onClick={() => handleOptionClick(option)}
               >
                 {option.text}

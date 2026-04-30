@@ -2,7 +2,8 @@ import './ItemDetailModal.css';
 
 import React, { useState } from 'react';
 
-import type { EquipmentItem, InventoryItem, ItemRarity } from '../../types';
+import type { EquipmentDetail, EquipmentItem, InventoryItem, ItemRarity } from '../../types';
+import { calculateEquipmentBaseAttributes, calculateEquipmentBonusAttributes } from '../../utils/attributeCalculator';
 import { EQUIPMENT_SLOT_TYPE_NAMES, ITEM_TYPE_NAMES, RARITY_CONFIG } from '../common/constants';
 import { getEquipmentQualityColor, isEquipmentItem } from '../common/utils';
 
@@ -77,9 +78,16 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
     const isAttackType = ['weapon', 'bracelet', 'necklace'].includes(equip.equipmentType);
     const isDefenseType = ['helmet', 'clothes', 'shoes'].includes(equip.equipmentType);
 
-    // 计算追加属性（基于魔魂等级）
-    const calculateAddAttack = (base: number) => Math.floor(base / 10) * equip.magicSoulLevel;
-    const calculateAddDefense = (base: number) => Math.floor(base / 10) * equip.magicSoulLevel;
+    // 使用 attributeCalculator 动态计算基础属性和追加属性
+    // 与角色面板攻击/防御悬浮弹窗使用相同的计算逻辑
+    // 构造与 EquipmentDetail 兼容的对象，只需 type, useLevel, magicSoulLevel 字段
+    const equipLike = {
+      type: equip.equipmentType,
+      useLevel: equip.useLevel,
+      magicSoulLevel: equip.magicSoulLevel || 0
+    } as EquipmentDetail;
+    const baseAttrs = calculateEquipmentBaseAttributes(equipLike);
+    const bonusAttrs = calculateEquipmentBonusAttributes(equipLike);
 
     return (
       <>
@@ -111,19 +119,19 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
           <div className="section-title">装备属性</div>
           <div className="equipment-attributes-list">
             {/* 攻击型装备显示攻击力 */}
-            {isAttackType && equip.attackMin !== undefined && equip.attackMax !== undefined && (
+            {isAttackType && baseAttrs.attackMin > 0 && (
               <>
                 <div className="equipment-attribute">
                   <span className="attribute-label">攻击：</span>
                   <span className="attribute-value attack-value">
-                    {equip.attackMin}-{equip.attackMax}
+                    {baseAttrs.attackMin}-{baseAttrs.attackMax}
                   </span>
                 </div>
                 {equip.magicSoulLevel > 0 && (
                   <div className="equipment-attribute">
                     <span className="attribute-label">追加攻击：</span>
                     <span className="attribute-value attack-value">
-                      +{calculateAddAttack(equip.attackMin)}-+{calculateAddAttack(equip.attackMax)}
+                    {bonusAttrs.attackMin}-{bonusAttrs.attackMax}
                     </span>
                   </div>
                 )}
@@ -131,19 +139,19 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             )}
 
             {/* 防御型装备显示防御力 */}
-            {isDefenseType && equip.defense !== undefined && (
+            {isDefenseType && baseAttrs.defense > 0 && (
               <>
                 <div className="equipment-attribute">
                   <span className="attribute-label">防御：</span>
                   <span className="attribute-value defense-value">
-                    {equip.defense}
+                    {baseAttrs.defense}
                   </span>
                 </div>
                 {equip.magicSoulLevel > 0 && (
                   <div className="equipment-attribute">
                     <span className="attribute-label">追加防御：</span>
                     <span className="attribute-value defense-value">
-                      +{calculateAddDefense(equip.defense)}
+                      +{bonusAttrs.defense}
                     </span>
                   </div>
                 )}

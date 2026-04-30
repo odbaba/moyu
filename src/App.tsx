@@ -7,6 +7,7 @@ import './components/inventory/inventory.css';
 import './components/cover/cover.css';
 import './components/settings/settings.css';
 import './components/game-ending/game-ending.css';
+import './components/help/help.css';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -15,7 +16,7 @@ import { Battle } from './components/battle';
 // 导入组件 - 角色模块
 import { CharacterPage } from './components/character';
 // 导入组件 - 公共模块
-import { DonationModal, EnemyModal, NPCModal } from './components/common';
+import { DonationModal, EnemyModal, GuideOverlay, NPCModal } from './components/common';
 import CollectorModal from './components/common/CollectorModal';
 import EquipmentRefineModal from './components/common/EquipmentRefineModal';
 import ExperienceExchangeModal from './components/common/ExperienceExchangeModal';
@@ -26,6 +27,8 @@ import InfoModal from './components/common/InfoModal';
 import { CoverPage } from './components/cover';
 // 导入组件 - 游戏结算页模块
 import { GameEndingPage } from './components/game-ending';
+// 导入组件 - 帮助页模块
+import HelpPage from './components/help/HelpPage';
 // 导入组件 - 首页模块
 import {
   InteractionButtons,
@@ -60,7 +63,7 @@ import { examplePets } from './data/petData';
 // 导入PK赛配置数据
 import { createPKBossEnemyData, getPKMatchGroup, getPKMatchReward, isSaturday } from './data/pkMatchData';
 import { getShopItemById } from './data/shopData';
-import { createInitialSkills, getSkillUpgradeCost } from './data/skillData';
+import { createInitialSkills } from './data/skillData';
 import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, DailyTaskState, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, MapChallengeState, NPCInteractable, Pet, PetInstituteState, PetType, PlayerResources, PrincessRelationship, RefineResult, RelationshipLevel, SkillDetail, TimeSystem } from './types';
 import { gainCharacterExperience } from './utils/attributeCalculator';
 // 导入 BOSS 工具函数
@@ -142,6 +145,8 @@ import { checkWarSoulDrop } from './utils/warSoulDropUtils';
 import { calculateGameEnding, type GameEndingParams, type GameEndingResult } from './utils/gameEndingUtils';
 // 导入开发者模式配置
 import { isDeveloperMode, getInitialGold, getInitialMagicStone, getMiningTimeCost } from './utils/developerMode';
+// 导入引导状态管理 Hook
+import { useGuide } from './hooks/useGuide';
 
 // 初始化空装备槽位
 const createEmptyEquippedItems = (): Record<EquipmentSlotType, EquipmentDetail | null> => ({
@@ -286,6 +291,20 @@ function App() {
   // 默认为 true，进入游戏时先显示封面页
   const [showCover, setShowCover] = useState(true);
 
+  // ========== 引导系统状态 ==========
+  // 使用引导状态管理 Hook
+  const {
+    isActive: isGuideActive,
+    currentStepIndex,
+    totalSteps: guideTotalSteps,
+    startGuide,
+    nextStep,
+    skipGuide,
+    completeGuide,
+    getCurrentStep,
+    isFirstTime
+  } = useGuide();
+
   // 游戏结算页面状态
   const [showGameEnding, setShowGameEnding] = useState(false);
   // 是否胜利（击败最终BOSS/通关地下城3层）
@@ -297,6 +316,9 @@ function App() {
 
   // 设置页面状态
   const [showSettingsPage, setShowSettingsPage] = useState(false);
+
+  // 帮助页面状态
+  const [showHelp, setShowHelp] = useState(false);
 
   // 音乐开关状态 - 从 localStorage 加载
   const [isMusicEnabled, setIsMusicEnabled] = useState(() => {
@@ -362,11 +384,19 @@ function App() {
   /**
    * 处理"开始游戏"
    * 保留存档数据，继续之前的游戏进度
+   * 如果是首次进入，触发新手指引
    */
   const handleStartGame = useCallback(() => {
     // 关闭封面页，进入游戏主界面
     setShowCover(false);
-  }, []);
+    // 如果是首次进入，触发新手指引
+    if (isFirstTime()) {
+      // 延迟触发引导，等待页面渲染完成
+      setTimeout(() => {
+        startGuide();
+      }, 300);
+    }
+  }, [isFirstTime, startGuide]);
 
   /**
    * 处理"退出游戏"
@@ -3223,7 +3253,7 @@ function App() {
                 daysPassed: timeSystem.nowday,
                 maxCombatPower,
                 level: character.level,
-                equipment: character.equipment,
+                equipment: characterWithPetBonus.equipment,
                 pets,
                 militaryRankLevel: nobleRank >= 5 ? 6 : militaryRank, // 如果授予王爵位，使用新的爵位
                 militaryRankName: getMilitaryRankName(militaryRank),
@@ -3861,6 +3891,14 @@ function App() {
   };
 
   /**
+   * 处理角色按钮点击
+   * 打开角色页面
+   */
+  const handleShowCharacterPage = useCallback(() => {
+    setShowCharacterPage(true);
+  }, []);
+
+  /**
    * 卸下装备
    * 从装备槽位移除装备，放回背包
    * @param slotType 要卸下的装备槽位类型
@@ -3886,37 +3924,6 @@ function App() {
   };
 
   /**
-   * 处理技能升级
-   * @param skillId 要升级的技能ID
-   */
-  const handleUpgradeSkill = useCallback((skillId: string) => {
-    setSkills(prevSkills => {
-      return prevSkills.map(skill => {
-        if (skill.id !== skillId) return skill;
-
-        // 检查是否可以升级
-        if (skill.level >= skill.maxLevel) return skill;
-
-        // 获取升级消耗
-        const upgradeCost = getSkillUpgradeCost(skill);
-
-        // 检查金币是否足够（这里暂时不扣除金币，后续集成金币系统）
-        // TODO: 集成金币系统后添加金币扣除逻辑
-
-        // 升级技能
-        const newLevel = skill.level + 1;
-
-        // 记录到交互日志
-        setInteractionLog(logs => [...logs, `技能${skill.name}升级到Lv.${newLevel}！消耗${upgradeCost}金币`]);
-
-        return {
-          ...skill,
-          level: newLevel,
-          isLearned: true
-        };
-      });
-    });
-  }, []);
 
   /**
    * 获取背包中的所有装备物品
@@ -4604,7 +4611,7 @@ function App() {
           {/* 顶部位置显示 */}
           <LocationHeader
             location={currentLoc?.name || ''}
-            onShowCharacter={() => setShowCharacterPage(true)}
+            onShowCharacter={handleShowCharacterPage}
             onShowInventory={() => setShowInventoryPage(true)}
             onShowPet={() => setShowPetPage(true)}
           />
@@ -4649,6 +4656,7 @@ function App() {
             onShowPet={() => setShowPetPage(true)}
             onSaveGame={handleSaveGame}
             onShowSettings={() => setShowSettingsPage(true)}
+            onShowHelp={() => setShowHelp(true)}
           />
 
           {/* 大地图 */}
@@ -4726,8 +4734,6 @@ function App() {
             isVisible={showSkillPage}
             skills={skills}
             onClose={() => setShowSkillPage(false)}
-            onUpgradeSkill={handleUpgradeSkill}
-            gold={0}
           />
 
           {/* 幻兽页面 */}
@@ -4752,6 +4758,18 @@ function App() {
             onClose={() => setShowSettingsPage(false)}
             onExitGame={handleExitGame}
           />
+
+          {/* 帮助页面 */}
+          {showHelp && (
+            <HelpPage
+              character={characterWithPetBonus}
+              pets={pets}
+              warSoulSystemEnabled={warSoulSystemEnabled}
+              princessRelationship={princessRelationship}
+              resources={playerResources}
+              onClose={() => setShowHelp(false)}
+            />
+          )}
 
           {/* 商店页面 */}
           {showShopPage && (
@@ -4949,6 +4967,17 @@ function App() {
           <FloatingTextManager
             texts={floatingTexts}
             onRemove={removeFloatingText}
+          />
+
+          {/* 新手引导蒙层 */}
+          <GuideOverlay
+            isVisible={isGuideActive}
+            currentStep={getCurrentStep()}
+            currentStepIndex={currentStepIndex}
+            totalSteps={guideTotalSteps}
+            onSkip={skipGuide}
+            onComplete={completeGuide}
+            onHighlightClick={nextStep}
           />
         </>
       )}

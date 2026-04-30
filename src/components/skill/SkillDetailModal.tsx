@@ -4,7 +4,7 @@ import React, { type JSX } from 'react';
 
 import { getFightingSpiritBonus, getSkillDamagePercent, getSkillDisplayName } from '../../data/skillData';
 import type { SkillDetail } from '../../types';
-import { canUpgradeSkill, getAttackTypeName, getLearnMethodName, getSkillUpgradeCost } from '../../utils/skillUtils';
+import { getAttackTypeName, getLearnMethodName } from '../../utils/skillUtils';
 import { getRarityClassName, getRarityText } from '../common/utils';
 
 /**
@@ -17,10 +17,6 @@ interface SkillDetailModalProps {
   skill: SkillDetail | null;
   /** 关闭弹窗的回调函数 */
   onClose: () => void;
-  /** 技能升级回调 */
-  onUpgrade?: (skillId: string) => void;
-  /** 当前金币数量 */
-  gold?: number;
 }
 
 /**
@@ -31,9 +27,7 @@ interface SkillDetailModalProps {
 const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
   isVisible,
   skill,
-  onClose,
-  onUpgrade,
-  gold = 0
+  onClose
 }) => {
   // 如果不可见或没有技能数据，不渲染
   if (!isVisible || !skill) return null;
@@ -115,18 +109,6 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
     }
 
     return effects;
-  };
-
-  /** 检查是否可以升级 */
-  const canUpgrade = canUpgradeSkill(skill) && skill.isLearned;
-  const upgradeCost = getSkillUpgradeCost(skill);
-  const canAffordUpgrade = gold >= upgradeCost;
-
-  /** 处理升级按钮点击 */
-  const handleUpgradeClick = () => {
-    if (canUpgrade && canAffordUpgrade && onUpgrade) {
-      onUpgrade(skill.id);
-    }
   };
 
   /** 处理点击覆盖层关闭弹窗 */
@@ -230,23 +212,6 @@ const SkillDetailModal: React.FC<SkillDetailModalProps> = ({
             </div>
           </div>
         </div>
-
-        {/* 升级按钮 */}
-        {canUpgrade && (
-          <div className="skill-upgrade-section">
-            <button
-              className={`skill-upgrade-button ${canAffordUpgrade ? '' : 'disabled'}`}
-              onClick={handleUpgradeClick}
-              disabled={!canAffordUpgrade}
-            >
-              <span className="upgrade-text">升级技能</span>
-              <span className="upgrade-cost">{upgradeCost} 金币</span>
-            </button>
-            {!canAffordUpgrade && (
-              <p className="upgrade-warning">金币不足</p>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

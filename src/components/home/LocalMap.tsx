@@ -271,6 +271,7 @@ const LocalMap: React.FC<LocalMapProps> = ({ currentLocation, onMove, isAutoMovi
                     transition: 'border-color 0.3s ease, box-shadow 0.3s ease'
                   }}
                   className={`map-area ${showHighlight ? 'current' : ''}`}
+                  data-location-id={loc.id}
                   onClick={() => handleLocationClick(loc.id, isCurrent, isAdjacent)}
                 >
                   <span

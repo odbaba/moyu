@@ -23,6 +23,8 @@ interface MenuProps {
   onSaveGame: () => void;
   /** 显示设置页面的回调 */
   onShowSettings: () => void;
+  /** 显示帮助页面的回调 */
+  onShowHelp: () => void;
 }
 
 /**
@@ -39,7 +41,8 @@ const Menu: React.FC<MenuProps> = ({
   onShowSkill,
   onShowPet,
   onSaveGame,
-  onShowSettings
+  onShowSettings,
+  onShowHelp
 }) => {
   // 菜单容器引用，用于检测点击是否在菜单外部
   const menuRef = useRef<HTMLDivElement>(null);
@@ -81,6 +84,15 @@ const Menu: React.FC<MenuProps> = ({
     onToggle();
   };
 
+  /**
+   * 处理帮助按钮点击
+   * 打开帮助页面后关闭菜单
+   */
+  const handleShowHelp = () => {
+    onShowHelp();
+    onToggle();
+  };
+
   return (
     <div className="menu-container" ref={menuRef}>
       {/* 菜单按钮 */}
@@ -97,7 +109,7 @@ const Menu: React.FC<MenuProps> = ({
           <button onClick={onShowMap}>大地图</button>
           <button onClick={handleSaveGame}>保存游戏</button>
           <button onClick={handleShowSettings}>设置</button>
-          <button>帮助</button>
+          <button className="help-button" onClick={handleShowHelp}>帮助</button>
         </div>
       )}
     </div>

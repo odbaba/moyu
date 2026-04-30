@@ -28,6 +28,9 @@ export { default as GiftSelectModal } from './GiftSelectModal';
 export type { FloatingTextItem } from './FloatingTextManager';
 export { default as FloatingTextManager } from './FloatingTextManager';
 
+// 引导蒙层组件
+export { default as GuideOverlay } from './GuideOverlay';
+
 // 公共常量导出
 export * from './constants';
 

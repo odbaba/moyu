@@ -398,6 +398,9 @@ const LotteryArea: React.FC<LotteryAreaProps> = ({
           setMenuOpen(false);
           onShowSettings?.();
         }}
+        onShowHelp={() => {
+          setMenuOpen(false);
+        }}
       />
     </div>
   );

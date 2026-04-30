@@ -1,5 +1,6 @@
 import type { EquipmentDetail, EquipmentItem, EquipmentQuality, EquipmentSlotType, GemAttribute } from '../types';
 import { WarSoulType } from '../types';
+import { calculateEquipmentBaseAttributes, calculateEquipmentBonusAttributes } from './attributeCalculator';
 
 /**
  * 装备品质映射（EquipmentItem 的 equipmentQuality 到 EquipmentDetail 的 quality）
@@ -43,17 +44,6 @@ const GEM_EXP_BONUS: Record<string, number> = {
   '中级经验石': 25,
   '高级经验石': 50
 };
-
-/**
- * 计算魔魂追加属性
- * 根据参考文档：每级追加装备基本属性的10%
- * @param baseValue 基础属性值
- * @param magicSoulLevel 魔魂等级
- * @returns 追加属性值
- */
-export function calculateMagicSoulBonus(baseValue: number, magicSoulLevel: number): number {
-  return Math.floor(baseValue / 10) * magicSoulLevel;
-}
 
 /**
  * 计算宝石属性加成
@@ -212,17 +202,25 @@ export function calculateEquipmentCombatPower(equipment: EquipmentDetail): numbe
  * @returns 装备槽位的装备详情
  */
 export function equipmentItemToDetail(item: EquipmentItem): EquipmentDetail {
-  // 获取基础属性（不包含魔魂追加）
-  const baseAttackMin = item.attackMin || 0;
-  const baseAttackMax = item.attackMax || 0;
-  const baseDefense = item.defense || 0;
+  // 构造与 EquipmentDetail 兼容的对象用于属性计算
+  const equipLike = {
+    type: item.equipmentType,
+    useLevel: item.useLevel,
+    magicSoulLevel: item.magicSoulLevel || 0
+  } as EquipmentDetail;
+  
+  // 使用 attributeCalculator 动态计算基础属性和追加属性
+  // 与角色面板攻击/防御悬浮弹窗使用相同的计算逻辑
+  const baseAttrs = calculateEquipmentBaseAttributes(equipLike);
+  const bonusAttrs = calculateEquipmentBonusAttributes(equipLike);
+  
+  const baseAttackMin = baseAttrs.attackMin;
+  const baseAttackMax = baseAttrs.attackMax;
+  const baseDefense = baseAttrs.defense;
+  const bonusAttackMin = bonusAttrs.attackMin;
+  const bonusAttackMax = bonusAttrs.attackMax;
+  const bonusDefense = bonusAttrs.defense;
   const magicSoulLevel = item.magicSoulLevel || 0;
-
-  // 获取追加属性（魔魂加成）
-  // 优先使用 item 中的 bonus 字段，如果没有则重新计算
-  const bonusAttackMin = item.bonusAttackMin ?? calculateMagicSoulBonus(baseAttackMin, magicSoulLevel);
-  const bonusAttackMax = item.bonusAttackMax ?? calculateMagicSoulBonus(baseAttackMax, magicSoulLevel);
-  const bonusDefense = item.bonusDefense ?? calculateMagicSoulBonus(baseDefense, magicSoulLevel);
 
   // 计算战魂属性加成（仅用于角色面板属性计算，不加入装备详情面板的攻击值）
   const soulBonus = calculateSoulBonus(item.soulType, item.soulLevel, baseAttackMin, baseAttackMax);
@@ -279,16 +277,17 @@ export function equipmentItemToDetail(item: EquipmentItem): EquipmentDetail {
  * @returns 背包中的装备物品
  */
 export function equipmentDetailToItem(detail: EquipmentDetail): EquipmentItem {
-  // 使用基础属性值，而不是 attributes 中的值（attributes 包含了追加属性）
-  // 避免装备穿脱时属性累积
-  const baseAttackMin = detail.baseAttackMin ?? detail.attributes.attackMin ?? 0;
-  const baseAttackMax = detail.baseAttackMax ?? detail.attributes.attackMax ?? 0;
-  const baseDefense = detail.baseDefense ?? detail.attributes.defense ?? 0;
+  // 使用 attributeCalculator 动态计算基础属性和追加属性
+  // 不需要从 detail.baseDefense/bonusDefense 等存储字段读取
+  const baseAttrs = calculateEquipmentBaseAttributes(detail);
+  const bonusAttrs = calculateEquipmentBonusAttributes(detail);
 
-  // 获取追加属性
-  const bonusAttackMin = detail.bonusAttackMin ?? 0;
-  const bonusAttackMax = detail.bonusAttackMax ?? 0;
-  const bonusDefense = detail.bonusDefense ?? 0;
+  const baseAttackMin = baseAttrs.attackMin;
+  const baseAttackMax = baseAttrs.attackMax;
+  const baseDefense = baseAttrs.defense;
+  const bonusAttackMin = bonusAttrs.attackMin;
+  const bonusAttackMax = bonusAttrs.attackMax;
+  const bonusDefense = bonusAttrs.defense;
 
   return {
     id: detail.id,

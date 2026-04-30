@@ -3,6 +3,7 @@ import {
   calculateAllEquipmentQualityCombatPower,
   calculateAllHoleCountCombatPower,
   calculateAllGemCombatPower,
+  calculateEquipmentBaseCombatPower,
   calculateFullSetMagicSoulBonusCombatPower,
   calculateSoulCombatPower,
   calculateAllPetsCombatPower
@@ -377,18 +378,19 @@ export function evaluateWealth(gold: number, magicStone: number): EvaluationItem
 
 /**
  * 计算装备战斗力
- * 装备战斗力 = 品质战斗力 + 洞数战斗力 + 宝石战斗力 + 全套魔魂加成 + 战魂战斗力
+ * 装备战斗力 = 装备基础贡献 + 品质战斗力 + 洞数战斗力 + 宝石战斗力 + 全套魔魂加成 + 战魂战斗力
  * @param equipment 角色装备对象
  * @returns 装备战斗力总值
  */
 export function calculateEquipmentPower(equipment: CharacterData['equipment']): number {
+  const basePower = calculateEquipmentBaseCombatPower(equipment);
   const qualityPower = calculateAllEquipmentQualityCombatPower(equipment);
   const holeCountPower = calculateAllHoleCountCombatPower(equipment);
   const gemPower = calculateAllGemCombatPower(equipment);
   const fullSetMagicSoulBonus = calculateFullSetMagicSoulBonusCombatPower(equipment);
   const soulPower = calculateSoulCombatPower(equipment);
 
-  return qualityPower + holeCountPower + gemPower + fullSetMagicSoulBonus + soulPower;
+  return basePower + qualityPower + holeCountPower + gemPower + fullSetMagicSoulBonus + soulPower;
 }
 
 /**

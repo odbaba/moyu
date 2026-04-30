@@ -1,0 +1,180 @@
+/**
+ * 帮助页面样式
+ * 全屏深色背景，居中布局，手机端一屏展示
+ */
+
+/* 帮助页面容器 - 全屏居中 */
+.help-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #252935;
+  padding: 16px;
+  overflow-y: auto;
+  gap: 12px;
+}
+
+/* 标题 - 白色 */
+.help-title {
+  color: #FCFFFF;
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(255, 255, 255, 0.15);
+  margin: 0;
+  text-align: center;
+}
+
+/* 信息列表容器 */
+.help-info-list {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 单个信息项 */
+.help-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  gap: 4px;
+}
+
+/* 信息项标签 */
+.help-label {
+  color: #FCFFFF;
+  flex-shrink: 0;
+}
+
+/* 信息项数值 */
+.help-value {
+  color: #FCFFFF;
+  font-weight: bold;
+}
+
+/* 帮助文本 - 红色提示，前面显示感叹号图标 */
+.help-text {
+  color: #ff4444;
+  font-size: 0.75rem;
+  width: 100%;
+  margin-top: 2px;
+  padding-left: 0;
+}
+
+.help-text::before {
+  content: '⚠️ ';
+}
+
+/* 多条帮助文本容器 */
+.help-text--multi {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* 容器本身不显示图标，由子元素各自显示 */
+.help-text--multi::before {
+  content: none;
+}
+
+.help-text--multi > div {
+  color: #ff4444;
+  font-size: 0.75rem;
+}
+
+.help-text--multi > div::before {
+  content: '⚠️ ';
+}
+
+/* 按钮区域 */
+.help-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+  width: 100%;
+  max-width: 360px;
+}
+
+/* 帮助页面按钮 */
+.help-btn {
+  padding: 8px 24px;
+  font-size: 0.9rem;
+  min-width: 100px;
+}
+
+/* 手机端响应式 - 确保一屏展示 */
+@media (max-width: 768px) {
+  .help-page {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .help-title {
+    font-size: 1.4rem;
+  }
+
+  .help-info-list {
+    gap: 6px;
+  }
+
+  .help-item {
+    font-size: 0.8rem;
+  }
+
+  .help-text {
+    font-size: 0.7rem;
+  }
+
+  .help-text--multi > div {
+    font-size: 0.7rem;
+  }
+
+  .help-buttons {
+    gap: 10px;
+  }
+
+  .help-btn {
+    padding: 8px 20px;
+    font-size: 0.85rem;
+    min-width: 90px;
+  }
+}
+
+/* 小屏手机适配 */
+@media (max-width: 375px) {
+  .help-title {
+    font-size: 1.2rem;
+  }
+
+  .help-item {
+    font-size: 0.75rem;
+  }
+
+  .help-text {
+    font-size: 0.65rem;
+  }
+
+  .help-text--multi > div {
+    font-size: 0.65rem;
+  }
+
+  .help-btn {
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    min-width: 80px;
+  }
+}

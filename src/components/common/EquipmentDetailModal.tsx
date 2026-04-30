@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import type { EquipmentDetail } from '../../types';
 import { WarSoulType } from '../../types';
+import { calculateEquipmentBaseAttributes, calculateEquipmentBonusAttributes } from '../../utils/attributeCalculator';
 import { canEquipEquipment, getEquipmentLevelRequirementMessage } from '../../utils/equipmentUtils';
 import { EQUIPMENT_SLOT_TYPE_NAMES } from '../common/constants';
 import { getEquipmentQualityColor } from '../common/utils';
@@ -112,15 +113,10 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
   const isAttackType = ['weapon', 'bracelet', 'necklace'].includes(equipment.type);
   const isDefenseType = ['clothes', 'shoes', 'helmet'].includes(equipment.type);
 
-  // 获取基础属性（不包含魔魂追加）
-  const baseAttackMin = equipment.baseAttackMin ?? 0;
-  const baseAttackMax = equipment.baseAttackMax ?? 0;
-  const baseDefense = equipment.baseDefense ?? 0;
-
-  // 获取追加属性（魔魂加成）
-  const bonusAttackMin = equipment.bonusAttackMin ?? 0;
-  const bonusAttackMax = equipment.bonusAttackMax ?? 0;
-  const bonusDefense = equipment.bonusDefense ?? 0;
+  // 使用 attributeCalculator 动态计算基础属性和追加属性
+  // 与角色面板攻击/防御悬浮弹窗使用相同的计算逻辑
+  const baseAttrs = calculateEquipmentBaseAttributes(equipment);
+  const bonusAttrs = calculateEquipmentBonusAttributes(equipment);
 
   // 判断是否为已装备状态（有卸下和替换回调）
   const isEquipped = !!(onUnequip || onReplace);
@@ -205,14 +201,14 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
               <div className="attribute-row">
                 <span className="attribute-label">攻击：</span>
                 <span className="attribute-value attack-value">
-                  {baseAttackMin}-{baseAttackMax}
+                  {baseAttrs.attackMin}-{baseAttrs.attackMax}
                 </span>
               </div>
               {equipment.magicSoulLevel > 0 && (
                 <div className="attribute-row">
                   <span className="attribute-label">追加攻击：</span>
                   <span className="attribute-value attack-value">
-                    +{bonusAttackMin}-+{bonusAttackMax}
+                    {bonusAttrs.attackMin}-{bonusAttrs.attackMax}
                   </span>
                 </div>
               )}
@@ -225,14 +221,14 @@ const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
               <div className="attribute-row">
                 <span className="attribute-label">防御：</span>
                 <span className="attribute-value defense-value">
-                  {baseDefense}
+                  {baseAttrs.defense}
                 </span>
               </div>
               {equipment.magicSoulLevel > 0 && (
                 <div className="attribute-row">
                   <span className="attribute-label">追加防御：</span>
                   <span className="attribute-value defense-value">
-                    +{bonusDefense}
+                    +{bonusAttrs.defense}
                   </span>
                 </div>
               )}
