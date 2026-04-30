@@ -58,7 +58,7 @@ import { exampleCharacter } from './data/characterData';
 // 导入数据
 import { locations } from './data/gameData';
 import { generateBossInteractables, generateWumingshiInteractable, interactableConfig } from './data/interactableData';
-import { exampleItems, createInitialEquipment } from './data/inventoryData';
+import { exampleItems, createInitialEquipment, gaoJiDouZhiYiYang } from './data/inventoryData';
 import { examplePets } from './data/petData';
 // 导入PK赛配置数据
 import { createPKBossEnemyData, getPKMatchGroup, getPKMatchReward, isSaturday } from './data/pkMatchData';
@@ -1738,27 +1738,8 @@ function App() {
 
           // 少将以上额外获得"高级斗志昂扬"
           if (payResult.specialReward) {
-            // 创建高级斗志昂扬物品并添加到背包
-            const skillBook = {
-              id: 'skillbook_gaojidouzhiyiyang',
-              name: '高级斗志昂扬',
-              icon: '📓',
-              quantity: 1,
-              type: 'skillBook' as const,
-              rarity: 'legendary' as const,
-              source: '军饷奖励',
-              description: '记载着高级斗志昂扬技能的秘籍，是斗志昂扬的升级版，大幅提升战斗力。',
-              maxStack: 1,
-              usable: true,
-              equippable: false,
-              skillId: 'skill_gaojidouzhiyiyang',
-              skillName: '高级斗志昂扬',
-              skillType: 'buff',
-              skillEffect: '大幅提升战斗力',
-              goldValue: 82800000,
-              magicStoneValue: 25000,
-              imagePath: './images/items/skillbook/gaojidouzhiyiyang.png',
-            };
+            // 使用 cloneItem 复用 inventoryData 中正确的高级斗志昂扬模板
+            const skillBook = cloneItem(gaoJiDouZhiYiYang);
             setInventory(prev => [...prev, skillBook]);
             setInteractionLog(prev => [...prev, `额外获得：${payResult.specialReward}`]);
           }
