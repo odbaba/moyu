@@ -131,7 +131,7 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                   <div className="equipment-attribute">
                     <span className="attribute-label">追加攻击：</span>
                     <span className="attribute-value attack-value">
-                    {bonusAttrs.attackMin}-{bonusAttrs.attackMax}
+                      {bonusAttrs.attackMin}-{bonusAttrs.attackMax}
                     </span>
                   </div>
                 )}

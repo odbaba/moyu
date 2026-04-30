@@ -32,6 +32,8 @@ const SAVE_KEY = 'moyu_save_data';
 export interface SaveData {
   // 存档版本号，用于兼容性检查
   version: string;
+  // TapTap 用户 ID，用于账号关联（可选，游客模式为空）
+  taptapUserId?: string;
   // 当前所在位置ID
   currentLocation: string;
   // 时间系统（天数、时间）
@@ -98,11 +100,17 @@ export interface SaveData {
  * 保存游戏状态到 localStorage
  * 将所有游戏状态序列化并保存，Set 类型需转为 Array
  * @param data 要保存的游戏状态数据
+ * @param taptapUserId 可选的 TapTap 用户 ID，用于账号关联
  * @returns 是否保存成功
  */
-export const saveGame = (data: SaveData): boolean => {
+export const saveGame = (data: SaveData, taptapUserId?: string): boolean => {
   try {
-    const jsonData = JSON.stringify(data);
+    // 将用户 ID 写入存档数据
+    const saveDataWithUser = {
+      ...data,
+      taptapUserId: taptapUserId,
+    };
+    const jsonData = JSON.stringify(saveDataWithUser);
     localStorage.setItem(SAVE_KEY, jsonData);
 
     return true;
@@ -116,9 +124,10 @@ export const saveGame = (data: SaveData): boolean => {
 /**
  * 从 localStorage 加载游戏状态
  * 读取存档数据并反序列化，Array 类型需转回 Set
- * @returns 加载的游戏状态数据，如果加载失败或版本不兼容则返回 null
+ * @param taptapUserId 可选的 TapTap 用户 ID，用于验证存档归属
+ * @returns 加载的游戏状态数据，如果加载失败、版本不兼容或用户 ID 不匹配则返回 null
  */
-export const loadGame = (): SaveData | null => {
+export const loadGame = (taptapUserId?: string): SaveData | null => {
   try {
     const jsonData = localStorage.getItem(SAVE_KEY);
     if (!jsonData) {
@@ -131,6 +140,25 @@ export const loadGame = (): SaveData | null => {
 
       return null;
     }
+
+    // 用户 ID 验证逻辑
+    // 如果存档有关联的用户 ID，则需要验证当前用户是否匹配
+    if (data.taptapUserId) {
+      // 存档已关联账号，检查用户 ID 是否匹配
+      if (taptapUserId && data.taptapUserId !== taptapUserId) {
+        // 用户 ID 不匹配，无法加载此存档
+        console.warn('存档用户 ID 不匹配，无法加载');
+
+        return null;
+      }
+      // 如果当前没有登录用户（taptapUserId 为空），也无法加载已关联账号的存档
+      if (!taptapUserId) {
+        console.warn('存档已关联账号，请先登录');
+
+        return null;
+      }
+    }
+    // 如果存档没有用户 ID（游客存档），则正常加载，允许任何用户加载
 
     return data;
   } catch (error) {
@@ -160,6 +188,64 @@ export const hasSaveData = (): boolean => {
     return true;
   } catch {
     return false;
+  }
+};
+
+/**
+ * 检查是否存在指定用户的存档
+ * 用于判断当前登录用户是否有可用的存档
+ * @param taptapUserId 可选的 TapTap 用户 ID
+ * @returns 是否存在该用户的存档
+ */
+export const hasSaveForUser = (taptapUserId?: string): boolean => {
+  try {
+    const jsonData = localStorage.getItem(SAVE_KEY);
+    if (!jsonData) {
+      return false;
+    }
+    const data = JSON.parse(jsonData) as SaveData;
+    // 版本不兼容视为无存档
+    if (data.version !== SAVE_VERSION) {
+      return false;
+    }
+
+    // 游客存档（无用户 ID）对任何人都可用
+    if (!data.taptapUserId) {
+      return true;
+    }
+
+    // 已关联账号的存档，检查用户 ID 是否匹配
+    if (taptapUserId && data.taptapUserId === taptapUserId) {
+      return true;
+    }
+
+    // 用户 ID 不匹配或未登录，无法使用此存档
+    return false;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * 获取存档关联的用户 ID
+ * 用于判断存档是否已关联账号
+ * @returns 存档关联的用户 ID，如果存档不存在或为游客存档则返回 undefined
+ */
+export const getSaveUserId = (): string | undefined => {
+  try {
+    const jsonData = localStorage.getItem(SAVE_KEY);
+    if (!jsonData) {
+      return undefined;
+    }
+    const data = JSON.parse(jsonData) as SaveData;
+    // 版本不兼容则返回 undefined
+    if (data.version !== SAVE_VERSION) {
+      return undefined;
+    }
+
+    return data.taptapUserId;
+  } catch {
+    return undefined;
   }
 };
 

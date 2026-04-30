@@ -208,12 +208,12 @@ export function equipmentItemToDetail(item: EquipmentItem): EquipmentDetail {
     useLevel: item.useLevel,
     magicSoulLevel: item.magicSoulLevel || 0
   } as EquipmentDetail;
-  
+
   // 使用 attributeCalculator 动态计算基础属性和追加属性
   // 与角色面板攻击/防御悬浮弹窗使用相同的计算逻辑
   const baseAttrs = calculateEquipmentBaseAttributes(equipLike);
   const bonusAttrs = calculateEquipmentBonusAttributes(equipLike);
-  
+
   const baseAttackMin = baseAttrs.attackMin;
   const baseAttackMax = baseAttrs.attackMax;
   const baseDefense = baseAttrs.defense;

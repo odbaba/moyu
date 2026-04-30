@@ -17,7 +17,7 @@
   justify-content: center;
   background-color: #252935;
   padding: 20px;
-  gap: 40px;
+  gap: 30px;
 }
 
 /* 游戏标题 - 金色发光效果 */
@@ -32,6 +32,91 @@
   letter-spacing: 0.3em;
   margin: 0;
   text-align: center;
+}
+
+/* TapTap 登录区域 */
+.taptap-login-section {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 用户信息区域 */
+.taptap-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+/* 用户头像 */
+.taptap-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #FCFFFF;
+}
+
+/* 用户昵称 */
+.taptap-username {
+  color: #FCFFFF;
+  font-size: 14px;
+}
+
+/* 登录按钮 */
+.taptap-login-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: #FCFFFF;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+/* 登录按钮悬停效果 */
+.taptap-login-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* 登录按钮禁用状态 */
+.taptap-login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 退出登录按钮 */
+.taptap-logout-btn {
+  padding: 4px 8px;
+  background: transparent;
+  color: #FCFFFF;
+  border: 1px solid #FCFFFF;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+/* 退出登录按钮悬停效果 */
+.taptap-logout-btn:hover:not(:disabled) {
+  background: rgba(252, 255, 255, 0.1);
+}
+
+/* 退出登录按钮禁用状态 */
+.taptap-logout-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 错误信息 */
+.taptap-error {
+  color: #ff6b6b;
+  font-size: 12px;
 }
 
 /* 按钮区域 - 垂直排列 */
@@ -72,7 +157,7 @@
   }
 
   .cover-page {
-    gap: 30px;
+    gap: 24px;
     padding: 16px;
   }
 
@@ -85,6 +170,35 @@
     padding: 8px 16px;
     font-size: 1rem;
   }
+
+  /* 手机端用户信息区域调整 */
+  .taptap-user-info {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+
+  /* 手机端用户头像调整 */
+  .taptap-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* 手机端用户昵称调整 */
+  .taptap-username {
+    font-size: 13px;
+  }
+
+  /* 手机端登录按钮调整 */
+  .taptap-login-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  /* 手机端退出按钮调整 */
+  .taptap-logout-btn {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
 }
 
 /* 小屏手机适配 */
@@ -94,6 +208,23 @@
   }
 
   .cover-page {
-    gap: 24px;
+    gap: 20px;
+  }
+
+  /* 小屏手机用户信息区域调整 */
+  .taptap-user-info {
+    padding: 5px 8px;
+    gap: 6px;
+  }
+
+  /* 小屏手机用户头像调整 */
+  .taptap-avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* 小屏手机用户昵称调整 */
+  .taptap-username {
+    font-size: 12px;
   }
 }

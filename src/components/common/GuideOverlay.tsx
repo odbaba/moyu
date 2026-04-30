@@ -36,10 +36,10 @@ interface HighlightPosition {
 
 /**
  * 引导蒙层组件
- * 
+ *
  * 用于新手引导功能，显示半透明蒙层覆盖整个游戏界面
  * 高亮指定的目标元素，并显示引导文字
- * 
+ *
  * 特性：
  * - 使用纯 CSS 实现，不依赖 SVG
  * - 非侵入式设计，不需要修改业务代码
@@ -62,6 +62,7 @@ const GuideOverlay: React.FC<GuideOverlayProps> = ({
   const calculateHighlightPosition = useCallback(() => {
     if (!currentStep) {
       setHighlightPosition(null);
+
       return;
     }
 
@@ -69,6 +70,7 @@ const GuideOverlay: React.FC<GuideOverlayProps> = ({
 
     if (!targetElement) {
       setHighlightPosition(null);
+
       return;
     }
 

@@ -762,7 +762,7 @@ export function calculateGemReward(
   quantity: number
 ): DailyTaskReward {
   const multiplier = getExperienceMultiplier();
-  
+
   if (itemType === '灵魂晶石') {
     // 收集灵魂晶石：经验 = 30000 × 数量，功勋 = 500
     const exp = Math.floor(30000 * quantity * multiplier);

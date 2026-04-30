@@ -191,15 +191,16 @@ export function getPKMatchGroup(playerLevel: number): PKMatchGroupConfig {
 export function getPKMatchReward(group: PKMatchGroup): PKMatchReward | undefined {
   const baseReward = pkMatchRewardsBase.find(reward => reward.group === group);
   if (!baseReward) return undefined;
-  
+
   // 根据开发者模式调整经验值
   const multiplier = getExperienceMultiplier();
+
   return {
     ...baseReward,
     exp: Math.floor(baseReward.exp * multiplier),
-    description: multiplier === 1 
-      ? baseReward.description 
-      : `${baseReward.magicStone}魔石、${Math.floor(baseReward.exp * multiplier)}经验、${baseReward.skillBook}${baseReward.specialItems.length > 0 ? '、' + baseReward.specialItems.join('、') : ''}`,
+    description: multiplier === 1
+      ? baseReward.description
+      : `${baseReward.magicStone}魔石、${Math.floor(baseReward.exp * multiplier)}经验、${baseReward.skillBook}${baseReward.specialItems.length > 0 ? `、${ baseReward.specialItems.join('、')}` : ''}`,
   };
 }
 

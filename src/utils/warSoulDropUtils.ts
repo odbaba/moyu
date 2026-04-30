@@ -4,10 +4,10 @@
  * 参考文档：reference/docs/战魂系统完整文档.md
  */
 
-import type { GemItem, InventoryItem } from '../types';
-import { cloneItem, ITEM_TEMPLATES } from './itemFactory';
 // 导入怪物刷新配置，用于从 enemy.id 中提取 templateId
 import { monsterSpawnConfigs } from '../data/monsterData';
+import type { GemItem, InventoryItem } from '../types';
+import { cloneItem, ITEM_TEMPLATES } from './itemFactory';
 
 // ==================== 类型定义 ====================
 
@@ -321,17 +321,17 @@ function extractTemplateIdFromEnemyId(enemyId: string): string {
   const enemyMatch = enemyId.match(/^(.+)_enemy_\d+$/);
   if (enemyMatch) {
     const spawnId = enemyMatch[1];
-    
+
     // 通过 spawnId 在 monsterSpawnConfigs 中查找 templateId
     const spawnConfig = monsterSpawnConfigs.find(config => config.id === spawnId);
     if (spawnConfig) {
       return spawnConfig.templateId;
     }
-    
+
     // 如果找不到 spawnConfig，返回 spawnId（可能是 templateId）
     return spawnId;
   }
-  
+
   // 如果不匹配 enemy.id 格式，直接返回原始ID
   return enemyId;
 }
@@ -344,7 +344,7 @@ function extractTemplateIdFromEnemyId(enemyId: string): string {
 export function getWarSoulDropConfig(monsterId: string): WarSoulDropConfig | null {
   // 从 enemy.id 中提取 templateId
   const templateId = extractTemplateIdFromEnemyId(monsterId);
-  
+
   // 首先尝试精确匹配怪物模板ID
   const config = WAR_SOUL_DROP_CONFIGS.find((c) => c.monsterId === templateId);
   if (config) {
@@ -368,6 +368,7 @@ export function getWarSoulDropConfig(monsterId: string): WarSoulDropConfig | nul
 export function isBossMonster(monsterId: string): boolean {
   // 从 enemy.id 中提取 templateId
   const templateId = extractTemplateIdFromEnemyId(monsterId);
+
   return BOSS_MONSTER_IDS.includes(templateId);
 }
 

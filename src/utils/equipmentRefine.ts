@@ -4,8 +4,8 @@
  * 参考文档：reference/docs/装备打造师交互逻辑文档.md
  */
 
-import { calculateEquipmentBaseAttributes, getEquipmentName } from '../data/equipmentNames';
 import { getEquipmentImagePath } from '../data/equipmentImages';
+import { calculateEquipmentBaseAttributes, getEquipmentName } from '../data/equipmentNames';
 import type { EquipmentItem, EquipmentQuality, GemItem, RefineResult } from '../types';
 import { WarSoulType } from '../types';
 
@@ -351,7 +351,7 @@ export function refineMagicSoul(equipment: EquipmentItem, gem: GemItem, _warSoul
     // 魔魂升到+12时，战魂等级+1
     let soulLevelChange = 0;
     let soulLevelUpMessage = '';
-    
+
     if (newLevel === 12 && _warSoulSystemEnabled) {
       if (equipment.soulType && equipment.soulType > WarSoulType.NONE) {
         const currentSoulLevel = equipment.soulLevel || 1;

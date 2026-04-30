@@ -7,20 +7,20 @@
 
 import {
   createEquipment,
+  douZhiYiYang,
   EQUIPMENT_LEVELS,
+  feiTianLianZhan,
+  gaoJiDouZhiYiYang,
+  gaoJiFeiTianLianZhan,
+  gaoJiXingMoJian,
+  huanMoZhiXin,
   lingHunJingShi,
   lingHunWang,
-  yueGuangBaoHe,
-  yueGuangBaoHeZengQiangBan,
+  moHunZhiXin,
   // 特殊怪物掉落物品
   xingMoJian,
-  gaoJiXingMoJian,
-  feiTianLianZhan,
-  gaoJiFeiTianLianZhan,
-  douZhiYiYang,
-  gaoJiDouZhiYiYang,
-  moHunZhiXin,
-  huanMoZhiXin,
+  yueGuangBaoHe,
+  yueGuangBaoHeZengQiangBan,
 } from '../data/inventoryData';
 import type { EquipmentItem, InventoryItem } from '../types';
 import { cloneItem, generateItemId } from './itemFactory';
@@ -259,8 +259,8 @@ export function mergeLootResults(results: LootResult[]): LootResult {
  * 用于判断是否为特殊怪物
  */
 const SPECIAL_MONSTER_IDS = [
-  'zhizhu',                    // 蜘蛛
-  'zhizhu-wanghou-aida',       // 蜘蛛王后艾达
+  'zhizhu', // 蜘蛛
+  'zhizhu-wanghou-aida', // 蜘蛛王后艾达
 ];
 
 /**
@@ -272,7 +272,7 @@ export function isSpecialMonster(monsterId: string): boolean {
   // 检查怪物ID是否包含特殊怪物标识
   return SPECIAL_MONSTER_IDS.some(id => monsterId.includes(id)) ||
          monsterId.includes('zhizhu') || // 蜘蛛相关
-         monsterId.includes('spider');   // 英文标识
+         monsterId.includes('spider'); // 英文标识
 }
 
 /**

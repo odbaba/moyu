@@ -1,6 +1,11 @@
 import './game-ending.css';
 
 import React from 'react';
+
+import { Capacitor } from '@capacitor/core';
+
+import { useTapTapLeaderboard } from '../../hooks/useTapTapLeaderboard';
+import { useTapTapLogin } from '../../hooks/useTapTapLogin';
 import type { GameEndingResult } from '../../utils/gameEndingUtils';
 
 /**
@@ -23,6 +28,15 @@ interface GameEndingPageProps {
  * 手机端一屏展示所有内容
  */
 const GameEndingPage: React.FC<GameEndingPageProps> = ({ result, onPlayAgain, onLoadSave, onContinuePlaying }) => {
+  // 检测是否在原生安卓环境
+  const isNative = Capacitor.isNativePlatform();
+
+  // TapTap 登录状态
+  const { isLoggedIn } = useTapTapLogin();
+
+  // TapTap 排行榜上传分数相关状态和方法
+  const { submitScores, isSubmitting, submitSuccess, submitError } = useTapTapLeaderboard();
+
   // 渲染单个评价项
   const renderEvaluationItem = (
     label: string,
@@ -59,6 +73,64 @@ const GameEndingPage: React.FC<GameEndingPageProps> = ({ result, onPlayAgain, on
         <span className="ending-value">{name}</span>
         <span className="ending-title">{prefix}{titleDisplay}</span>
       </div>
+    );
+  };
+
+  /**
+   * 点击上传分数按钮的处理函数
+   * 同时上传拯救国王天数和总战斗力到两个排行榜
+   */
+  const handleSubmitScore = async () => {
+    if (isSubmitting || submitSuccess) return;
+    // daysPassed 作为最快拯救国王排行榜的分数
+    // combatPower.value（总战斗力）作为最强战斗力排行榜的分数
+    const combatPowerValue = typeof result.combatPower.value === 'number'
+      ? result.combatPower.value
+      : parseInt(String(result.combatPower.value), 10) || 0;
+    await submitScores(result.daysPassed, combatPowerValue);
+  };
+
+  /**
+   * 渲染上传分数按钮
+   * 仅在原生环境且已登录时显示
+   * 根据上传状态显示不同样式和文字
+   */
+  const renderSubmitButton = () => {
+    // 非原生环境或未登录时不显示按钮
+    if (!(isNative && isLoggedIn)) return null;
+
+    // 上传成功后按钮变为已上传状态
+    if (submitSuccess) {
+      return (
+        <>
+          <button className="game-btn ending-btn ending-btn--submitted" disabled>
+            已上传
+          </button>
+          <p className="submit-status submit-status--success">上传成功</p>
+        </>
+      );
+    }
+
+    // 上传中状态
+    if (isSubmitting) {
+      return (
+        <button className="game-btn ending-btn ending-btn--submitting" disabled>
+          上传中...
+        </button>
+      );
+    }
+
+    // 默认状态：可点击上传
+    return (
+      <>
+        <button className="game-btn ending-btn ending-btn--submit" onClick={handleSubmitScore}>
+          上传分数
+        </button>
+        {/* 上传失败时显示错误信息 */}
+        {submitError && (
+          <p className="submit-status submit-status--error">{submitError}</p>
+        )}
+      </>
     );
   };
 
@@ -162,6 +234,8 @@ const GameEndingPage: React.FC<GameEndingPageProps> = ({ result, onPlayAgain, on
         <button className="game-btn ending-btn" onClick={onLoadSave}>
           读取存档
         </button>
+        {/* 上传分数按钮 - 仅在原生环境且已登录时显示 */}
+        {renderSubmitButton()}
       </div>
     </div>
   );

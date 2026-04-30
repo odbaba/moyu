@@ -148,7 +148,7 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
    * 用于一键售出功能
    */
   const commonEquipments = useMemo(() => {
-    return items.filter(item => 
+    return items.filter(item =>
       isEquipmentItem(item) && item.equipmentQuality === '普通品'
     ) as EquipmentItem[];
   }, [items]);
@@ -164,6 +164,7 @@ const InventoryPage: React.FC<InventoryPageProps> = ({
       const magicSoulLevel = item.magicSoulLevel || 0;
       const holeCount = item.holeCount || 0;
       const goldValue = 100 * useLevel * 1 + 100 * magicSoulLevel + 10000 * Math.pow(holeCount, 3);
+
       return total + goldValue;
     }, 0);
   }, [commonEquipments]);

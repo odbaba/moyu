@@ -1,25 +1,26 @@
 import './help.css';
 
 import React from 'react';
-import type { CharacterData, Pet, PrincessRelationship, PlayerResources } from '../../types';
-import {
-  getLevelHelpText,
-  getEquipmentQualityHelpText,
-  getEquipmentMagicSoulHelpText,
-  getEquipmentUseLevelHelpText,
-  getEquipmentSoulLevelHelpText,
-  getEquipmentSoulSetHelpText,
-  getPetHelpText,
-  getMilitaryRankHelpText,
-  getNobleRankHelpText,
-  getPrincessRelationHelpText,
-  getWealthHelpText
-} from '../../utils/helpUtils';
+
+import type { CharacterData, Pet, PlayerResources, PrincessRelationship } from '../../types';
 import {
   calculateEquipmentPower,
   calculatePetPower,
   formatNumber
 } from '../../utils/gameEndingUtils';
+import {
+  getEquipmentMagicSoulHelpText,
+  getEquipmentQualityHelpText,
+  getEquipmentSoulLevelHelpText,
+  getEquipmentSoulSetHelpText,
+  getEquipmentUseLevelHelpText,
+  getLevelHelpText,
+  getMilitaryRankHelpText,
+  getNobleRankHelpText,
+  getPetHelpText,
+  getPrincessRelationHelpText,
+  getWealthHelpText
+} from '../../utils/helpUtils';
 
 /**
  * 帮助页面组件属性接口

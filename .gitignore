@@ -27,3 +27,12 @@ reference
 .VSCodeCounter
 /dist (*).zip
 
+# Android 构建产物
+android/app/build
+android/build
+android/.gradle
+android/app/.gradle
+android/local.properties
+android/.idea
+android/capacitor-cordova-android-plugins/build
+

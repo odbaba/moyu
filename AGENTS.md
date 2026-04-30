@@ -17,3 +17,6 @@
 9.尽可能复用现有功能，避免重复实现相同的功能，如果已有功能逻辑存在不一致请和我确认是否需要修改，例：生成装备使用createEquipmentItem，生成幻兽使用generatePetByType，生成特殊的奇异兽（8星、12星、19星）使用generateStarStrangePet
 
 10.所有白色字体和白色边框都是指的#FCFFFF颜色
+
+11.所有依赖安卓原生能力的功能都需要根据Capacitor.isNativePlatform()判断是否在安卓原生环境，如果是则显示，否则隐藏
+

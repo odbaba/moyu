@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">魔域</string>
+    <string name="title_activity_main">魔域</string>
+    <string name="package_name">com.moyu.nilaizijianghu</string>
+    <string name="custom_url_scheme">com.moyu.nilaizijianghu</string>
+</resources>

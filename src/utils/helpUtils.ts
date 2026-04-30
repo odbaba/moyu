@@ -23,6 +23,7 @@ function calculateNextUseLevel(currentLevel: number): number {
   } else if (currentLevel < 125) {
     return 125;
   }
+
   return currentLevel;
 }
 
@@ -44,6 +45,7 @@ export function getLevelHelpText(level: number): string | null {
   if (level < 132) {
     return '日常任务，幻兽研究所任务、战斗和使用满经验球都可快速升级，可以在经验导师处兑换经验球';
   }
+
   return null;
 }
 
@@ -62,6 +64,7 @@ export function getEquipmentQualityHelpText(equipment: CharacterData['equipment'
       return '你有装备可以提升品质';
     }
   }
+
   // 所有装备都是极品或无装备，返回 null
   return null;
 }
@@ -81,6 +84,7 @@ export function getEquipmentMagicSoulHelpText(equipment: CharacterData['equipmen
       return '你有装备可以提升魔魂等级';
     }
   }
+
   // 所有装备魔魂等级都是12级或无装备，返回 null
   return null;
 }
@@ -109,6 +113,7 @@ export function getEquipmentUseLevelHelpText(
       return '你有装备可以提升使用等级';
     }
   }
+
   // 所有装备提升后都会超过角色等级，或已满级，返回 null
   return null;
 }
@@ -137,6 +142,7 @@ export function getEquipmentSoulLevelHelpText(
       return '你有装备可以提升战魂等级';
     }
   }
+
   // 所有装备战魂等级都是5级或无装备，返回 null
   return null;
 }
@@ -204,6 +210,7 @@ export function getMilitaryRankHelpText(militaryRankLevel: number): string | nul
   if (militaryRankLevel < 11) {
     return '获得战功来提高军衔和战斗力';
   }
+
   return null;
 }
 
@@ -217,6 +224,7 @@ export function getNobleRankHelpText(nobleRankLevel: number): string | null {
   if (nobleRankLevel < 6) {
     return '获得功勋来提高爵位和战斗力';
   }
+
   return null;
 }
 
@@ -230,6 +238,7 @@ export function getPrincessRelationHelpText(relationshipLevel: number): string |
   if (relationshipLevel < 6) {
     return '每周日给公主赠送礼物，每天和公主聊天，均可提升亲密度';
   }
+
   return null;
 }
 

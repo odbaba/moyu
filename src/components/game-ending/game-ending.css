@@ -134,6 +134,51 @@
   background-color: #a07e1a;
 }
 
+/* 上传分数按钮 - 蓝色主题 */
+.ending-btn--submit {
+  background-color: #1565C0;
+  border-color: #2196F3;
+  color: #FCFFFF;
+}
+
+.ending-btn--submit:hover {
+  background-color: #1976D2;
+}
+
+/* 上传分数按钮 - 上传中状态，灰色禁用 */
+.ending-btn--submitting {
+  background-color: #555;
+  border-color: #666;
+  color: #999;
+  cursor: wait;
+}
+
+/* 上传分数按钮 - 上传成功状态，绿色 */
+.ending-btn--submitted {
+  background-color: #2E7D32;
+  border-color: #4CAF50;
+  color: #FCFFFF;
+  cursor: default;
+}
+
+/* 上传分数提示信息 - 用于显示上传结果文字 */
+.submit-status {
+  color: #FCFFFF;
+  font-size: 0.8rem;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* 上传成功提示 - 绿色 */
+.submit-status--success {
+  color: #4CAF50;
+}
+
+/* 上传失败提示 - 红色 */
+.submit-status--error {
+  color: #ff6b6b;
+}
+
 /* 手机端响应式 - 确保一屏展示 */
 @media (max-width: 768px) {
   .game-ending-page {

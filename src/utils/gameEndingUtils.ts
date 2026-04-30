@@ -1,13 +1,12 @@
 import type { CharacterData, Pet } from '../types';
 import {
   calculateAllEquipmentQualityCombatPower,
-  calculateAllHoleCountCombatPower,
   calculateAllGemCombatPower,
+  calculateAllHoleCountCombatPower,
+  calculateAllPetsCombatPower,
   calculateEquipmentBaseCombatPower,
   calculateFullSetMagicSoulBonusCombatPower,
-  calculateSoulCombatPower,
-  calculateAllPetsCombatPower
-} from './combatPower';
+  calculateSoulCombatPower} from './combatPower';
 
 // 单个维度的评价结果
 export interface EvaluationItem {
@@ -135,7 +134,7 @@ export function evaluateLevel(level: number): EvaluationItem {
   }
 
   return {
-    value: level + '级',
+    value: `${level }级`,
     label: '你的等级',
     name: '',
     title,
@@ -171,7 +170,7 @@ export function evaluateEquipment(equipmentPower: number): EvaluationItem {
   }
 
   return {
-    value: equipmentPower + '战斗力',
+    value: `${equipmentPower }战斗力`,
     label: '你的装备的战斗力',
     name: '',
     title,
@@ -207,7 +206,7 @@ export function evaluatePet(petPower: number): EvaluationItem {
   }
 
   return {
-    value: petPower + '战斗力',
+    value: `${petPower }战斗力`,
     label: '你的幻兽的战斗力',
     name: '',
     title,

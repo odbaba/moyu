@@ -58,12 +58,16 @@ import { exampleCharacter } from './data/characterData';
 // 导入数据
 import { locations } from './data/gameData';
 import { generateBossInteractables, generateWumingshiInteractable, interactableConfig } from './data/interactableData';
-import { exampleItems, createInitialEquipment, gaoJiDouZhiYiYang } from './data/inventoryData';
+import { createInitialEquipment, exampleItems, gaoJiDouZhiYiYang } from './data/inventoryData';
 import { examplePets } from './data/petData';
 // 导入PK赛配置数据
 import { createPKBossEnemyData, getPKMatchGroup, getPKMatchReward, isSaturday } from './data/pkMatchData';
 import { getShopItemById } from './data/shopData';
 import { createInitialSkills } from './data/skillData';
+// 导入引导状态管理 Hook
+import { useGuide } from './hooks/useGuide';
+// 导入 TapTap 登录类型
+import type { TapTapUserInfo } from './plugins/TapTapLogin';
 import type { ActionInteractable, BattleCharacter, BattlePet, BattleResult, CharacterData, DailyTaskState, EnemyData, EnemyInteractable, EquipmentDetail, EquipmentItem, EquipmentSlotType, GemItem, Interactable, InventoryItem, MapChallengeState, NPCInteractable, Pet, PetInstituteState, PetType, PlayerResources, PrincessRelationship, RefineResult, RelationshipLevel, SkillDetail, TimeSystem } from './types';
 import { gainCharacterExperience } from './utils/attributeCalculator';
 // 导入 BOSS 工具函数
@@ -82,11 +86,15 @@ import {
   getValidPetsForTraining,
   removePetFromList
 } from './utils/dailyTaskUtils';
+// 导入开发者模式配置
+import { getInitialGold, getInitialMagicStone, getMiningTimeCost, isDeveloperMode } from './utils/developerMode';
 import { equipmentDetailToItem, equipmentItemToDetail } from './utils/equipmentConverter';
 // 导入装备检测工具函数
 import { canEquipEquipment, checkAllEquipmentLegendary } from './utils/equipmentUtils';
 // 导入经验计算工具函数
 import { calculateCombatPowerBonusExp } from './utils/experienceUtils';
+// 导入游戏结算工具函数
+import { calculateGameEnding, type GameEndingParams, type GameEndingResult } from './utils/gameEndingUtils';
 // 导入宝石合成工具函数
 import { consumeMaterials, getRecipeById, performSynthesis } from './utils/gemSynthesisUtils';
 // 导入物品工厂工具函数
@@ -141,12 +149,6 @@ import { learnSkillFromBook } from './utils/skillLearnUtils';
 import { useBackgroundMusic } from './utils/useBackgroundMusic';
 // 导入战魂物品掉落工具函数
 import { checkWarSoulDrop } from './utils/warSoulDropUtils';
-// 导入游戏结算工具函数
-import { calculateGameEnding, type GameEndingParams, type GameEndingResult } from './utils/gameEndingUtils';
-// 导入开发者模式配置
-import { isDeveloperMode, getInitialGold, getInitialMagicStone, getMiningTimeCost } from './utils/developerMode';
-// 导入引导状态管理 Hook
-import { useGuide } from './hooks/useGuide';
 
 // 初始化空装备槽位
 const createEmptyEquippedItems = (): Record<EquipmentSlotType, EquipmentDetail | null> => ({
@@ -169,6 +171,8 @@ function App() {
   // 游戏状态管理
   // 初始位置设置为雷鸣大陆（新游戏开始位置）
   const [currentLocation, setCurrentLocation] = useState('leiming-dalu');
+  // TapTap 用户 ID 状态（用于存档关联）
+  const [taptapUserId, setTaptapUserId] = useState<string | null>(null);
   const [interactionLog, setInteractionLog] = useState<string[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showMap, setShowMap] = useState(false);
@@ -217,6 +221,7 @@ function App() {
   // 初始化时从初始幻兽数据中读取已出战的幻兽填入槽位
   const [deployedPetSlots, setDeployedPetSlots] = useState<(Pet | null)[]>(() => {
     const deployed = examplePets.filter(p => p.isDeployed);
+
     return [deployed[0] || null, deployed[1] || null];
   });
   // 技能数据状态
@@ -389,6 +394,14 @@ function App() {
   // ========== 封面页操作处理 ==========
 
   /**
+   * 处理 TapTap 登录成功回调
+   * 更新用户 ID 状态，用于存档关联
+   */
+  const handleLoginSuccess = useCallback((userInfo: TapTapUserInfo) => {
+    setTaptapUserId(userInfo.userId);
+  }, []);
+
+  /**
    * 处理"开始游戏"
    * 保留存档数据，继续之前的游戏进度
    * 如果是首次进入，触发新手指引
@@ -421,8 +434,8 @@ function App() {
   const handleContinueGame = useCallback(() => {
     // 先设置 isInitializedRef，防止第一天初始化的 useEffect 执行
     isInitializedRef.current = true;
-    // 从存档读取数据
-    const savedData = loadGame();
+    // 从存档读取数据（传递 TapTap 用户 ID 进行验证）
+    const savedData = loadGame(taptapUserId ?? undefined);
     if (savedData) {
       // 恢复位置
       setCurrentLocation(savedData.currentLocation ?? 'kasanuocheng');
@@ -489,7 +502,7 @@ function App() {
     }
     // 关闭封面页，进入游戏主界面
     setShowCover(false);
-  }, []);
+  }, [taptapUserId]);
 
   // 日常任务状态
   const [_dailyTaskState, setDailyTaskState] = useState<DailyTaskState>(
@@ -698,7 +711,8 @@ function App() {
       isWin,
       maxCombatPower,
     };
-    const success = saveGame(saveData);
+    // 保存游戏（传递 TapTap 用户 ID 进行账号关联）
+    const success = saveGame(saveData, taptapUserId ?? undefined);
     // 在交互日志中显示保存结果
     if (success) {
       setInteractionLog(prev => [...prev, '💾 游戏保存成功！']);
@@ -715,6 +729,7 @@ function App() {
     killedMonsters, spawnedBosses, spawnedSpecialMonsters, _dailyTaskState, mapChallengeState,
     hasParticipatedPKToday, maid1DailyPurchaseCount, hasPurchasedYearPig,
     hasUsedDianJiangYaoShuiToday, petInstituteState, isWin, maxCombatPower,
+    taptapUserId,
   ]);
 
   // 游戏初始化时的第一天日志和 BOSS 刷新
@@ -894,6 +909,7 @@ function App() {
       // 如果超过一天的时间上限，进入下一天
       if (newNowtime >= prev.onedaytime) {
         const newNowday = prev.nowday + 1;
+
         return {
           ...prev,
           nowtime: 0,
@@ -2258,7 +2274,7 @@ function App() {
           // 发放白玫瑰
           if (reward.whiteRoses && reward.whiteRoses > 0 && reward.roseType) {
             // 将roseType转换为完整的物品名称（'99朵' -> '99朵白玫瑰'，'999朵' -> '999朵白玫瑰'）
-            const roseName = reward.roseType + '白玫瑰';
+            const roseName = `${reward.roseType }白玫瑰`;
             // 玫瑰物品数量固定为1（一个'999朵白玫瑰'物品就代表999朵玫瑰）
             const roseItem = createItemFromTemplate(roseName, 1);
             if (roseItem) {
@@ -3438,6 +3454,7 @@ function App() {
                 for (const lootItem of specialLoot.items) {
                   newInventory = addItemToInventory(newInventory, lootItem);
                 }
+
                 return newInventory;
               });
 
@@ -3766,9 +3783,16 @@ function App() {
       });
     }
 
+    // ========== PK赛战斗离开处理 ==========
+    // PK赛战斗中离开等同于战斗失败，清空PK赛分组状态
+    if (currentPKMatchGroup) {
+      setCurrentPKMatchGroup(null);
+      setInteractionLog(prev => [...prev, 'PK赛中离开战斗，视为挑战失败！']);
+    }
+
     // 添加离开战斗消息到交互日志
     setInteractionLog(prev => [...prev, '你离开了战斗。']);
-  }, [consumeTime]);
+  }, [consumeTime, currentPKMatchGroup]);
 
   /**
    * 获取出战幻兽列表
@@ -3861,6 +3885,7 @@ function App() {
     setDeployedPetSlots(prev => {
       const newSlots = [...prev];
       newSlots[emptySlotIndex] = { ...petToDeploy, isDeployed: true, isMerged: true };
+
       return newSlots;
     });
 
@@ -4629,6 +4654,7 @@ function App() {
           onStartGame={handleStartGame}
           onContinueGame={handleContinueGame}
           hasSaveData={hasSaveData()}
+          onLoginSuccess={handleLoginSuccess}
         />
       ) : showGameEnding ? (
         /* 游戏结算页面 */

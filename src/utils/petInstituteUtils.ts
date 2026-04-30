@@ -50,6 +50,7 @@ const PRODUCTION_TASK_EXP_REWARD_BASE: Record<number, number> = {
  */
 export function getProductionTaskExpReward(productionRate: number): number {
   const baseExp = PRODUCTION_TASK_EXP_REWARD_BASE[productionRate] || 0;
+
   return Math.floor(baseExp * getExperienceMultiplier());
 }
 

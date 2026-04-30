@@ -64,7 +64,7 @@ export function learnSkillFromBook(
     if (isIncrementalUpgrade) {
       // 斗志昂扬最高等级为5级
       const maxLevel = targetSkill.skillIndex === 4 ? 5 : (targetSkill.maxLevel || 2);
-      
+
       if (targetSkill.level >= maxLevel) {
         return {
           success: false,
