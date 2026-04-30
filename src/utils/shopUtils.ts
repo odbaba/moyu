@@ -99,7 +99,7 @@ export function hasInventorySpace(
  * @param item 物品信息
  * @returns 出售价格（金币和魔石）
  */
-export function calculateSellPrice(item: InventoryItem): { gold: number; magicStone: number } {
+export function calculateSellPrice(item: InventoryItem, shopType?: ShopType): { gold: number; magicStone: number } {
   const quantity = item.quantity || 1;
 
   // 装备类物品：根据公式计算价值
@@ -121,9 +121,9 @@ export function calculateSellPrice(item: InventoryItem): { gold: number; magicSt
     // 金币价值 = 100 * dj * (pz + 1) + 100 * mhdj + 10000 * dong³
     const goldValue = 100 * dj * (pz + 1) + 100 * mhdj + 10000 * dong * dong * dong;
 
-    // 魔石价值（仅极品 pz=4）
+    // 魔石价值（仅极品 pz=4），金币商店不出售魔石
     let magicStoneValue = 0;
-    if (pz === 4) {
+    if (shopType !== 'gold' && pz === 4) {
       magicStoneValue = 28 * (dj * 2.5 + 50) + mhdj * 128 + 1500 * dong * dong * dong;
     }
 
@@ -136,7 +136,8 @@ export function calculateSellPrice(item: InventoryItem): { gold: number; magicSt
 
   // 非装备类物品：使用 goldValue 和 magicStoneValue 属性
   const goldValue = item.goldValue || 0;
-  const magicStoneValue = item.magicStoneValue || 0;
+  // 金币商店不出售魔石，强制为0
+  const magicStoneValue = shopType === 'gold' ? 0 : (item.magicStoneValue || 0);
 
   // 出售价格为75%
   return {
@@ -232,7 +233,8 @@ export function purchaseItem(
  */
 export function sellItem(
   item: InventoryItem,
-  quantity: number
+  quantity: number,
+  shopType?: ShopType
 ): SellResult {
   // 1. 检查出售数量是否合法
   if (quantity <= 0) {
@@ -251,9 +253,9 @@ export function sellItem(
     };
   }
 
-  // 3. 计算出售价格（创建临时物品用于计算单价）
+  // 3. 计算出售价格（创建临时物品用于计算单价，传入商店类型以控制货币类型）
   const tempItem = { ...item, quantity: 1 };
-  const unitPrice = calculateSellPrice(tempItem);
+  const unitPrice = calculateSellPrice(tempItem, shopType);
   const goldEarned = unitPrice.gold * quantity;
   const magicStoneEarned = unitPrice.magicStone * quantity;
 

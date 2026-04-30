@@ -278,7 +278,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
     // 先关闭弹窗，避免遮挡提示信息
     setSelectedItem(null);
 
-    const result = sellItem(inventoryItem, quantity);
+    const result = sellItem(inventoryItem, quantity, shopType);
 
     if (result.success) {
       onSell(result.itemId!, result.quantity!, result.goldEarned || 0, result.magicStoneEarned || 0);
@@ -359,7 +359,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
       : 0;
 
     const sellPriceResult = !isBuying && inventoryItem
-      ? calculateSellPrice({ ...inventoryItem, quantity })
+      ? calculateSellPrice({ ...inventoryItem, quantity }, shopType)
       : { gold: 0, magicStone: 0 };
 
     // 检查是否可以购买
