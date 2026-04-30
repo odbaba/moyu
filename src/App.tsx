@@ -212,6 +212,13 @@ function App() {
   const [showPetPage, setShowPetPage] = useState(false);
   // 幻兽数据状态
   const [pets, setPets] = useState<Pet[]>(examplePets);
+  // 出战幻兽槽位状态：固定2个槽位，空槽位为 null
+  // 槽位0和槽位1分别对应位置一和位置二，召回时只清空对应槽位，不移动其他槽位
+  // 初始化时从初始幻兽数据中读取已出战的幻兽填入槽位
+  const [deployedPetSlots, setDeployedPetSlots] = useState<(Pet | null)[]>(() => {
+    const deployed = examplePets.filter(p => p.isDeployed);
+    return [deployed[0] || null, deployed[1] || null];
+  });
   // 技能数据状态
   const [skills, setSkills] = useState<SkillDetail[]>(createInitialSkills(false));
 
@@ -3775,9 +3782,16 @@ function App() {
   /**
    * 召回幻兽
    * 将幻兽从出战状态切换为休息状态
+   * 只清空对应槽位，不移动其他槽位的幻兽
    * @param petId 要召回的幻兽ID
    */
   const handleRecallPet = (petId: string) => {
+    // 清空对应槽位（将匹配的幻兽置为 null）
+    setDeployedPetSlots(prev =>
+      prev.map(slot => slot?.id === petId ? null : slot)
+    );
+
+    // 同步更新 pets 中的出战状态
     setPets(prev => prev.map(pet =>
       pet.id === petId
         ? { ...pet, isDeployed: false, isMerged: false }
@@ -3791,6 +3805,11 @@ function App() {
    * @param petId 要合体的幻兽ID
    */
   const handleMergePet = (petId: string) => {
+    // 同步更新出战槽位中的幻兽引用
+    setDeployedPetSlots(prev =>
+      prev.map(slot => slot?.id === petId ? { ...slot, isMerged: true } : slot)
+    );
+
     setPets(prev => prev.map(pet =>
       pet.id === petId
         ? { ...pet, isMerged: true }
@@ -3804,6 +3823,11 @@ function App() {
    * @param petId 要解体的幻兽ID
    */
   const handleUnmergePet = (petId: string) => {
+    // 同步更新出战槽位中的幻兽引用
+    setDeployedPetSlots(prev =>
+      prev.map(slot => slot?.id === petId ? { ...slot, isMerged: false } : slot)
+    );
+
     setPets(prev => prev.map(pet =>
       pet.id === petId
         ? { ...pet, isMerged: false }
@@ -3813,22 +3837,55 @@ function App() {
 
   /**
    * 出战幻兽
-   * 将幻兽设置为出战状态
-   * 最多同时出战2只幻兽
+   * 将幻兽设置为出战状态，填入第一个空槽位
+   * 最多同时出战2只幻兽，空槽位用 null 表示
    * @param petId 要出战的幻兽ID
    */
   const handleDeployPet = (petId: string) => {
-    // 检查当前出战数量
-    const currentDeployedCount = pets.filter(p => p.isDeployed).length;
-    if (currentDeployedCount >= 2) {
+    // 通过槽位检查当前出战数量
+    const emptySlotIndex = deployedPetSlots.findIndex(slot => slot === null);
+    if (emptySlotIndex === -1) {
       return; // 已满2只，不能再出战
     }
 
+    // 检查是否已出战（防止重复出战）
+    if (deployedPetSlots.some(slot => slot?.id === petId)) {
+      return;
+    }
+
+    // 在 pets 中找到该幻兽
+    const petToDeploy = pets.find(p => p.id === petId);
+    if (!petToDeploy) return;
+
+    // 填入第一个空槽位（存储的引用需包含 isDeployed/isMerged 状态，
+    // 因为 PetListItem 依据 pet.isDeployed 决定显示"出战"还是"召回"按钮）
+    setDeployedPetSlots(prev => {
+      const newSlots = [...prev];
+      newSlots[emptySlotIndex] = { ...petToDeploy, isDeployed: true, isMerged: true };
+      return newSlots;
+    });
+
+    // 同步更新 pets 中的出战状态（出征时自动进入合体状态）
     setPets(prev => prev.map(pet =>
       pet.id === petId
-        ? { ...pet, isDeployed: true, isMerged: true } // 出征时自动进入合体状态
+        ? { ...pet, isDeployed: true, isMerged: true }
         : pet
     ));
+  };
+
+  /**
+   * 丢弃幻兽
+   * 从幻兽列表中移除该幻兽，如果正在出战则同时清空对应槽位
+   * @param petId 要丢弃的幻兽ID
+   */
+  const handleDiscardPet = (petId: string) => {
+    // 如果该幻兽正在出战，清空对应槽位
+    setDeployedPetSlots(prev =>
+      prev.map(slot => slot?.id === petId ? null : slot)
+    );
+
+    // 从幻兽数组中移除
+    setPets(prev => prev.filter(pet => pet.id !== petId));
   };
 
   /**
@@ -4741,11 +4798,12 @@ function App() {
             isVisible={showPetPage}
             onClose={() => setShowPetPage(false)}
             pets={pets}
-            deployedPets={getDeployedPets()}
+            deployedPets={deployedPetSlots}
             onRecall={handleRecallPet}
             onMerge={handleMergePet}
             onUnmerge={handleUnmergePet}
             onDeploy={handleDeployPet}
+            onDiscard={handleDiscardPet}
           />
 
           {/* 设置页面 */}

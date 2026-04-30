@@ -27,10 +27,12 @@ pet/
 - `isVisible: boolean` - 是否显示页面
 - `onClose: () => void` - 关闭页面的回调函数
 - `pets: Pet[]` - 所有幻兽数据数组
-- `deployedPets: Pet[]` - 出战幻兽数组（最多2只）
-- `onRecall: (petId: string) => void` - 召回幻兽的回调函数
+- `deployedPets: (Pet | null)[]` - 出战幻兽槽位数组（固定2个元素，槽位0=位置一，槽位1=位置二，空槽位为 null）
+- `onRecall: (petId: string) => void` - 召回幻兽的回调函数（清空对应槽位，不移动其他槽位）
 - `onMerge: (petId: string) => void` - 合体幻兽的回调函数
 - `onUnmerge: (petId: string) => void` - 解体幻兽的回调函数
+- `onDeploy: (petId: string) => void` - 出战幻兽的回调函数（填入第一个空槽位）
+- `onDiscard: (petId: string) => void` - 丢弃幻兽的回调函数（从幻兽列表移除，若出战则同步清空槽位）
 
 **布局结构**：
 - 顶部：页面标题和关闭按钮
@@ -73,6 +75,10 @@ pet/
 **Props**：
 - `pet: Pet` - 幻兽对象
 - `onClick: (pet: Pet) => void` - 点击幻兽项时触发的回调函数
+- `onDeploy?: (petId: string) => void` - 出战幻兽的回调函数
+- `onRecall?: (petId: string) => void` - 召回幻兽的回调函数
+- `canDeploy?: boolean` - 是否可以出战（默认true）
+- `onDiscard?: (petId: string) => void` - 丢弃幻兽的回调函数（仅休息中幻兽显示）
 
 **显示内容**：
 - 幻兽头像（emoji图标）
@@ -81,6 +87,7 @@ pet/
 - 幻兽等级
 - 品质标签
 - 状态标签（出战中/合体中）
+- 操作按钮：出战中显示"召回"，休息中显示"出战"+"丢弃"
 
 **品质颜色映射**：
 - 普通：#9e9e9e（灰色）
@@ -190,13 +197,22 @@ import { examplePets } from './data/petData';
 const App: React.FC = () => {
   const [showPetPage, setShowPetPage] = useState(false);
   const [pets, setPets] = useState(examplePets);
-  const [deployedPets, setDeployedPets] = useState(
-    examplePets.filter(p => p.isDeployed)
-  );
+  const [deployedPets, setDeployedPets] = useState<(Pet | null)[]>([null, null]);
 
   const handleRecall = (petId: string) => {
-    // 召回幻兽逻辑
-    console.log('召回幻兽:', petId);
+    // 召回幻兽逻辑：清空对应槽位，不移动其他槽位
+    setDeployedPets(prev => prev.map(slot => slot?.id === petId ? null : slot));
+    setPets(prev => prev.map(p => p.id === petId ? { ...p, isDeployed: false } : p));
+  };
+
+  const handleDeploy = (petId: string) => {
+    // 出战幻兽逻辑：填入第一个空槽位
+    const emptyIndex = deployedPets.findIndex(s => s === null);
+    if (emptyIndex === -1) return;
+    const pet = pets.find(p => p.id === petId);
+    if (!pet) return;
+    setDeployedPets(prev => { const n = [...prev]; n[emptyIndex] = pet; return n; });
+    setPets(prev => prev.map(p => p.id === petId ? { ...p, isDeployed: true } : p));
   };
 
   const handleMerge = (petId: string) => {
@@ -223,6 +239,7 @@ const App: React.FC = () => {
         onRecall={handleRecall}
         onMerge={handleMerge}
         onUnmerge={handleUnmerge}
+        onDeploy={handleDeploy}
       />
     </div>
   );
@@ -259,7 +276,7 @@ export default App;
 ## 注意事项
 
 1. **幻兽数据**：确保传入的幻兽数据符合 `Pet` 接口定义
-2. **出战幻兽**：最多支持2只幻兽同时出战
+2. **出战幻兽**：最多支持2只幻兽同时出战，固定2个槽位（槽位0=位置一，槽位1=位置二）。召回时只清空对应槽位，不移动其他槽位。出战时自动填入第一个空槽位。
 3. **回调函数**：所有回调函数必须正确实现，否则操作按钮无法正常工作
 4. **品质称号**：品质称号基于总评分自动计算，无需手动设置
 5. **合体状态**：合体状态的幻兽会显示特殊的边框样式和标签

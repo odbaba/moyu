@@ -608,6 +608,63 @@
   transform: scale(0.95);
 }
 
+/* 幻兽列表项操作按钮容器（出战+丢弃） */
+.pet-list-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* 幻兽列表项丢弃按钮 */
+.pet-discard-button {
+  padding: 5px 10px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #e53935 0%, #b71c1c 100%);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border: 1px solid #7f0000;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.pet-discard-button:hover {
+  background: linear-gradient(180deg, #ef5350 0%, #c62828 100%);
+  transform: scale(1.05);
+}
+
+.pet-discard-button:active {
+  transform: scale(0.95);
+}
+
+/* 丢弃确认弹窗 */
+.pet-discard-confirm {
+  max-width: 360px;
+  text-align: center;
+}
+
+.pet-discard-confirm .pet-discard-confirm-title {
+  font-size: 1.1rem;
+  color: #ffd700;
+  margin: 0 0 12px 0;
+  padding-right: 24px;
+}
+
+.pet-discard-confirm .pet-discard-confirm-text {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin: 0 0 8px 0;
+}
+
+.pet-discard-confirm .pet-discard-confirm-warning {
+  font-size: 0.75rem;
+  color: #e57373;
+  margin: 0 0 16px 0;
+}
+
 /* ========== 幻兽详情弹窗样式 ========== */
 
 .pet-detail-modal-overlay {

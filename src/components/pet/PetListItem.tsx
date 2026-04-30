@@ -34,6 +34,11 @@ interface PetListItemProps {
    * 当已有两只幻兽出战时，应该为false
    */
   canDeploy?: boolean;
+  /**
+   * 丢弃幻兽的回调函数（可选，仅对休息中的幻兽生效）
+   * @param petId 要丢弃的幻兽ID
+   */
+  onDiscard?: (petId: string) => void;
 }
 
 /**
@@ -47,7 +52,8 @@ const PetListItem: React.FC<PetListItemProps> = ({
   onClick,
   onDeploy,
   onRecall,
-  canDeploy = true
+  canDeploy = true,
+  onDiscard
 }) => {
   /**
    * 处理点击事件
@@ -75,6 +81,17 @@ const PetListItem: React.FC<PetListItemProps> = ({
     e.stopPropagation();
     if (onRecall && pet.isDeployed) {
       onRecall(pet.id);
+    }
+  };
+
+  /**
+   * 处理丢弃按钮点击事件
+   * 阻止事件冒泡，避免触发列表项点击
+   */
+  const handleDiscardClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDiscard) {
+      onDiscard(pet.id);
     }
   };
 
@@ -138,14 +155,22 @@ const PetListItem: React.FC<PetListItemProps> = ({
           召回
         </button>
       ) : (
-        /* 未出战 - 显示出战按钮 */
-        <button
-          className={`pet-deploy-button ${!canDeploy ? 'disabled' : ''}`}
-          onClick={handleDeployClick}
-          disabled={!canDeploy}
-        >
-          出战
-        </button>
+        /* 未出战 - 显示出战和丢弃按钮 */
+        <div className="pet-list-actions">
+          <button
+            className={`pet-deploy-button ${!canDeploy ? 'disabled' : ''}`}
+            onClick={handleDeployClick}
+            disabled={!canDeploy}
+          >
+            出战
+          </button>
+          <button
+            className="pet-discard-button"
+            onClick={handleDiscardClick}
+          >
+            丢弃
+          </button>
+        </div>
       )}
     </div>
   );
