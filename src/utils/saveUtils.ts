@@ -46,6 +46,8 @@ export interface SaveData {
   inventory: InventoryItem[];
   // 幻兽列表
   pets: Pet[];
+  // 出战幻兽槽位（固定2个元素，空槽位为 null，保存槽位顺序防止读档时错乱）
+  deployedPetSlots: (Pet | null)[];
   // 技能列表
   skills: SkillDetail[];
   // 军衔等级（0-11）
