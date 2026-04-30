@@ -218,12 +218,8 @@ function App() {
   const [pets, setPets] = useState<Pet[]>(examplePets);
   // 出战幻兽槽位状态：固定2个槽位，空槽位为 null
   // 槽位0和槽位1分别对应位置一和位置二，召回时只清空对应槽位，不移动其他槽位
-  // 初始化时从初始幻兽数据中读取已出战的幻兽填入槽位
-  const [deployedPetSlots, setDeployedPetSlots] = useState<(Pet | null)[]>(() => {
-    const deployed = examplePets.filter(p => p.isDeployed);
-
-    return [deployed[0] || null, deployed[1] || null];
-  });
+  // 初始为空，由 handleStartGame（新游戏）或 handleContinueGame（继续游戏）填充
+  const [deployedPetSlots, setDeployedPetSlots] = useState<(Pet | null)[]>([null, null]);
   // 技能数据状态
   const [skills, setSkills] = useState<SkillDetail[]>(createInitialSkills(false));
 
@@ -407,6 +403,9 @@ function App() {
    * 如果是首次进入，触发新手指引
    */
   const handleStartGame = useCallback(() => {
+    // 新游戏：从初始幻兽数据中设置出战槽位
+    const deployed = examplePets.filter(p => p.isDeployed);
+    setDeployedPetSlots([deployed[0] || null, deployed[1] || null]);
     // 关闭封面页，进入游戏主界面
     setShowCover(false);
     // 如果是首次进入，触发新手指引
@@ -449,8 +448,27 @@ function App() {
       setEquippedItems(savedData.equippedItems);
       // 恢复背包
       setInventory(savedData.inventory);
-      // 恢复幻兽
-      setPets(savedData.pets);
+      // 恢复出战幻兽槽位（优先使用存档中的槽位数据，兼容旧存档用 isDeployed 推断）
+      let loadedSlots: (Pet | null)[];
+      if (savedData.deployedPetSlots) {
+        loadedSlots = savedData.deployedPetSlots;
+      } else {
+        const savedDeployed = savedData.pets.filter((p: Pet) => p.isDeployed);
+        loadedSlots = [savedDeployed[0] || null, savedDeployed[1] || null];
+      }
+      setDeployedPetSlots(loadedSlots);
+
+      // 恢复幻兽列表，并根据槽位数据修正 isDeployed 标志
+      // 确保只有槽位中的幻兽 isDeployed 为 true，其余为 false
+      const slotDeployedIds = loadedSlots
+        .filter((s: Pet | null): s is Pet => s !== null)
+        .map((s: Pet) => s.id);
+      const reconciledPets = savedData.pets.map((p: Pet) => ({
+        ...p,
+        isDeployed: slotDeployedIds.includes(p.id),
+        isMerged: slotDeployedIds.includes(p.id) ? p.isMerged : false,
+      }));
+      setPets(reconciledPets);
       // 恢复技能
       setSkills(savedData.skills);
       // 恢复军衔和战功
@@ -687,6 +705,7 @@ function App() {
       equippedItems,
       inventory,
       pets,
+      deployedPetSlots,
       skills,
       militaryRank,
       battleExp,
@@ -723,7 +742,7 @@ function App() {
     return success;
   }, [
     currentLocation, timeSystem, character, playerResources, equippedItems,
-    inventory, pets, skills, militaryRank, battleExp, hasClaimedMilitaryPay,
+    inventory, pets, deployedPetSlots, skills, militaryRank, battleExp, hasClaimedMilitaryPay,
     nobleRank, princessRelationship, isKingRescued, explorerUnlocked,
     mysteriousPersonTriggered, wumingshiDefeated, warSoulSystemEnabled,
     killedMonsters, spawnedBosses, spawnedSpecialMonsters, _dailyTaskState, mapChallengeState,
