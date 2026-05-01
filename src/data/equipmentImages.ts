@@ -6,18 +6,6 @@
 import type { EquipmentItem } from '../types';
 
 /**
- * 装备类型对应的emoji回退图标
- */
-export const EQUIPMENT_FALLBACK_ICONS: Record<EquipmentItem['equipmentType'], string> = {
-  weapon: '⚔️',
-  helmet: '🪖',
-  clothes: '🛡️',
-  shoes: '👢',
-  bracelet: '💫',
-  necklace: '📿',
-};
-
-/**
  * 获取装备图片路径
  * @param equipmentType 装备类型
  * @param useLevel 使用等级

@@ -17,16 +17,6 @@ export interface Interaction {
   options: InteractionOption[];
 }
 
-// 位置数据类型定义
-export interface LocationData {
-  [key: string]: Location;
-}
-
-// 交互数据类型定义
-export interface InteractionData {
-  [key: string]: Interaction;
-}
-
 // 网格位置类型定义
 export interface GridPosition {
   x: number;
@@ -41,21 +31,6 @@ export interface Skill {
   mpCost: number;
   fixedDamage: number;
   attackPercent: number;
-}
-
-// 角色接口定义
-export interface Character {
-  id: string;
-  name: string;
-  maxHp: number;
-  currentHp: number;
-  maxMp: number;
-  currentMp: number;
-  attack: number;
-  defense: number;
-  skills: Skill[];
-  isPlayer: boolean;
-  gridPosition: GridPosition;
 }
 
 // 装备类型枚举
@@ -78,39 +53,6 @@ export interface CharacterEquipment {
   weapon: Equipment | null;
   armor: Equipment | null;
   accessory: Equipment | null;
-}
-
-// 详细角色信息接口定义
-export interface CharacterDetail {
-  id: string;
-  name: string;
-  level: number;
-  exp: number;
-  maxExp: number;
-  maxHp: number;
-  currentHp: number;
-  maxMp: number;
-  currentMp: number;
-  attack: number;
-  defense: number;
-  equipment: CharacterEquipment;
-  skills: Skill[];
-}
-
-// 角色属性总览接口定义
-export interface CharacterStats {
-  baseAttack: number;
-  baseDefense: number;
-  baseMaxHp: number;
-  baseMaxMp: number;
-  equipmentAttack: number;
-  equipmentDefense: number;
-  equipmentMaxHp: number;
-  equipmentMaxMp: number;
-  totalAttack: number;
-  totalDefense: number;
-  totalMaxHp: number;
-  totalMaxMp: number;
 }
 
 // 装备品质类型（普通品=白品，品质0）
@@ -474,24 +416,7 @@ export interface SkillLearnResult {
   skillLevel?: number; // 技能等级（可选，用于公主关系技能学习）
 }
 
-/**
- * 关系升级结果接口
- * 包含关系更新和技能学习的结果
- * 用于公主关系系统
- */
-export interface RelationshipUpgradeResult {
-  relationship: PrincessRelationship; // 更新后的关系数据
-  skillLearnResult: SkillLearnResult | null; // 技能学习结果（如果有的话）
-  upgradeMessage: string; // 升级提示消息
-}
-
 // ========== 交互系统类型定义 ==========
-
-/**
- * 交互类型枚举
- * 定义三种标准交互类型
- */
-export type InteractableType = 'action' | 'enemy' | 'npc';
 
 /**
  * 动作类型枚举
@@ -879,18 +804,6 @@ export interface EnemyTemplate {
   description?: string; // 敌人描述
 }
 
-/**
- * 战斗初始化参数接口
- */
-export interface BattleInitParams {
-  playerData: CharacterData; // 玩家角色数据
-  playerSkills: SkillDetail[]; // 玩家技能数据
-  enemyTemplate: EnemyTemplate; // 敌人模板
-  enemyLevel: number; // 敌人等级
-  enemyCount: number; // 敌人数量
-  pets?: Pet[]; // 幻兽数组，用于计算幻兽战斗力加成
-}
-
 // ========== 怪物系统类型定义 ==========
 
 /**
@@ -1047,6 +960,17 @@ export interface PrincessRelationship {
 }
 
 /**
+ * 关系升级结果接口
+ * 包含关系更新和技能学习的结果
+ * 用于公主关系系统
+ */
+export interface RelationshipUpgradeResult {
+  relationship: PrincessRelationship; // 更新后的关系数据
+  skillLearnResult: SkillLearnResult | null; // 技能学习结果（如果有的话）
+  upgradeMessage: string; // 升级提示消息
+}
+
+/**
  * 关系等级配置接口
  * 定义每个关系等级的详细信息
  */
@@ -1170,16 +1094,6 @@ export interface DailyTaskStatus {
   targetProgress: number; // 目标进度
   acceptedAt?: number; // 接受时间戳
   completedAt?: number; // 完成时间戳
-}
-
-/**
- * 日常任务完成结果接口
- * 定义任务完成后的结果
- */
-export interface DailyTaskCompletionResult {
-  success: boolean; // 是否成功
-  message: string; // 提示消息
-  rewards?: DailyTaskReward; // 获得的奖励
 }
 
 /**
@@ -1322,17 +1236,6 @@ export enum WarSoulType {
  * - zhanHunJingShi: 战魂晶石
  */
 export type WarSoulItemType = 'zhanHunZhiXin' | 'zhanHunJingShi';
-
-/**
- * 战魂掉落配置接口
- * 定义怪物掉落战魂物品的配置
- */
-export interface WarSoulDropConfig {
-  monsterId: string; // 怪物ID
-  itemType: WarSoulItemType; // 战魂物品类型（战魂之心/战魂晶石）
-  dropRate: number; // 掉落概率（0-1之间）
-  requireSystemEnabled: boolean; // 是否需要战魂系统开启才能掉落
-}
 
 // ========== 地图挑战系统类型定义 ==========
 

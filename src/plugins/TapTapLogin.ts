@@ -16,17 +16,6 @@ export interface TapTapUserInfo {
 }
 
 /**
- * TapTap 登录错误类型定义
- * 用于登录过程中可能出现的错误情况
- */
-export interface TapTapLoginError {
-  /** 错误代码 */
-  code: string;
-  /** 错误信息描述 */
-  message: string;
-}
-
-/**
  * 登录状态检测结果
  */
 export interface LoginStatusResult {

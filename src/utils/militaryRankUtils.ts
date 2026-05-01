@@ -392,17 +392,6 @@ export function getMilitaryRankDescription(): string {
   return text;
 }
 
-// ========== 战功奖励计算 ==========
-
-/**
- * 战功获取来源配置
- * 参考文档：reference/docs/scripts_analysis/14_NPC系统.md
- */
-export const BATTLE_EXP_REWARDS = {
-  BOSS_KILL: 1000, // 消灭BOSS获得战功
-  ICE_GIANT_KILL: 10000, // 消灭雪域边境冰雪巨人获得战功
-};
-
 // ========== 战功获取和晋升逻辑 ==========
 
 /**

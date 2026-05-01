@@ -7,33 +7,9 @@
 // 导入日常任务相关类型
 import type {
   DailyTask,
-  PetTrainingReward,
 } from '../types';
 
 // ==================== 训练幻兽任务奖励配置 ====================
-
-/**
- * 训练幻兽任务奖励配置
- * 根据幻兽星级给予不同数量的魔石奖励
- * 参考文档：14_NPC系统.md 第190-196行
- */
-export const petTrainingRewards: PetTrainingReward[] = [
-  {
-    starLevel: 10, // 极品10星
-    magicStone: 5000, // 奖励5000魔石
-    description: '极品10星攻防型幻兽奖励5000魔石',
-  },
-  {
-    starLevel: 15, // 极品15星
-    magicStone: 10000, // 奖励10000魔石
-    description: '极品15星攻防型幻兽奖励10000魔石',
-  },
-  {
-    starLevel: 30, // 极品30星
-    magicStone: 50000, // 奖励50000魔石
-    description: '极品30星攻防型幻兽奖励50000魔石',
-  },
-];
 
 // ==================== 每日任务配置 ====================
 
@@ -236,20 +212,6 @@ const dailyTaskSunday: DailyTask = {
 // ==================== 任务配置映射表 ====================
 
 /**
- * 日常任务配置映射表
- * 按任务ID组织，便于快速查找
- */
-export const dailyTaskConfig: Record<string, DailyTask> = {
-  daily_task_monday: dailyTaskMonday,
-  daily_task_tuesday: dailyTaskTuesday,
-  daily_task_wednesday: dailyTaskWednesday,
-  daily_task_thursday: dailyTaskThursday,
-  daily_task_friday: dailyTaskFriday,
-  daily_task_saturday: dailyTaskSaturday,
-  daily_task_sunday: dailyTaskSunday,
-};
-
-/**
  * 按星期分组的任务配置
  * 索引0=周日，1=周一，...，6=周六
  */
@@ -263,27 +225,4 @@ export const dailyTasksByWeekday: Record<number, DailyTask> = {
   6: dailyTaskSaturday, // 周六
 };
 
-
-// ==================== 辅助函数 ====================
-
-/**
- * 根据幻兽星级获取训练任务奖励
- * @param starLevel 幻兽星级
- * @returns 奖励配置，如果没有匹配则返回基础奖励
- */
-export function getPetTrainingReward(starLevel: number): PetTrainingReward | null {
-  // 查找匹配的奖励配置
-  const reward = petTrainingRewards.find(r => r.starLevel === starLevel);
-
-  if (reward) {
-    return reward;
-  }
-
-  // 如果没有精确匹配，返回最接近的低星级奖励
-  const lowerReward = petTrainingRewards
-    .filter(r => r.starLevel <= starLevel)
-    .sort((a, b) => b.starLevel - a.starLevel)[0];
-
-  return lowerReward || null;
-}
 

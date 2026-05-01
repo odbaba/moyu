@@ -43,14 +43,6 @@ export interface Interaction {
 export type LocationData = Location[];
 
 /**
- * 交互数据类型定义（旧版，保留兼容性）
- * @deprecated 请使用 interactableConfig
- */
-export interface InteractionData {
-  [key: string]: Interaction;
-}
-
-/**
  * 位置数据 - 魔域新地图
  * 坐标系统：x从左到右增大，y从上到下增大
  * 北边 = y更小，南边 = y更大

@@ -109,41 +109,6 @@ export function resetDailyTaskState(
   return newState;
 }
 
-// ==================== 任务状态检查函数 ====================
-
-/**
- * 检查是否可以接受指定类型的任务
- * @param taskState 任务状态
- * @param taskType 任务类型（'collect' | 'train' | 'raid' | 'pk' | 'dungeon'）
- * @returns 是否可以接受任务
- */
-export function canAcceptTask(
-  taskState: DailyTaskState,
-  taskType: string
-): boolean {
-  switch (taskType) {
-    case 'collect':
-      // 收集宝石任务：检查 rw_bs 标记
-      return taskState.rw_bs;
-
-    case 'train':
-      // 训练幻兽任务：检查 rw_hs 标记
-      return taskState.rw_hs;
-
-    case 'dungeon':
-      // 地下城任务：检查 rw_dxc 标记
-      return taskState.rw_dxc;
-
-    case 'raid':
-    case 'pk':
-      // 突袭和PK赛任务：没有次数限制，始终可以接受
-      return true;
-
-    default:
-      return false;
-  }
-}
-
 /**
  * 标记任务为已完成
  * 根据任务类型设置相应的完成标记为 false
@@ -182,24 +147,4 @@ export function completeTask(
   return newState;
 }
 
-// ==================== 状态描述函数 ====================
-
-/**
- * 获取任务状态的描述文本
- * @param taskState 任务状态
- * @param taskType 任务类型
- * @returns 状态描述文本
- */
-export function getTaskStateDescription(
-  taskState: DailyTaskState,
-  taskType: string
-): string {
-  const canAccept = canAcceptTask(taskState, taskType);
-
-  if (canAccept) {
-    return '✅ 可以接受任务';
-  } else {
-    return '❌ 今天已完成，明天再来';
-  }
-}
 

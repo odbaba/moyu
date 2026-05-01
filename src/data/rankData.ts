@@ -106,22 +106,6 @@ export function getNextNobleRankMerit(currentLevel: number): number | null {
   return nextRank ? nextRank.requiredMerit : null;
 }
 
-// ========== 功勋获取规则 ==========
-
-/**
- * 功勋获取来源配置
- * 击败特定敌人获得的功勋值
- */
-export const MERIT_REWARDS: Record<string, number> = {
-  'boss-10': 100, // 10级BOSS
-  'boss-20': 200, // 20级BOSS
-  'boss-30': 300, // 30级BOSS
-  'boss-50': 500, // 50级BOSS
-  'boss-70': 700, // 70级BOSS
-  'boss-90': 900, // 90级BOSS
-  'boss-100': 1000, // 100级BOSS
-};
-
 // ========== 爵位奖励配置 ==========
 
 /**

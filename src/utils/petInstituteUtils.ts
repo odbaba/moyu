@@ -193,45 +193,6 @@ export function canDonate(
   return { canDonate: true, reason: '' };
 }
 
-/**
- * 检查是否可以做提高产量任务
- * @param state 研究所状态
- * @param inventory 背包物品
- * @returns 是否可以做任务
- */
-export function canImproveProduction(
-  state: PetInstituteState,
-  inventory: InventoryItem[]
-): { canImprove: boolean; reason: string; requiredSoulKings: number } {
-  // 检查是否可以完成任务
-  if (!state.canDoProductionTask) {
-    return { canImprove: false, reason: '本周提高产量任务已完成', requiredSoulKings: 0 };
-  }
-
-  // 检查生产量是否已满（最多5次任务，生产量从0到5）
-  if (state.productionRate >= MAX_PRODUCTION_RATE) {
-    return { canImprove: false, reason: '生产量已达上限', requiredSoulKings: 0 };
-  }
-
-  // 获取所需灵魂王数量
-  const requiredSoulKings = PRODUCTION_TASK_SOUL_KING_COST[state.productionRate] || 0;
-
-  // 检查背包中灵魂王数量
-  const soulKingCount = inventory
-    .filter(item => item.name === '灵魂王')
-    .reduce((sum, item) => sum + item.quantity, 0);
-
-  if (soulKingCount < requiredSoulKings) {
-    return {
-      canImprove: false,
-      reason: `灵魂王不足，需要 ${requiredSoulKings} 个，当前 ${soulKingCount} 个`,
-      requiredSoulKings,
-    };
-  }
-
-  return { canImprove: true, reason: '', requiredSoulKings };
-}
-
 // ==================== 操作函数 ====================
 
 /**

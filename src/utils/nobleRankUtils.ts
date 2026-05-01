@@ -28,15 +28,6 @@ export function getNobleRankName(level: number): string {
 }
 
 /**
- * 获取下一级爵位所需功勋
- * @param level 当前爵位等级
- * @returns 所需功勋，如果已满级返回 null
- */
-export function getNextNobleRankRequirement(level: number): number | null {
-  return getNextNobleRankMerit(level);
-}
-
-/**
  * 检查地图进入权限
  * @param nobleRank 当前爵位等级
  * @param locationId 地图ID
@@ -81,50 +72,6 @@ ${NOBLE_RANKS.map(rank => `${rank.name}（需要${rank.requiredMerit}功勋）`)
 }
 
 // ========== 爵位奖励领取功能 ==========
-
-/**
- * 爵位奖励领取结果接口
- */
-export interface NobleRewardClaimResult {
-  success: boolean; // 是否成功
-  message: string; // 结果消息
-  reward?: NobleRankReward; // 奖励详情（成功时）
-}
-
-/**
- * 检查是否可以领取爵位奖励
- * @param nobleRank 当前爵位等级
- * @param lastClaimTime 上次领取时间（时间戳）
- * @returns 是否可以领取
- */
-export function canClaimNobleReward(nobleRank: number, lastClaimTime: number | null): boolean {
-  // 平民没有奖励
-  if (nobleRank === 0) {
-    return false;
-  }
-
-  // 如果从未领取过，可以领取
-  if (lastClaimTime === null) {
-    return true;
-  }
-
-  // 检查是否已经过了7天（每周领取一次）
-  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-  const now = Date.now();
-
-  return (now - lastClaimTime) >= ONE_WEEK_MS;
-}
-
-// ========== 交易功能（预留接口） ==========
-
-/**
- * 交易功能状态
- * 当前为预留接口，显示"交易功能开发中..."
- */
-export const TRADE_SYSTEM_STATUS = {
-  available: false,
-  message: '交易功能开发中...',
-};
 
 // ========== 爵位晋升相关功能 ==========
 

@@ -10,11 +10,9 @@
 import type {
   ChatReward,
   DemonArmyInfo,
-  GiftResult,
   PrincessRelationship,
   RelationshipLevel,
   RelationshipLevelConfig,
-  RelationshipUpgradeResult,
   SkillDetail,
   SkillLearnResult,
   SundayGift} from '../types';
@@ -223,36 +221,6 @@ export const getNextRelationshipRequirement = (level: number): number => {
 };
 
 /**
- * 判断是否可以升级关系
- * 根据当前亲密度和关系等级，判断是否可以升级到下一级
- *
- * @param currentIntimacy 当前亲密度
- * @param currentLevel 当前关系等级 (0-6)
- * @returns 是否可以升级
- *
- * @example
- * canUpgradeRelationship(0, 0)   // 返回: false (亲密度不足)
- * canUpgradeRelationship(1, 0)   // 返回: true (可以升级到认识)
- * canUpgradeRelationship(10, 1)  // 返回: true (可以升级到普通朋友)
- * canUpgradeRelationship(200, 6) // 返回: false (已达最高级)
- */
-export const canUpgradeRelationship = (
-  currentIntimacy: number,
-  currentLevel: number
-): boolean => {
-  // 如果已经是最高级，无法升级
-  if (currentLevel >= 6) {
-    return false;
-  }
-
-  // 获取下一级所需亲密度
-  const requiredIntimacy = getNextRelationshipRequirement(currentLevel);
-
-  // 判断当前亲密度是否足够
-  return currentIntimacy >= requiredIntimacy;
-};
-
-/**
  * 根据亲密度计算关系等级
  *
  * @param intimacy 亲密度
@@ -407,35 +375,6 @@ export const performChat = (
 // ========== 送礼功能 ==========
 
 /**
- * 计算送礼增加的亲密度
- * 根据花朵类型和数量计算亲密度增加
- *
- * @param flowerType 花朵类型 ('99朵白玫瑰' | '999朵白玫瑰')
- * @param quantity 花朵数量
- * @returns 增加的亲密度
- *
- * @example
- * calculateGiftIntimacy('99朵白玫瑰', 1)   // 返回: 5 (基础5点)
- * calculateGiftIntimacy('99朵白玫瑰', 10)   // 返回: 14 (基础5点 + 9点)
- * calculateGiftIntimacy('999朵白玫瑰', 1)   // 返回: 25 (基础25点)
- * calculateGiftIntimacy('999朵白玫瑰', 10)  // 返回: 70 (基础25点 + 45点)
- */
-export const calculateGiftIntimacy = (
-  flowerType: '99朵白玫瑰' | '999朵白玫瑰',
-  quantity: number
-): number => {
-  if (flowerType === '99朵白玫瑰') {
-    // 99朵白玫瑰：基础5点 + 每多1朵+1点
-    return 5 + (quantity - 1) * 1;
-  } else if (flowerType === '999朵白玫瑰') {
-    // 999朵白玫瑰：基础25点 + 每多1朵+5点
-    return 25 + (quantity - 1) * 5;
-  }
-
-  return 0;
-};
-
-/**
  * 检查是否可以赠送玫瑰花
  * 检查本周是否已送礼，以及本次赠送数量是否超过上限
  *
@@ -466,60 +405,6 @@ export const canGiftRose = (
   return {
     canGift: true,
     message: ''
-  };
-};
-
-/**
- * 执行送礼功能
- * 送花给公主，增加亲密度
- * 一周只能送一次，一次最多12个
- *
- * @param relationship 当前公主关系数据
- * @param flowerType 花朵类型
- * @param quantity 花朵数量
- * @param isSunday 是否是周日
- * @returns 送礼结果
- */
-export const performGift = (
-  relationship: PrincessRelationship,
-  flowerType: '99朵白玫瑰' | '999朵白玫瑰',
-  quantity: number,
-  isSunday: boolean
-): GiftResult => {
-  // 检查是否是周日
-  if (!isSunday) {
-    return {
-      success: false,
-      intimacyGain: 0,
-      message: '只有在周日才能送花给公主。'
-    };
-  }
-
-  // 检查本周是否已送礼
-  if (!relationship.canGiftThisWeek) {
-    return {
-      success: false,
-      intimacyGain: 0,
-      message: '本周已经送过礼物了，下周再来吧。'
-    };
-  }
-
-  // 检查本次赠送数量是否超过上限
-  if (quantity > MAX_WEEKLY_ROSE_GIFT_COUNT) {
-    return {
-      success: false,
-      intimacyGain: 0,
-      message: `一次最多只能赠送${MAX_WEEKLY_ROSE_GIFT_COUNT}个玫瑰花。`
-    };
-  }
-
-  // 计算亲密度增加
-  const intimacyGain = calculateGiftIntimacy(flowerType, quantity);
-
-  return {
-    success: true,
-    intimacyGain,
-    message: `公主收下了你的${quantity}份${flowerType}，友好度+${intimacyGain}！`
   };
 };
 
@@ -719,15 +604,6 @@ export const receiveConfidantGift = (
 // ========== 魔族大军情报功能 ==========
 
 /**
- * 获取所有魔族大军情报
- *
- * @returns 魔族大军情报列表
- */
-export const getAllDemonArmyInfo = (): DemonArmyInfo[] => {
-  return DEMON_ARMY_INFO;
-};
-
-/**
  * 获取指定魔族大军情报
  *
  * @param demonId 魔族ID
@@ -761,92 +637,6 @@ export const getDemonArmyDialogue = (demonId: string): string => {
   dialogue += `描述：${demon.description}`;
 
   return dialogue;
-};
-
-// ========== 关系升级提示功能 ==========
-
-/**
- * 获取关系升级提示消息
- *
- * @param newLevel 新的关系等级
- * @returns 提示消息
- */
-export const getUpgradeMessage = (newLevel: number): string => {
-  switch (newLevel) {
-    case 1:
-      return '恭喜，你认识了公主。';
-    case 2:
-      return '恭喜，你与公主交上朋友了。';
-    case 3:
-      return '恭喜，你与公主成为好朋友了。';
-    case 4:
-      return '恭喜，你与公主已经成为知己了。';
-    case 5:
-      return '恭喜，你与公主感情关系提高到了恋人了。学会了新技能：爱的力量。';
-    case 6:
-      return '恭喜，你与公主感情关系到了最高级了。学会了新技能：爱的力量。';
-    default:
-      return '关系等级提升！';
-  }
-};
-
-// ========== 每日重置功能 ==========
-
-/**
- * 重置每日状态
- * 每天重置聊天状态
- *
- * @param relationship 当前公主关系数据
- * @returns 重置后的关系数据
- */
-export const resetDailyStatus = (
-  relationship: PrincessRelationship
-): PrincessRelationship => {
-  return {
-    ...relationship,
-    canChatToday: true
-  };
-};
-
-/**
- * 重置每周状态
- * 每周日重置礼物领取状态和送礼状态
- *
- * @param relationship 当前公主关系数据
- * @returns 重置后的关系数据
- */
-export const resetWeeklyStatus = (
-  relationship: PrincessRelationship
-): PrincessRelationship => {
-  return {
-    ...relationship,
-    canReceiveSundayGift: true,
-    canGiftThisWeek: true // 重置本周送礼状态
-  };
-};
-
-/**
- * 更新关系数据
- * 根据亲密度更新关系等级和名称
- *
- * @param relationship 当前公主关系数据
- * @param intimacyChange 亲密度变化值（可正可负）
- * @returns 更新后的关系数据
- */
-export const updateRelationship = (
-  relationship: PrincessRelationship,
-  intimacyChange: number
-): PrincessRelationship => {
-  const newIntimacy = Math.max(0, relationship.intimacy + intimacyChange);
-  const newLevel = calculateRelationshipLevel(newIntimacy);
-  const newName = getRelationshipName(newLevel);
-
-  return {
-    ...relationship,
-    intimacy: newIntimacy,
-    level: newLevel,
-    relationshipName: newName
-  };
 };
 
 // ========== 技能学习功能 ==========
@@ -969,57 +759,5 @@ export const learnLovePowerSkill = (
     skillLevel,
     message,
     updatedSkills
-  };
-};
-
-/**
- * 处理关系升级（包含技能学习）
- * 当关系等级提升时，自动检查并学习"爱的力量"技能
- *
- * @param relationship 当前公主关系数据
- * @param intimacyChange 亲密度变化值
- * @param currentSkills 当前技能列表
- * @returns 关系升级结果，包含更新后的关系数据和技能学习结果
- *
- * @example
- * // 从知己升级到恋人
- * const result = processRelationshipUpgrade(relationship, 50, skills);
- * if (result.skillLearnResult?.success) {
- *   console.log('学会了"爱的力量"技能！');
- * }
- */
-export const processRelationshipUpgrade = (
-  relationship: PrincessRelationship,
-  intimacyChange: number,
-  currentSkills: SkillDetail[]
-): RelationshipUpgradeResult => {
-  // 更新关系数据
-  const newRelationship = updateRelationship(relationship, intimacyChange);
-
-  // 检查是否需要学习技能
-  const skillUnlock = checkSkillUnlock(relationship.level, newRelationship.level);
-
-  let skillLearnResult: SkillLearnResult | null = null;
-  let upgradeMessage = '';
-
-  // 如果关系等级提升，生成升级消息
-  if (newRelationship.level > relationship.level) {
-    upgradeMessage = getUpgradeMessage(newRelationship.level);
-
-    // 如果需要学习技能
-    if (skillUnlock) {
-      skillLearnResult = learnLovePowerSkill(currentSkills, skillUnlock.skillLevel);
-
-      // 如果技能学习成功，添加技能学习提示
-      if (skillLearnResult.success) {
-        upgradeMessage += `\n${skillLearnResult.message}`;
-      }
-    }
-  }
-
-  return {
-    relationship: newRelationship,
-    skillLearnResult,
-    upgradeMessage
   };
 };

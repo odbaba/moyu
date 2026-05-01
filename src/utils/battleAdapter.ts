@@ -11,7 +11,6 @@ import type {
   BattleSkill,
   CharacterData,
   EnemyData,
-  EnemyTemplate,
   GridPosition,
   Pet,
   SkillDetail,
@@ -120,91 +119,6 @@ export function characterToBattleCharacter(
   battleCharacter.combatPower = calculateTotalCombatPower(characterData, pets, skills);
 
   return battleCharacter;
-}
-
-/**
- * 从敌人模板创建敌人数据
- * @param template 敌人模板
- * @param level 敌人等级
- * @param index 敌人索引（用于生成唯一ID）
- * @param gridPosition 九宫格位置
- * @returns 战斗角色数据
- */
-export function createEnemyFromTemplate(
-  template: EnemyTemplate,
-  level: number,
-  index: number,
-  gridPosition: GridPosition,
-  warSoulSetInfo?: WarSoulSetInfo
-): BattleCharacter {
-  // 生成唯一ID
-  const id = `${template.id}_${index}`;
-
-  // 计算最大生命值 = 基础生命 + 成长生命 × 等级
-  const maxHp = template.baseHp + template.growthHp * level;
-
-  // 计算最大体力 = 50 + 等级 × 5
-  const maxStamina = 50 + level * 5;
-
-  // 计算最小攻击力 = 基础最小攻击 + 成长最小攻击 × 等级
-  const attackMin = template.baseAttackMin + template.growthAttackMin * level;
-
-  // 计算最大攻击力 = 基础最大攻击 + 成长最大攻击 × 等级
-  const attackMax = template.baseAttackMax + template.growthAttackMax * level;
-
-  // 计算防御力 = 基础防御 + 成长防御 × 等级
-  const defense = template.baseDefense + template.growthDefense * level;
-
-  // 计算战斗力 = 基础战斗力 + 成长战斗力 × 等级
-  const combatPower = template.baseCombatPower + template.growthCombatPower * level;
-
-  // 创建敌人战斗角色对象
-  const enemy: BattleCharacter = {
-    id: id,
-    name: template.name,
-    level: level,
-    maxHp: maxHp,
-    currentHp: maxHp,
-    maxStamina: maxStamina,
-    currentStamina: maxStamina,
-    attackMin: attackMin,
-    attackMax: attackMax,
-    defense: defense,
-    combatPower: combatPower,
-    dodgeRate: 0, // 敌人默认无闪避
-    luck: 0, // 敌人默认无幸运
-    skills: [], // 敌人技能后续处理
-    buffs: [], // 初始无增益效果
-    isPlayer: false,
-    gridPosition: gridPosition
-  };
-
-  // 应用战魂套装压制效果
-  if (warSoulSetInfo && warSoulSetInfo.isActive) {
-    if (warSoulSetInfo.setType === WarSoulType.TIAN_HUN) {
-      // 天魂套装：降低怪物战斗力（套装等级×2%，最大10%）
-      const suppressionRate = Math.min(warSoulSetInfo.setLevel * 0.02, 0.10);
-      enemy.originalCombatPower = enemy.combatPower; // 保存原始值
-      enemy.combatPower = Math.round(enemy.combatPower * (1 - suppressionRate));
-      enemy.warSoulSuppression = {
-        type: 'combatPower',
-        percentage: suppressionRate
-      };
-    } else if (warSoulSetInfo.setType === WarSoulType.DI_HUN) {
-      // 地魂套装：降低怪物生命值（套装等级×5%，最大25%）
-      const suppressionRate = Math.min(warSoulSetInfo.setLevel * 0.05, 0.25);
-      enemy.originalMaxHp = enemy.maxHp; // 保存原始值
-      enemy.maxHp = Math.round(enemy.maxHp * (1 - suppressionRate));
-      enemy.currentHp = enemy.maxHp; // 当前生命值也同步调整
-      // 设置战魂套装压制信息，用于UI展示
-      enemy.warSoulSuppression = {
-        type: 'hp',
-        percentage: suppressionRate
-      };
-    }
-  }
-
-  return enemy;
 }
 
 /**

@@ -127,21 +127,6 @@ export function calculateItemMagicStoneValue(item: InventoryItem): number {
 }
 
 /**
- * 计算物品列表的总魔石价值
- * @param items - 物品列表
- * @returns 总魔石价值
- */
-export function calculateTotalValue(items: InventoryItem[]): number {
-  if (!items || items.length === 0) {
-    return 0;
-  }
-
-  return items.reduce((total, item) => {
-    return total + calculateItemMagicStoneValue(item);
-  }, 0);
-}
-
-/**
  * 计算收购价格（80%）
  * 收藏家以魔石价值的80%收购物品
  * @param value - 物品魔石价值

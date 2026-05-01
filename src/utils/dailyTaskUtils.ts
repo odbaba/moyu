@@ -7,13 +7,11 @@
 // 导入日常任务相关类型
 // 导入日常任务配置数据
 import {
-  dailyTaskConfig,
   dailyTasksByWeekday,
 } from '../data/dailyTaskData';
 import type {
   DailyTask,
   DailyTaskReward,
-  DailyTaskStatus,
   InventoryItem,
   Pet,
 } from '../types';
@@ -40,69 +38,6 @@ export function getDailyTask(weekday: number): DailyTask | null {
 
   // 从配置中获取对应星期的任务
   return dailyTasksByWeekday[weekday] || null;
-}
-
-/**
- * 检查任务是否完成
- * @param taskId 任务ID
- * @param playerData 玩家数据（包含背包、幻兽等信息）
- * @param taskStatus 任务状态（可选，如果提供则直接检查状态）
- * @returns 任务是否完成
- *
- * @example
- * const isCompleted = checkTaskCompletion('daily_task_monday', playerData);
- */
-export function checkTaskCompletion(
-  taskId: string,
-  playerData: {
-    inventory?: InventoryItem[]; // 玩家背包
-    pets?: Pet[]; // 玩家幻兽列表
-    defeatedEnemies?: string[]; // 已击败的敌人列表
-    completedDungeons?: string[]; // 已完成的地下城列表
-    participatedPK?: boolean; // 是否参加了PK赛
-  },
-  taskStatus?: DailyTaskStatus
-): boolean {
-  // 如果提供了任务状态，直接返回完成状态
-  if (taskStatus && taskStatus.isCompleted) {
-    return true;
-  }
-
-  // 获取任务配置
-  const task = dailyTaskConfig[taskId];
-  if (!task) {
-    console.error(`任务不存在: ${taskId}`);
-
-    return false;
-  }
-
-  // 根据任务类型检查完成条件
-  switch (task.type) {
-    case 'collect':
-      // 收集类任务：检查背包中是否有指定物品
-      return checkCollectTask(task, playerData.inventory || []);
-
-    case 'train':
-      // 训练类任务：检查是否有符合要求的幻兽
-      return checkTrainTask(task, playerData.pets || []);
-
-    case 'raid':
-      // 突袭类任务：检查是否击败了指定敌人
-      return checkRaidTask(task, playerData.defeatedEnemies || []);
-
-    case 'pk':
-      // PK赛任务：检查是否参加了PK赛
-      return playerData.participatedPK || false;
-
-    case 'dungeon':
-      // 地下城任务：检查是否完成了地下城
-      return checkDungeonTask(task, playerData.completedDungeons || []);
-
-    default:
-      console.error(`未知的任务类型: ${task.type}`);
-
-      return false;
-  }
 }
 
 // ==================== 突袭任务专用函数 ====================
@@ -367,87 +302,6 @@ export function removePetFromList(pets: Pet[], petId: string): Pet[] {
  */
 export function getValidPetsForTraining(pets: Pet[]): Pet[] {
   return pets.filter(pet => checkPetRequirement(pet));
-}
-
-// ==================== 辅助检查函数 ====================
-
-/**
- * 检查收集类任务是否完成
- * @param task 任务配置
- * @param inventory 玩家背包
- * @returns 是否完成
- */
-function checkCollectTask(task: DailyTask, inventory: InventoryItem[]): boolean {
-  const target = task.requirement.target;
-  const quantity = task.requirement.quantity;
-
-  // 查找背包中的目标物品
-  const item = inventory.find(
-    item => item.name === target ||
-            item.name === '灵魂晶石' ||
-            item.name === '灵魂王'
-  );
-
-  // 检查数量是否足够
-  return item !== undefined && item.quantity >= quantity;
-}
-
-/**
- * 检查训练类任务是否完成
- * @param task 任务配置
- * @param pets 玩家幻兽列表
- * @returns 是否完成
- */
-function checkTrainTask(_task: DailyTask, pets: Pet[]): boolean {
-  // 查找符合要求的幻兽（攻防型）
-  const validPet = pets.find(pet => {
-    // 检查是否为攻防型幻兽
-    if (pet.hs_name !== '攻防型') {
-      return false;
-    }
-
-    // 检查品质是否为极品（品质称号包含"极品"）
-    if (!pet.qualityTitle.includes('极品')) {
-      return false;
-    }
-
-    // 检查星级（至少10星）
-    if (pet.pz < 1000) { // 评分1000对应约10星
-      return false;
-    }
-
-    return true;
-  });
-
-  return validPet !== undefined;
-}
-
-/**
- * 检查突袭类任务是否完成
- * @param task 任务配置
- * @param defeatedEnemies 已击败的敌人列表
- * @returns 是否完成
- */
-function checkRaidTask(task: DailyTask, defeatedEnemies: string[]): boolean {
-  const target = task.requirement.target;
-
-  // 检查是否击败了目标敌人
-  return defeatedEnemies.some(
-    enemy => enemy.includes(target) || enemy === '冰雪巨人'
-  );
-}
-
-/**
- * 检查地下城任务是否完成
- * @param task 任务配置
- * @param completedDungeons 已完成的地下城列表
- * @returns 是否完成
- */
-function checkDungeonTask(_task: DailyTask, completedDungeons: string[]): boolean {
-  // 检查是否完成了地下城
-  return completedDungeons.some(
-    dungeon => dungeon.includes('地下城') || dungeon.includes('魔族会议')
-  );
 }
 
 // ==================== 其他辅助函数 ====================
