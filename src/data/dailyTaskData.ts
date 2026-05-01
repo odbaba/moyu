@@ -263,18 +263,6 @@ export const dailyTasksByWeekday: Record<number, DailyTask> = {
   6: dailyTaskSaturday, // 周六
 };
 
-/**
- * 所有日常任务列表
- */
-export const allDailyTasks: DailyTask[] = [
-  dailyTaskMonday,
-  dailyTaskTuesday,
-  dailyTaskWednesday,
-  dailyTaskThursday,
-  dailyTaskFriday,
-  dailyTaskSaturday,
-  dailyTaskSunday,
-];
 
 // ==================== 辅助函数 ====================
 
@@ -299,26 +287,3 @@ export function getPetTrainingReward(starLevel: number): PetTrainingReward | nul
   return lowerReward || null;
 }
 
-/**
- * 获取所有日常任务的简要描述
- * 用于NPC对话显示
- * @returns 任务描述文本
- */
-export function getDailyTasksDescription(): string {
-  return `日常任务说明：
-
-周一/周二：收集宝石（收集灵魂晶石/灵魂王）
-奖励：大量经验+500功勋
-
-周三/周四：训练幻兽（上交攻防型幻兽）
-奖励：魔石+1000战功
-
-周五：突袭（消灭雪域边境冰雪巨人）
-奖励：大量战功
-
-周六：PK赛（参加PK比赛）
-奖励：丰厚奖励
-
-周日：地下城（前往地下城破坏魔族会议）
-奖励：功勋值`;
-}

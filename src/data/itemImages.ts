@@ -75,12 +75,3 @@ export const ITEM_IMAGE_MAP: Record<string, string> = {
   'gold-ore-9': './images/items/special/jinkuang.png',
   'gold-ore-10': './images/items/special/jinkuang.png',
 };
-
-/**
- * 获取物品图片路径
- * @param itemId 物品ID
- * @returns 图片路径，如果没有映射则返回null
- */
-export const getItemImagePath = (itemId: string): string | null => {
-  return ITEM_IMAGE_MAP[itemId] || null;
-};

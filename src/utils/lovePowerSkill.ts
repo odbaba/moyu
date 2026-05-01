@@ -98,16 +98,3 @@ export function checkLovePower(skills: SkillDetail[]): LovePowerResult {
   };
 }
 
-/**
- * 获取爱的力量技能等级描述
- * @param skillLevel 技能等级
- * @returns 技能等级描述
- */
-export function getLovePowerDescription(skillLevel: number): string {
-  const config = LOVE_POWER_CONFIG[skillLevel as keyof typeof LOVE_POWER_CONFIG];
-  if (!config) {
-    return '未学习';
-  }
-
-  return `等级${skillLevel}：${config.triggerChance}%概率触发，幸运值+${config.luckBonus}`;
-}

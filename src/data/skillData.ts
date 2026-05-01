@@ -286,19 +286,3 @@ export const getBreakDefenseHits = (skill: SkillDetail): number => {
  */
 export const exampleSkills = createInitialSkills(true);
 
-/**
- * 获取技能升级消耗
- * @param skill 技能数据
- * @returns 升级消耗金币
- */
-export const getSkillUpgradeCost = (skill: SkillDetail): number => {
-  // 斗志昂扬升级消耗递增
-  if (skill.skillIndex === 4) {
-    const costs = [3000, 5000, 10000, 20000, 50000];
-
-    return costs[skill.level] || 0;
-  }
-
-  // 其他技能升级消耗
-  return skill.upgradeCost || 0;
-};

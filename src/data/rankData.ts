@@ -39,21 +39,6 @@ export const MILITARY_RANKS: MilitaryRankConfig[] = [
 ];
 
 /**
- * 根据战功获取军衔等级
- * @param battleExp 累计战功
- * @returns 军衔等级
- */
-export function getMilitaryRankLevel(battleExp: number): number {
-  for (let i = MILITARY_RANKS.length - 1; i >= 0; i--) {
-    if (battleExp >= MILITARY_RANKS[i].requiredBattleExp) {
-      return MILITARY_RANKS[i].level;
-    }
-  }
-
-  return 0;
-}
-
-/**
  * 根据军衔等级获取配置
  * @param level 军衔等级
  * @returns 军衔配置
@@ -101,21 +86,6 @@ export const NOBLE_RANKS: NobleRankConfig[] = [
 ];
 
 /**
- * 根据功勋获取爵位等级
- * @param merit 累计功勋
- * @returns 爵位等级
- */
-export function getNobleRankLevel(merit: number): number {
-  for (let i = NOBLE_RANKS.length - 1; i >= 0; i--) {
-    if (merit >= NOBLE_RANKS[i].requiredMerit) {
-      return NOBLE_RANKS[i].level;
-    }
-  }
-
-  return 0;
-}
-
-/**
  * 根据爵位等级获取配置
  * @param level 爵位等级
  * @returns 爵位配置
@@ -151,15 +121,6 @@ export const MERIT_REWARDS: Record<string, number> = {
   'boss-90': 900, // 90级BOSS
   'boss-100': 1000, // 100级BOSS
 };
-
-/**
- * 获取击败敌人的功勋奖励
- * @param enemyId 敌人ID
- * @returns 功勋值
- */
-export function getMeritReward(enemyId: string): number {
-  return MERIT_REWARDS[enemyId] || 0;
-}
 
 // ========== 爵位奖励配置 ==========
 
@@ -272,15 +233,6 @@ export const NOBLE_RANK_REWARDS: NobleRankReward[] = [
     exp: 500000,
   },
 ];
-
-/**
- * 获取爵位奖励配置
- * @param level 爵位等级
- * @returns 爵位奖励配置
- */
-export function getNobleRankReward(level: number): NobleRankReward | undefined {
-  return NOBLE_RANK_REWARDS.find(reward => reward.level === level);
-}
 
 // ========== 地图权限配置 ==========
 

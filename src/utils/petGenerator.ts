@@ -515,19 +515,6 @@ export function generateInitialPet(
   });
 }
 
-/**
- * 生成两只初始攻防型幻兽
- * 新游戏开始时调用，两只幻兽都设置为出征和合体状态
- *
- * @returns 两只初始幻兽数组
- */
-export function generateInitialPets(): Pet[] {
-  const pet1 = generateInitialPet('initial-pet-001', '攻防型', true, true);
-  const pet2 = generateInitialPet('initial-pet-002', '攻防型', true, true);
-
-  return [pet1, pet2];
-}
-
 // ========== 幻兽升级函数 ==========
 
 /**

@@ -1,8 +1,7 @@
 import './game-ending.css';
 
-import React from 'react';
-
 import { Capacitor } from '@capacitor/core';
+import React from 'react';
 
 import { useTapTapLeaderboard } from '../../hooks/useTapTapLeaderboard';
 import { useTapTapLogin } from '../../hooks/useTapTapLogin';

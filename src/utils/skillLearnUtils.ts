@@ -124,17 +124,3 @@ export function learnSkillFromBook(
   }
 }
 
-/**
- * 检查是否可以使用技能书
- * @param skillBook 技能书物品
- * @param currentSkills 当前技能列表
- * @returns 是否可以使用
- */
-export function canLearnSkill(
-  skillBook: InventoryItem,
-  currentSkills: SkillDetail[]
-): boolean {
-  const result = learnSkillFromBook(skillBook, currentSkills);
-
-  return result.success;
-}

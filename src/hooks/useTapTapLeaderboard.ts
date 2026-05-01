@@ -1,8 +1,8 @@
 import { Capacitor } from '@capacitor/core';
 import { useCallback, useState } from 'react';
 
-import TapTapLeaderboard from '../plugins/TapTapLeaderboard';
 import type { ScoreItem } from '../plugins/TapTapLeaderboard';
+import TapTapLeaderboard from '../plugins/TapTapLeaderboard';
 
 /** 最快拯救国王排行榜 ID（用 daysPassed 作为分数） */
 const LEADERBOARD_ID_RESCUE_KING = 't5b9jle8a16emsex4r';
@@ -95,16 +95,19 @@ export function useTapTapLeaderboard(): UseTapTapLeaderboardReturn {
         const result = await TapTapLeaderboard.submitScores({ scores });
 
         setSubmitSuccess(result.success);
+
         return result.success;
       } else {
         // Web 环境：不支持排行榜功能
         setSubmitError('排行榜功能仅在原生环境可用');
+
         return false;
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '上传分数失败，请重试';
       console.error('上传分数失败:', err);
       setSubmitError(errorMessage);
+
       return false;
     } finally {
       setIsSubmitting(false);

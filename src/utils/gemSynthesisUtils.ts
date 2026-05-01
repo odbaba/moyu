@@ -102,15 +102,6 @@ export function getRecipeById(recipeId: string): SynthesisRecipe | undefined {
 }
 
 /**
- * 根据结果物品名称获取配方
- * @param resultName 结果物品名称
- * @returns 配方配置，不存在则返回 undefined
- */
-export function getRecipeByResultName(resultName: string): SynthesisRecipe | undefined {
-  return SYNTHESIS_RECIPES.find(recipe => recipe.result === resultName);
-}
-
-/**
  * 检查背包中是否有足够的材料
  * @param inventory 背包物品列表
  * @param materials 所需材料
@@ -226,40 +217,3 @@ export function performSynthesis(
   };
 }
 
-/**
- * 获取所有合成配方的描述文本
- * 用于NPC对话显示
- * @returns 配方描述文本
- */
-export function getAllRecipesDescription(): string {
-  let description = '我可以帮你合成以下高级宝石：\n\n';
-
-  for (const recipe of SYNTHESIS_RECIPES) {
-    const materialsList = Object.entries(recipe.materials)
-      .map(([name, count]) => `${count}个${name}`)
-      .join('、');
-    description += `【${recipe.result}】需要${materialsList}\n`;
-  }
-
-  description += '\n合成成功率均为100%！';
-
-  return description;
-}
-
-/**
- * 获取配方的简要描述
- * @param recipeId 配方ID
- * @returns 配方描述
- */
-export function getRecipeDescription(recipeId: string): string {
-  const recipe = getRecipeById(recipeId);
-  if (!recipe) {
-    return '未知配方';
-  }
-
-  const materialsList = Object.entries(recipe.materials)
-    .map(([name, count]) => `${count}个${name}`)
-    .join('、');
-
-  return `${recipe.result}：需要${materialsList}`;
-}

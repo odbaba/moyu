@@ -43,30 +43,6 @@ export interface ChallengerConfig {
 }
 
 /**
- * 挑战者属性要求接口
- * 定义挑战者需要满足的等级和战斗力要求
- */
-export interface ChallengerRequirement {
-  /** 挑战者最低等级要求 */
-  level: number;
-  /** 挑战者最低战斗力要求 */
-  combatPower: number;
-}
-
-/**
- * 保护者奖励物品接口
- * 定义保护者每日可领取的奖励物品
- */
-export interface ProtectorRewardItem {
-  /** 物品ID */
-  itemId: string;
-  /** 物品名称 */
-  itemName: string;
-  /** 物品数量 */
-  quantity: number;
-}
-
-/**
  * 保护者奖励接口
  * 定义地图保护者每日可领取的完整奖励
  */
@@ -367,10 +343,3 @@ export function getAvailableMapChallenges(nobleRank: number): MapChallengeConfig
   return MAP_CHALLENGE_CONFIGS.filter(config => nobleRank >= config.requiredNobleRank);
 }
 
-/**
- * 获取所有地图挑战配置
- * @returns 所有地图挑战配置列表
- */
-export function getAllMapChallengeConfigs(): MapChallengeConfig[] {
-  return MAP_CHALLENGE_CONFIGS;
-}

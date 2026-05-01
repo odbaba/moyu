@@ -18,9 +18,6 @@ export const DEFAULT_TECH_LEVEL_MAX = 150;
 /** 最大生产量（初始1，完成7次任务后达到8） */
 export const MAX_PRODUCTION_RATE = 8;
 
-/** 最大VIP等级 */
-export const MAX_VIP_LEVEL = 10;
-
 /** 提高产量任务所需灵魂王数量映射（根据当前生产量） */
 export const PRODUCTION_TASK_SOUL_KING_COST: Record<number, number> = {
   1: 1,
@@ -301,46 +298,6 @@ export function donate(
   };
 }
 
-/**
- * 完成提高产量任务
- * @param state 研究所状态
- * @param inventory 背包物品
- * @returns 任务结果
- */
-export function improveProduction(
-  state: PetInstituteState,
-  inventory: InventoryItem[]
-): {
-  success: boolean;
-  message: string;
-  expGained: number;
-  vipGained: number;
-  consumedSoulKings: number;
-} {
-  const checkResult = canImproveProduction(state, inventory);
-
-  if (!checkResult.canImprove) {
-    return {
-      success: false,
-      message: checkResult.reason,
-      expGained: 0,
-      vipGained: 0,
-      consumedSoulKings: 0,
-    };
-  }
-
-  const expGained = getProductionTaskExpReward(state.productionRate);
-  const vipGained = 1;
-
-  return {
-    success: true,
-    message: `成功完成提高产量任务！生产量+1，获得经验 ${expGained}，VIP星级+1`,
-    expGained,
-    vipGained,
-    consumedSoulKings: checkResult.requiredSoulKings,
-  };
-}
-
 // ==================== 信息函数 ====================
 
 /**
@@ -398,19 +355,6 @@ export function weeklyReset(state: PetInstituteState): PetInstituteState {
     ...state,
     techLevel: newTechLevel,
     canDoProductionTask: true,
-  };
-}
-
-/**
- * 关闭提高产量任务
- * 每周日完成任务后调用
- * @param state 研究所状态
- * @returns 新状态
- */
-export function closeProductionTask(state: PetInstituteState): PetInstituteState {
-  return {
-    ...state,
-    canDoProductionTask: false,
   };
 }
 

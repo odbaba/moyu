@@ -1530,17 +1530,6 @@ export function findItemByName(name: string): InventoryItem | undefined {
   return exampleItems.find(item => item.name === name);
 }
 
-/**
- * 根据ID查找物品模板
- * 用于从物品ID查找对应的物品数据
- *
- * @param id 物品ID
- * @returns 物品模板，如果找不到则返回 undefined
- */
-export function findItemById(id: string): InventoryItem | undefined {
-  return exampleItems.find(item => item.id === id);
-}
-
 // ==================== 初始装备生成函数 ====================
 
 /**

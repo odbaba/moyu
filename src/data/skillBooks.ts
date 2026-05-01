@@ -120,34 +120,3 @@ export const skillBookItems: InventoryItem[] = [
   },
 ];
 
-/**
- * 根据技能ID获取对应的技能书
- * @param skillId 技能ID
- * @returns 技能书物品数组
- */
-export const getSkillBooksBySkillId = (skillId: string): InventoryItem[] => {
-  return skillBookItems.filter(item => item.skillId === skillId);
-};
-
-/**
- * 获取学习技能所需的技能书
- * @param skillId 技能ID
- * @returns 学习技能书（非升级）
- */
-export const getLearnSkillBook = (skillId: string): InventoryItem | undefined => {
-  return skillBookItems.find(item => item.skillId === skillId && !item.isUpgrade);
-};
-
-/**
- * 获取升级技能所需的技能书
- * @param skillId 技能ID
- * @param currentLevel 当前等级
- * @returns 升级技能书
- */
-export const getUpgradeSkillBook = (skillId: string, currentLevel: number): InventoryItem | undefined => {
-  return skillBookItems.find(item =>
-    item.skillId === skillId &&
-    item.isUpgrade &&
-    item.targetLevel === currentLevel + 1
-  );
-};

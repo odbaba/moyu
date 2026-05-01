@@ -395,11 +395,3 @@ export function getShopItemById(itemId: string): ShopItem | undefined {
   return undefined;
 }
 
-/**
- * 获取商店物品列表
- * @param shopType 商店类型
- * @returns 物品列表
- */
-export function getShopItems(shopType: ShopType): ShopItem[] {
-  return shopConfig[shopType].items;
-}

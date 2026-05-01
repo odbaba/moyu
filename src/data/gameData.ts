@@ -355,8 +355,3 @@ export const connections = [
   ['dixiacheng-2', 'dixiacheng-3']
 ];
 
-/**
- * 交互数据（旧版，保留兼容性）
- * @deprecated 请使用 interactableConfig
- */
-export const interactions: InteractionData = {};

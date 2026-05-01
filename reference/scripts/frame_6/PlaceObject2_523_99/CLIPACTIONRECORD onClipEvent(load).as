@@ -1,3 +1,0 @@
-onClipEvent(load){
-   pking = false;
-}

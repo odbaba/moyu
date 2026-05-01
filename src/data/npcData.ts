@@ -1051,28 +1051,6 @@ export const npcByLocation: Record<string, NPCInteractable[]> = {
 };
 
 /**
- * 获取指定地图的 NPC ID 列表
- * @param locationId 地图ID
- * @returns NPC ID 数组
- */
-export function getNpcIdsByLocation(locationId: string): string[] {
-  const npcs = npcByLocation[locationId] || [];
-
-  return npcs.map(npc => npc.id);
-}
-
-/**
- * 获取指定类型的 NPC ID 列表
- * @param npcType NPC类型
- * @returns NPC ID 数组
- */
-export function getNpcIdsByType(npcType: 'palace' | 'function' | 'shop' | 'special'): string[] {
-  const npcs = npcByType[npcType] || [];
-
-  return npcs.map(npc => npc.id);
-}
-
-/**
  * 检查 NPC 选项是否满足显示条件
  * @param option NPC 交互选项
  * @param gameState 游戏状态（包含星期、关系等级、军衔、爵位等信息）
@@ -1145,25 +1123,3 @@ function compareValues(actual: number, expected: any, operator: string): boolean
   }
 }
 
-/**
- * 获取 NPC 可用的交互选项列表
- * @param npcId NPC ID
- * @param gameState 游戏状态
- * @returns 可用的交互选项列表
- */
-export function getAvailableNpcOptions(
-  npcId: string,
-  gameState: {
-    weekday?: string;
-    relationship?: number;
-    militaryRank?: number;
-    nobleRank?: number;
-  }
-): NPCInteractionOption[] {
-  const npc = npcConfig[npcId];
-  if (!npc) {
-    return [];
-  }
-
-  return npc.options.filter(option => checkNpcOptionCondition(option, gameState));
-}

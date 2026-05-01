@@ -440,7 +440,7 @@ const ShopPage: React.FC<ShopPageProps> = ({
               min="1"
               max="99"
               value={quantity || ''}
-              onChange={(e) => {setQuantity(Math.max(1, Math.min(99, parseInt(e.target.value) || 1)))}}
+              onChange={(e) => {setQuantity(Math.max(1, Math.min(99, parseInt(e.target.value) || 1)));}}
               onBlur={() => {
                 // 失焦时强制恢复最小值1
                 if (quantity < 1) setQuantity(1);

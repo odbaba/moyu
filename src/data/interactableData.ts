@@ -242,17 +242,6 @@ const monsterInteractables = generateMonsterInteractables();
 // 将怪物交互对象添加到配置映射表
 Object.assign(interactableConfig, monsterInteractables);
 
-/**
- * 获取指定地图的怪物交互ID列表
- * @param locationId 地图ID
- * @returns 交互ID数组
- */
-export function getMonsterInteractableIdsByLocation(locationId: string): string[] {
-  return monsterSpawnConfigs
-    .filter((config) => config.location === locationId)
-    .map((config) => config.interactableId);
-}
-
 // ==================== BOSS 交互配置 ====================
 
 /**
@@ -296,14 +285,6 @@ export function generateBossInteractables(
   }
 
   return bossInteractables;
-}
-
-/**
- * 获取所有 BOSS 交互 ID 列表
- * @returns BOSS 交互 ID 数组
- */
-export function getAllBossInteractableIds(): string[] {
-  return bossSpawnConfigs.map(config => config.interactableId);
 }
 
 // ==================== 无名氏动态生成 ====================

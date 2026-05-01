@@ -156,17 +156,6 @@ export function calculatePurchasePrice(value: number): number {
 }
 
 /**
- * 批量计算收购价格
- * @param items - 物品列表
- * @returns 总收购价格
- */
-export function calculateTotalPurchasePrice(items: InventoryItem[]): number {
-  const totalValue = calculateTotalValue(items);
-
-  return calculatePurchasePrice(totalValue);
-}
-
-/**
  * 格式化魔石数量显示（添加千分位分隔符）
  * @param value - 魔石数量
  * @returns 格式化后的字符串

@@ -194,64 +194,6 @@ export const hasSaveData = (): boolean => {
 };
 
 /**
- * 检查是否存在指定用户的存档
- * 用于判断当前登录用户是否有可用的存档
- * @param taptapUserId 可选的 TapTap 用户 ID
- * @returns 是否存在该用户的存档
- */
-export const hasSaveForUser = (taptapUserId?: string): boolean => {
-  try {
-    const jsonData = localStorage.getItem(SAVE_KEY);
-    if (!jsonData) {
-      return false;
-    }
-    const data = JSON.parse(jsonData) as SaveData;
-    // 版本不兼容视为无存档
-    if (data.version !== SAVE_VERSION) {
-      return false;
-    }
-
-    // 游客存档（无用户 ID）对任何人都可用
-    if (!data.taptapUserId) {
-      return true;
-    }
-
-    // 已关联账号的存档，检查用户 ID 是否匹配
-    if (taptapUserId && data.taptapUserId === taptapUserId) {
-      return true;
-    }
-
-    // 用户 ID 不匹配或未登录，无法使用此存档
-    return false;
-  } catch {
-    return false;
-  }
-};
-
-/**
- * 获取存档关联的用户 ID
- * 用于判断存档是否已关联账号
- * @returns 存档关联的用户 ID，如果存档不存在或为游客存档则返回 undefined
- */
-export const getSaveUserId = (): string | undefined => {
-  try {
-    const jsonData = localStorage.getItem(SAVE_KEY);
-    if (!jsonData) {
-      return undefined;
-    }
-    const data = JSON.parse(jsonData) as SaveData;
-    // 版本不兼容则返回 undefined
-    if (data.version !== SAVE_VERSION) {
-      return undefined;
-    }
-
-    return data.taptapUserId;
-  } catch {
-    return undefined;
-  }
-};
-
-/**
  * 删除存档
  * @returns 是否删除成功
  */

@@ -7,7 +7,6 @@
 import type {
   ChallengerConfig,
   MapChallengeConfig,
-  ProtectorReward,
 } from '../data/mapChallengeData';
 import {
   getAvailableMapChallenges,
@@ -184,49 +183,6 @@ export function claimReward(state: MapChallengeState): MapChallengeState {
 
 // ========== 保护者奖励相关函数 ==========
 
-/**
- * 获取保护者奖励配置
- * @param locationId 地图ID
- * @returns 奖励配置，如果不存在则返回 null
- */
-export function getProtectorReward(locationId: string): ProtectorReward | null {
-  const config = getMapChallengeConfig(locationId);
-
-  return config ? config.protectorReward : null;
-}
-
-/**
- * 获取保护者奖励预览
- * 生成奖励内容的详细描述
- * @param locationId 地图ID
- * @returns 奖励预览文本
- */
-export function getProtectorRewardPreview(locationId: string): string {
-  const config = getMapChallengeConfig(locationId);
-  if (!config) {
-    return '该地图暂未开放保护者奖励';
-  }
-  const reward = config.protectorReward;
-  let preview = `【${config.locationName}保护者每日奖励】\n\n`;
-  preview += `• 满经验球 × ${reward.expBalls}\n`;
-  preview += `• ${reward.soulStoneType} × ${reward.soulStones}\n`;
-  if (reward.whiteRoses && reward.roseType) {
-    // 玫瑰物品数量固定为1（一个'999朵白玫瑰'物品就代表999朵玫瑰）
-    preview += `• ${reward.roseType}白玫瑰 × 1\n`;
-  }
-  if (reward.skillReward) {
-    preview += `• 技能书：${reward.skillReward}\n`;
-  }
-  if (reward.equipmentReward) {
-    preview += `• ${reward.equipmentReward.quality}+${reward.equipmentReward.bonusLevel}装备\n`;
-  }
-  if (reward.petReward) {
-    preview += `• ${reward.petReward.star}星${reward.petReward.petType}\n`;
-  }
-
-  return preview;
-}
-
 // ========== NPC对话相关函数 ==========
 
 /**
@@ -298,63 +254,36 @@ export function getNPCDialogOptions(
   return options;
 }
 
-// ========== 地图挑战说明生成函数 ==========
-
 /**
- * 获取地图挑战说明
- * @param config 地图挑战配置
- * @returns 地图挑战说明文本
+ * 获取保护者奖励预览
+ * 生成奖励内容的详细描述
+ * @param locationId 地图ID
+ * @returns 奖励预览文本
  */
-export function getMapChallengeDescription(config: MapChallengeConfig): string {
-  let description = `【${config.locationName}地图挑战】\n\n`;
-  description += `${config.description}\n\n`;
-  description += '【爵位要求】\n';
-  description += `需要爵位：${config.requiredNobleRankName}\n\n`;
-  description += '【挑战者信息】\n';
-  description += `挑战者：${config.challenger.name}\n`;
-  description += `等级：${config.challenger.level}\n`;
-  description += `战斗力：${config.challenger.combatPower}\n\n`;
-  description += '【保护者每日奖励】\n';
+export function getProtectorRewardPreview(locationId: string): string {
+  const config = getMapChallengeConfig(locationId);
+  if (!config) {
+    return '该地图暂未开放保护者奖励';
+  }
   const reward = config.protectorReward;
-  description += `• 满经验球 × ${reward.expBalls}\n`;
-  description += `• ${reward.soulStoneType} × ${reward.soulStones}\n`;
+  let preview = `【${config.locationName}保护者每日奖励】\n\n`;
+  preview += `• 满经验球 × ${reward.expBalls}\n`;
+  preview += `• ${reward.soulStoneType} × ${reward.soulStones}\n`;
   if (reward.whiteRoses && reward.roseType) {
     // 玫瑰物品数量固定为1（一个'999朵白玫瑰'物品就代表999朵玫瑰）
-    description += `• ${reward.roseType}白玫瑰 × 1\n`;
+    preview += `• ${reward.roseType}白玫瑰 × 1\n`;
   }
   if (reward.skillReward) {
-    description += `• 技能：${reward.skillReward}\n`;
+    preview += `• 技能书：${reward.skillReward}\n`;
   }
   if (reward.equipmentReward) {
-    description += `• ${reward.equipmentReward.quality}+${reward.equipmentReward.bonusLevel}装备\n`;
+    preview += `• ${reward.equipmentReward.quality}+${reward.equipmentReward.bonusLevel}装备\n`;
   }
   if (reward.petReward) {
-    description += `• ${reward.petReward.star}星${reward.petReward.petType}\n`;
+    preview += `• ${reward.petReward.star}星${reward.petReward.petType}\n`;
   }
 
-  return description;
-}
-
-/**
- * 获取所有地图挑战列表说明
- * @param nobleRank 玩家爵位等级
- * @returns 地图挑战列表说明
- */
-export function getAllMapChallengesDescription(nobleRank: number): string {
-  const availableChallenges = getAvailableMapChallenges(nobleRank);
-  let description = '【地图挑战系统】\n\n';
-  description += '各地图的挑战要求和奖励如下：\n\n';
-  MAP_CHALLENGE_CONFIGS.forEach((config, index) => {
-    const isAvailable = nobleRank >= config.requiredNobleRank;
-    const status = isAvailable ? '✓ 可挑战' : `✗ 需要${config.requiredNobleRankName}`;
-    description += `${index + 1}. ${config.locationName}\n`;
-    description += `   爵位要求：${config.requiredNobleRankName}\n`;
-    description += `   挑战者：${config.challenger.name} (Lv.${config.challenger.level})\n`;
-    description += `   状态：${status}\n\n`;
-  });
-  description += `可挑战地图数量：${availableChallenges.length}/${MAP_CHALLENGE_CONFIGS.length}`;
-
-  return description;
+  return preview;
 }
 
 // ========== 导出所有功能 ==========

@@ -1,1 +1,0 @@
-gotoAndStop(_parent.bxname);

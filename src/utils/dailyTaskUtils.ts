@@ -9,11 +9,9 @@
 import {
   dailyTaskConfig,
   dailyTasksByWeekday,
-  getPetTrainingReward,
 } from '../data/dailyTaskData';
 import type {
   DailyTask,
-  DailyTaskCompletionResult,
   DailyTaskReward,
   DailyTaskStatus,
   InventoryItem,
@@ -105,131 +103,6 @@ export function checkTaskCompletion(
 
       return false;
   }
-}
-
-/**
- * 领取任务奖励
- * @param taskId 任务ID
- * @param playerData 玩家数据
- * @returns 奖励领取结果
- *
- * @example
- * const result = claimTaskReward('daily_task_monday', playerData);
- * if (result.success) {
- *   console.log('奖励已领取:', result.rewards);
- * }
- */
-export function claimTaskReward(
-  taskId: string,
-  playerData: {
-    inventory?: InventoryItem[];
-    pets?: Pet[];
-    defeatedEnemies?: string[];
-    completedDungeons?: string[];
-    participatedPK?: boolean;
-  }
-): DailyTaskCompletionResult {
-  // 获取任务配置
-  const task = dailyTaskConfig[taskId];
-  if (!task) {
-    return {
-      success: false,
-      message: '任务不存在',
-    };
-  }
-
-  // 检查任务是否完成
-  const isCompleted = checkTaskCompletion(taskId, playerData);
-  if (!isCompleted) {
-    return {
-      success: false,
-      message: '任务尚未完成，无法领取奖励',
-    };
-  }
-
-  // 计算奖励（针对训练幻兽任务需要特殊处理）
-  const finalReward: DailyTaskReward = { ...task.reward };
-
-  if (task.type === 'train' && playerData.pets) {
-    // 训练幻兽任务：根据幻兽星级计算魔石奖励
-    const petReward = calculatePetTrainingReward(playerData.pets);
-    if (petReward) {
-      finalReward.magicStone = petReward.magicStone;
-      finalReward.description = petReward.description;
-    }
-  }
-
-  // 返回成功结果
-  return {
-    success: true,
-    message: `恭喜完成任务【${task.name}】！获得奖励：${finalReward.description}`,
-    rewards: finalReward,
-  };
-}
-
-/**
- * 获取任务描述
- * @param task 日常任务对象
- * @returns 格式化的任务描述文本
- *
- * @example
- * const task = getDailyTask(1);
- * const description = getTaskDescription(task);
- * console.log(description);
- */
-export function getTaskDescription(task: DailyTask): string {
-  // 构建任务描述
-  const lines: string[] = [];
-
-  // 任务标题
-  lines.push(`【${task.name}】`);
-  lines.push('');
-
-  // 任务基本信息
-  lines.push(`📅 时间：${task.weekdayName}`);
-  lines.push(`📍 地点：${task.location}`);
-  lines.push('');
-
-  // 任务描述
-  lines.push('📝 任务描述：');
-  lines.push(task.description);
-  lines.push('');
-
-  // 任务要求
-  lines.push('🎯 任务要求：');
-  lines.push(`  ${task.requirement.description}`);
-  if (task.requirement.quantity > 1) {
-    lines.push(`  数量：${task.requirement.quantity}`);
-  }
-  lines.push('');
-
-  // 任务奖励
-  lines.push('🎁 任务奖励：');
-  lines.push(`  ${task.reward.description}`);
-
-  // 详细奖励信息
-  const rewardDetails: string[] = [];
-  if (task.reward.exp) {
-    rewardDetails.push(`经验: ${task.reward.exp}`);
-  }
-  if (task.reward.merit) {
-    rewardDetails.push(`功勋: ${task.reward.merit}`);
-  }
-  if (task.reward.battleExp) {
-    rewardDetails.push(`战功: ${task.reward.battleExp}`);
-  }
-  if (task.reward.magicStone) {
-    rewardDetails.push(`魔石: ${task.reward.magicStone}`);
-  }
-  if (task.reward.items && task.reward.items.length > 0) {
-    rewardDetails.push(`物品: ${task.reward.items.join(', ')}`);
-  }
-
-  if (rewardDetails.length > 0) {
-    lines.push(`  (${rewardDetails.join(' | ')})`);
-  }
-
-  return lines.join('\n');
 }
 
 // ==================== 突袭任务专用函数 ====================
@@ -385,27 +258,6 @@ export function getDailyTaskDescriptionByWeekday(
 
     default:
       return '今天没有可接受的任务';
-  }
-}
-
-/**
- * 获取任务传送目标地点
- * @param weekday 星期几
- * @returns 传送目标地点ID，如果不需要传送则返回null
- */
-export function getTaskTeleportLocation(weekday: number): string | null {
-  switch (weekday) {
-    case 5: // 周五：传送到雪域边境
-      return 'xueyu-bianjing';
-
-    case 6: // 周六：传送到皇宫
-      return 'huanggong';
-
-    case 0: // 周日：传送到地下城
-      return 'dixiacheng-1'; // 地下城1层
-
-    default:
-      return null;
   }
 }
 
@@ -598,111 +450,7 @@ function checkDungeonTask(_task: DailyTask, completedDungeons: string[]): boolea
   );
 }
 
-/**
- * 计算训练幻兽任务的奖励
- * @param pets 玩家幻兽列表
- * @returns 奖励配置
- */
-function calculatePetTrainingReward(pets: Pet[]): { magicStone: number; description: string } | null {
-  // 找到符合条件的最高星级幻兽
-  const validPets = pets.filter(pet => {
-    return pet.hs_name === '攻防型' && pet.qualityTitle.includes('极品');
-  });
-
-  if (validPets.length === 0) {
-    return null;
-  }
-
-  // 按评分排序，取最高的
-  const bestPet = validPets.sort((a, b) => b.pz - a.pz)[0];
-
-  // 根据评分估算星级（评分/100 ≈ 星级）
-  const estimatedStar = Math.floor(bestPet.pz / 100);
-
-  // 获取对应的奖励配置
-  const rewardConfig = getPetTrainingReward(estimatedStar);
-
-  if (rewardConfig) {
-    return {
-      magicStone: rewardConfig.magicStone,
-      description: rewardConfig.description,
-    };
-  }
-
-  // 默认奖励
-  return {
-    magicStone: 5000,
-    description: '极品攻防型幻兽奖励5000魔石',
-  };
-}
-
 // ==================== 其他辅助函数 ====================
-
-/**
- * 获取当前星期的任务
- * @returns 当前星期的任务配置
- */
-export function getCurrentDailyTask(): DailyTask | null {
-  // 获取当前星期（0=周日, 1=周一, ..., 6=周六）
-  const today = new Date().getDay();
-
-  return getDailyTask(today);
-}
-
-/**
- * 获取任务状态描述
- * @param taskStatus 任务状态
- * @returns 状态描述文本
- */
-export function getTaskStatusDescription(taskStatus: DailyTaskStatus): string {
-  if (taskStatus.isRewarded) {
-    return '✅ 已领取奖励';
-  }
-
-  if (taskStatus.isCompleted) {
-    return '🎉 任务完成，可领取奖励';
-  }
-
-  if (taskStatus.isAccepted) {
-    const progress = `${taskStatus.progress}/${taskStatus.targetProgress}`;
-
-    return `🔄 进行中 (${progress})`;
-  }
-
-  return '⏳ 未接受';
-}
-
-/**
- * 验证任务ID是否有效
- * @param taskId 任务ID
- * @returns 是否有效
- */
-export function isValidTaskId(taskId: string): boolean {
-  return taskId in dailyTaskConfig;
-}
-
-/**
- * 获取所有可用的任务ID列表
- * @returns 任务ID数组
- */
-export function getAllTaskIds(): string[] {
-  return Object.keys(dailyTaskConfig);
-}
-
-/**
- * 获取任务进度百分比
- * @param taskStatus 任务状态
- * @returns 进度百分比（0-100）
- */
-export function getTaskProgressPercentage(taskStatus: DailyTaskStatus): number {
-  if (taskStatus.targetProgress === 0) {
-    return 0;
-  }
-
-  const percentage = (taskStatus.progress / taskStatus.targetProgress) * 100;
-
-  return Math.min(100, Math.max(0, percentage));
-}
 
 // ==================== 收集宝石任务专用函数 ====================
 

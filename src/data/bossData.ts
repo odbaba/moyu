@@ -12,8 +12,6 @@
 
 import type { BossSpawnConfig, BossTemplate } from '../types';
 
-// ========== BOSS 模板数据 ==========
-
 /**
  * BOSS 模板映射表
  * 以 BOSS ID 为索引，存储所有 BOSS 的模板数据
@@ -226,31 +224,3 @@ export const bossSpawnConfigs: BossSpawnConfig[] = [
   },
 ];
 
-// ========== 辅助函数 ==========
-
-/**
- * 根据地图ID获取BOSS模板
- * @param locationId 地图ID
- * @returns BOSS模板或undefined
- */
-export function getBossTemplateByLocation(locationId: string): BossTemplate | undefined {
-  return Object.values(bossTemplates).find(boss => boss.location === locationId);
-}
-
-/**
- * 根据BOSS ID获取刷新配置
- * @param bossId BOSS模板ID
- * @returns 刷新配置或undefined
- */
-export function getBossSpawnConfig(bossId: string): BossSpawnConfig | undefined {
-  return bossSpawnConfigs.find(config => config.bossTemplateId === bossId);
-}
-
-/**
- * 根据交互ID获取刷新配置
- * @param interactableId 交互ID
- * @returns 刷新配置或undefined
- */
-export function getBossSpawnConfigByInteractableId(interactableId: string): BossSpawnConfig | undefined {
-  return bossSpawnConfigs.find(config => config.interactableId === interactableId);
-}

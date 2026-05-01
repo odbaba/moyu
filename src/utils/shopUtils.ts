@@ -8,8 +8,6 @@
 
 import type {
   EquipmentItem,
-  EquipmentQuality,
-  EquipmentSlotType,
   InventoryItem,
   Pet,
   PlayerResources,
@@ -277,67 +275,6 @@ export function sellItem(
     magicStoneEarned,
     itemId: item.id,
     quantity,
-  };
-}
-
-// ==================== 随机武器生成函数 ====================
-
-/**
- * 生成随机武器
- * @returns 装备物品数据
- */
-export function generateRandomWeapon(): EquipmentItem {
-  // 1. 随机装备类型
-  const equipmentTypes: EquipmentSlotType[] = ['weapon', 'helmet', 'clothes', 'shoes', 'bracelet', 'necklace'];
-  const equipmentType = equipmentTypes[Math.floor(Math.random() * equipmentTypes.length)];
-
-  // 2. 随机品质（普通50%、良好33%、优秀17%）
-  const qualityRandom = Math.random() * 100;
-  let equipmentQuality: EquipmentQuality;
-  if (qualityRandom < 50) {
-    equipmentQuality = '普通品';
-  } else if (qualityRandom < 83) {
-    equipmentQuality = '良品';
-  } else {
-    equipmentQuality = '上品';
-  }
-
-  // 3. 随机洞数（0.1%概率有1-2个洞）
-  let holeCount = 0;
-  if (Math.random() < 0.001) {
-    holeCount = Math.floor(Math.random() * 2) + 1; // 1-2个洞
-  }
-
-  // 4. 随机魔魂等级（0-3级）
-  const magicSoulLevel = Math.floor(Math.random() * 4);
-
-  // 5. 生成装备ID
-  const id = `random_${equipmentType}_${Date.now()}`;
-
-  // 6. 根据品质计算属性
-  const qualityMultiplier = equipmentQuality === '普通品' ? 1 : equipmentQuality === '良品' ? 1.2 : 1.5;
-
-  // 7. 计算攻击力范围
-  const baseAttack = Math.floor((10 + Math.random() * 10) * qualityMultiplier);
-  const attackMin = baseAttack;
-  const attackMax = baseAttack + Math.floor(Math.random() * 10);
-
-  // 8. 返回装备数据
-  return {
-    id,
-    name: '随机装备',
-    type: 'equipment',
-    equipmentType,
-    useLevel: 1,
-    equipmentQuality,
-    magicSoulLevel,
-    holeCount,
-    attackMin,
-    attackMax,
-    defense: Math.floor((5 + Math.random() * 5) * qualityMultiplier),
-    icon: '⚔️',
-    description: `随机生成的${equipmentQuality}装备`,
-    quantity: 1,
   };
 }
 

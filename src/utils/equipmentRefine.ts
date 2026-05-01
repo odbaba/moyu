@@ -10,23 +10,6 @@ import type { EquipmentItem, EquipmentQuality, GemItem, RefineResult } from '../
 import { WarSoulType } from '../types';
 
 /**
- * 装备类型名称列表
- * 用于判断物品是否为装备
- */
-const EQUIPMENT_TYPES = ['武器', '头盔', '手镯', '项链', '衣服', '战鞋'];
-
-/**
- * 宝石名称列表
- * 用于判断物品是否为宝石
- */
-const GEM_NAMES = [
-  '高级经验石', '高级战斗力石', '幻魔晶石', '幻魔之心',
-  '灵魂晶石', '灵魂王', '魔魂晶石', '魔魂之心',
-  '月光宝盒', '月光宝盒增强版', '中级经验石', '中级战斗力石',
-  '战魂晶石', '战魂之心'
-];
-
-/**
  * 品质等级映射表
  * 将品质名称转换为数字等级
  */
@@ -61,33 +44,6 @@ const QUALITY_COMBAT_POWER: Record<EquipmentQuality, number> = {
   '精品': 3,
   '极品': 4
 };
-
-/**
- * 物品识别函数
- * 判断物品是装备、宝石还是其他类型
- * @param item - 待识别的物品
- * @returns 0: 不是装备或宝石, 1: 是装备, 2: 是宝石
- */
-export function isWeaponOrStone(item: unknown): 0 | 1 | 2 {
-  // 类型守卫：检查 item 是否为对象且包含 name 属性
-  if (!item || typeof item !== 'object' || !('name' in item)) {
-    return 0;
-  }
-
-  const itemObj = item as { name?: string; type?: string };
-
-  // 检查是否为装备类型
-  if (EQUIPMENT_TYPES.includes(itemObj.name || '') || itemObj.type === 'equipment') {
-    return 1;
-  }
-
-  // 检查是否为宝石类型
-  if (GEM_NAMES.includes(itemObj.name || '') || itemObj.type === 'gem') {
-    return 2;
-  }
-
-  return 0;
-}
 
 /**
  * 更新装备名称和基础属性
@@ -977,36 +933,6 @@ function calculateNewLevel(currentLevel: number): number {
   return currentLevel;
 }
 
-/**
- * 品质名称转换
- * 将品质等级转换为品质名称
- * @param quality - 品质等级（0-4）
- * @returns 品质名称
- */
-export function getQualityName(quality: number): EquipmentQuality {
-  return QUALITY_NAMES[quality] || '普通品';
-}
-
-/**
- * 获取品质战斗力加成
- * @param quality - 品质名称
- * @returns 战斗力加成值
- */
-export function getQualityCombatPower(quality: EquipmentQuality): number {
-  return QUALITY_COMBAT_POWER[quality] || 0;
-}
-
-/**
- * 获取战魂类型名称
- * @param soulType - 战魂类型（WarSoulType枚举）
- * @returns 战魂类型名称
- */
-export function getSoulTypeName(soulType: WarSoulType | undefined): string {
-  if (soulType === WarSoulType.TIAN_HUN) return '天魂';
-  if (soulType === WarSoulType.DI_HUN) return '地魂';
-
-  return '无';
-}
 
 /**
  * 检查装备是否可以精炼

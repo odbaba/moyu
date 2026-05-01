@@ -66,17 +66,6 @@ export function canPromoteMilitaryRank(currentExp: number, currentLevel: number)
   return currentExp >= nextRequirement;
 }
 
-/**
- * 获取军衔战斗力加成
- * @param level 军衔等级
- * @returns 战斗力加成百分比
- */
-export function getMilitaryRankCombatPowerBonus(level: number): number {
-  const rank = getMilitaryRankByLevel(level);
-
-  return rank.combatPowerBonus;
-}
-
 // ========== 军饷领取功能 ==========
 
 /**
@@ -403,28 +392,6 @@ export function getMilitaryRankDescription(): string {
   return text;
 }
 
-/**
- * 获取军衔晋升信息
- * @param currentLevel 当前军衔等级
- * @returns 晋升信息文本
- */
-export function getPromotionInfo(currentLevel: number): string {
-  if (currentLevel >= 11) {
-    return '恭喜你已达到最高军衔：元帅！';
-  }
-
-  const currentRank = getMilitaryRankByLevel(currentLevel);
-  const nextRank = getMilitaryRankByLevel(currentLevel + 1);
-
-  let text = `当前军衔：${currentRank.name}\n`;
-  text += `下一级军衔：${nextRank.name}\n`;
-  text += `所需战功：${nextRank.requiredBattleExp.toLocaleString()}\n`;
-  text += `战斗力加成：${currentRank.combatPowerBonus}% → ${nextRank.combatPowerBonus}%\n`;
-  text += `军饷奖励：${currentRank.pay.toLocaleString()} → ${nextRank.pay.toLocaleString()}魔石`;
-
-  return text;
-}
-
 // ========== 战功奖励计算 ==========
 
 /**
@@ -435,22 +402,6 @@ export const BATTLE_EXP_REWARDS = {
   BOSS_KILL: 1000, // 消灭BOSS获得战功
   ICE_GIANT_KILL: 10000, // 消灭雪域边境冰雪巨人获得战功
 };
-
-/**
- * 计算战功奖励
- * @param enemyType 敌人类型 ('boss' | 'ice_giant')
- * @returns 战功值
- */
-export function calculateBattleExp(enemyType: 'boss' | 'ice_giant'): number {
-  switch (enemyType) {
-    case 'boss':
-      return BATTLE_EXP_REWARDS.BOSS_KILL;
-    case 'ice_giant':
-      return BATTLE_EXP_REWARDS.ICE_GIANT_KILL;
-    default:
-      return 0;
-  }
-}
 
 // ========== 战功获取和晋升逻辑 ==========
 

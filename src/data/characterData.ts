@@ -1,4 +1,4 @@
-import type { CharacterData, EquipmentDetail, PrincessRelationship } from '../types';
+import type { CharacterData, EquipmentDetail } from '../types';
 import { WarSoulType } from '../types';
 import { CHARACTER_BASE_STATS, CHARACTER_GROWTH_RATES } from '../utils/attributeCalculator';
 import { calculateTotalCombatPower } from '../utils/combatPower';
@@ -174,60 +174,3 @@ export const exampleCharacter: CharacterData = {
   combatPower: calculateTotalCombatPower(playerCharacter, examplePets, [])
 };
 
-// 导出示例装备数据
-export const exampleEquipments: EquipmentDetail[] = [
-  weapon,
-  clothes,
-  shoes,
-  bracelet,
-  necklace,
-  helmet
-];
-
-
-// ========== 公主关系系统数据 ==========
-
-/**
- * 示例公主关系数据
- * 初始状态：未认识公主
- */
-export const examplePrincessRelationship: PrincessRelationship = {
-  level: 0, // 关系等级：未认识
-  intimacy: 0, // 亲密度：0
-  relationshipName: '未认识', // 关系名称
-  canChatToday: true, // 今天可以聊天
-  canGiftToday: true, // 今天可以送礼
-  canReceiveSundayGift: true, // 本周可以领取周日礼物
-  hasReceivedConfidantGift: false, // 未领取知己的礼物
-  canGiftThisWeek: true // 本周可以送礼（一周只能送一次，一次最多12个）
-};
-
-/**
- * 公主关系数据（已建立关系示例）
- * 关系等级：知己
- */
-export const confidantPrincessRelationship: PrincessRelationship = {
-  level: 4, // 关系等级：知己
-  intimacy: 75, // 亲密度：75
-  relationshipName: '知己', // 关系名称
-  canChatToday: true, // 今天可以聊天
-  canGiftToday: true, // 今天可以送礼
-  canReceiveSundayGift: true, // 本周可以领取周日礼物
-  hasReceivedConfidantGift: false, // 未领取知己的礼物
-  canGiftThisWeek: true // 本周可以送礼（一周只能送一次，一次最多12个）
-};
-
-/**
- * 公主关系数据（恋人示例）
- * 关系等级：恋人
- */
-export const loverPrincessRelationship: PrincessRelationship = {
-  level: 5, // 关系等级：恋人
-  intimacy: 150, // 亲密度：150
-  relationshipName: '恋人', // 关系名称
-  canChatToday: true, // 今天可以聊天
-  canGiftToday: true, // 今天可以送礼
-  canReceiveSundayGift: true, // 本周可以领取周日礼物
-  hasReceivedConfidantGift: true, // 已领取知己的礼物
-  canGiftThisWeek: true // 本周可以送礼（一周只能送一次，一次最多12个）
-};

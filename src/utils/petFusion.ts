@@ -4,7 +4,7 @@
  * 参考文档：reference/docs/幻兽幻化师交互逻辑文档.md
  */
 
-import type { Pet, PetType } from '../types';
+import type { Pet } from '../types';
 import { getQualityTitle, upgradePetLevel } from './petGenerator';
 
 // ==================== 评分计算相关函数 ====================
@@ -542,35 +542,3 @@ export function checkFusionConditions(
   };
 }
 
-/**
- * 获取幻兽类型的主属性加成系数配置
- * 用于UI展示幻兽类型的加成特点
- *
- * @param petType 幻兽类型
- * @returns 主属性加成系数配置
- */
-export function getFusionCoefficients(petType: PetType): {
-  minAttack: number;
-  maxAttack: number;
-  defense: number;
-  hp: number;
-} {
-  switch (petType) {
-    case '攻防型':
-      return { minAttack: 1.0, maxAttack: 1.2, defense: 0.8, hp: 0 };
-    case '调皮猫':
-      return { minAttack: 0.8, maxAttack: 1.4, defense: 0.7, hp: 0 };
-    case '吉鲁猪':
-      return { minAttack: 1.2, maxAttack: 1.6, defense: 0, hp: 0 };
-    case '奇异兽':
-      return { minAttack: 1.3, maxAttack: 1.3, defense: 0, hp: 0 };
-    case '圣天使':
-      return { minAttack: 0.5, maxAttack: 0.8, defense: 0, hp: 1.8 };
-    case '守护':
-      return { minAttack: 1.4, maxAttack: 1.6, defense: 0, hp: 0 };
-    case '年猪':
-      return { minAttack: 1.1, maxAttack: 1.2, defense: 1.0, hp: 1.5 };
-    default:
-      return { minAttack: 1.0, maxAttack: 1.2, defense: 0, hp: 0 };
-  }
-}

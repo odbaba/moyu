@@ -1,9 +1,0 @@
-on(release){
-   _root.CloseAll();
-   _root.cangku.openme();
-   _root.beibao.openme();
-   if(!isopen)
-   {
-   }
-   closeme();
-}

@@ -1,4 +1,4 @@
-import { getMilitaryRankByLevel, getNobleRankByLevel, MILITARY_RANKS, NOBLE_RANKS } from '../data/rankData';
+import { MILITARY_RANKS, NOBLE_RANKS } from '../data/rankData';
 import type { CharacterData, EquipmentDetail, EquipmentQuality, Pet, SkillDetail } from '../types';
 import { getQualityValue } from './attributeCalculator';
 import { calculateGemCombatPower } from './equipmentConverter';
@@ -96,13 +96,6 @@ export function calculateMilitaryRankCombatPower(militaryRankName: string): numb
   return rank ? rank.combatPowerBonus : 0;
 }
 
-// 计算军衔等级加成战斗力（通过等级直接计算）
-export function calculateMilitaryRankCombatPowerByLevel(militaryRankLevel: number): number {
-  const rank = getMilitaryRankByLevel(militaryRankLevel);
-
-  return rank.combatPowerBonus;
-}
-
 // 计算爵位加成战斗力
 // 根据爵位等级从 rankData.ts 获取战斗力加成
 export function calculateTitleCombatPower(title: string): number {
@@ -112,12 +105,6 @@ export function calculateTitleCombatPower(title: string): number {
   return rank ? rank.combatPowerBonus : 0;
 }
 
-// 计算爵位等级加成战斗力（通过等级直接计算）
-export function calculateNobleRankCombatPowerByLevel(nobleRankLevel: number): number {
-  const rank = getNobleRankByLevel(nobleRankLevel);
-
-  return rank.combatPowerBonus;
-}
 
 // 计算人物等级贡献战斗力
 export function calculateLevelCombatPower(level: number): number {

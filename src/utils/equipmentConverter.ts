@@ -36,16 +36,6 @@ const GEM_COMBAT_POWER: Record<string, number> = {
 };
 
 /**
- * 宝石经验加成映射表
- * 中级经验石：+25% 经验
- * 高级经验石：+50% 经验
- */
-const GEM_EXP_BONUS: Record<string, number> = {
-  '中级经验石': 25,
-  '高级经验石': 50
-};
-
-/**
  * 计算宝石属性加成
  * @param gems 镶嵌的宝石名称数组
  * @returns 宝石属性加成对象
@@ -89,24 +79,6 @@ export function calculateGemCombatPower(gems: string[] | undefined): number {
   });
 
   return totalCombatPower;
-}
-
-/**
- * 计算宝石经验加成
- * @param gems 镶嵌的宝石名称数组
- * @returns 经验加成百分比
- */
-export function calculateGemExpBonus(gems: string[] | undefined): number {
-  if (!gems || gems.length === 0) {
-    return 0;
-  }
-
-  let totalExpBonus = 0;
-  gems.forEach(gemName => {
-    totalExpBonus += GEM_EXP_BONUS[gemName] || 0;
-  });
-
-  return totalExpBonus;
 }
 
 /**

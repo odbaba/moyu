@@ -37,18 +37,6 @@ export function decreaseLuck(currentLuck: number, amount: number): number {
 }
 
 /**
- * 计算暴率系数
- * 公式：baoli = 1 + (xy + 1) / 100
- * 参考代码：reference/scripts/DefineSprite_443/frame_1/DoAction.as 第4行
- *
- * @param luckValue 幸运值
- * @returns 暴率系数
- */
-export function calculateDropRate(luckValue: number): number {
-  return 1 + (luckValue + 1) / 100;
-}
-
-/**
  * 检查幸运值是否为零
  *
  * @param luckValue 幸运值
@@ -58,19 +46,3 @@ export function isLuckZero(luckValue: number): boolean {
   return luckValue <= LUCK_CONSTANTS.MIN;
 }
 
-/**
- * 获取幸运值等级描述
- * 根据幸运值范围返回对应的描述
- *
- * @param luckValue 幸运值
- * @returns 幸运值等级描述
- */
-export function getLuckLevelDescription(luckValue: number): string {
-  if (luckValue >= 90) return '极佳';
-  if (luckValue >= 70) return '很好';
-  if (luckValue >= 50) return '普通';
-  if (luckValue >= 30) return '较差';
-  if (luckValue >= 10) return '很差';
-
-  return '极差';
-}

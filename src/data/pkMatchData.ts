@@ -205,15 +205,6 @@ export function getPKMatchReward(group: PKMatchGroup): PKMatchReward | undefined
 }
 
 /**
- * 根据分组获取PK赛BOSS属性
- * @param group PK赛分组
- * @returns PK赛BOSS属性
- */
-export function getPKBossStats(group: PKMatchGroup): PKBossStats {
-  return pkBossStats[group];
-}
-
-/**
  * 创建PK赛BOSS敌人数据
  * 用于战斗系统
  * 注意：攻击力保留最小值和最大值范围，战斗时才随机取值
@@ -251,13 +242,3 @@ export function isSaturday(nowday: number): boolean {
   return nowday % 7 === 6;
 }
 
-/**
- * 获取星期几名称
- * @param nowday 当前天数（从1开始）
- * @returns 星期几名称
- */
-export function getWeekdayName(nowday: number): string {
-  const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-
-  return weekdays[nowday % 7];
-}

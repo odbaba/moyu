@@ -7,10 +7,8 @@
 import { getBreakDefenseHits, getSkillDamagePercent, getSkillDisplayName } from '../data/skillData';
 import type {
   BattleCharacter,
-  BattleInitParams,
   BattlePet,
   BattleSkill,
-  BattleState,
   CharacterData,
   EnemyData,
   EnemyTemplate,
@@ -210,70 +208,6 @@ export function createEnemyFromTemplate(
 }
 
 /**
- * 创建战斗状态
- * @param params 战斗初始化参数
- * @returns 战斗状态数据
- */
-export function createBattleState(params: BattleInitParams, warSoulSetInfo?: WarSoulSetInfo): BattleState {
-  const { playerData, playerSkills, enemyTemplate, enemyLevel, enemyCount, pets } = params;
-
-  // 创建玩家战斗角色（玩家位置固定在九宫格中心）
-  const player = characterToBattleCharacter(
-    playerData,
-    playerSkills,
-    true,
-    { x: 1, y: 1 }, // 九宫格中心位置
-    pets
-  );
-
-  // 创建敌人列表
-  const enemies: BattleCharacter[] = [];
-
-  // 根据敌人数量生成敌人，分布在九宫格的不同位置
-  const enemyPositions: GridPosition[] = [
-    { x: 0, y: 0 }, // 左上
-    { x: 2, y: 0 }, // 右上
-    { x: 0, y: 2 }, // 左下
-    { x: 2, y: 2 }, // 右下
-    { x: 1, y: 0 }, // 上中
-    { x: 1, y: 2 }, // 下中
-    { x: 0, y: 1 }, // 左中
-    { x: 2, y: 1 }, // 右中
-    { x: 2, y: 1 } // 备用位置
-  ];
-
-  // 生成指定数量的敌人
-  for (let i = 0; i < enemyCount && i < enemyPositions.length; i++) {
-    const enemy = createEnemyFromTemplate(
-      enemyTemplate,
-      enemyLevel,
-      i,
-      enemyPositions[i],
-      warSoulSetInfo
-    );
-    enemies.push(enemy);
-  }
-
-  // 创建初始战斗状态
-  const battleState: BattleState = {
-    player: player,
-    enemies: enemies,
-    deployedPets: [], // 初始无出战幻兽
-    currentTurn: 'player', // 玩家先手
-    isPlayerTurn: true,
-    battleLogs: [], // 初始无战斗日志
-    round: 1, // 第一回合
-    selectedAction: null, // 未选择行动
-    targetEnemy: null, // 未选择目标
-    battleResult: 'in_progress', // 战斗进行中
-    logIdCounter: 0, // 日志ID计数器初始为0
-    currentEnemyActionIndex: 0 // 初始化敌人行动索引
-  };
-
-  return battleState;
-}
-
-/**
  * 幻兽数据转换为战斗幻兽数据
  * 将 Pet 类型转换为 BattlePet 类型，用于战斗系统
  *
@@ -441,74 +375,3 @@ export function calculateCombatPowerFromEnemyData(enemyData: EnemyData): number 
   return level;
 }
 
-/**
- * 根据敌人数据列表创建战斗状态
- * 用于怪物交互场景，直接使用敌人数据创建战斗
- *
- * @param playerData 玩家角色数据
- * @param playerSkills 玩家技能列表
- * @param enemiesData 敌人数据列表（来自怪物交互配置）
- * @param pets 幻兽数组，用于计算幻兽战斗力加成
- * @returns 战斗状态数据
- */
-export function createBattleStateFromEnemies(
-  playerData: CharacterData,
-  playerSkills: SkillDetail[],
-  enemiesData: EnemyData[],
-  pets?: Pet[],
-  warSoulSetInfo?: WarSoulSetInfo
-): BattleState {
-  // 创建玩家战斗角色（玩家位置固定在九宫格中心）
-  const player = characterToBattleCharacter(
-    playerData,
-    playerSkills,
-    true,
-    { x: 1, y: 1 }, // 九宫格中心位置
-    pets
-  );
-
-  // 创建敌人列表
-  const enemies: BattleCharacter[] = [];
-
-  // 敌人位置配置（九宫格，排除中心位置）
-  const enemyPositions: GridPosition[] = [
-    { x: 0, y: 0 }, // 左上
-    { x: 2, y: 0 }, // 右上
-    { x: 0, y: 2 }, // 左下
-    { x: 2, y: 2 }, // 右下
-    { x: 1, y: 0 }, // 上中
-    { x: 1, y: 2 }, // 下中
-    { x: 0, y: 1 }, // 左中
-    { x: 2, y: 1 }, // 右中
-    { x: 2, y: 1 } // 备用位置
-  ];
-
-  // 从敌人数据列表创建敌人
-  for (let i = 0; i < enemiesData.length && i < enemyPositions.length; i++) {
-    const enemy = createEnemyFromEnemyData(
-      enemiesData[i],
-      i,
-      enemyPositions[i],
-      warSoulSetInfo
-    );
-    enemies.push(enemy);
-  }
-
-  // 创建初始战斗状态
-  const battleState: BattleState = {
-    player: player,
-    enemies: enemies,
-    deployedPets: [], // 初始无出战幻兽
-    currentTurn: 'player', // 玩家先手
-    isPlayerTurn: true,
-    battleLogs: [], // 初始无战斗日志
-    round: 1, // 第一回合
-    selectedAction: null, // 未选择行动
-    targetEnemy: null, // 未选择目标
-    battleResult: 'in_progress', // 战斗进行中
-    logIdCounter: 0, // 日志ID计数器初始为0
-    currentEnemyActionIndex: 0 // 初始化敌人行动索引
-  };
-
-  return battleState;
-}

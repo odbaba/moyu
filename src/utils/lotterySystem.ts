@@ -368,24 +368,6 @@ export function checkMagicStone(
   };
 }
 
-/**
- * 扣除魔石
- * 返回扣除后的玩家资源（不修改原对象）
- *
- * @param playerResources 玩家资源
- * @param amount 扣除数量
- * @returns 扣除后的玩家资源
- */
-export function deductMagicStone(
-  playerResources: PlayerResources,
-  amount: number
-): PlayerResources {
-  return {
-    ...playerResources,
-    magicStone: Math.max(0, playerResources.magicStone - amount),
-  };
-}
-
 // ==================== 完整抽奖流程函数 ====================
 
 /**
@@ -450,36 +432,3 @@ export function executeLottery(
 
 // ==================== 工具函数 ====================
 
-/**
- * 获取奖品等级概率
- * 返回各奖品等级的概率百分比
- *
- * @returns 概率映射表
- */
-export function getPrizeProbabilities(): Record<PrizeLevel, number> {
-  return {
-    legendary: 2,
-    high: 5,
-    medium: 38,
-    common: 55,
-  };
-}
-
-/**
- * 格式化抽奖结果消息
- *
- * @param result 抽奖结果
- * @returns 格式化后的消息
- */
-export function formatLotteryResult(result: LotteryResult): string {
-  if (!result.success) {
-    return result.message;
-  }
-
-  const levelName = PRIZE_LEVEL_NAMES[result.prizeLevel];
-  let message = `【${levelName}】\n`;
-  message += `奖品: ${result.prizeName}\n`;
-  message += `消耗魔石: ${result.magicStoneCost}`;
-
-  return message;
-}
