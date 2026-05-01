@@ -29,6 +29,7 @@ reference
 
 # Android 构建产物
 android/app/build
+android/app/release
 android/build
 android/.gradle
 android/app/.gradle

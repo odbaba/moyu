@@ -17,9 +17,6 @@ const config: CapacitorConfig = {
   server: {
     // Android 签名包使用 https，调试使用 http
     androidScheme: 'https',
-    // live-reload 开发时连接的 Vite 开发服务器地址
-    // 使用时通过 --live-reload --host 参数会自动覆盖此配置
-    url: 'http://192.168.31.37:5173',
   },
   // 插件配置
   plugins: {},

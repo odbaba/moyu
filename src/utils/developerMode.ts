@@ -8,7 +8,7 @@
  * true: 开启开发者模式（示例物品、大量资源、正常经验）
  * false: 关闭开发者模式（初始装备、少量资源、经验降为1%）
  */
-export const isDeveloperMode: boolean = true;
+export const isDeveloperMode: boolean = false;
 
 /**
  * 获取经验倍率
