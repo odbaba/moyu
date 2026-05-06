@@ -26,6 +26,7 @@ reference
 
 .VSCodeCounter
 /dist (*).zip
+/dist.zip
 
 # Android 构建产物
 android/app/build

@@ -38,7 +38,7 @@ public class MoyuApplication extends Application {
                 TapTapRegion.CN // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
         );
         // 设置屏幕方向，ScreenOrientation.LANDSCAPE 或 1 横屏， ScreenOrientation.PORTRAIT 或 0 竖屏
-        tapSdkOptions.setScreenOrientation(ScreenOrientation.LANDSCAPE);
+        tapSdkOptions.setScreenOrientation(ScreenOrientation.PORTRAIT);
         // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
         tapSdkOptions.setEnableLog(BuildConfig.DEBUG);
         TapTapSdk.init(this, tapSdkOptions);
