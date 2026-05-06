@@ -847,6 +847,16 @@ function App() {
       return;
     }
 
+    // 能量塔禁地入口限制：魔军主帅未击败时不能进入
+    if (locationId === 'nenliangta-jindi') {
+      const taskState = _dailyTaskState;
+      if (taskState.mj_zs) {
+        setInteractionLog(prev => [...prev, '能量塔禁地还未开放，请先击败魔军主帅']);
+
+        return;
+      }
+    }
+
     // 地下城层间移动条件检查：从低层前往高层时，需清除当前层所有怪物
     const dungeonFloorOrder = ['dixiacheng-1', 'dixiacheng-2', 'dixiacheng-3'];
     const currentFloorIndex = dungeonFloorOrder.indexOf(currentLocation);
@@ -2939,7 +2949,7 @@ function App() {
           }
           
           // 魔军图腾兽存活时，战斗力提高50%
-          if (taskState.mj_tt) {
+          if (taskState.mj_tt && modifiedEnemy.combatPower) {
             modifiedEnemy.combatPower = Math.round(modifiedEnemy.combatPower * 1.5);
           }
           
