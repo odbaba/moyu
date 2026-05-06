@@ -171,13 +171,64 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
   }, [collectorSlots]);
 
   /**
+   * 将收藏架中所有物品放回背包
+   */
+  const returnAllItemsToInventory = () => {
+    let newInventory = [...inventoryItems];
+    
+    collectorSlots.forEach(slot => {
+      if (slot.item) {
+        const item = slot.item;
+        const quantity = item.quantity || 1;
+        
+        // 查找背包中是否有相同物品（可堆叠）
+        const existingItemIndex = newInventory.findIndex(i =>
+          i.name === item.name &&
+          i.type === item.type &&
+          i.rarity === item.rarity
+        );
+        
+        if (existingItemIndex !== -1) {
+          // 如果背包中已有相同物品，增加数量
+          newInventory[existingItemIndex] = {
+            ...newInventory[existingItemIndex],
+            quantity: (newInventory[existingItemIndex].quantity || 1) + quantity
+          };
+        } else {
+          // 否则添加新物品
+          const itemToReturn: InventoryItem = {
+            ...item,
+            id: item.id.replace('_collector_', '_'), // 恢复原始ID
+            quantity: quantity
+          };
+          newInventory.push(itemToReturn);
+        }
+      }
+    });
+    
+    onUpdateInventory(newInventory);
+    
+    // 清空收藏架
+    setCollectorSlots(Array.from({ length: 8 }, (_, index) => ({ index, item: null })));
+  };
+
+  /**
    * 处理遮罩层点击事件
    * 点击遮罩层（非内容区域）关闭模态窗口
    */
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
+      returnAllItemsToInventory();
       onClose();
     }
+  };
+
+  /**
+   * 处理关闭按钮点击事件
+   */
+  const handleCloseClick = () => {
+    returnAllItemsToInventory();
+    onClose();
   };
 
   /**
@@ -369,7 +420,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
     <div className="collector-modal-overlay" onClick={handleOverlayClick}>
       <div className="collector-modal-content">
         {/* 关闭按钮 */}
-        <button className="collector-close-modal" onClick={onClose}>×</button>
+        <button className="collector-close-modal" onClick={handleCloseClick}>×</button>
 
         {/* 标题 */}
         <h3 className="collector-modal-title">收藏架</h3>

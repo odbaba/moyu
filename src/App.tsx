@@ -2898,6 +2898,7 @@ function App() {
   /**
    * 开始战斗
    * 从敌人交互数据中提取战斗参数
+   * 应用魔军属性加成逻辑
    */
   const handleStartBattle = () => {
     if (currentEnemyData && currentEnemyData.enemies.length > 0) {
@@ -2905,7 +2906,46 @@ function App() {
       setCurrentBattleInteractableId(currentEnemyData.id);
 
       // 直接使用敌人数据列表
-      const enemiesData = currentEnemyData.enemies;
+      let enemiesData = currentEnemyData.enemies;
+
+      // ========== 魔军属性加成逻辑 ==========
+      // 检查敌人是否是魔军（通过名称判断）
+      const isDemonArmy = enemiesData.some(enemy => 
+        enemy.name.includes('魔军') || enemy.name.includes('魔的能量')
+      );
+
+      if (isDemonArmy) {
+        // 获取魔军状态
+        const taskState = _dailyTaskState;
+        
+        // 应用魔军属性加成
+        enemiesData = enemiesData.map(enemy => {
+          let modifiedEnemy = { ...enemy };
+          
+          // 魔军突击队存活时，攻击力提高50%
+          if (taskState.mj_gj) {
+            modifiedEnemy.attackMin = Math.round(modifiedEnemy.attackMin * 1.5);
+            modifiedEnemy.attackMax = Math.round(modifiedEnemy.attackMax * 1.5);
+          }
+          
+          // 魔军守卫军存活时，防御力提高50%
+          if (taskState.mj_fy) {
+            modifiedEnemy.defense = Math.round(modifiedEnemy.defense * 1.5);
+          }
+          
+          // 魔军神秘部队存活时，生命值提高50%
+          if (taskState.mj_sm) {
+            modifiedEnemy.maxHp = Math.round(modifiedEnemy.maxHp * 1.5);
+          }
+          
+          // 魔军图腾兽存活时，战斗力提高50%
+          if (taskState.mj_tt) {
+            modifiedEnemy.combatPower = Math.round(modifiedEnemy.combatPower * 1.5);
+          }
+          
+          return modifiedEnemy;
+        });
+      }
 
       // 敌人数量
       const enemyCount = enemiesData.length;
@@ -3809,9 +3849,16 @@ function App() {
       setInteractionLog(prev => [...prev, 'PK赛中离开战斗，视为挑战失败！']);
     }
 
+    // ========== 地图挑战赛离开处理 ==========
+    // 地图挑战赛中离开等同于挑战失败，清空正在挑战的地图状态
+    if (currentChallengingMap) {
+      setCurrentChallengingMap(null);
+      setInteractionLog(prev => [...prev, '地图挑战赛中离开战斗，视为挑战失败！']);
+    }
+
     // 添加离开战斗消息到交互日志
     setInteractionLog(prev => [...prev, '你离开了战斗。']);
-  }, [consumeTime, currentPKMatchGroup]);
+  }, [consumeTime, currentPKMatchGroup, currentChallengingMap]);
 
   /**
    * 获取出战幻兽列表

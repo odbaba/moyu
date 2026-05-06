@@ -684,7 +684,7 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     type: 'special',
     level: 1, // 无等级，设置为1
     combatPower: 500,
-    location: 'mozhongjun-zhendi',
+    location: 'nenliangta-jindi', // 位于能量塔禁地
     icon: '💫',
     description: '魔族大军的力量源泉，是魔族的生命支柱。特殊效果：每天复活所有被消灭的魔族军队。',
     baseHp: 50000,
@@ -703,7 +703,7 @@ export const monsterTemplates: Record<string, MonsterTemplate> = {
     type: 'special',
     level: 2000,
     combatPower: 2000,
-    location: 'mozhongjun-zhendi',
+    location: 'mojun-shuaiqi', // 位于魔军帅旗
     icon: '👿',
     description: '魔族大军的最高指挥官，2000级。负责保护魔的能量不被破坏。只有消灭它才能进一步消灭魔的能量。',
     baseHp: 100000,

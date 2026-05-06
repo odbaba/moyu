@@ -236,17 +236,41 @@ export const locations: LocationData = [
     id: 'mozhongjun-zhendi',
     name: '魔中军阵地',
     description: '魔族大军的营地，驻扎着强大的魔族军队。只有救出国王后才能进入。',
-    adjacentLocations: ['xueyu-bianjing'], // 仅与雪域边境连通
-    // 魔中军阵地：6个魔族大军怪物按钮
+    adjacentLocations: ['xueyu-bianjing', 'mojun-shuaiqi'], // 与雪域边境和魔军帅旗连通
+    // 魔中军阵地：4个魔族大军怪物按钮（魔军主帅已移至魔军帅旗，魔的能量已移至能量塔禁地）
     interactables: [
       'interact-mojun-tujidui',
       'interact-mojun-shouweijun',
       'interact-mojun-shenmibudui',
       'interact-mojun-tutengshou',
-      'interact-mojun-nengliang',
-      'interact-mojun-shuai',
     ],
     x: 5, // 位于雪域边境右边
+    y: 3,
+  },
+  // 魔军帅旗：魔军主帅的所在地，从魔中军阵地进入
+  {
+    id: 'mojun-shuaiqi',
+    name: '魔军帅旗',
+    description: '魔军主帅的指挥大帐，魔族大军的最高指挥官在此坐镇。只有救出国王后才能进入。',
+    adjacentLocations: ['mozhongjun-zhendi', 'nenliangta-jindi'], // 与魔中军阵地和能量塔禁地连通
+    // 魔军帅旗：魔军主帅交互按钮
+    interactables: [
+      'interact-mojun-shuai',
+    ],
+    x: 6, // 位于魔中军阵地右边
+    y: 3,
+  },
+  // 能量塔禁地：魔的能量所在地，从魔军帅旗进入
+  {
+    id: 'nenliangta-jindi',
+    name: '能量塔禁地',
+    description: '魔族大军的能量核心所在地，传说中魔的能量在此守护着整个魔族的力量源泉。只有救出国王后才能进入。',
+    adjacentLocations: ['mojun-shuaiqi'], // 仅与魔军帅旗连通
+    // 能量塔禁地：魔的能量交互按钮
+    interactables: [
+      'interact-mojun-nengliang',
+    ],
+    x: 7, // 位于魔军帅旗右边
     y: 3,
   },
   // 战魂封印迷宫：独立地点，通过探险家NPC传送到达
@@ -323,6 +347,8 @@ export const connections = [
   ['mimeng-zhaozhe', 'binggong'],
   ['binggong', 'xueyu-bianjing'],
   ['xueyu-bianjing', 'mozhongjun-zhendi'], // 魔中军阵地连接
+  ['mozhongjun-zhendi', 'mojun-shuaiqi'], // 魔军帅旗连接
+  ['mojun-shuaiqi', 'nenliangta-jindi'], // 能量塔禁地连接
 
   // 地下城之间横向连接
   ['dixiacheng-1', 'dixiacheng-2'],
