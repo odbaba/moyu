@@ -13,7 +13,7 @@ interface SoldierModalProps {
  * 小兵弹窗组件
  * 显示三个小兵的描述，提供攻击和离开按钮
  */
-const SoldierModal: React.FC<SoldierModalProps> = ({
+export const SoldierModal: React.FC<SoldierModalProps> = ({
   isVisible,
   onClose,
   onAttack
@@ -73,5 +73,3 @@ const SoldierModal: React.FC<SoldierModalProps> = ({
     </div>
   );
 };
-
-export default SoldierModal;

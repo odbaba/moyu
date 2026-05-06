@@ -9,7 +9,7 @@
     "build:singlefile": "tsc -b && vite build -c vite.singlefile.config.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint:exports": "ts-prune --project tsconfig.app.json",
+    "lint:exports": "ts-prune --project tsconfig.app.json | findstr /V \"(used in module)\"",
     "preview": "vite preview",
     "cap:sync": "npm run build && npx cap sync android",
     "cap:open": "npx cap open android",

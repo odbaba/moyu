@@ -20,24 +20,6 @@ export interface Location {
 }
 
 /**
- * 交互选项类型定义（旧版，保留兼容性）
- * @deprecated 请使用 NPCInteractionOption
- */
-export interface InteractionOption {
-  text: string;
-  result: string;
-}
-
-/**
- * 交互对象类型定义（旧版，保留兼容性）
- * @deprecated 请使用 NPCInteractable
- */
-export interface Interaction {
-  description: string;
-  options: InteractionOption[];
-}
-
-/**
  * 位置数据类型定义
  */
 export type LocationData = Location[];

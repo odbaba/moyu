@@ -41,7 +41,7 @@ interface LotteryBoxProps {
  * - 消耗2点时间
  * - 显示抽奖结果，极品奖励有特殊提示
  */
-const LotteryBox: React.FC<LotteryBoxProps> = ({
+export const LotteryBox: React.FC<LotteryBoxProps> = ({
   magicStones,
   onUpdateMagicStones,
   playerLevel,
@@ -173,5 +173,3 @@ const LotteryBox: React.FC<LotteryBoxProps> = ({
     </div>
   );
 };
-
-export default LotteryBox;

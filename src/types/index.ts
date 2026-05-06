@@ -5,18 +5,6 @@ export interface Location {
   interactables: string[];
 }
 
-// 交互选项类型定义
-export interface InteractionOption {
-  text: string;
-  result: string;
-}
-
-// 交互对象类型定义
-export interface Interaction {
-  description: string;
-  options: InteractionOption[];
-}
-
 // 网格位置类型定义
 export interface GridPosition {
   x: number;
