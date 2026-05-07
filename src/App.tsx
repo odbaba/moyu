@@ -98,7 +98,7 @@ import { calculateGameEnding, type GameEndingParams, type GameEndingResult } fro
 // 导入宝石合成工具函数
 import { consumeMaterials, getRecipeById, performSynthesis } from './utils/gemSynthesisUtils';
 // 导入物品工厂工具函数
-import { addItemToInventory, cloneItem, createEquipmentItem, createItemFromTemplate, ITEM_TEMPLATES, randomGemSlots } from './utils/itemFactory';
+import { addItemToInventory, cloneItem, createEquipmentItem, createFallbackItem, createItemFromTemplate, ITEM_TEMPLATES, randomGemSlots } from './utils/itemFactory';
 // 导入战利品工具函数
 import { calculateLoot, calculateSpecialMonsterLoot, isSpecialMonster, mergeLootResults } from './utils/lootUtils';
 // 导入爱的力量技能
@@ -2784,8 +2784,8 @@ function App() {
         setInteractionLog(prev => [...prev, `购买成功：${shopItem.name} × ${quantity}`]);
       } else {
         // 找不到模板时，使用原有逻辑创建基础物品
-        const fallbackItem: InventoryItem = {
-          id: itemId,
+        // 使用统一的兜底物品创建函数
+        const fallbackItem = createFallbackItem({
           name: shopItem.name,
           type: shopItem.type,
           description: shopItem.description,
@@ -2796,7 +2796,7 @@ function App() {
           magicStoneValue: shopItem.priceMagicStone,
           stackable: shopItem.stackable,
           maxStack: shopItem.maxStack,
-        };
+        });
         setInventory(prev => addItemToInventory(prev, fallbackItem));
         setInteractionLog(prev => [...prev, `购买成功：${shopItem.name} × ${quantity}`]);
       }

@@ -1,0 +1,15 @@
+- [x] itemFactory.ts 新增 createSilverOreItem 函数，功能与原 inventoryData.ts 的 createSilverOre 一致
+- [x] itemFactory.ts 新增 createGoldOreItem 函数，功能与原 inventoryData.ts 的 createGoldOre 一致
+- [x] itemFactory.ts 新增 createFallbackItem 函数，可创建带自动生成ID的兜底 InventoryItem
+- [x] ITEM_TEMPLATES 导出包含 zhanHunJingShi（战魂晶石）
+- [x] inventoryData.ts 导出 zhanHunJingShi
+- [x] inventoryData.ts 中 createSilverOre/createGoldOre 已删除（迁移到 itemFactory.ts）
+- [x] inventoryData.ts 中 createInitialEquipment 使用 cloneItem 替代展开语法
+- [x] inventoryData.ts 中银矿/金矿预生成变量使用 itemFactory 的函数
+- [x] lootUtils.ts 的 generateRandomEquipment 使用 createEquipmentItem 而非 createEquipment + generateItemId
+- [x] lootUtils.ts 不再直接导入 createEquipment 和 generateItemId
+- [x] warSoulDropUtils.ts 的 getWarSoulItemTemplate 使用 ITEM_TEMPLATES.zhanHunJingShi 而非对象字面量
+- [x] lotterySystem.ts 的 createLotteryItem fallback 使用 createFallbackItem 而非对象字面量
+- [x] App.tsx 商店购买 fallback 使用 createFallbackItem 而非对象字面量
+- [x] 所有引用 createSilverOre/createGoldOre 的地方已更新导入路径
+- [x] 项目构建通过，无类型错误和编译错误

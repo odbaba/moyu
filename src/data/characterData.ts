@@ -142,6 +142,8 @@ const playerCharacter: CharacterData = {
   attackMax: 55,
   defense: 88,
   dodgeRate: 30,
+  criticalRate: 5.0, // 1级基础暴击率5.0%
+  criticalDamageRate: 150, // 1级基础暴击伤害率150%
   luck: 50,
   equipment: {
     weapon: weapon,

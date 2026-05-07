@@ -123,6 +123,8 @@ export interface CharacterData {
   attackMax: number;
   defense: number;
   dodgeRate: number;
+  criticalRate: number; // 暴击率（百分比，如5.0表示5%）
+  criticalDamageRate: number; // 暴击伤害率（百分比，如150表示150%，即×1.5）
   luck: number;
   equipment: {
     weapon: EquipmentDetail | null;
@@ -674,6 +676,8 @@ export interface BattleCharacter {
   defense: number; // 防御力
   combatPower: number; // 战斗力
   dodgeRate: number; // 闪避率（百分比）
+  criticalRate: number; // 暴击率（百分比，如5.0表示5%）
+  criticalDamageRate: number; // 暴击伤害率（百分比，如150表示150%，即×1.5）
   luck: number; // 幸运值
   skills: BattleSkill[]; // 技能列表
   buffs: Buff[]; // 增益效果列表
@@ -768,6 +772,7 @@ export interface DamageResult {
   isBreakDefense: boolean; // 是否破防攻击
   combatPowerModifier: number; // 战斗力修正系数
   isCritical: boolean; // 是否暴击
+  criticalDamageRate: number; // 本次暴击使用的暴击伤害率（百分比，如150表示150%）
 }
 
 /**

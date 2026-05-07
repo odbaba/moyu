@@ -45,6 +45,90 @@ export const CHARACTER_GROWTH_RATES = {
 };
 
 /**
+ * 暴击率/暴击伤害率等级成长表
+ * 根据策划文档第二章的属性成长表定义
+ * 暴击率单位：百分比（如5.0表示5%）
+ * 暴击伤害率单位：百分比（如150表示150%，即×1.5）
+ * 未列出的等级使用线性插值计算
+ */
+export const CRITICAL_STATS_TABLE: Map<number, { criticalRate: number; criticalDamageRate: number }> = new Map([
+  [1,   { criticalRate: 5.0,  criticalDamageRate: 150 }],
+  [5,   { criticalRate: 5.0,  criticalDamageRate: 150 }],
+  [10,  { criticalRate: 5.0,  criticalDamageRate: 150 }],
+  [15,  { criticalRate: 5.0,  criticalDamageRate: 150 }],
+  [20,  { criticalRate: 5.0,  criticalDamageRate: 150 }],
+  [25,  { criticalRate: 5.0,  criticalDamageRate: 150 }],
+  [30,  { criticalRate: 5.0,  criticalDamageRate: 150 }],
+  [35,  { criticalRate: 5.2,  criticalDamageRate: 152 }],
+  [40,  { criticalRate: 5.4,  criticalDamageRate: 154 }],
+  [45,  { criticalRate: 5.6,  criticalDamageRate: 156 }],
+  [50,  { criticalRate: 5.8,  criticalDamageRate: 158 }],
+  [55,  { criticalRate: 6.0,  criticalDamageRate: 160 }],
+  [60,  { criticalRate: 6.3,  criticalDamageRate: 162 }],
+  [65,  { criticalRate: 6.6,  criticalDamageRate: 165 }],
+  [70,  { criticalRate: 7.0,  criticalDamageRate: 168 }],
+  [75,  { criticalRate: 7.5,  criticalDamageRate: 171 }],
+  [80,  { criticalRate: 8.0,  criticalDamageRate: 175 }],
+  [85,  { criticalRate: 8.5,  criticalDamageRate: 179 }],
+  [90,  { criticalRate: 9.0,  criticalDamageRate: 183 }],
+  [95,  { criticalRate: 9.5,  criticalDamageRate: 188 }],
+  [100, { criticalRate: 10.0, criticalDamageRate: 193 }],
+  [105, { criticalRate: 10.8, criticalDamageRate: 198 }],
+  [110, { criticalRate: 11.6, criticalDamageRate: 204 }],
+  [115, { criticalRate: 12.5, criticalDamageRate: 210 }],
+  [120, { criticalRate: 13.5, criticalDamageRate: 217 }],
+  [125, { criticalRate: 14.5, criticalDamageRate: 224 }],
+  [130, { criticalRate: 15.5, criticalDamageRate: 232 }],
+  [132, { criticalRate: 16.0, criticalDamageRate: 235 }],
+]);
+
+/**
+ * 根据等级计算暴击率和暴击伤害率
+ * 对于成长表中明确列出的等级直接返回，未列出的等级使用线性插值计算
+ * @param level 角色等级
+ * @returns 暴击率和暴击伤害率对象
+ */
+export function calculateCriticalStats(level: number): { criticalRate: number; criticalDamageRate: number } {
+  // 等级下限保护
+  const clampedLevel = Math.max(1, Math.min(level, 132));
+
+  // 如果等级在成长表中，直接返回
+  const directValue = CRITICAL_STATS_TABLE.get(clampedLevel);
+  if (directValue) {
+    return { ...directValue };
+  }
+
+  // 查找最近的两个关键等级进行线性插值
+  const sortedLevels = Array.from(CRITICAL_STATS_TABLE.keys()).sort((a, b) => a - b);
+
+  // 找到当前等级所在的区间：lowerLevel < clampedLevel < upperLevel
+  let lowerLevel = sortedLevels[0];
+  let upperLevel = sortedLevels[sortedLevels.length - 1];
+
+  for (let i = 0; i < sortedLevels.length - 1; i++) {
+    if (sortedLevels[i] <= clampedLevel && sortedLevels[i + 1] >= clampedLevel) {
+      lowerLevel = sortedLevels[i];
+      upperLevel = sortedLevels[i + 1];
+      break;
+    }
+  }
+
+  const lowerStats = CRITICAL_STATS_TABLE.get(lowerLevel)!;
+  const upperStats = CRITICAL_STATS_TABLE.get(upperLevel)!;
+
+  // 线性插值公式：lower + (upper - lower) * (level - lowerLevel) / (upperLevel - lowerLevel)
+  const ratio = (clampedLevel - lowerLevel) / (upperLevel - lowerLevel);
+  const criticalRate = lowerStats.criticalRate + (upperStats.criticalRate - lowerStats.criticalRate) * ratio;
+  const criticalDamageRate = lowerStats.criticalDamageRate + (upperStats.criticalDamageRate - lowerStats.criticalDamageRate) * ratio;
+
+  // 保留一位小数
+  return {
+    criticalRate: Math.round(criticalRate * 10) / 10,
+    criticalDamageRate: Math.round(criticalDamageRate * 10) / 10,
+  };
+}
+
+/**
  * 计算单件装备的基础属性
  * 根据装备类型和使用等级计算基础属性
  * @param equipment 装备对象
@@ -179,13 +263,20 @@ export function calculateCharacterBaseAttributes(level: number): {
   attackMin: number;
   attackMax: number;
   defense: number;
+  criticalRate: number;
+  criticalDamageRate: number;
 } {
+  // 根据等级获取暴击属性
+  const criticalStats = calculateCriticalStats(level);
+
   return {
     maxHp: CHARACTER_BASE_STATS.baseHp + CHARACTER_GROWTH_RATES.growthHp * level,
     maxStamina: CHARACTER_BASE_STATS.baseStamina + CHARACTER_GROWTH_RATES.growthStamina * level,
     attackMin: CHARACTER_BASE_STATS.baseAttackMin + CHARACTER_GROWTH_RATES.growthAttackMin * level,
     attackMax: CHARACTER_BASE_STATS.baseAttackMax + CHARACTER_GROWTH_RATES.growthAttackMax * level,
-    defense: CHARACTER_BASE_STATS.baseDefense + CHARACTER_GROWTH_RATES.growthDefense * level
+    defense: CHARACTER_BASE_STATS.baseDefense + CHARACTER_GROWTH_RATES.growthDefense * level,
+    criticalRate: criticalStats.criticalRate,
+    criticalDamageRate: criticalStats.criticalDamageRate,
   };
 }
 
@@ -202,6 +293,8 @@ export function calculateTotalCharacterAttributes(character: CharacterData): {
   attackMax: number;
   defense: number;
   dodgeRate: number;
+  criticalRate: number;
+  criticalDamageRate: number;
 } {
   // 基础属性
   const baseAttrs = calculateCharacterBaseAttributes(character.level);
@@ -225,7 +318,10 @@ export function calculateTotalCharacterAttributes(character: CharacterData): {
     attackMin: totalAttackMin,
     attackMax: totalAttackMax,
     defense: baseAttrs.defense + equipmentBonus.defense + petBonus.defense,
-    dodgeRate: equipmentBonus.dodgeRate
+    dodgeRate: equipmentBonus.dodgeRate,
+    // 暴击率和暴击伤害率直接使用角色属性值，不再实时查表
+    criticalRate: character.criticalRate,
+    criticalDamageRate: character.criticalDamageRate,
   };
 }
 
@@ -369,6 +465,9 @@ export function gainCharacterExperience(
       attackMax: totalAttrs.attackMax,
       defense: totalAttrs.defense,
       dodgeRate: totalAttrs.dodgeRate,
+      // 升级时根据新等级更新暴击率和暴击伤害率
+      criticalRate: calculateCriticalStats(newLevel).criticalRate,
+      criticalDamageRate: calculateCriticalStats(newLevel).criticalDamageRate,
       // 升级时恢复HP和MP到最大值
       currentHp: totalAttrs.maxHp,
       currentStamina: totalAttrs.maxStamina,

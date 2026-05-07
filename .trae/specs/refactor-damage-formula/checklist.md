@@ -1,0 +1,18 @@
+- [x] BattleCharacter 类型包含 criticalRate 和 criticalDamageRate 字段
+- [x] DamageResult 类型包含 criticalDamageRate 字段
+- [x] calculateTotalCharacterAttributes 返回 criticalRate 和 criticalDamageRate
+- [x] calculateCharacterBaseAttributes 返回基于等级的暴击率和暴击伤害率
+- [x] characterToBattleCharacter 正确传递 criticalRate 和 criticalDamageRate
+- [x] createEnemyFromEnemyData 为敌人设置默认暴击率和暴击伤害率
+- [x] calculateKValue 函数正确计算 K = 200 + 10 × level
+- [x] calculateDamage 使用新公式：基础伤害 = 攻击力 × K/(K+防御)
+- [x] 暴击判定使用 criticalRate 而非幸运值
+- [x] 暴击伤害使用 criticalDamageRate 而非固定×2
+- [x] calculateCombatPowerModifier 使用分段查表而非线性缩放
+- [x] 最终伤害包含99%~101%的浮动
+- [x] 伤害结算顺序正确：防御减伤 → 暴击 → 战斗力修正 → 技能倍率 → 浮动
+- [x] 破防时增加额外伤害倍率而非跳过防御计算
+- [x] 幻兽承伤顺序为：幻兽A → 幻兽B → 玩家
+- [x] 幻兽血量降为0时自动解除合体状态
+- [x] 溢出伤害正确传递到下一级承伤目标
+- [x] 多段攻击中的幻兽承伤逻辑同步更新

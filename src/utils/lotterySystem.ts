@@ -18,6 +18,7 @@ import type {
 } from '../types';
 import {
   createEquipmentItem,
+  createFallbackItem,
   createItemFromTemplate,
   randomEquipmentType,
   randomMagicSoulLevel
@@ -324,13 +325,11 @@ function createLotteryItem(itemName: string): InventoryItem {
     return item;
   }
 
-  // 如果找不到模板，创建基础物品
-  return {
-    id: `lottery_item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+  // 使用统一的兜底物品创建函数
+  return createFallbackItem({
     name: itemName,
-    icon: '🎁',
-    quantity: 1,
     type: 'special',
+    icon: '🎁',
     rarity: 'epic',
     source: '抽奖获得',
     description: `抽奖获得的${itemName}`,
@@ -340,7 +339,7 @@ function createLotteryItem(itemName: string): InventoryItem {
     goldValue: 0,
     magicStoneValue: 0,
     imagePath: `./images/items/special/${itemName}.png`,
-  };
+  });
 }
 
 // ==================== 魔石检查和扣除函数 ====================

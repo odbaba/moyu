@@ -14,12 +14,14 @@ import {
   manJingYanQiu,
   yueGuangBaoHe,
   yueGuangBaoHeZengQiangBan,
+  zhanHunJingShi,
   zhanHunZhiXin,
 } from '../data/inventoryData';
 import type {
   EquipmentItem,
   EquipmentSlotType,
   InventoryItem,
+  SpecialItem,
 } from '../types';
 
 // ==================== ID生成函数 ====================
@@ -200,6 +202,7 @@ export const ITEM_TEMPLATES = {
   // 宝石类
   lingHunJingShi,
   lingHunWang,
+  zhanHunJingShi,
   zhanHunZhiXin,
 
   // 特殊道具类
@@ -266,4 +269,117 @@ export function randomGemSlots(quality: number): number {
     // 普通装备：10%概率有宝石孔
     return Math.random() < 0.1 ? 1 : 0;
   }
+}
+
+// ==================== 矿石工厂函数 ====================
+
+/**
+ * 创建银矿物品
+ * 从 inventoryData.ts 迁移，统一由 itemFactory 管理
+ *
+ * @param quality 矿石品质（1-10）
+ * @returns 银矿 SpecialItem
+ */
+export function createSilverOreItem(quality: number): SpecialItem {
+  return {
+    id: `silver-ore-${quality}`,
+    name: `银矿（品质${quality}）`,
+    icon: '🥈',
+    quantity: 0,
+    type: 'special',
+    rarity: quality >= 7 ? 'rare' : quality >= 4 ? 'uncommon' : 'common',
+    source: '雷鸣矿洞挖矿获得',
+    description: '含有银的矿石，卖给[卡萨诺城]的[杂货商]可以得到不少金币。',
+    maxStack: 999,
+    usable: false,
+    equippable: false,
+    specialType: 'ore',
+    effect: '出售换金币',
+    effectValue: quality * 10000,
+    quality: quality,
+    goldValue: quality * 10000,
+    magicStoneValue: 0,
+    imagePath: './images/items/special/yinkuang.png',
+  };
+}
+
+/**
+ * 创建金矿物品
+ * 从 inventoryData.ts 迁移，统一由 itemFactory 管理
+ *
+ * @param quality 矿石品质（1-10）
+ * @returns 金矿 SpecialItem
+ */
+export function createGoldOreItem(quality: number): SpecialItem {
+  return {
+    id: `gold-ore-${quality}`,
+    name: `金矿（品质${quality}）`,
+    icon: '🥇',
+    quantity: 0,
+    type: 'special',
+    rarity: quality >= 7 ? 'rare' : quality >= 4 ? 'uncommon' : 'common',
+    source: '雷鸣矿洞挖矿获得',
+    description: '含有金的矿石，可以卖不菲的价钱，[卡萨诺城]的[收藏家]正在高价收购。',
+    maxStack: 999,
+    usable: false,
+    equippable: false,
+    specialType: 'ore',
+    effect: '出售换魔石',
+    effectValue: quality * 10,
+    quality: quality,
+    goldValue: 0,
+    magicStoneValue: quality * 10,
+    imagePath: './images/items/special/jinkuang.png',
+  };
+}
+
+// ==================== 兜底物品创建函数 ====================
+
+/**
+ * 兜底物品创建配置
+ * 当物品模板不存在时使用此配置创建基础物品
+ */
+export interface FallbackItemConfig {
+  name: string;
+  type: InventoryItem['type'];
+  description?: string;
+  icon?: string;
+  source?: string;
+  quantity?: number;
+  rarity?: InventoryItem['rarity'];
+  goldValue?: number;
+  magicStoneValue?: number;
+  imagePath?: string;
+  maxStack?: number;
+  stackable?: boolean;
+  usable?: boolean;
+  equippable?: boolean;
+}
+
+/**
+ * 创建兜底物品
+ * 当物品模板不存在时，使用此函数创建基础物品实例
+ * 自动生成唯一ID，提供合理的默认值
+ *
+ * @param config 兜底物品配置
+ * @returns 合法的 InventoryItem 实例
+ */
+export function createFallbackItem(config: FallbackItemConfig): InventoryItem {
+  return {
+    id: generateItemId(config.type, config.name),
+    name: config.name,
+    icon: config.icon || '🎁',
+    quantity: config.quantity || 1,
+    type: config.type,
+    rarity: config.rarity || 'common',
+    source: config.source || '未知来源',
+    description: config.description || `${config.name}`,
+    maxStack: config.maxStack || 99,
+    usable: config.usable ?? false,
+    equippable: config.equippable ?? false,
+    goldValue: config.goldValue || 0,
+    magicStoneValue: config.magicStoneValue || 0,
+    imagePath: config.imagePath || `./images/items/${config.type}/${config.name}.png`,
+    ...(config.stackable !== undefined ? { stackable: config.stackable } : {}),
+  };
 }

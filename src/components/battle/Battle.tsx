@@ -7,7 +7,20 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
  * 1. 玩家与敌人的回合制战斗
  * 2. 幻兽系统支持（最多2只幻兽同时出战）
  * 3. 合体幻兽机制（幻兽合体后属性加成到玩家）
- * 4. 幻兽保留1血机制（集成人物幸运值和爱的力量技能）
+ * 4. 幻兽顺序承伤机制（策划文档1.2节）
+ * 5. 幻兽保留1血机制（集成人物幸运值和爱的力量技能）
+ *
+ * ========== 幻兽顺序承伤机制说明（策划文档1.2节） ==========
+ *
+ * 【承伤优先级】
+ * 合体状态下，所有来自怪物的伤害按以下优先级结算：
+ * 1. 第一优先级：合体幻兽A的生命值
+ * 2. 第二优先级：合体幻兽B的生命值
+ * 3. 第三优先级：玩家自身生命值
+ *
+ * 【溢出伤害传递】
+ * - 当幻兽生命值不足以承受全部伤害时，溢出伤害传递到下一级承伤目标
+ * - 当幻兽生命值降至0时，该幻兽自动解除合体状态（isMerged = false），不再提供属性加成
  *
  * ========== 幻兽保留1血机制说明 ==========
  *
@@ -19,7 +32,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
  *
  * 1. 幻兽保留1血
  *    - 幻兽血量保留为1，不会阵亡，继续存活
- *    - 幻兽保持合体状态，不会解除合体
+ *    - 幻兽解除合体状态（isMerged = false），不再提供属性加成
+ *    - 溢出伤害传递到下一级承伤目标（幻兽B或玩家）
  *
  * 2. 人物幸运值降低
  *    - 人物幸运值降低10点（确保不低于0）
@@ -33,11 +47,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
  * 4. 爱的力量触发效果
  *    - 人物幸运值增加（根据技能等级）
  *    - 幻兽满血复活（currentHp = maxHp）
+ *    - 幻兽保持合体状态（isMerged = true）
  *    - 战斗日志记录：技能描述消息
  *
  * 5. 爱的力量未触发效果
  *    - 幻兽保留1血继续存活
- *    - 幻兽保持合体状态
+ *    - 幻兽解除合体状态（isMerged = false），不再提供属性加成
+ *    - 溢出伤害传递到下一级承伤目标（幻兽B或玩家）
  *
  * 6. 人物幸运值为0时退出战斗
  *    - 当人物幸运值降为0时，自动退出战斗
@@ -49,6 +65,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
  * - 非合体幻兽受到致命伤害会直接阵亡
  * - 人物幸运值为0时自动退出战斗
  * - 幻兽保留1血后，下次受到伤害会再次触发保留1血机制
+ * - 爱的力量触发时，幻兽满血复活并保持合体状态，溢出伤害仍传递到下一级
  *
  * 【相关文件】
  * - 类型定义：src/types/index.ts（Pet接口、BattlePet接口）
@@ -589,9 +606,10 @@ const Battle: React.FC<BattleProps> = ({
    * 支持更新玩家角色或幻兽的生命值
    * 当幻兽血量降为0时，添加阵亡战斗日志
    *
-   * 合体幻兽伤害扣除逻辑：
-   * - 优先从幻兽血条扣除
-   * - 如果幻兽血量不足，将幻兽血量清零，溢出伤害消失，不再扣除主角血量
+   * 幻兽顺序承伤逻辑（策划文档1.2节）：
+   * - 合体状态下，伤害按优先级结算：幻兽A → 幻兽B → 玩家
+   * - 溢出伤害传递到下一级承伤目标
+   * - 当幻兽生命值降至0时，该幻兽自动解除合体状态（isMerged = false）
    *
    * @param result 攻击结果
    * @param attacker 攻击者
@@ -626,141 +644,147 @@ const Battle: React.FC<BattleProps> = ({
         );
       }
 
-      // ========== 合体幻兽伤害扣除逻辑 ==========
-      // 检查是否有合体幻兽
-      const mergedPet = newState.deployedPets.find(pet => pet.isMerged && pet.currentHp > 0);
+      // ========== 幻兽顺序承伤逻辑 ==========
+      // 合体状态下，伤害按优先级结算：幻兽A → 幻兽B → 玩家
+      // 溢出伤害传递到下一级承伤目标
+      // 获取所有合体且存活的幻兽，按顺序排列
+      const mergedPets = newState.deployedPets.filter(pet => pet.isMerged && pet.currentHp > 0);
 
-      if (mergedPet && result.defender.isPlayer) {
-        // 有合体幻兽，优先从幻兽血条扣除
-        const damage = result.damageResult.damage;
-        const newHp = mergedPet.currentHp - damage;
+      if (mergedPets.length > 0 && result.defender.isPlayer) {
+        // 有合体幻兽，按顺序扣除幻兽血量
+        let remainingDamage = result.damageResult.damage;
 
-        // 检查幻兽是否受到致命伤害（血量降为0或以下）
-        if (newHp <= 0) {
-          // ========== 幻兽保留1血机制 ==========
-          // 幻兽阵亡时不会解除合体状态，而是保留1的最低血量继续存活
-          // 但是降低人物10幸运值，同时判断是否触发爱的力量技能
+        for (const pet of mergedPets) {
+          if (remainingDamage <= 0) break;
 
-          // 1. 降低人物幸运值10点（确保不低于0）
-          newState.player.luck = Math.max(0, newState.player.luck - 10);
+          // 计算该幻兽实际承受的伤害（不超过幻兽当前血量）
+          const petDamage = Math.min(remainingDamage, pet.currentHp);
+          const newHp = pet.currentHp - petDamage;
 
-          // 2. 添加战斗日志：记录人物幸运值降低
-          const luckDownLogEntry: BattleLogEntry = {
-            id: generateLogId(),
-            round: newState.round,
-            actor: mergedPet.name,
-            actorId: mergedPet.id,
-            action: `${mergedPet.name} 受到致命伤害，人物幸运值降低10点！当前幸运值：${newState.player.luck}`,
-            actionType: 'damage',
-            damage: damage,
-            target: mergedPet.name,
-            targetId: mergedPet.id
-          };
-          newState.battleLogs = [...newState.battleLogs, luckDownLogEntry];
+          // 更新剩余伤害（溢出伤害传递到下一级承伤目标）
+          remainingDamage -= petDamage;
 
-          // 3. 检查是否触发"爱的力量"技能
-          const lovePowerResult = checkLovePower(playerSkills);
+          // 检查幻兽是否受到致命伤害（血量降为0或以下）
+          if (newHp <= 0) {
+            // ========== 幻兽保留1血机制 ==========
+            // 幻兽受到致命伤害时，保留1血并解除合体状态
+            // 同时降低人物幸运值，检查是否触发爱的力量
 
-          if (lovePowerResult.triggered) {
-            // 4. 触发爱的力量：人物幸运值+10或+20（根据技能等级），幻兽满血复活
-            newState.player.luck = newState.player.luck + lovePowerResult.luckBonus;
+            // 1. 降低人物幸运值10点（确保不低于0）
+            newState.player.luck = Math.max(0, newState.player.luck - 10);
 
-            // 幻兽满血复活
-            newState.deployedPets = newState.deployedPets.map(pet => {
-              if (pet.id === mergedPet.id) {
-                return {
-                  ...pet,
-                  currentHp: pet.maxHp
-                };
-              }
-
-              return pet;
-            });
-
-            // 添加战斗日志：记录爱的力量触发
-            const lovePowerLogEntry: BattleLogEntry = {
+            // 2. 添加战斗日志：记录人物幸运值降低
+            const luckDownLogEntry: BattleLogEntry = {
               id: generateLogId(),
               round: newState.round,
-              actor: mergedPet.name,
-              actorId: mergedPet.id,
-              action: lovePowerResult.message,
-              actionType: 'skill',
-              damage: 0,
-              target: mergedPet.name,
-              targetId: mergedPet.id
+              actor: pet.name,
+              actorId: pet.id,
+              action: `${pet.name} 受到致命伤害，人物幸运值降低10点！当前幸运值：${newState.player.luck}`,
+              actionType: 'damage',
+              damage: petDamage,
+              target: pet.name,
+              targetId: pet.id
             };
-            newState.battleLogs = [...newState.battleLogs, lovePowerLogEntry];
-          } else {
-            // 5. 未触发爱的力量：幻兽保留1血继续存活
-            newState.deployedPets = newState.deployedPets.map(pet => {
-              if (pet.id === mergedPet.id) {
-                return {
-                  ...pet,
-                  currentHp: 1
-                };
-              }
+            newState.battleLogs = [...newState.battleLogs, luckDownLogEntry];
 
-              return pet;
-            });
-          }
+            // 3. 检查是否触发"爱的力量"技能
+            const lovePowerResult = checkLovePower(playerSkills);
 
-          // 6. 检查人物幸运值是否为0，如果为0则自动退出战斗
-          if (newState.player.luck === 0) {
-            // 添加战斗日志：记录人物幸运值耗尽
-            const luckExhaustedLogEntry: BattleLogEntry = {
-              id: generateLogId(),
-              round: newState.round,
-              actor: newState.player.name,
-              actorId: newState.player.id,
-              action: `${newState.player.name} 幸运值耗尽，自动退出战斗！`,
-              actionType: 'death',
-              damage: 0,
-              target: newState.player.name,
-              targetId: newState.player.id
-            };
-            newState.battleLogs = [...newState.battleLogs, luckExhaustedLogEntry];
+            if (lovePowerResult.triggered) {
+              // 4. 触发爱的力量：人物幸运值+10或+20（根据技能等级），幻兽满血复活
+              newState.player.luck = newState.player.luck + lovePowerResult.luckBonus;
 
-            // 设置战斗结果为敌方胜利
-            newState.battleResult = 'enemy_win';
-          }
-        } else {
-          // 幻兽血量足够，正常扣除幻兽血量
-          newState.deployedPets = newState.deployedPets.map(pet => {
-            if (pet.id === mergedPet.id) {
-              return {
-                ...pet,
-                currentHp: newHp
+              // 幻兽满血复活，保持合体状态
+              newState.deployedPets = newState.deployedPets.map(p => {
+                if (p.id === pet.id) {
+                  return { ...p, currentHp: p.maxHp };
+                }
+                return p;
+              });
+
+              // 添加战斗日志：记录爱的力量触发
+              const lovePowerLogEntry: BattleLogEntry = {
+                id: generateLogId(),
+                round: newState.round,
+                actor: pet.name,
+                actorId: pet.id,
+                action: lovePowerResult.message,
+                actionType: 'skill',
+                damage: 0,
+                target: pet.name,
+                targetId: pet.id
               };
+              newState.battleLogs = [...newState.battleLogs, lovePowerLogEntry];
+            } else {
+              // 5. 未触发爱的力量：幻兽保留1血，解除合体状态
+              newState.deployedPets = newState.deployedPets.map(p => {
+                if (p.id === pet.id) {
+                  return { ...p, currentHp: 1, isMerged: false };
+                }
+                return p;
+              });
             }
 
-            return pet;
-          });
-        }
-      } else {
-        // 没有合体幻兽，直接扣除主角血量
-        if (result.defender.isPlayer) {
-          newState.player = result.defender;
-        } else {
-          // 防御者是敌人，更新敌人列表
-          newState.enemies = newState.enemies.map(enemy =>
-            enemy.id === result.defender.id ? result.defender : enemy
-          );
+            // 6. 检查人物幸运值是否为0，如果为0则自动退出战斗
+            if (newState.player.luck === 0) {
+              // 添加战斗日志：记录人物幸运值耗尽
+              const luckExhaustedLogEntry: BattleLogEntry = {
+                id: generateLogId(),
+                round: newState.round,
+                actor: newState.player.name,
+                actorId: newState.player.id,
+                action: `${newState.player.name} 幸运值耗尽，自动退出战斗！`,
+                actionType: 'death',
+                damage: 0,
+                target: newState.player.name,
+                targetId: newState.player.id
+              };
+              newState.battleLogs = [...newState.battleLogs, luckExhaustedLogEntry];
 
-          // 检查敌人是否阵亡，添加阵亡日志
-          if (result.defender.currentHp <= 0) {
-            const deathLogEntry: BattleLogEntry = {
-              id: generateLogId(),
-              round: newState.round,
-              actor: result.defender.name,
-              actorId: result.defender.id,
-              action: `${result.defender.name} 阵亡了！`,
-              actionType: 'death',
-              damage: 0,
-              target: result.defender.name,
-              targetId: result.defender.id
-            };
-            newState.battleLogs = [...newState.battleLogs, deathLogEntry];
+              // 设置战斗结果为敌方胜利
+              newState.battleResult = 'enemy_win';
+            }
+          } else {
+            // 幻兽血量足够，正常扣除幻兽血量
+            newState.deployedPets = newState.deployedPets.map(p => {
+              if (p.id === pet.id) {
+                return { ...p, currentHp: newHp };
+              }
+              return p;
+            });
           }
+        }
+
+        // 如果还有剩余伤害（溢出所有幻兽后），扣除玩家血量
+        if (remainingDamage > 0) {
+          newState.player = {
+            ...newState.player,
+            currentHp: Math.max(0, newState.player.currentHp - remainingDamage)
+          };
+        }
+      } else if (result.defender.isPlayer) {
+        // 没有合体幻兽，直接扣除主角血量
+        newState.player = result.defender;
+      } else {
+        // 防御者是敌人，更新敌人列表
+        newState.enemies = newState.enemies.map(enemy =>
+          enemy.id === result.defender.id ? result.defender : enemy
+        );
+
+        // 检查敌人是否阵亡，添加阵亡日志
+        if (result.defender.currentHp <= 0) {
+          const deathLogEntry: BattleLogEntry = {
+            id: generateLogId(),
+            round: newState.round,
+            actor: result.defender.name,
+            actorId: result.defender.id,
+            action: `${result.defender.name} 阵亡了！`,
+            actionType: 'death',
+            damage: 0,
+            target: result.defender.name,
+            targetId: result.defender.id
+          };
+          newState.battleLogs = [...newState.battleLogs, deathLogEntry];
         }
       }
 
@@ -951,118 +975,126 @@ const Battle: React.FC<BattleProps> = ({
               action: `使用 ${skill.name} 第 ${index + 1} 击攻击 ${currentDefender.name}`
             } : result.logEntries[index];
 
-            // ========== 合体幻兽伤害扣除逻辑（多段攻击） ==========
-            // 检查是否有合体幻兽
-            const mergedPetForMulti = newState.deployedPets.find(pet => pet.isMerged && pet.currentHp > 0);
+            // ========== 幻兽顺序承伤逻辑（多段攻击） ==========
+            // 合体状态下，伤害按优先级结算：幻兽A → 幻兽B → 玩家
+            // 溢出伤害传递到下一级承伤目标
+            // 获取所有合体且存活的幻兽，按顺序排列
+            const mergedPetsForMulti = newState.deployedPets.filter(pet => pet.isMerged && pet.currentHp > 0);
 
             // 更新防御者
             if (currentDefender.isPlayer) {
               // 玩家受到伤害，检查是否有合体幻兽
-              if (mergedPetForMulti) {
-                // 有合体幻兽，优先从幻兽血条扣除
-                const damage = damageResult.damage;
-                const newHp = mergedPetForMulti.currentHp - damage;
+              if (mergedPetsForMulti.length > 0) {
+                // 有合体幻兽，按顺序扣除幻兽血量
+                let remainingDamage = damageResult.damage;
 
-                // 检查幻兽是否受到致命伤害（血量降为0或以下）
-                if (newHp <= 0) {
-                  // ========== 幻兽保留1血机制（多段攻击） ==========
-                  // 幻兽阵亡时不会解除合体状态，而是保留1的最低血量继续存活
-                  // 但是降低人物10幸运值，同时判断是否触发爱的力量技能
+                for (const pet of mergedPetsForMulti) {
+                  if (remainingDamage <= 0) break;
 
-                  // 1. 降低人物幸运值10点（确保不低于0）
-                  newState.player.luck = Math.max(0, newState.player.luck - 10);
+                  // 计算该幻兽实际承受的伤害（不超过幻兽当前血量）
+                  const petDamage = Math.min(remainingDamage, pet.currentHp);
+                  const newHp = pet.currentHp - petDamage;
 
-                  // 2. 添加战斗日志：记录人物幸运值降低
-                  const luckDownLogEntry: BattleLogEntry = {
-                    id: generateLogId(),
-                    round: newState.round,
-                    actor: mergedPetForMulti.name,
-                    actorId: mergedPetForMulti.id,
-                    action: `${mergedPetForMulti.name} 受到致命伤害，人物幸运值降低10点！当前幸运值：${newState.player.luck}`,
-                    actionType: 'damage',
-                    damage: damage,
-                    target: mergedPetForMulti.name,
-                    targetId: mergedPetForMulti.id
-                  };
-                  newState.battleLogs = [...newState.battleLogs, luckDownLogEntry];
+                  // 更新剩余伤害（溢出伤害传递到下一级承伤目标）
+                  remainingDamage -= petDamage;
 
-                  // 3. 检查是否触发"爱的力量"技能
-                  const lovePowerResult = checkLovePower(playerSkills);
+                  // 检查幻兽是否受到致命伤害（血量降为0或以下）
+                  if (newHp <= 0) {
+                    // ========== 幻兽保留1血机制（多段攻击） ==========
+                    // 幻兽受到致命伤害时，保留1血并解除合体状态
+                    // 同时降低人物幸运值，检查是否触发爱的力量
 
-                  if (lovePowerResult.triggered) {
-                    // 4. 触发爱的力量：人物幸运值+10或+20（根据技能等级），幻兽满血复活
-                    newState.player.luck = newState.player.luck + lovePowerResult.luckBonus;
+                    // 1. 降低人物幸运值10点（确保不低于0）
+                    newState.player.luck = Math.max(0, newState.player.luck - 10);
 
-                    // 幻兽满血复活
-                    newState.deployedPets = newState.deployedPets.map(pet => {
-                      if (pet.id === mergedPetForMulti.id) {
-                        return {
-                          ...pet,
-                          currentHp: pet.maxHp
-                        };
-                      }
-
-                      return pet;
-                    });
-
-                    // 添加战斗日志：记录爱的力量触发
-                    const lovePowerLogEntry: BattleLogEntry = {
+                    // 2. 添加战斗日志：记录人物幸运值降低
+                    const luckDownLogEntry: BattleLogEntry = {
                       id: generateLogId(),
                       round: newState.round,
-                      actor: mergedPetForMulti.name,
-                      actorId: mergedPetForMulti.id,
-                      action: lovePowerResult.message,
-                      actionType: 'skill',
-                      damage: 0,
-                      target: mergedPetForMulti.name,
-                      targetId: mergedPetForMulti.id
+                      actor: pet.name,
+                      actorId: pet.id,
+                      action: `${pet.name} 受到致命伤害，人物幸运值降低10点！当前幸运值：${newState.player.luck}`,
+                      actionType: 'damage',
+                      damage: petDamage,
+                      target: pet.name,
+                      targetId: pet.id
                     };
-                    newState.battleLogs = [...newState.battleLogs, lovePowerLogEntry];
-                  } else {
-                    // 5. 未触发爱的力量：幻兽保留1血继续存活
-                    newState.deployedPets = newState.deployedPets.map(pet => {
-                      if (pet.id === mergedPetForMulti.id) {
-                        return {
-                          ...pet,
-                          currentHp: 1
-                        };
-                      }
+                    newState.battleLogs = [...newState.battleLogs, luckDownLogEntry];
 
-                      return pet;
-                    });
-                  }
+                    // 3. 检查是否触发"爱的力量"技能
+                    const lovePowerResult = checkLovePower(playerSkills);
 
-                  // 6. 检查人物幸运值是否为0，如果为0则自动退出战斗
-                  if (newState.player.luck === 0) {
-                    // 添加战斗日志：记录人物幸运值耗尽
-                    const luckExhaustedLogEntry: BattleLogEntry = {
-                      id: generateLogId(),
-                      round: newState.round,
-                      actor: newState.player.name,
-                      actorId: newState.player.id,
-                      action: `${newState.player.name} 幸运值耗尽，自动退出战斗！`,
-                      actionType: 'death',
-                      damage: 0,
-                      target: newState.player.name,
-                      targetId: newState.player.id
-                    };
-                    newState.battleLogs = [...newState.battleLogs, luckExhaustedLogEntry];
+                    if (lovePowerResult.triggered) {
+                      // 4. 触发爱的力量：人物幸运值+10或+20（根据技能等级），幻兽满血复活
+                      newState.player.luck = newState.player.luck + lovePowerResult.luckBonus;
 
-                    // 设置战斗结果为敌方胜利
-                    newState.battleResult = 'enemy_win';
-                  }
-                } else {
-                  // 幻兽血量足够，正常扣除幻兽血量
-                  newState.deployedPets = newState.deployedPets.map(pet => {
-                    if (pet.id === mergedPetForMulti.id) {
-                      return {
-                        ...pet,
-                        currentHp: newHp
+                      // 幻兽满血复活，保持合体状态
+                      newState.deployedPets = newState.deployedPets.map(p => {
+                        if (p.id === pet.id) {
+                          return { ...p, currentHp: p.maxHp };
+                        }
+                        return p;
+                      });
+
+                      // 添加战斗日志：记录爱的力量触发
+                      const lovePowerLogEntry: BattleLogEntry = {
+                        id: generateLogId(),
+                        round: newState.round,
+                        actor: pet.name,
+                        actorId: pet.id,
+                        action: lovePowerResult.message,
+                        actionType: 'skill',
+                        damage: 0,
+                        target: pet.name,
+                        targetId: pet.id
                       };
+                      newState.battleLogs = [...newState.battleLogs, lovePowerLogEntry];
+                    } else {
+                      // 5. 未触发爱的力量：幻兽保留1血，解除合体状态
+                      newState.deployedPets = newState.deployedPets.map(p => {
+                        if (p.id === pet.id) {
+                          return { ...p, currentHp: 1, isMerged: false };
+                        }
+                        return p;
+                      });
                     }
 
-                    return pet;
-                  });
+                    // 6. 检查人物幸运值是否为0，如果为0则自动退出战斗
+                    if (newState.player.luck === 0) {
+                      // 添加战斗日志：记录人物幸运值耗尽
+                      const luckExhaustedLogEntry: BattleLogEntry = {
+                        id: generateLogId(),
+                        round: newState.round,
+                        actor: newState.player.name,
+                        actorId: newState.player.id,
+                        action: `${newState.player.name} 幸运值耗尽，自动退出战斗！`,
+                        actionType: 'death',
+                        damage: 0,
+                        target: newState.player.name,
+                        targetId: newState.player.id
+                      };
+                      newState.battleLogs = [...newState.battleLogs, luckExhaustedLogEntry];
+
+                      // 设置战斗结果为敌方胜利
+                      newState.battleResult = 'enemy_win';
+                    }
+                  } else {
+                    // 幻兽血量足够，正常扣除幻兽血量
+                    newState.deployedPets = newState.deployedPets.map(p => {
+                      if (p.id === pet.id) {
+                        return { ...p, currentHp: newHp };
+                      }
+                      return p;
+                    });
+                  }
+                }
+
+                // 如果还有剩余伤害（溢出所有幻兽后），扣除玩家血量
+                if (remainingDamage > 0) {
+                  newState.player = {
+                    ...newState.player,
+                    currentHp: Math.max(0, newState.player.currentHp - remainingDamage)
+                  };
                 }
               } else {
                 // 没有合体幻兽，直接扣除玩家血量

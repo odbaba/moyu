@@ -282,29 +282,8 @@ function getWarSoulItemTemplate(itemType: WarSoulItemType): GemItem | null {
     case 'zhanHunZhiXin':
       return ITEM_TEMPLATES.zhanHunZhiXin;
     case 'zhanHunJingShi':
-      // 战魂晶石需要从 inventoryData 导入
-      // 由于 ITEM_TEMPLATES 中没有导出战魂晶石，需要特殊处理
-      return {
-        id: 'gem_zhanhunjingshi',
-        name: '战魂晶石',
-        icon: '⚔️',
-        quantity: 1,
-        type: 'gem',
-        rarity: 'legendary',
-        source: 'BOSS掉落',
-        description: '蕴含战魂之力的宝石。用于激活装备战魂属性，成功率20%。注意：已有战魂会改变种类并降为1级。',
-        maxStack: 20,
-        usable: false,
-        equippable: false,
-        gemType: 'enhance',
-        gemSubType: 'soul',
-        effect: '激活战魂属性',
-        successRate: '20%',
-        refineType: 'soul',
-        goldValue: 28000000,
-        magicStoneValue: 2800,
-        imagePath: './images/items/gem/zhanhunjingshi.png',
-      };
+      // 使用统一的物品模板获取战魂晶石
+      return ITEM_TEMPLATES.zhanHunJingShi;
     default:
       return null;
   }

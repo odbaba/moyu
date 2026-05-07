@@ -108,6 +108,8 @@ export function characterToBattleCharacter(
     defense: totalAttributes.defense, // 使用总防御力（包含装备、幻兽加成）
     combatPower: 0, // 先设为0，后面计算
     dodgeRate: totalAttributes.dodgeRate, // 使用总闪避率（包含地魂战魂加成）
+    criticalRate: characterData.criticalRate, // 直接使用角色暴击率属性
+    criticalDamageRate: characterData.criticalDamageRate, // 直接使用角色暴击伤害率属性
     luck: characterData.luck,
     skills: battleSkills,
     buffs: [], // 初始无增益效果
@@ -228,6 +230,8 @@ export function createEnemyFromEnemyData(
     defense: enemyData.defense,
     combatPower: calculateCombatPowerFromEnemyData(enemyData),
     dodgeRate: 0, // 敌人默认无闪避
+    criticalRate: 0, // 敌人默认无暴击率（暴击率由怪物模板单独配置，当前暂设为0）
+    criticalDamageRate: 150, // 敌人默认暴击伤害率150%
     luck: 0, // 敌人默认无幸运
     skills: [defaultSkill], // 为敌人添加默认普通攻击技能
     buffs: [], // 初始无增益效果

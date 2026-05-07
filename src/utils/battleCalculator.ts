@@ -2,33 +2,42 @@ import type { BattleCharacter, BattleLogEntry, BattleSkill, Buff, BuffType, Dama
 
 /**
  * 计算战斗力修正系数
- * 根据攻击者和防御者的战斗力差距计算伤害修正
+ * 根据攻击者和防御者的战斗力差距，通过分段查表获取伤害倍率
  * @param attackerCombatPower 攻击者战斗力
  * @param defenderCombatPower 防御者战斗力
- * @returns 修正系数（1.0 表示无修正，范围 0.5-2.0）
+ * @returns 伤害倍率（1.0 表示无修正，范围 0.40-1.50）
  */
 export function calculateCombatPowerModifier(
   attackerCombatPower: number,
   defenderCombatPower: number
 ): number {
-  // 如果攻击者战斗力高
-  if (attackerCombatPower > defenderCombatPower) {
-    const gap = attackerCombatPower - defenderCombatPower;
+  // 计算战斗力差值
+  const diff = attackerCombatPower - defenderCombatPower;
 
-    // 修正 = 1 + Math.min(差距, 20) * 0.05（最多 +100%，即系数 2.0）
-    return 1 + Math.min(gap, 20) * 0.05;
-  }
+  // 分段查表：返回攻击者对防御者的伤害倍率
+  if (diff >= 100) return 1.50;
+  if (diff >= 80) return 1.40;
+  if (diff >= 60) return 1.28;
+  if (diff >= 40) return 1.16;
+  if (diff >= 20) return 1.08;
+  if (diff >= 1) return 1.03;
+  if (diff === 0) return 1.00;
+  if (diff >= -19) return 0.97;
+  if (diff >= -39) return 0.92;
+  if (diff >= -59) return 0.84;
+  if (diff >= -79) return 0.72;
+  if (diff >= -99) return 0.60;
+  return 0.40; // diff <= -100
+}
 
-  // 如果防御者战斗力高
-  if (defenderCombatPower > attackerCombatPower) {
-    const gap = defenderCombatPower - attackerCombatPower;
-
-    // 修正 = 1 - Math.min(差距, 50) * 0.01（最多 -50%，即系数 0.5）
-    return 1 - Math.min(gap, 50) * 0.01;
-  }
-
-  // 如果相等，修正 = 1.0
-  return 1.0;
+/**
+ * 计算防御减伤常数K
+ * K = 200 + 10 × 攻击方等级
+ * @param attackerLevel 攻击方等级
+ * @returns 防御减伤常数K
+ */
+export function calculateKValue(attackerLevel: number): number {
+  return 200 + 10 * attackerLevel;
 }
 
 /**
@@ -59,29 +68,32 @@ export function calculateBaseDamage(attackMin: number, attackMax: number): numbe
 
 /**
  * 检查是否暴击
- * 根据幸运值判断是否暴击
- *
- * 【幸运值影响暴击率】
- * - 暴击率 = 幸运值 / 100，最大50%
- * - 幸运值越高，暴击率越高
- * - 人物幸运值范围：0-100，初始值100
- *
- * @param luck 幸运值（人物幸运值）
+ * 使用暴击率属性判定，不再依赖幸运值
+ * @param criticalRate 暴击率（百分比，如5.0表示5%）
  * @returns 是否暴击
  */
-export function checkCritical(luck: number): boolean {
-  // 基础暴击率 = 幸运值 / 100，最大 50%
-  const criticalRate = Math.min(luck / 100, 50);
-  // 生成 0-99 的随机数
-  const random = Math.floor(Math.random() * 100);
-
+export function checkCritical(criticalRate: number): boolean {
+  // 生成 0-99.99 的随机数
+  const random = Math.random() * 100;
   // 如果随机数 < 暴击率，返回 true（暴击成功）
   return random < criticalRate;
 }
 
 /**
  * 计算最终伤害
- * 综合考虑闪避、暴击、战斗力修正、防御力等因素计算最终伤害
+ * 综合考虑闪避、防御减伤、暴击、战斗力修正、技能倍率、破防等因素计算最终伤害
+ *
+ * 结算顺序：
+ * 1. 闪避判定
+ * 2. 计算基础伤害（攻击力在min~max随机取值）
+ * 3. 应用防御减伤公式：基础伤害 = 攻击力 × K/(K+防御)
+ * 4. 暴击判定，暴击时伤害 × (criticalDamageRate/100)
+ * 5. 应用战斗力修正
+ * 6. 应用技能倍率
+ * 7. 破防时额外增加伤害倍率（×1.5）
+ * 8. 应用伤害浮动（99%~101%）
+ * 9. 最小伤害保底为1
+ *
  * @param attacker 攻击者战斗角色数据
  * @param defender 防御者战斗角色数据
  * @param skill 使用的战斗技能
@@ -94,55 +106,60 @@ export function calculateDamage(
   skill: BattleSkill,
   isBreakDefense: boolean
 ): DamageResult {
-  // 1. 检查闪避
+  // 1. 闪避判定
   const isDodged = checkDodge(defender.dodgeRate);
-
-  // 2. 如果闪避成功，返回伤害为0
   if (isDodged) {
     return {
       damage: 0,
       isDodged: true,
       isBreakDefense: false,
       combatPowerModifier: 1,
-      isCritical: false
+      isCritical: false,
+      criticalDamageRate: 0
     };
   }
 
-  // 3. 检查暴击
-  const isCritical = checkCritical(attacker.luck);
+  // 2. 计算基础伤害（攻击力在min~max随机取值）
+  const baseAttack = calculateBaseDamage(attacker.attackMin, attacker.attackMax);
 
-  // 4. 计算基础伤害
-  let damage = calculateBaseDamage(attacker.attackMin, attacker.attackMax);
+  // 3. 应用防御减伤公式：基础伤害 = 攻击力 × K/(K+防御)
+  const K = calculateKValue(attacker.level);
+  const defenseReduction = K / (K + defender.defense); // 贯穿比
+  let damage = baseAttack * defenseReduction;
 
-  // 5. 应用技能倍率：baseDamage * (skill.damagePercent / 100)
-  damage = damage * (skill.damagePercent / 100);
-
-  // 6. 如果暴击，伤害翻倍
+  // 4. 暴击判定，暴击时伤害 × (criticalDamageRate/100)
+  const isCritical = checkCritical(attacker.criticalRate);
+  const criticalDamageRate = attacker.criticalDamageRate;
   if (isCritical) {
-    damage = damage * 2;
+    damage = damage * (criticalDamageRate / 100);
   }
 
-  // 7. 计算战斗力修正
+  // 5. 应用战斗力修正
   const combatPowerModifier = calculateCombatPowerModifier(attacker.combatPower, defender.combatPower);
-
-  // 8. 应用战斗力修正：damage * combatPowerModifier
   damage = damage * combatPowerModifier;
 
-  // 9. 如果不是破防攻击，减去防御力：damage - defender.defense
-  if (!isBreakDefense) {
-    damage = damage - defender.defense;
+  // 6. 应用技能倍率
+  damage = damage * (skill.damagePercent / 100);
+
+  // 7. 破防时额外增加伤害倍率（×1.5）
+  if (isBreakDefense) {
+    damage = damage * 1.5;
   }
 
-  // 10. 最小伤害为 1
+  // 8. 应用伤害浮动（99%~101%）
+  const floatMultiplier = 0.99 + Math.random() * 0.02;
+  damage = damage * floatMultiplier;
+
+  // 9. 最小伤害保底为1
   damage = Math.max(1, Math.floor(damage));
 
-  // 11. 返回结果
   return {
     damage,
     isDodged: false,
     isBreakDefense,
     combatPowerModifier,
-    isCritical
+    isCritical,
+    criticalDamageRate: isCritical ? criticalDamageRate : 0
   };
 }
 

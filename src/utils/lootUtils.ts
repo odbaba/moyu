@@ -6,7 +6,7 @@
 
 
 import {
-  createEquipment,
+  // 移除 createEquipment，改用 itemFactory 中的 createEquipmentItem 统一接口
   douZhiYiYang,
   EQUIPMENT_LEVELS,
   feiTianLianZhan,
@@ -23,7 +23,8 @@ import {
   yueGuangBaoHeZengQiangBan,
 } from '../data/inventoryData';
 import type { EquipmentItem, InventoryItem } from '../types';
-import { cloneItem, generateItemId } from './itemFactory';
+// 移除 generateItemId，改用 createEquipmentItem 统一接口（内部自动生成ID）
+import { cloneItem, createEquipmentItem } from './itemFactory';
 
 /**
  * 战利品结果接口
@@ -223,14 +224,14 @@ function generateRandomEquipment(monsterLevel: number, dropRate: number, isBossL
   // 装备类型随机
   const equipmentType = EQUIPMENT_TYPES[Math.floor(Math.random() * EQUIPMENT_TYPES.length)];
 
-  // 使用 inventoryData.ts 中的 createEquipment 函数生成装备
-  const equipment = createEquipment(equipmentType, equipLevel, qualityNum, magicSoulLevel, holeCount);
-
-  // 为战利品生成唯一ID（使用统一的ID生成函数）
-  return {
-    ...equipment,
-    id: generateItemId('loot', `${equipmentType}_${equipLevel}_${qualityNum}`),
-  };
+  // 使用统一的装备创建接口（内部自动生成ID和完整装备数据）
+  return createEquipmentItem({
+    equipmentType,
+    level: equipLevel,
+    quality: qualityNum,
+    magicSoulLevel,
+    gemSlots: holeCount,
+  });
 }
 
 /**

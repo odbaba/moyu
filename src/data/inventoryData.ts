@@ -4,6 +4,8 @@
  * 物品分为五大类：装备类、消耗品类、技能书类、宝石类、特殊道具类
  */
 
+import { createSilverOreItem, createGoldOreItem, cloneItem } from '../utils/itemFactory';
+
 import type {
   EquipmentItem,
   GemItem,
@@ -916,7 +918,8 @@ const huanMoZhiXin: GemItem = {
 /**
  * 战魂晶石 - 激活战魂属性，成功率20%
  */
-const zhanHunJingShi: GemItem = {
+// 导出战魂晶石，供 itemFactory.ts 等模块引用
+export const zhanHunJingShi: GemItem = {
   id: 'gem_zhanhunjingshi',
   name: '战魂晶石',
   icon: '⚔️',
@@ -1328,79 +1331,31 @@ const chuanSongJuanZhou: InventoryItem = {
   imagePath: './images/items/skillbook/xingmojian.png',
 };
 
-// ==================== 生成银矿物品（品质1-10）====================
+// 银矿和金矿的生成函数已迁移至 itemFactory.ts（createSilverOreItem / createGoldOreItem）
 
-const createSilverOre = (quality: number): SpecialItem => {
-  return {
-    id: `silver-ore-${quality}`,
-    name: `银矿（品质${quality}）`,
-    icon: '🥈',
-    quantity: 0,
-    type: 'special',
-    rarity: quality >= 7 ? 'rare' : quality >= 4 ? 'uncommon' : 'common',
-    source: '雷鸣矿洞挖矿获得',
-    description: '含有银的矿石，卖给[卡萨诺城]的[杂货商]可以得到不少金币。',
-    maxStack: 999,
-    usable: false,
-    equippable: false,
-    specialType: 'ore',
-    effect: '出售换金币',
-    effectValue: quality * 10000,
-    quality: quality,
-    goldValue: quality * 10000,
-    magicStoneValue: 0,
-    imagePath: './images/items/special/yinkuang.png',
-  };
-};
+// 银矿（品质1-10）- 使用 itemFactory 的 createSilverOreItem 生成
+const silverOre1 = createSilverOreItem(1);
+const silverOre2 = createSilverOreItem(2);
+const silverOre3 = createSilverOreItem(3);
+const silverOre4 = createSilverOreItem(4);
+const silverOre5 = createSilverOreItem(5);
+const silverOre6 = createSilverOreItem(6);
+const silverOre7 = createSilverOreItem(7);
+const silverOre8 = createSilverOreItem(8);
+const silverOre9 = createSilverOreItem(9);
+const silverOre10 = createSilverOreItem(10);
 
-// ==================== 生成金矿物品（品质1-10）====================
-
-const createGoldOre = (quality: number): SpecialItem => {
-  return {
-    id: `gold-ore-${quality}`,
-    name: `金矿（品质${quality}）`,
-    icon: '🥇',
-    quantity: 0,
-    type: 'special',
-    rarity: quality >= 7 ? 'rare' : quality >= 4 ? 'uncommon' : 'common',
-    source: '雷鸣矿洞挖矿获得',
-    description: '含有金的矿石，可以卖不菲的价钱，[卡萨诺城]的[收藏家]正在高价收购。',
-    maxStack: 999,
-    usable: false,
-    equippable: false,
-    specialType: 'ore',
-    effect: '出售换魔石',
-    effectValue: quality * 10,
-    quality: quality,
-    goldValue: 0,
-    magicStoneValue: quality * 10,
-    imagePath: './images/items/special/jinkuang.png',
-  };
-};
-
-// 银矿（品质1-10）
-const silverOre1 = createSilverOre(1);
-const silverOre2 = createSilverOre(2);
-const silverOre3 = createSilverOre(3);
-const silverOre4 = createSilverOre(4);
-const silverOre5 = createSilverOre(5);
-const silverOre6 = createSilverOre(6);
-const silverOre7 = createSilverOre(7);
-const silverOre8 = createSilverOre(8);
-const silverOre9 = createSilverOre(9);
-const silverOre10 = createSilverOre(10);
-
-// 金矿（品质1-10）
-const goldOre1 = createGoldOre(1);
-const goldOre2 = createGoldOre(2);
-const goldOre3 = createGoldOre(3);
-const goldOre4 = createGoldOre(4);
-const goldOre5 = createGoldOre(5);
-const goldOre6 = createGoldOre(6);
-const goldOre7 = createGoldOre(7);
-const goldOre8 = createGoldOre(8);
-const goldOre9 = createGoldOre(9);
-const goldOre10 = createGoldOre(10);
+// 金矿（品质1-10）- 使用 itemFactory 的 createGoldOreItem 生成
+const goldOre1 = createGoldOreItem(1);
+const goldOre2 = createGoldOreItem(2);
+const goldOre3 = createGoldOreItem(3);
+const goldOre4 = createGoldOreItem(4);
+const goldOre5 = createGoldOreItem(5);
+const goldOre6 = createGoldOreItem(6);
+const goldOre7 = createGoldOreItem(7);
+const goldOre8 = createGoldOreItem(8);
+const goldOre9 = createGoldOreItem(9);
+const goldOre10 = createGoldOreItem(10);
 
 // ==================== 物品数据集合 ====================
 
@@ -1560,12 +1515,12 @@ export function createInitialEquipment(): InventoryItem[] {
     createEquipment('bracelet', 1, 0, 0, 0),
     // 项链：普通品、魔魂+0
     createEquipment('necklace', 1, 0, 0, 0),
-    // 灵魂晶石 × 1
-    { ...lingHunJingShi, quantity: 1 },
-    // 魔魂晶石 × 1
-    { ...moHunJingShi, quantity: 1 },
-    // 幻魔晶石 × 1
-    { ...huanMoJingShi, quantity: 1 },
+    // 灵魂晶石 × 1（使用 cloneItem 避免引用共享）
+    { ...cloneItem(lingHunJingShi), quantity: 1 },
+    // 魔魂晶石 × 1（使用 cloneItem 避免引用共享）
+    { ...cloneItem(moHunJingShi), quantity: 1 },
+    // 幻魔晶石 × 1（使用 cloneItem 避免引用共享）
+    { ...cloneItem(huanMoJingShi), quantity: 1 },
   ];
 }
 
