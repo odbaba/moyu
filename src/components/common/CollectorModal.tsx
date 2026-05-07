@@ -9,6 +9,7 @@ import {
   calculatePurchasePrice,
   formatMagicStoneValue
 } from '../../utils/itemValueCalculator';
+import { addItemToInventory } from '../../utils/itemFactory';
 import { getEquipmentQualityColor, isEquipmentItem } from '../common/utils';
 
 /**
@@ -172,37 +173,26 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
 
   /**
    * 将收藏架中所有物品放回背包
+   * 使用addItemToInventory函数处理堆叠逻辑，确保不可堆叠物品（如装备）不会错误堆叠
    */
   const returnAllItemsToInventory = () => {
     let newInventory = [...inventoryItems];
     
+    // 遍历收藏架中的所有物品，使用addItemToInventory添加到背包
     collectorSlots.forEach(slot => {
       if (slot.item) {
         const item = slot.item;
-        const quantity = item.quantity || 1;
         
-        // 查找背包中是否有相同物品（可堆叠）
-        const existingItemIndex = newInventory.findIndex(i =>
-          i.name === item.name &&
-          i.type === item.type &&
-          i.rarity === item.rarity
-        );
+        // 恢复原始ID并创建物品副本
+        const itemToReturn: InventoryItem = {
+          ...item,
+          id: item.id.replace('_collector_', '_'), // 恢复原始ID
+          quantity: item.quantity || 1
+        };
         
-        if (existingItemIndex !== -1) {
-          // 如果背包中已有相同物品，增加数量
-          newInventory[existingItemIndex] = {
-            ...newInventory[existingItemIndex],
-            quantity: (newInventory[existingItemIndex].quantity || 1) + quantity
-          };
-        } else {
-          // 否则添加新物品
-          const itemToReturn: InventoryItem = {
-            ...item,
-            id: item.id.replace('_collector_', '_'), // 恢复原始ID
-            quantity: quantity
-          };
-          newInventory.push(itemToReturn);
-        }
+        // 使用addItemToInventory处理堆叠逻辑
+        // 该函数会根据stackable属性判断是否应该堆叠
+        newInventory = addItemToInventory(newInventory, itemToReturn);
       }
     });
     
@@ -345,41 +335,24 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
   /**
    * 处理收藏架格子点击
    * 点击收藏架物品，自动放回背包
+   * 使用addItemToInventory函数处理堆叠逻辑，确保不可堆叠物品（如装备）不会错误堆叠
    */
   const handleSlotClick = (index: number) => {
     const slot = collectorSlots[index];
     if (!slot.item) return;
 
     const item = slot.item;
-    const quantity = item.quantity || 1;
 
-    // 查找背包中是否有相同物品（可堆叠）
-    const existingItemIndex = inventoryItems.findIndex(i =>
-      i.name === item.name &&
-      i.type === item.type &&
-      i.rarity === item.rarity
-    );
+    // 恢复原始ID并创建物品副本
+    const itemToReturn: InventoryItem = {
+      ...item,
+      id: item.id.replace('_collector_', '_'), // 恢复原始ID
+      quantity: item.quantity || 1
+    };
 
-    let newInventory: InventoryItem[];
-
-    if (existingItemIndex !== -1) {
-      // 如果背包中已有相同物品，增加数量
-      newInventory = inventoryItems.map((i, idx) => {
-        if (idx === existingItemIndex) {
-          return { ...i, quantity: (i.quantity || 1) + quantity };
-        }
-
-        return i;
-      });
-    } else {
-      // 否则添加新物品
-      const itemToReturn: InventoryItem = {
-        ...item,
-        id: item.id.replace('_collector_', '_'), // 恢复原始ID
-        quantity: quantity
-      };
-      newInventory = [...inventoryItems, itemToReturn];
-    }
+    // 使用addItemToInventory处理堆叠逻辑
+    // 该函数会根据stackable属性判断是否应该堆叠
+    const newInventory = addItemToInventory(inventoryItems, itemToReturn);
 
     onUpdateInventory(newInventory);
 
@@ -388,7 +361,7 @@ const CollectorModal: React.FC<CollectorModalProps> = ({
     newSlots[index] = { index, item: null };
     setCollectorSlots(newSlots);
 
-    setMessage(`已将 ${item.name} x${quantity} 放回背包`);
+    setMessage(`已将 ${item.name} x${itemToReturn.quantity} 放回背包`);
     setTimeout(() => setMessage(''), 2000);
   };
 
