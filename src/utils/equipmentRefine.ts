@@ -904,6 +904,7 @@ export function removeGem(equipment: EquipmentItem, gemIndex: number): RefineRes
   return {
     success: true,
     message,
+    updatedEquipment: { ...equipment },
     attributeChanges: {
       removedGem: removedGemName,
       soulLevelChange: soulLevelChanged ? -(equipment.soulLevel || 1) + 1 : 0
