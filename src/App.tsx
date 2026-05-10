@@ -3872,10 +3872,13 @@ function App() {
 
   /**
    * 获取出战幻兽列表
-   * 筛选出 isDeployed 为 true 的幻兽
+   * 按照出战槽位顺序返回幻兽数组
+   * 槽位0（位置一）在前，槽位1（位置二）在后
+   * 过滤掉空槽位（null）
    */
   const getDeployedPets = (): Pet[] => {
-    return pets.filter(pet => pet.isDeployed);
+    // 按照槽位顺序返回幻兽，过滤掉空槽位
+    return deployedPetSlots.filter((slot): slot is Pet => slot !== null);
   };
 
   /**
